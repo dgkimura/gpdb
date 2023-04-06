@@ -33,11 +33,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLWindowSpec::CDXLWindowSpec(CMemoryPool *mp,
-							   ULongPtrArray *partition_by_colid_array,
-							   CMDName *mdname,
-							   gpos::Ref<CDXLNode> sort_col_list_dxlnode,
-							   gpos::Ref<CDXLWindowFrame> window_frame)
+CDXLWindowSpec::CDXLWindowSpec(
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> partition_by_colid_array,
+	CMDName *mdname, gpos::Ref<CDXLNode> sort_col_list_dxlnode,
+	gpos::Ref<CDXLWindowFrame> window_frame)
 	: m_mp(mp),
 	  m_partition_by_colid_array(partition_by_colid_array),
 	  m_mdname(mdname),
@@ -58,9 +57,6 @@ CDXLWindowSpec::CDXLWindowSpec(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLWindowSpec::~CDXLWindowSpec()
 {
-	m_partition_by_colid_array->Release();
-	SafeRelease(m_window_frame);
-	SafeRelease(m_sort_col_list_dxlnode);
 	GPOS_DELETE(m_mdname);
 }
 

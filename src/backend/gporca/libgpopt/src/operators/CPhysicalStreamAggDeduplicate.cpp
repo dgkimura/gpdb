@@ -28,10 +28,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalStreamAgg(
 		  mp, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates,
 		  nullptr /*pdrgpcrGbMinusDistinct*/, fMultiStage, isAggFromSplitDQA,
@@ -52,7 +53,6 @@ CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::~CPhysicalStreamAggDeduplicate()
 {
-	m_pdrgpcrKeys->Release();
 }
 
 //---------------------------------------------------------------------------

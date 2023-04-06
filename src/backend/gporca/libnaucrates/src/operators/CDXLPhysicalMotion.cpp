@@ -33,8 +33,6 @@ CDXLPhysicalMotion::CDXLPhysicalMotion(CMemoryPool *mp)
 
 CDXLPhysicalMotion::~CDXLPhysicalMotion()
 {
-	SafeRelease(m_input_segids_array);
-	SafeRelease(m_output_segids_array);
 }
 
 //---------------------------------------------------------------------------
@@ -45,7 +43,7 @@ CDXLPhysicalMotion::~CDXLPhysicalMotion()
 //
 //
 //---------------------------------------------------------------------------
-const IntPtrArray *
+const gpos::Ref<IntPtrArray>
 CDXLPhysicalMotion::GetInputSegIdsArray() const
 {
 	return m_input_segids_array;
@@ -59,7 +57,7 @@ CDXLPhysicalMotion::GetInputSegIdsArray() const
 //
 //
 //---------------------------------------------------------------------------
-const IntPtrArray *
+const gpos::Ref<IntPtrArray>
 CDXLPhysicalMotion::GetOutputSegIdsArray() const
 {
 	return m_output_segids_array;
@@ -74,7 +72,7 @@ CDXLPhysicalMotion::GetOutputSegIdsArray() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMotion::SetInputSegIds(IntPtrArray *input_segids_array)
+CDXLPhysicalMotion::SetInputSegIds(gpos::Ref<IntPtrArray> input_segids_array)
 {
 	GPOS_ASSERT(nullptr == m_input_segids_array);
 	GPOS_ASSERT(nullptr != input_segids_array);
@@ -90,7 +88,7 @@ CDXLPhysicalMotion::SetInputSegIds(IntPtrArray *input_segids_array)
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMotion::SetOutputSegIds(IntPtrArray *output_segids_array)
+CDXLPhysicalMotion::SetOutputSegIds(gpos::Ref<IntPtrArray> output_segids_array)
 {
 	GPOS_ASSERT(nullptr == m_output_segids_array);
 	GPOS_ASSERT(nullptr != output_segids_array);
@@ -106,8 +104,8 @@ CDXLPhysicalMotion::SetOutputSegIds(IntPtrArray *output_segids_array)
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMotion::SetSegmentInfo(IntPtrArray *input_segids_array,
-								   IntPtrArray *output_segids_array)
+CDXLPhysicalMotion::SetSegmentInfo(gpos::Ref<IntPtrArray> input_segids_array,
+								   gpos::Ref<IntPtrArray> output_segids_array)
 {
 	GPOS_ASSERT(nullptr == m_output_segids_array &&
 				nullptr == m_input_segids_array);
@@ -128,7 +126,7 @@ CDXLPhysicalMotion::SetSegmentInfo(IntPtrArray *input_segids_array,
 //---------------------------------------------------------------------------
 CWStringDynamic *
 CDXLPhysicalMotion::GetSegIdsCommaSeparatedStr(
-	const IntPtrArray *segment_ids_array) const
+	const gpos::Ref<IntPtrArray> segment_ids_array) const
 {
 	GPOS_ASSERT(segment_ids_array != nullptr && 0 < segment_ids_array->Size());
 

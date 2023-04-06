@@ -32,12 +32,12 @@ public:
 	CPhysicalHashAgg(const CPhysicalHashAgg &) = delete;
 
 	// ctor
-	CPhysicalHashAgg(CMemoryPool *mp, CColRefArray *colref_array,
-					 CColRefArray *pdrgpcrMinimal,
+	CPhysicalHashAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+					 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 					 COperator::EGbAggType egbaggtype,
-					 BOOL fGeneratesDuplicates, CColRefArray *pdrgpcrArgDQA,
-					 BOOL fMultiStage, BOOL isAggFromSplitDQA,
-					 CLogicalGbAgg::EAggStage aggStage,
+					 BOOL fGeneratesDuplicates,
+					 gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
+					 BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 					 BOOL should_enforce_distribution = true
 					 // should_enforce_distribution should be set to false if
 					 // 'local' and 'global' splits don't need to have different
@@ -72,7 +72,7 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public:
 		GPOS_ASSERT(EopPhysicalHashAgg == pop->Eopid() ||
 					EopPhysicalHashAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalHashAgg> >(pop);
+		return gpos::dyn_cast<CPhysicalHashAgg>(pop);
 	}
 
 };	// class CPhysicalHashAgg

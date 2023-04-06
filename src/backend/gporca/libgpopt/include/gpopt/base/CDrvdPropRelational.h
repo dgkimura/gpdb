@@ -92,7 +92,7 @@ private:
 	gpos::Ref<CKeyCollection> m_pkc;
 
 	// functional dependencies
-	CFunctionalDependencyArray *m_pdrgpfd;
+	gpos::Ref<CFunctionalDependencyArray> m_pdrgpfd;
 
 	// max card
 	CMaxCard m_maxcard;
@@ -112,12 +112,14 @@ private:
 	gpos::Ref<CTableDescriptor> m_table_descriptor;
 
 	// helper for getting applicable FDs from child
-	static CFunctionalDependencyArray *DeriveChildFunctionalDependencies(
-		CMemoryPool *mp, ULONG child_index, CExpressionHandle &exprhdl);
+	static gpos::Ref<CFunctionalDependencyArray>
+	DeriveChildFunctionalDependencies(CMemoryPool *mp, ULONG child_index,
+									  CExpressionHandle &exprhdl);
 
 	// helper for creating local FDs
-	static CFunctionalDependencyArray *DeriveLocalFunctionalDependencies(
-		CMemoryPool *mp, CExpressionHandle &exprhdl);
+	static gpos::Ref<CFunctionalDependencyArray>
+	DeriveLocalFunctionalDependencies(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl);
 
 	// Have all the properties been derived?
 	//
@@ -149,7 +151,7 @@ protected:
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(CExpressionHandle &);
 
 	// functional dependencies
-	CFunctionalDependencyArray *DeriveFunctionalDependencies(
+	gpos::Ref<CFunctionalDependencyArray> DeriveFunctionalDependencies(
 		CExpressionHandle &);
 
 	// max cardinality
@@ -211,7 +213,7 @@ public:
 	gpos::Ref<CKeyCollection> GetKeyCollection() const;
 
 	// functional dependencies
-	CFunctionalDependencyArray *GetFunctionalDependencies() const;
+	gpos::Ref<CFunctionalDependencyArray> GetFunctionalDependencies() const;
 
 	// max cardinality
 	CMaxCard GetMaxCard() const;

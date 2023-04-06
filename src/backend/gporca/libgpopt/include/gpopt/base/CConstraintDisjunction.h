@@ -33,16 +33,17 @@ class CConstraintDisjunction : public CConstraint
 {
 private:
 	// array of constraints
-	CConstraintArray *m_pdrgpcnstr;
+	gpos::Ref<CConstraintArray> m_pdrgpcnstr;
 
 	// mapping colref -> array of child constraints
-	ColRefToConstraintArrayMap *m_phmcolconstr;
+	gpos::Ref<ColRefToConstraintArrayMap> m_phmcolconstr;
 
 public:
 	CConstraintDisjunction(const CConstraintDisjunction &) = delete;
 
 	// ctor
-	CConstraintDisjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+	CConstraintDisjunction(CMemoryPool *mp,
+						   gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 	// dtor
 	~CConstraintDisjunction() override;
@@ -55,7 +56,7 @@ public:
 	}
 
 	// all constraints in disjunction
-	CConstraintArray *
+	gpos::Ref<CConstraintArray>
 	Pdrgpcnstr() const
 	{
 		return m_pdrgpcnstr;
@@ -66,7 +67,7 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// scalar expression

@@ -17,9 +17,9 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -31,7 +31,7 @@ class CDXLScalarSortGroupClause;
 
 // arrays of column references
 using CDXLScalarSortGroupClauseArray =
-	CDynamicPtrArray<CDXLScalarSortGroupClause, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CDXLScalarSortGroupClause>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -102,7 +102,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSortGroupClause == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarSortGroupClause> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSortGroupClause>(dxl_op);
 	}
 
 	// does the operator return a boolean result

@@ -13,10 +13,10 @@
 #define GPDXL_CDXLPhysicalBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -69,7 +69,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalBitmapTableScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalBitmapTableScan> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalBitmapTableScan>(dxl_op);
 	}
 
 };	// class CDXLPhysicalBitmapTableScan

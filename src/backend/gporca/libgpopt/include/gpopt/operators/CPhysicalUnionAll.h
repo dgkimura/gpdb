@@ -16,23 +16,25 @@ class CPhysicalUnionAll : public CPhysical
 {
 private:
 	// output column array
-	CColRefArray *const m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> const m_pdrgpcrOutput;
 
 	// input column array
-	CColRef2dArray *const m_pdrgpdrgpcrInput;
+	gpos::Ref<CColRef2dArray> const m_pdrgpdrgpcrInput;
 
 	// set representation of input columns
-	CColRefSetArray *m_pdrgpcrsInput;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrsInput;
 
 	// array of child hashed distributions -- used locally for distribution derivation
-	CDistributionSpecArray *m_pdrgpds;
+	gpos::Ref<CDistributionSpecArray> m_pdrgpds;
 
-	void PopulateDistrSpecs(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							CColRef2dArray *pdrgpdrgpcrInput);
+	void PopulateDistrSpecs(CMemoryPool *mp,
+							gpos::Ref<CColRefArray> pdrgpcrOutput,
+							gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// map given array of scalar ident expressions to positions of UnionAll input columns in the given child;
-	ULongPtrArray *PdrgpulMap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
-							  ULONG child_index) const;
+	gpos::Ref<ULongPtrArray> PdrgpulMap(CMemoryPool *mp,
+										gpos::Ref<CExpressionArray> pdrgpexpr,
+										ULONG child_index) const;
 
 	// map given ColRefSet, expressed in terms of outputs,
 	// into an equivalent ColRefSet, expressed in terms
@@ -52,7 +54,7 @@ private:
 
 	// compute output hashed distribution matching the outer child's hashed distribution
 	gpos::Ref<CDistributionSpecHashed> PdsMatching(
-		CMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
+		CMemoryPool *mp, const gpos::Ref<ULongPtrArray> pdrgpulOuter) const;
 
 	// derive output distribution based on child distribution
 	static gpos::Ref<CDistributionSpec> PdsDeriveFromChildren(
@@ -65,8 +67,8 @@ protected:
 		ULONG child_index) const;
 
 public:
-	CPhysicalUnionAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-					  CColRef2dArray *pdrgpdrgpcrInput);
+	CPhysicalUnionAll(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+					  gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	~CPhysicalUnionAll() override;
 
@@ -82,10 +84,10 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// accessor of output column array
-	CColRefArray *PdrgpcrOutput() const;
+	gpos::Ref<CColRefArray> PdrgpcrOutput() const;
 
 	// accessor of input column array
-	CColRef2dArray *PdrgpdrgpcrInput() const;
+	gpos::Ref<CColRef2dArray> PdrgpdrgpcrInput() const;
 
 	// return true if operator passes through stats obtained from children,
 	// this is used when computing stats during costing
@@ -100,13 +102,13 @@ public:
 									   CExpressionHandle &exprhdl,
 									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
-									   CDrvdPropArray *pdrgpdpCtxt,
+									   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CCTEReq> pcter, ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
@@ -114,14 +116,14 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// conversion function
 	static gpos::Ref<CPhysicalUnionAll> PopConvert(gpos::Ref<COperator> pop);

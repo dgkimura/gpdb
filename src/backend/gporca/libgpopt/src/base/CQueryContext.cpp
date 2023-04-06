@@ -34,8 +34,9 @@ FORCE_GENERATE_DBGSTR(CQueryContext);
 //---------------------------------------------------------------------------
 CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 gpos::Ref<CReqdPropPlan> prpp,
-							 CColRefArray *colref_array,
-							 CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
+							 gpos::Ref<CColRefArray> colref_array,
+							 gpos::Ref<CMDNameArray> pdrgpmdname,
+							 BOOL fDeriveStats)
 	: m_prpp(prpp),
 	  m_pdrgpcr(colref_array),
 	  m_pdrgpcrSystemCols(nullptr),
@@ -63,12 +64,12 @@ CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 
 	pcrsOutputAndOrderingCols->Include(colref_array);
 	pcrsOutputAndOrderingCols->Include(pcrsOrderSpec);
-	pcrsOrderSpec->Release();
+
 
 	m_pexpr = CExpressionPreprocessor::PexprPreprocess(
 		mp, pexpr, pcrsOutputAndOrderingCols);
 
-	pcrsOutputAndOrderingCols->Release();
+
 	GPOS_ASSERT(m_pdrgpcr->Size() == ulReqdColumns);
 
 	// collect required system columns
@@ -96,11 +97,6 @@ CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 //---------------------------------------------------------------------------
 CQueryContext::~CQueryContext()
 {
-	m_pexpr->Release();
-	m_prpp->Release();
-	m_pdrgpcr->Release();
-	m_pdrgpmdname->Release();
-	SafeRelease(m_pdrgpcrSystemCols);
 }
 
 
@@ -166,13 +162,14 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CQueryContext *
 CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-						   ULongPtrArray *pdrgpulQueryOutputColRefId,
-						   CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
+						   gpos::Ref<ULongPtrArray> pdrgpulQueryOutputColRefId,
+						   gpos::Ref<CMDNameArray> pdrgpmdname,
+						   BOOL fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr && nullptr != pdrgpulQueryOutputColRefId);
 
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	gpos::Ref<COptCtxt> poptctxt = COptCtxt::PoctxtFromTLS();
 	CColumnFactory *col_factory = poptctxt->Pcf();
@@ -204,7 +201,6 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	{
 		// top level operator is a limit, copy order spec to query context
 		pos = CLogicalLimit::PopConvert(popTop)->Pos();
-		pos->AddRef();
 	}
 	else
 	{
@@ -258,7 +254,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
 
 	// Finally, create the CQueryContext
-	pdrgpmdname->AddRef();
+
 	return GPOS_NEW(mp) CQueryContext(mp, pexprResult, prpp, colref_array,
 									  pdrgpmdname, fDeriveStats);
 }

@@ -75,7 +75,8 @@ private:
 	// on the distribution keys
 	static gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CExpressionArray *pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr);
+		gpos::Ref<CExpressionArray> pdrgpexprHashed,
+		gpos::Ref<CConstraint> pcnstr);
 
 	// compute the direct dispatch info  from the constraints
 	// for a randomly distributed table
@@ -111,7 +112,7 @@ public:
 	// check whether a project list has the same columns in the given array
 	// and in the same order
 	static BOOL FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
-								  CColRefArray *colref_array);
+								  gpos::Ref<CColRefArray> colref_array);
 
 	// create a project list by creating references to the columns of the given
 	// project list of the child node
@@ -131,7 +132,8 @@ public:
 	static gpos::Ref<CDXLNode> PdxlnIdent(
 		CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
 		ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
-		ColRefToUlongMap *phmcrulPartColId, const gpos::Ref<CColRef> colref);
+		gpos::Ref<ColRefToUlongMap> phmcrulPartColId,
+		const gpos::Ref<CColRef> colref);
 
 	// replace subplan entry in the given map with a dxl column reference
 	static void ReplaceSubplan(CMemoryPool *mp,
@@ -145,14 +147,14 @@ public:
 		const gpos::Ref<CColRef> colref);
 
 	// construct an array of NULL datums for a given array of columns
-	static IDatumArray *PdrgpdatumNulls(CMemoryPool *mp,
-										CColRefArray *colref_array);
+	static gpos::Ref<IDatumArray> PdrgpdatumNulls(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// map an array of columns to a new array of columns
-	static CColRefArray *PdrgpcrMapColumns(CMemoryPool *mp,
-										   CColRefArray *pdrgpcrInput,
-										   ColRefToUlongMap *phmcrul,
-										   CColRefArray *pdrgpcrMapDest);
+	static gpos::Ref<CColRefArray> PdrgpcrMapColumns(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInput,
+		gpos::Ref<ColRefToUlongMap> phmcrul,
+		gpos::Ref<CColRefArray> pdrgpcrMapDest);
 
 	// combine two boolean expressions using the given boolean operator
 	static gpos::Ref<CDXLNode> PdxlnCombineBoolean(
@@ -168,12 +170,12 @@ public:
 	// create a DXL ValuesScan node
 	static gpos::Ref<CDXLNode> PdxlnValuesScan(
 		CMemoryPool *mp, gpos::Ref<CDXLPhysicalProperties> dxl_properties,
-		gpos::Ref<CDXLNode> pdxlnPrL, IDatum2dArray *pdrgpdrgdatum);
+		gpos::Ref<CDXLNode> pdxlnPrL, gpos::Ref<IDatum2dArray> pdrgpdrgdatum);
 
 	// build hashmap based on a column array, where the key is the column
 	// and the value is the index of that column in the array
-	static ColRefToUlongMap *PhmcrulColIndex(CMemoryPool *mp,
-											 CColRefArray *colref_array);
+	static gpos::Ref<ColRefToUlongMap> PhmcrulColIndex(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// set statistics of the operator
 	static void SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
@@ -184,7 +186,7 @@ public:
 	static void SetDirectDispatchInfo(
 		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> dxlnode,
 		gpos::Ref<CExpression> pexpr,
-		CDistributionSpecArray *pdrgpdsBaseTables);
+		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables);
 
 	// is the aggregate a local hash aggregate that is safe to stream
 	static BOOL FLocalHashAggStreamSafe(gpos::Ref<CExpression> pexprAgg);

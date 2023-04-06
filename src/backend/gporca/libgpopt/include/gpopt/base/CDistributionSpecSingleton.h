@@ -104,15 +104,13 @@ public:
 	{
 		return Edt() == pds->Edt() &&
 			   FOnMaster() ==
-				   dynamic_cast<const gpos::Ref<CDistributionSpecSingleton> >(
-					   pds)
-					   ->FOnMaster();
+				   gpos::dyn_cast<CDistributionSpecSingleton>(pds)->FOnMaster();
 	}
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdPropPlan> prpp,
-						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// print
@@ -126,7 +124,7 @@ public:
 		GPOS_ASSERT(EdtSingleton == pds->Edt() ||
 					EdtStrictSingleton == pds->Edt());
 
-		return dynamic_cast<gpos::Ref<CDistributionSpecSingleton> >(pds);
+		return gpos::dyn_cast<CDistributionSpecSingleton>(pds);
 	}
 
 };	// class CDistributionSpecSingleton

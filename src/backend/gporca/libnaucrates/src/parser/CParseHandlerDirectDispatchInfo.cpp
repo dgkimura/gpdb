@@ -56,8 +56,6 @@ CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo(
 //---------------------------------------------------------------------------
 CParseHandlerDirectDispatchInfo::~CParseHandlerDirectDispatchInfo()
 {
-	SafeRelease(m_dxl_datum_array);
-	SafeRelease(m_direct_dispatch_info);
 }
 
 
@@ -93,7 +91,6 @@ CParseHandlerDirectDispatchInfo::StartElement(
 					  CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
 					  element_local_name))
 	{
-		SafeRelease(m_dxl_datum_array);
 		m_dxl_datum_array = GPOS_NEW(m_mp) CDXLDatumArray(m_mp);
 	}
 	else if (0 ==
@@ -144,7 +141,7 @@ CParseHandlerDirectDispatchInfo::EndElement(
 					  element_local_name))
 	{
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
-		m_dxl_datum_array->AddRef();
+
 		m_datum_array_combination->Append(m_dxl_datum_array);
 	}
 	else if (0 !=

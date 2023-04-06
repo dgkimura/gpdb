@@ -47,7 +47,6 @@ CParseHandlerPartitionSelector::CParseHandlerPartitionSelector(
 
 CParseHandlerPartitionSelector::~CParseHandlerPartitionSelector()
 {
-	SafeRelease(m_rel_mdid);
 }
 //---------------------------------------------------------------------------
 //	@function:
@@ -193,7 +192,7 @@ CParseHandlerPartitionSelector::EndElement(
 				   str->GetBuffer());
 	}
 
-	m_rel_mdid->AddRef();
+
 	gpos::Ref<CDXLPhysicalPartitionSelector> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalPartitionSelector(
 			m_mp, m_rel_mdid, m_selector_id, m_scan_id, m_partitions);

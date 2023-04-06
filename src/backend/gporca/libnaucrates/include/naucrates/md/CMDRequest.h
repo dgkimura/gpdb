@@ -73,7 +73,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// array of mdids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// type info requests
 	SMDTypeRequestArray *m_mdtype_request_array;
@@ -85,7 +85,7 @@ public:
 	CMDRequest(const CMDRequest &) = delete;
 
 	// ctor
-	CMDRequest(CMemoryPool *mp, IMdIdArray *mdid_array,
+	CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
 			   SMDTypeRequestArray *mdtype_request_array);
 
 	// ctor: type request only
@@ -97,7 +97,7 @@ public:
 	// accessors
 
 	// array of mdids
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetMdIdArray() const
 	{
 		return m_mdid_array;

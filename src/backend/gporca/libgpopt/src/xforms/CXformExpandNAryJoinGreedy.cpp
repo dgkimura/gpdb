@@ -78,7 +78,7 @@ CXformExpandNAryJoinGreedy::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *pmp = pxfctxt->Pmp();
@@ -86,16 +86,16 @@ CXformExpandNAryJoinGreedy::Transform(gpos::Ref<CXformContext> pxfctxt,
 	const ULONG ulArity = pexpr->Arity();
 	GPOS_ASSERT(ulArity >= 3);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(pmp) CExpressionArray(pmp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(pmp) CExpressionArray(pmp);
 	for (ULONG ul = 0; ul < ulArity - 1; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+
 		pdrgpexpr->Append(pexprChild);
 	}
 
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[ulArity - 1];
-	CExpressionArray *pdrgpexprPreds =
+	gpos::Ref<CExpressionArray> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(pmp, pexprScalar);
 
 	// create a join order based on cardinality of intermediate results
@@ -107,7 +107,7 @@ CXformExpandNAryJoinGreedy::Transform(gpos::Ref<CXformContext> pxfctxt,
 		// normalize resulting expression
 		gpos::Ref<CExpression> pexprNormalized =
 			CNormalizer::PexprNormalize(pmp, pexprResult);
-		pexprResult->Release();
+
 		pxfres->Add(pexprNormalized);
 	}
 }

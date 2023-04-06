@@ -35,10 +35,10 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						   CMDName *mdname, BOOL is_clustered,
 						   BOOL is_partitioned, EmdindexType index_type,
 						   gpos::Ref<IMDId> mdid_item_type,
-						   ULongPtrArray *index_key_cols_array,
-						   ULongPtrArray *included_cols_array,
-						   IMdIdArray *mdid_opfamilies_array,
-						   IMdIdArray *child_index_oids)
+						   gpos::Ref<ULongPtrArray> index_key_cols_array,
+						   gpos::Ref<ULongPtrArray> included_cols_array,
+						   gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+						   gpos::Ref<IMdIdArray> child_index_oids)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -83,12 +83,6 @@ CMDIndexGPDB::~CMDIndexGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	SafeRelease(m_mdid_item_type);
-	m_index_key_cols_array->Release();
-	m_included_cols_array->Release();
-	m_mdid_opfamilies_array->Release();
-	SafeRelease(m_child_index_oids);
 }
 
 //---------------------------------------------------------------------------
@@ -422,7 +416,7 @@ CMDIndexGPDB::IsCompatible(const gpos::Ref<IMDScalarOp> md_scalar_op,
 	return false;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CMDIndexGPDB::ChildIndexMdids() const
 {
 	return m_child_index_oids;

@@ -47,7 +47,6 @@ CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 //---------------------------------------------------------------------------
 CScalarSwitch::~CScalarSwitch()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

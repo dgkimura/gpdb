@@ -197,7 +197,7 @@ CBitVector::ExchangeClear(ULONG ulBit)
 //
 //---------------------------------------------------------------------------
 void
-CBitVector::Or(const CBitVector *vec)
+CBitVector::Or(const gpos::Ref<CBitVector> vec)
 {
 	GPOS_ASSERT(m_nbits == vec->m_nbits && m_len == vec->m_len &&
 				"vectors must be of same size");
@@ -219,7 +219,7 @@ CBitVector::Or(const CBitVector *vec)
 //
 //---------------------------------------------------------------------------
 void
-CBitVector::And(const CBitVector *vec)
+CBitVector::And(const gpos::Ref<CBitVector> vec)
 {
 	GPOS_ASSERT(m_nbits == vec->m_nbits && m_len == vec->m_len &&
 				"vectors must be of same size");
@@ -241,7 +241,7 @@ CBitVector::And(const CBitVector *vec)
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitVector::ContainsAll(const CBitVector *vec) const
+CBitVector::ContainsAll(const gpos::Ref<CBitVector> vec) const
 {
 	GPOS_ASSERT(m_nbits == vec->m_nbits && m_len == vec->m_len &&
 				"vectors must be of same size");
@@ -269,7 +269,7 @@ CBitVector::ContainsAll(const CBitVector *vec) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitVector::IsDisjoint(const CBitVector *vec) const
+CBitVector::IsDisjoint(const gpos::Ref<CBitVector> vec) const
 {
 	GPOS_ASSERT(m_nbits == vec->m_nbits && m_len == vec->m_len &&
 				"vectors must be of same size");
@@ -295,7 +295,7 @@ CBitVector::IsDisjoint(const CBitVector *vec) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitVector::Equals(const CBitVector *vec) const
+CBitVector::Equals(const gpos::Ref<CBitVector> vec) const
 {
 	GPOS_ASSERT(m_nbits == vec->m_nbits && m_len == vec->m_len &&
 				"vectors must be of same size");

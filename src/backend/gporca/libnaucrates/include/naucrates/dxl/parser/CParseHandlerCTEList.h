@@ -34,7 +34,7 @@ class CParseHandlerCTEList : public CParseHandlerBase
 {
 private:
 	// CTE list
-	CDXLNodeArray *m_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_dxl_array;
 
 	// process the start of an element
 	void StartElement(
@@ -63,7 +63,7 @@ public:
 	~CParseHandlerCTEList() override;
 
 	// CTE list
-	CDXLNodeArray *
+	gpos::Ref<CDXLNodeArray>
 	GetDxlCteArray() const
 	{
 		return m_dxl_array;

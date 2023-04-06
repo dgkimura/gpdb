@@ -255,13 +255,12 @@ CParseHandlerMDGPDBScalarOp::EndElement(const XMLCh *const,	 // element_uri,
 
 		GPOS_ASSERT(0 == this->Length() || 1 == this->Length());
 
-		IMdIdArray *mdid_opfamilies_array = nullptr;
+		gpos::Ref<IMdIdArray> mdid_opfamilies_array = nullptr;
 		if (0 < this->Length())
 		{
 			CParseHandlerMetadataIdList *mdid_list_parse_handler =
 				dynamic_cast<CParseHandlerMetadataIdList *>((*this)[0]);
 			mdid_opfamilies_array = mdid_list_parse_handler->GetMdIdArray();
-			mdid_opfamilies_array->AddRef();
 		}
 		else
 		{

@@ -43,7 +43,6 @@ CXformResult::CXformResult(CMemoryPool *mp) : m_ulExpr(0)
 CXformResult::~CXformResult()
 {
 	// release array (releases all elements)
-	m_pdrgpexpr->Release();
 }
 
 

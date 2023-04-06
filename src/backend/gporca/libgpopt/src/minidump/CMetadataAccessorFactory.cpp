@@ -17,16 +17,15 @@ CMetadataAccessorFactory::CMetadataAccessorFactory(CMemoryPool *mp,
 	// set up MD providers
 	CAutoRef<CMDProviderMemory> apmdp(GPOS_NEW(mp)
 										  CMDProviderMemory(mp, file_name));
-	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
+	const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
 	CAutoRef<CMDProviderArray> apdrgpmdp(GPOS_NEW(mp) CMDProviderArray(mp));
 
 	// ensure there is at least ONE system id
-	apmdp->AddRef();
+
 	apdrgpmdp->Append(apmdp.Value());
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
 	{
-		apmdp->AddRef();
 		apdrgpmdp->Append(apmdp.Value());
 	}
 

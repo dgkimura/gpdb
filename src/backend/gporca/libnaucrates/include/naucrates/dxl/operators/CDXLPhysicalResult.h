@@ -13,9 +13,9 @@
 #define GPDXL_CDXLPhysicalResult_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 // indices of result elements in the children array
@@ -59,7 +59,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalResult == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalResult> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalResult>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

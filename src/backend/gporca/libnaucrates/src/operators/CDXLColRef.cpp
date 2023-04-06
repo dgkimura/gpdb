@@ -46,7 +46,6 @@ CDXLColRef::CDXLColRef(CMDName *mdname, ULONG id, gpos::Ref<IMDId> mdid_type,
 CDXLColRef::~CDXLColRef()
 {
 	GPOS_DELETE(m_mdname);
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

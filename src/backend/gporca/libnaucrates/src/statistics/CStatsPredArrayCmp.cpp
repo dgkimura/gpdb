@@ -23,7 +23,7 @@ using namespace gpmd;
 // Ctor
 CStatsPredArrayCmp::CStatsPredArrayCmp(ULONG colid,
 									   CStatsPred::EStatsCmpType stats_cmp_type,
-									   CPointArray *points)
+									   gpos::Ref<CPointArray> points)
 	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_points(points)
 {
 	GPOS_ASSERT(CStatsPred::EstatscmptEq == m_stats_cmp_type);

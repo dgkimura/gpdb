@@ -44,19 +44,19 @@ private:
 	gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// Array of DXL nodes that represent the query output
-	CDXLNodeArray *m_query_output;
+	gpos::Ref<CDXLNodeArray> m_query_output;
 
 	// Array of DXL nodes that represent the CTE producers
-	CDXLNodeArray *m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	// DXL plan
 	gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::Ref<IMDCacheObjectArray> m_mdid_cached_obj_array;
 
 	// source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::Ref<CSystemIdArray> m_system_id_array;
 
 	// plan Id
 	ULLONG m_plan_id;
@@ -71,10 +71,11 @@ public:
 	CDXLMinidump(gpos::Ref<CBitSet> pbs,
 				 gpos::Ref<COptimizerConfig> optimizer_config,
 				 gpos::Ref<CDXLNode> query,
-				 CDXLNodeArray *query_output_dxlnode_array,
-				 CDXLNodeArray *cte_producers, gpos::Ref<CDXLNode> pdxlnPlan,
-				 IMDCacheObjectArray *mdcache_obj_array,
-				 CSystemIdArray *pdrgpsysid, ULLONG plan_id,
+				 gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+				 gpos::Ref<CDXLNodeArray> cte_producers,
+				 gpos::Ref<CDXLNode> pdxlnPlan,
+				 gpos::Ref<IMDCacheObjectArray> mdcache_obj_array,
+				 gpos::Ref<CSystemIdArray> pdrgpsysid, ULLONG plan_id,
 				 ULLONG plan_space_size);
 
 	// dtor
@@ -94,19 +95,19 @@ public:
 	const gpos::Ref<CDXLNode> GetQueryDXLRoot() const;
 
 	// query output columns
-	const CDXLNodeArray *PdrgpdxlnQueryOutput() const;
+	const gpos::Ref<CDXLNodeArray> PdrgpdxlnQueryOutput() const;
 
 	// CTE list
-	const CDXLNodeArray *GetCTEProducerDXLArray() const;
+	const gpos::Ref<CDXLNodeArray> GetCTEProducerDXLArray() const;
 
 	// plan
 	const gpos::Ref<CDXLNode> PdxlnPlan() const;
 
 	// metadata objects
-	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;
+	const gpos::Ref<IMDCacheObjectArray> GetMdIdCachedObjArray() const;
 
 	// source system ids
-	const CSystemIdArray *GetSysidPtrArray() const;
+	const gpos::Ref<CSystemIdArray> GetSysidPtrArray() const;
 
 	// return plan id
 	ULLONG GetPlanId() const;

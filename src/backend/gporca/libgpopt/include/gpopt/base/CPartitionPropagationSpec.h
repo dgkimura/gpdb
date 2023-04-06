@@ -70,9 +70,6 @@ private:
 
 		~SPartPropSpecInfo() override
 		{
-			m_root_rel_mdid->Release();
-			SafeRelease(m_selector_ids);
-			SafeRelease(m_filter_expr);
 		}
 
 		// hash function
@@ -119,7 +116,7 @@ private:
 					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
 					 CleanupRelease<SPartPropSpecInfo>>;
 
-	UlongToSPartPropSpecInfoMap *m_part_prop_spec_infos = nullptr;
+	gpos::Ref<UlongToSPartPropSpecInfoMap> m_part_prop_spec_infos = nullptr;
 
 	// Present scanids (for easy lookup)
 	gpos::Ref<CBitSet> m_scan_ids = nullptr;
@@ -136,7 +133,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdPropPlan> prpp,
-						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function

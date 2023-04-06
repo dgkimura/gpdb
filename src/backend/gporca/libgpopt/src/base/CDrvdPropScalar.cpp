@@ -58,12 +58,6 @@ CDrvdPropScalar::CDrvdPropScalar(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CDrvdPropScalar::~CDrvdPropScalar()
 {
-	SafeRelease(m_is_prop_derived);
-	SafeRelease(m_pcrsDefined);
-	SafeRelease(m_pcrsSetReturningFunction);
-	SafeRelease(m_pcrsUsed);
-	SafeRelease(m_ppartinfo);
-	SafeRelease(m_pfp);
 }
 
 
@@ -126,7 +120,7 @@ CDrvdPropScalar::GetDrvdScalarProps(gpos::Ref<CDrvdProp> pdp)
 	GPOS_ASSERT(EptScalar == pdp->Ept() &&
 				"This is not a scalar properties container");
 
-	return dynamic_cast<gpos::Ref<CDrvdPropScalar> >(pdp);
+	return gpos::dyn_cast<CDrvdPropScalar>(pdp);
 }
 
 

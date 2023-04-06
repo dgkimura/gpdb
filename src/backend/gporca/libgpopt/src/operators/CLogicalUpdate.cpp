@@ -50,8 +50,8 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
 							   gpos::Ref<CTableDescriptor> ptabdesc,
-							   CColRefArray *pdrgpcrDelete,
-							   CColRefArray *pdrgpcrInsert,
+							   gpos::Ref<CColRefArray> pdrgpcrDelete,
+							   gpos::Ref<CColRefArray> pdrgpcrInsert,
 							   gpos::Ref<CColRef> pcrCtid,
 							   gpos::Ref<CColRef> pcrSegmentId, BOOL fSplit)
 	: CLogical(mp),
@@ -86,9 +86,6 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalUpdate::~CLogicalUpdate()
 {
-	SafeRelease(m_ptabdesc);
-	SafeRelease(m_pdrgpcrDelete);
-	SafeRelease(m_pdrgpcrInsert);
 }
 
 //---------------------------------------------------------------------------
@@ -150,19 +147,19 @@ CLogicalUpdate::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalUpdate::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrDelete =
+	gpos::Ref<CColRefArray> pdrgpcrDelete =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
-	CColRefArray *pdrgpcrInsert =
+	gpos::Ref<CColRefArray> pdrgpcrInsert =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
 	gpos::Ref<CColRef> pcrCtid =
 		CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	gpos::Ref<CColRef> pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
-	m_ptabdesc->AddRef();
+
 
 	return GPOS_NEW(mp)
 		CLogicalUpdate(mp, m_ptabdesc, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
@@ -229,10 +226,10 @@ CLogicalUpdate::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUpdate2DML);
 	return xform_set;
 }
@@ -248,7 +245,7 @@ CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalUpdate::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

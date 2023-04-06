@@ -35,10 +35,10 @@ private:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// columns to delete
-	CColRefArray *m_pdrgpcrDelete;
+	gpos::Ref<CColRefArray> m_pdrgpcrDelete;
 
 	// columns to insert
-	CColRefArray *m_pdrgpcrInsert;
+	gpos::Ref<CColRefArray> m_pdrgpcrInsert;
 
 	// ctid column
 	gpos::Ref<CColRef> m_pcrCtid;
@@ -57,7 +57,8 @@ public:
 
 	// ctor
 	CLogicalUpdate(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
-				   CColRefArray *pdrgpcrDelete, CColRefArray *pdrgpcrInsert,
+				   gpos::Ref<CColRefArray> pdrgpcrDelete,
+				   gpos::Ref<CColRefArray> pdrgpcrInsert,
 				   gpos::Ref<CColRef> pcrCtid, gpos::Ref<CColRef> pcrSegmentId,
 				   BOOL fSplit);
 
@@ -79,14 +80,14 @@ public:
 	}
 
 	// columns to delete
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrDelete() const
 	{
 		return m_pdrgpcrDelete;
 	}
 
 	// columns to insert
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrInsert() const
 	{
 		return m_pdrgpcrInsert;
@@ -135,7 +136,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -183,7 +184,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(
@@ -192,7 +193,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -212,7 +213,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUpdate == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalUpdate> >(pop);
+		return gpos::dyn_cast<CLogicalUpdate>(pop);
 	}
 
 	// debug print

@@ -39,19 +39,19 @@ private:
 	// initialize cursors of child expressions
 	BOOL FInitChildCursors(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 						   gpos::Ref<CExpression> pexprPattern,
-						   CExpressionArray *pdrgpexpr);
+						   gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// advance cursors of child expressions
 	BOOL FAdvanceChildCursors(CMemoryPool *mp,
 							  gpos::Ref<CGroupExpression> pgexpr,
 							  gpos::Ref<CExpression> pexprPattern,
 							  gpos::Ref<CExpression> pexprLast,
-							  CExpressionArray *pdrgpexpr);
+							  gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// extraction of child expressions
 	BOOL FExtractChildren(CMemoryPool *mp, gpos::Ref<CExpression> pexprPattern,
 						  gpos::Ref<CGroupExpression> pgexprCursor,
-						  CExpressionArray *pdrgpexpr);
+						  gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// move cursor
 	static gpos::Ref<CGroupExpression> PgexprNext(
@@ -65,7 +65,7 @@ private:
 	BOOL FExtractChildren(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 						  gpos::Ref<CExpression> pexprPattern,
 						  gpos::Ref<CExpression> pexprLast,
-						  CExpressionArray *pdrgpexprChildren);
+						  gpos::Ref<CExpressionArray> pdrgpexprChildren);
 
 	// extract binding from a group
 	gpos::Ref<CExpression> PexprExtract(CMemoryPool *mp,
@@ -76,7 +76,7 @@ private:
 	// build expression
 	static gpos::Ref<CExpression> PexprFinalize(
 		CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
-		CExpressionArray *pdrgpexprChildren);
+		gpos::Ref<CExpressionArray> pdrgpexprChildren);
 
 	// private copy ctor
 	CBinding(const CBinding &);

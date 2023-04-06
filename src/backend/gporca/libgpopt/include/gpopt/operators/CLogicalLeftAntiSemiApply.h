@@ -38,7 +38,8 @@ public:
 	}
 
 	// ctor
-	CLogicalLeftAntiSemiApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalLeftAntiSemiApply(CMemoryPool *mp,
+							  gpos::Ref<CColRefArray> pdrgpcrInner,
 							  EOperatorId eopidOriginSubq)
 		: CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
 	{
@@ -111,7 +112,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -126,7 +127,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
@@ -136,7 +137,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftAntiSemiApply(pop));
 
-		return dynamic_cast<gpos::Ref<CLogicalLeftAntiSemiApply> >(pop);
+		return gpos::dyn_cast<CLogicalLeftAntiSemiApply>(pop);
 	}
 
 };	// class CLogicalLeftAntiSemiApply

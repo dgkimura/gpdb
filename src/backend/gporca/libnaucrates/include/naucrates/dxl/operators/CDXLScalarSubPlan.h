@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarSubPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -129,7 +129,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubPlan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarSubPlan> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubPlan>(dxl_op);
 	}
 
 	// does the operator return a boolean result

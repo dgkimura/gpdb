@@ -129,7 +129,7 @@ CDXLScalarBoolExpr::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	EdxlBoolExprType dxl_bool_type =
-		((gpos::Ref<CDXLScalarBoolExpr>) dxlnode->GetOperator())
+		gpos::dyn_cast<CDXLScalarBoolExpr>(dxlnode->GetOperator())
 			->GetDxlBoolTypeStr();
 
 	GPOS_ASSERT((dxl_bool_type == Edxlnot) || (dxl_bool_type == Edxlor) ||

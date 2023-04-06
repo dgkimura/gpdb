@@ -100,13 +100,13 @@ CHashMapTest::EresUnittest_Basic()
 	BOOL fSuccess GPOS_ASSERTS_ONLY = phm->Replace(&ulp, rgsz[0]);
 	GPOS_ASSERT(!fSuccess);
 
-	phm->Release();
+
 
 	// test replacing values and triggering their release
 	using UlongToUlongMap =
 		CHashMap<ULONG, ULONG, HashValue<ULONG>, gpos::Equals<ULONG>,
 				 CleanupDelete<ULONG>, CleanupDelete<ULONG>>;
-	UlongToUlongMap *phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
+	gpos::Ref<UlongToUlongMap> phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
 
 	ULONG *pulKey = GPOS_NEW(mp) ULONG(1);
 	ULONG *pulVal1 = GPOS_NEW(mp) ULONG(2);
@@ -132,7 +132,7 @@ CHashMapTest::EresUnittest_Basic()
 	GPOS_ASSERT(*pulVal == 3);
 #endif	// GPOS_DEBUG
 
-	phm2->Release();
+
 
 	return GPOS_OK;
 }
@@ -174,7 +174,7 @@ CHashMapTest::EresUnittest_Ownership()
 		GPOS_ASSERT(!phm->Insert(pulp, sz));
 	}
 
-	phm->Release();
+
 
 	return GPOS_OK;
 }

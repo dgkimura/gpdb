@@ -52,7 +52,6 @@ CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 {
-	m_pmdidElementFunc->Release();
 }
 
 
@@ -172,7 +171,7 @@ CScalarArrayCoerceExpr::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarArrayCoerceExpr == pop->Eopid());
 
-	return dynamic_cast<gpos::Ref<CScalarArrayCoerceExpr> >(pop);
+	return gpos::dyn_cast<CScalarArrayCoerceExpr>(pop);
 }
 
 

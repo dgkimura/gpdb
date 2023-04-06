@@ -88,7 +88,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *, BOOL);
@@ -125,7 +125,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 	};
 
 	// xforms to test
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfSubqJoin2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfSelect2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfProject2Apply);
@@ -144,7 +144,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 		gpos::Ref<CExpression> pexpr = rgpf[ulIndex](mp, fCorrelated);
 
 		// check for subq xforms
-		CXformSet *pxfsCand =
+		gpos::Ref<CXformSet> pxfsCand =
 			CLogical::PopConvert(pexpr->Pop())->PxfsCandidates(mp);
 		pxfsCand->Intersection(xform_set);
 
@@ -178,17 +178,14 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 
 			GPOS_TRACE(str.GetBuffer());
 			str.Reset();
-
-			pxfres->Release();
-			pxfctxt->Release();
 		}
 
-		pxfsCand->Release();
-		pexpr->Release();
+
+
 		fCorrelated = !fCorrelated;
 	}
 
-	xform_set->Release();
+
 
 	return GPOS_OK;
 }
@@ -210,7 +207,7 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -262,9 +259,7 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 	GPOS_TRACE(str.GetBuffer());
 	str.Reset();
 
-	pxfres->Release();
-	pxfctxt->Release();
-	pexpr->Release();
+
 
 	return GPOS_OK;
 }

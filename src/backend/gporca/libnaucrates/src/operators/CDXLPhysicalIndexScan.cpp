@@ -50,8 +50,6 @@ CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::~CDXLPhysicalIndexScan()
 {
-	m_dxl_index_descr->Release();
-	m_dxl_table_descr->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -151,11 +149,11 @@ CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 	node->SerializeChildrenToDXL(xml_serializer);
 
 	// serialize partition mdids (null in this case)
-	IMdIdArray *empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
+	gpos::Ref<IMdIdArray> empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
 	IMDCacheObject::SerializeMDIdList(
 		xml_serializer, empty, CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartition));
-	empty->Release();
+
 	// serialize index descriptor
 	m_dxl_index_descr->SerializeToDXL(xml_serializer);
 

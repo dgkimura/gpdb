@@ -612,7 +612,7 @@ private:
 		RangeTblEntry *pRTEHashFuncCal);
 
 	// hash a DXL datum with GPDB's hash function
-	ULONG GetDXLDatumGPDBHash(CDXLDatumArray *dxl_datum_array,
+	ULONG GetDXLDatumGPDBHash(gpos::Ref<CDXLDatumArray> dxl_datum_array,
 							  RangeTblEntry *pRTEHashFuncCal);
 
 	// translate nest loop colrefs to GPDB nestparams

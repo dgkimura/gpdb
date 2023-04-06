@@ -112,7 +112,7 @@ public:
 };
 
 // array of dxl buckets
-using CDXLBucketArray = CDynamicPtrArray<CDXLBucket, CleanupRelease>;
+using CDXLBucketArray = gpos::Vector<gpos::Ref<CDXLBucket>>;
 }  // namespace gpmd
 
 #endif	// !GPMD_CDXLBucket_H

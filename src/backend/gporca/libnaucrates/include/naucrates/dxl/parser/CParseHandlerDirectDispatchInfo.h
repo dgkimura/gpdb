@@ -35,7 +35,7 @@ class CParseHandlerDirectDispatchInfo : public CParseHandlerBase
 {
 private:
 	// current array of datums being parsed
-	CDXLDatumArray *m_dxl_datum_array;
+	gpos::Ref<CDXLDatumArray> m_dxl_datum_array;
 
 	// array of datum combinations
 	CDXLDatum2dArray *m_datum_array_combination;

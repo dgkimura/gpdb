@@ -39,13 +39,13 @@ class CParseHandlerMetadata : public CParseHandlerBase
 {
 private:
 	// list of parsed metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::Ref<IMDCacheObjectArray> m_mdid_cached_obj_array;
 
 	// list of parsed mdids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// list of parsed metatadata source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::Ref<CSystemIdArray> m_system_id_array;
 
 	// process the start of an element
 	void StartElement(
@@ -63,9 +63,9 @@ private:
 		) override;
 
 	// parse an array of system ids from the XML attributes
-	CSystemIdArray *GetSrcSysIdArray(const Attributes &attr,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem);
+	gpos::Ref<CSystemIdArray> GetSrcSysIdArray(const Attributes &attr,
+											   Edxltoken target_attr,
+											   Edxltoken target_elem);
 
 
 public:
@@ -83,13 +83,13 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return the list of parsed metadata objects
-	IMDCacheObjectArray *GetMdIdCachedObjArray();
+	gpos::Ref<IMDCacheObjectArray> GetMdIdCachedObjArray();
 
 	// return the list of parsed mdids
-	IMdIdArray *GetMdIdArray();
+	gpos::Ref<IMdIdArray> GetMdIdArray();
 
 	// return the list of parsed system ids
-	CSystemIdArray *GetSysidPtrArray();
+	gpos::Ref<CSystemIdArray> GetSysidPtrArray();
 };
 }  // namespace gpdxl
 

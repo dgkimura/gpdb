@@ -105,7 +105,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalFullOuterJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalFullOuterJoin> >(pop);
+		return gpos::dyn_cast<CLogicalFullOuterJoin>(pop);
 	}
 
 };	// class CLogicalFullOuterJoin

@@ -59,10 +59,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CJoinOrderDPv2::CJoinOrderDPv2(CMemoryPool *mp,
-							   CExpressionArray *pdrgpexprAtoms,
-							   CExpressionArray *innerJoinConjuncts,
-							   CExpressionArray *onPredConjuncts,
-							   ULongPtrArray *childPredIndexes,
+							   gpos::Ref<CExpressionArray> pdrgpexprAtoms,
+							   gpos::Ref<CExpressionArray> innerJoinConjuncts,
+							   gpos::Ref<CExpressionArray> onPredConjuncts,
+							   gpos::Ref<ULongPtrArray> childPredIndexes,
 							   gpos::Ref<CColRefSet> outerRefs)
 	: CJoinOrder(mp, pdrgpexprAtoms, innerJoinConjuncts, onPredConjuncts,
 				 childPredIndexes),
@@ -149,15 +149,6 @@ CJoinOrderDPv2::~CJoinOrderDPv2()
 	// in optimized build, we flush-down memory pools without leak checking,
 	// we can save time in optimized build by skipping all de-allocations here,
 	// we still have all de-allocations enabled in debug-build to detect any possible leaks
-	SafeRelease(m_non_inner_join_dependencies);
-	SafeRelease(m_child_pred_indexes);
-	m_bitset_to_group_info_map->Release();
-	SafeRelease(m_expression_to_edge_map);
-	m_top_k_expressions->Release();
-	m_top_k_part_expressions->Release();
-	m_join_levels->Release();
-	m_on_pred_conjuncts->Release();
-	m_outer_refs->Release();
 }
 
 
@@ -241,25 +232,26 @@ CJoinOrderDPv2::PexprBuildInnerJoinPred(gpos::Ref<CBitSet> pbsFst,
 			GPOS_ASSERT(!fSet);
 		}
 	}
-	pbs->Release();
+
 
 	gpos::Ref<CExpression> pexprPred = nullptr;
 	if (0 < pbsEdges->Size())
 	{
-		CExpressionArray *pdrgpexpr = GPOS_NEW(m_mp) CExpressionArray(m_mp);
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			GPOS_NEW(m_mp) CExpressionArray(m_mp);
 		CBitSetIter bsi(*pbsEdges);
 		while (bsi.Advance())
 		{
 			ULONG ul = bsi.Bit();
 			gpos::Ref<SEdge> pedge = m_rgpedge[ul];
-			pedge->m_pexpr->AddRef();
+
 			pdrgpexpr->Append(pedge->m_pexpr);
 		}
 
 		pexprPred = CPredicateUtils::PexprConjunction(m_mp, pdrgpexpr);
 	}
 
-	pbsEdges->Release();
+
 	return pexprPred;
 }
 
@@ -360,7 +352,6 @@ CJoinOrderDPv2::GetJoinExpr(const SGroupAndExpression &left_child_expr,
 			// predicate, so this is not a valid join
 			return nullptr;
 		}
-		scalar_expr->AddRef();
 	}
 
 	if (nullptr == scalar_expr)
@@ -384,8 +375,8 @@ CJoinOrderDPv2::GetJoinExpr(const SGroupAndExpression &left_child_expr,
 
 	gpos::Ref<CExpression> left_expr = left_expr_info->m_expr;
 	gpos::Ref<CExpression> right_expr = right_expr_info->m_expr;
-	left_expr->AddRef();
-	right_expr->AddRef();
+
+
 
 	if (isLOJ)
 	{
@@ -518,7 +509,7 @@ CJoinOrderDPv2::AddExprToGroupIfNecessary(
 	{
 		// At the top level, we have only one group. To be able to return multiple results
 		// for the xform, we keep the top k expressions (all from the same group) in a KHeap
-		new_expr_info->AddRef();
+
 		if (new_expr_info->m_properties.Satisfies(EJoinOrderHasPS))
 		{
 			m_top_k_part_expressions->Insert(new_expr_info);
@@ -646,7 +637,6 @@ CJoinOrderDPv2::AddExprToGroupIfNecessary(
 	if (discard)
 	{
 		// the new expression needs to be discarded
-		new_expr_info->Release();
 	}
 	else if (!replaced_expr)
 	{
@@ -717,7 +707,6 @@ CJoinOrderDPv2::PopulateExpressionToEdgeMapIfNeeded()
 				}
 			}
 		}
-		loj_right_children->Release();
 	}
 
 	if (populate)
@@ -728,8 +717,8 @@ CJoinOrderDPv2::PopulateExpressionToEdgeMapIfNeeded()
 		{
 			gpos::Ref<SEdge> pedge = m_rgpedge[en2];
 
-			pedge->AddRef();
-			pedge->m_pexpr->AddRef();
+
+
 			m_expression_to_edge_map->Insert(pedge->m_pexpr, pedge);
 		}
 	}
@@ -753,7 +742,8 @@ CJoinOrderDPv2::AddSelectNodeForRemainingEdges(gpos::Ref<CExpression> join_expr)
 		return join_expr;
 	}
 
-	CExpressionArray *exprArray = GPOS_NEW(m_mp) CExpressionArray(m_mp);
+	gpos::Ref<CExpressionArray> exprArray =
+		GPOS_NEW(m_mp) CExpressionArray(m_mp);
 	RecursivelyMarkEdgesAsUsed(join_expr);
 
 	// find any unused edges and add them to a select
@@ -771,7 +761,7 @@ CJoinOrderDPv2::AddSelectNodeForRemainingEdges(gpos::Ref<CExpression> join_expr)
 		{
 			// found an unused edge, this one will need to go into
 			// a select node on top of the join
-			pedge->m_pexpr->AddRef();
+
 			exprArray->Append(pedge->m_pexpr);
 		}
 	}
@@ -785,7 +775,7 @@ CJoinOrderDPv2::AddSelectNodeForRemainingEdges(gpos::Ref<CExpression> join_expr)
 			m_mp, GPOS_NEW(m_mp) CLogicalSelect(m_mp), join_expr, conj);
 	}
 
-	exprArray->Release();
+
 
 	return join_expr;
 }
@@ -855,11 +845,11 @@ CJoinOrderDPv2::PopulateDPEInfo(gpos::Ref<SExpressionInfo> join_expr_info,
 								gpos::Ref<SGroupInfo> part_table_group_info,
 								gpos::Ref<SGroupInfo> part_selector_group_info)
 {
-	SGroupInfoArray *atom_groups = GetGroupsForLevel(1);
+	gpos::Ref<SGroupInfoArray> atom_groups = GetGroupsForLevel(1);
 
 	CBitSetIter iter_pt(*part_table_group_info->m_atoms);
 	gpos::Ref<SGroupInfo> pt_atom = nullptr;
-	CPartKeysArray *partition_keys = nullptr;
+	gpos::Ref<CPartKeysArray> partition_keys = nullptr;
 	while (iter_pt.Advance())
 	{
 		pt_atom = (*atom_groups)[iter_pt.Bit()];
@@ -951,8 +941,10 @@ CJoinOrderDPv2::SearchJoinOrders(ULONG left_level, ULONG right_level)
 	GPOS_ASSERT(left_level > 0 && right_level > 0 &&
 				left_level + right_level <= m_ulComps);
 
-	SGroupInfoArray *left_group_info_array = GetGroupsForLevel(left_level);
-	SGroupInfoArray *right_group_info_array = GetGroupsForLevel(right_level);
+	gpos::Ref<SGroupInfoArray> left_group_info_array =
+		GetGroupsForLevel(left_level);
+	gpos::Ref<SGroupInfoArray> right_group_info_array =
+		GetGroupsForLevel(right_level);
 	gpos::Ref<SLevelInfo> current_level_info = Level(left_level + right_level);
 
 	ULONG left_size = left_group_info_array->Size();
@@ -1042,7 +1034,6 @@ CJoinOrderDPv2::SearchJoinOrders(ULONG left_level, ULONG right_level)
 				}
 				else
 				{
-					join_expr_info->Release();
 				}
 			}
 		}
@@ -1066,8 +1057,10 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 	ULONG right_level = 1;
 	GPOS_ASSERT(left_level > 0 && left_level + right_level <= m_ulComps);
 
-	SGroupInfoArray *left_group_info_array = GetGroupsForLevel(left_level);
-	SGroupInfoArray *right_group_info_array = GetGroupsForLevel(right_level);
+	gpos::Ref<SGroupInfoArray> left_group_info_array =
+		GetGroupsForLevel(left_level);
+	gpos::Ref<SGroupInfoArray> right_group_info_array =
+		GetGroupsForLevel(right_level);
 	gpos::Ref<SLevelInfo> current_level_info = Level(left_level + right_level);
 	SExpressionProperties left_reqd_properties(algo);
 	SExpressionProperties right_reqd_properties(EJoinOrderAny);
@@ -1158,13 +1151,12 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 				join_cost < best_cost_in_level)
 			{
 				best_group_info_in_level = join_group_info;
-				SafeRelease(best_expr_info_in_level);
+
 				best_expr_info_in_level = join_expr_info;
 				best_cost_in_level = join_cost;
 			}
 			else
 			{
-				join_expr_info->Release();
 			}
 
 			if (EJoinOrderQuery == algo)
@@ -1230,7 +1222,6 @@ CJoinOrderDPv2::LookupOrCreateGroupInfo(
 			GPOS_ASSERT(nullptr != real_expr_info_for_stats->m_expr->Pstats());
 			// we are using stats_expr_info in the new group, but the caller didn't
 			// allocate a ref count for us, so add one here
-			stats_expr_info->AddRef();
 		}
 		group_info->m_cardinality =
 			real_expr_info_for_stats->m_expr->Pstats()->Rows();
@@ -1252,14 +1243,13 @@ CJoinOrderDPv2::LookupOrCreateGroupInfo(
 		if (1 < levelInfo->m_level)
 		{
 			// also insert into the bitset to group map
-			group_info->m_atoms->AddRef();
-			group_info->AddRef();
+
+
 			m_bitset_to_group_info_map->Insert(group_info->m_atoms, group_info);
 		}
 	}
 	else
 	{
-		atoms->Release();
 	}
 
 	return group_info;
@@ -1300,11 +1290,10 @@ CJoinOrderDPv2::FinalizeDPLevel(ULONG level)
 			   (loser = level_info->m_top_k_groups->RemoveNextElement()))
 		{
 			m_bitset_to_group_info_map->Delete(loser->m_atoms);
-			loser->Release();
 		}
 
 		// release the remaining groups at this time, they won't be needed anymore
-		level_info->m_top_k_groups->Release();
+
 		level_info->m_top_k_groups = nullptr;
 	}
 }
@@ -1367,7 +1356,7 @@ CJoinOrderDPv2::PexprExpand()
 		gpos::Ref<CBitSet> atom_bitset = GPOS_NEW(m_mp) CBitSet(m_mp);
 		atom_bitset->ExchangeSet(atom_id);
 		gpos::Ref<CExpression> pexpr_atom = m_rgpcomp[atom_id]->m_pexpr;
-		pexpr_atom->AddRef();
+
 		gpos::Ref<SExpressionInfo> atom_expr_info =
 			GPOS_NEW(m_mp) SExpressionInfo(m_mp, pexpr_atom, atom_props);
 		if (0 == atom_id)
@@ -1397,12 +1386,12 @@ CJoinOrderDPv2::PexprExpand()
 		if (table_desc != nullptr)
 		{
 			gpos::Ref<IMDId> rel_mdid = table_desc->MDId();
-			rel_mdid->AddRef();
+
 			gpos::Ref<CMDIdRelStats> rel_stats_mdid =
 				GPOS_NEW(m_mp) CMDIdRelStats(CMDIdGPDB::CastMdid(rel_mdid));
 			const gpos::Ref<IMDRelStats> pmdRelStats =
 				md_accessor->Pmdrelstats(rel_stats_mdid);
-			rel_stats_mdid->Release();
+
 
 			atom_expr_info->m_atom_base_table_rows =
 				std::max(DOUBLE(1.0), pmdRelStats->Rows().Get());
@@ -1412,8 +1401,6 @@ CJoinOrderDPv2::PexprExpand()
 
 		// note that for atoms with stats, the above call will also insert atom_expr_info as first (and only)
 		// expression into the group
-
-		atom_expr_info->Release();
 	}
 
 	// call all the enumeration strategies, start with DP, as it builds some needed data structures
@@ -1678,8 +1665,7 @@ CJoinOrderDPv2::GetNextOfTopK()
 
 	gpos::Ref<CExpression> join_result = join_result_info->m_expr;
 
-	join_result->AddRef();
-	join_result_info->Release();
+
 
 	return AddSelectNodeForRemainingEdges(join_result);
 }
@@ -1838,7 +1824,7 @@ CJoinOrderDPv2::OsPrint(IOstream &os) const
 
 	for (ULONG lev = 1; lev < num_levels; lev++)
 	{
-		SGroupInfoArray *bitsets_this_level = GetGroupsForLevel(lev);
+		gpos::Ref<SGroupInfoArray> bitsets_this_level = GetGroupsForLevel(lev);
 		ULONG num_bitsets_this_level = bitsets_this_level->Size();
 
 		os << "CJoinOrderDPv2 - Level: " << lev << " ("

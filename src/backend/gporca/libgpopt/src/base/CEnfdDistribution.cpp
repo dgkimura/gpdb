@@ -60,7 +60,6 @@ CEnfdDistribution::CEnfdDistribution(gpos::Ref<CDistributionSpec> pds,
 //---------------------------------------------------------------------------
 CEnfdDistribution::~CEnfdDistribution()
 {
-	SafeRelease(m_pds);
 }
 
 

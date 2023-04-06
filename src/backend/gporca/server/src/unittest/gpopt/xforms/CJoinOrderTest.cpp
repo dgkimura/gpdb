@@ -87,7 +87,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -104,17 +104,18 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		exprhdl.Attach(pexprNAryJoin);
 		exprhdl.DeriveStats(mp, mp, nullptr /*prprel*/, nullptr /*stats_ctxt*/);
 
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
 			gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
-			pexprChild->AddRef();
+
 			pdrgpexpr->Append(pexprChild);
 		}
-		CExpressionArray *pdrgpexprPred =
+		gpos::Ref<CExpressionArray> pdrgpexprPred =
 			CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprNAryJoin)[ulRels]);
-		pdrgpexpr->AddRef();
-		pdrgpexprPred->AddRef();
+
+
 		CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPred);
 		gpos::Ref<CExpression> pexprResult = jomc.PexprExpand();
 		{
@@ -126,10 +127,6 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 					<< "OUTPUT:" << std::endl
 					<< *pexprResult << std::endl;
 		}
-		pexprResult->Release();
-		pexprNAryJoin->Release();
-		pdrgpexpr->Release();
-		pdrgpexprPred->Release();
 	}
 
 	return GPOS_OK;

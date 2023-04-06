@@ -85,7 +85,7 @@ CXformLeftSemiJoin2CrossProduct::Transform(gpos::Ref<CXformContext> pxfctxt,
 										   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -94,9 +94,8 @@ CXformLeftSemiJoin2CrossProduct::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+
+
 
 	// create a (limit 1) on top of inner child
 	gpos::Ref<CExpression> pexprLimitOffset =
@@ -116,7 +115,7 @@ CXformLeftSemiJoin2CrossProduct::Transform(gpos::Ref<CXformContext> pxfctxt,
 													pexprScalar);
 	gpos::Ref<CExpression> pexprNormalized =
 		CNormalizer::PexprNormalize(mp, pexprJoin);
-	pexprJoin->Release();
+
 
 	pxfres->Add(pexprNormalized);
 }

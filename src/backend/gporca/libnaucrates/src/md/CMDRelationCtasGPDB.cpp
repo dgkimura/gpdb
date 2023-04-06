@@ -29,11 +29,13 @@ using namespace gpmd;
 CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
 	CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
-	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamiles,
-	IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
+	Ereldistrpolicy rel_distr_policy, gpos::Ref<CMDColumnArray> mdcol_array,
+	gpos::Ref<ULongPtrArray> distr_col_array,
+	gpos::Ref<IMdIdArray> distr_opfamiles,
+	gpos::Ref<IMdIdArray> distr_opclasses,
+	gpos::Ref<ULongPtr2dArray> keyset_array,
 	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
-	IntPtrArray *vartypemod_array)
+	gpos::Ref<IntPtrArray> vartypemod_array)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname_schema(mdname_schema),
@@ -101,17 +103,6 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	m_md_col_array->Release();
-	m_keyset_array->Release();
-	m_col_width_array->Release();
-	SafeRelease(m_distr_col_array);
-	SafeRelease(m_attrno_nondrop_col_pos_map);
-	SafeRelease(m_nondrop_col_pos_array);
-	m_dxl_ctas_storage_option->Release();
-	m_vartypemod_array->Release();
-	m_distr_opfamilies->Release();
-	m_distr_opclasses->Release();
 }
 
 //---------------------------------------------------------------------------

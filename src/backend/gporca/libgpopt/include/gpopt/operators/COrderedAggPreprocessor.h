@@ -32,10 +32,10 @@ class COrderedAggPreprocessor
 private:
 	// iterate over project elements and split elements between Ordered Aggs
 	// list, and Others list
-	static void SplitPrjList(CMemoryPool *mp,
-							 gpos::Ref<CExpression> pexprInputAggPrj,
-							 CExpressionArray **ppdrgpexprOrderedAggsPrEl,
-							 CExpressionArray **ppdrgpexprOtherPrjElems);
+	static void SplitPrjList(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj,
+		gpos::Ref<CExpressionArray> *ppdrgpexprOrderedAggsPrEl,
+		gpos::Ref<CExpressionArray> *ppdrgpexprOtherPrjElems);
 
 	// split given InputAgg expression into:
 	//	- A GbAgg expression containing ordered aggs split to gp_percentile agg, and

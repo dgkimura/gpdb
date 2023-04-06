@@ -92,7 +92,7 @@ public:
 	}
 
 	// returns the key set at the specified position
-	const ULongPtrArray *KeySetAt(ULONG	 // pos
+	const gpos::Ref<ULongPtrArray> KeySetAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no keys");

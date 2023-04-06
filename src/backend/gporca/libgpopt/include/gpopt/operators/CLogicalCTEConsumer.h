@@ -33,13 +33,13 @@ private:
 	ULONG m_id;
 
 	// mapped cte columns
-	CColRefArray *m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// inlined expression
 	gpos::Ref<CExpression> m_pexprInlined;
 
 	// map of CTE producer's output column ids to consumer's output columns
-	UlongToColRefMap *m_phmulcr;
+	gpos::Ref<UlongToColRefMap> m_phmulcr;
 
 	// output columns
 	gpos::Ref<CColRefSet> m_pcrsOutput;
@@ -54,7 +54,8 @@ public:
 	explicit CLogicalCTEConsumer(CMemoryPool *mp);
 
 	// ctor
-	CLogicalCTEConsumer(CMemoryPool *mp, ULONG id, CColRefArray *colref_array);
+	CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
+						gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CLogicalCTEConsumer() override;
@@ -80,14 +81,14 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// column mapping
-	UlongToColRefMap *
+	gpos::Ref<UlongToColRefMap>
 	Phmulcr() const
 	{
 		return m_phmulcr;
@@ -110,7 +111,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -171,14 +172,14 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 
@@ -189,7 +190,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEConsumer == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalCTEConsumer> >(pop);
+		return gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 	}
 
 	// debug print

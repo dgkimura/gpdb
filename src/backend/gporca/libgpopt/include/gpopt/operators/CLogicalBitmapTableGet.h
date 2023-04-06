@@ -47,7 +47,7 @@ private:
 	const CName *m_pnameTableAlias;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 public:
 	CLogicalBitmapTableGet(const CLogicalBitmapTableGet &) = delete;
@@ -56,7 +56,7 @@ public:
 	CLogicalBitmapTableGet(CMemoryPool *mp,
 						   gpos::Ref<CTableDescriptor> ptabdesc,
 						   ULONG ulOriginOpId, const CName *pnameTableAlias,
-						   CColRefArray *pdrgpcrOutput);
+						   gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// ctor
 	// only for transformations
@@ -80,7 +80,7 @@ public:
 	}
 
 	// array of output column references
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -122,7 +122,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// derive output columns
@@ -176,12 +176,12 @@ public:
 	}
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -200,7 +200,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalBitmapTableGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalBitmapTableGet> >(pop);
+		return gpos::dyn_cast<CLogicalBitmapTableGet>(pop);
 	}
 
 };	// class CLogicalBitmapTableGet

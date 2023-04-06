@@ -48,7 +48,6 @@ CParseHandlerStatistics::CParseHandlerStatistics(
 //---------------------------------------------------------------------------
 CParseHandlerStatistics::~CParseHandlerStatistics()
 {
-	SafeRelease(m_dxl_stats_derived_rel_array);
 }
 
 //---------------------------------------------------------------------------
@@ -158,7 +157,7 @@ CParseHandlerStatistics::EndElement(const XMLCh *const,	 // element_uri,
 
 		gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation =
 			stats_derived_rel_parse_handler->GetDxlStatsDrvdRelation();
-		dxl_stats_derived_relation->AddRef();
+
 		m_dxl_stats_derived_rel_array->Append(dxl_stats_derived_relation);
 	}
 

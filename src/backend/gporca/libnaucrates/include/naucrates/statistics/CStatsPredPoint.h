@@ -67,7 +67,6 @@ public:
 	// dtor
 	~CStatsPredPoint() override
 	{
-		m_pred_point->Release();
 	}
 
 	// comparison types for stats computation
@@ -98,7 +97,7 @@ public:
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<gpos::Ref<CStatsPredPoint> >(pred_stats);
+		return gpos::dyn_cast<CStatsPredPoint>(pred_stats);
 	}
 
 };	// class CStatsPredPoint

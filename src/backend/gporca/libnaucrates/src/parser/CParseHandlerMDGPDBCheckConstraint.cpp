@@ -136,7 +136,7 @@ CParseHandlerMDGPDBCheckConstraint::EndElement(
 
 	gpos::Ref<CDXLNode> dxlnode_scalar_expr = op_parse_handler->CreateDXLNode();
 	GPOS_ASSERT(nullptr != dxlnode_scalar_expr);
-	dxlnode_scalar_expr->AddRef();
+
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDCheckConstraintGPDB(
 		m_mp, m_mdid, m_mdname, m_rel_mdid, dxlnode_scalar_expr);

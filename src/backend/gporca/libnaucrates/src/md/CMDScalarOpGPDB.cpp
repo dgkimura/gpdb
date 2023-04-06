@@ -35,7 +35,8 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(
 	gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> mdid_func,
 	gpos::Ref<IMDId> mdid_commute_opr, gpos::Ref<IMDId> m_mdid_inverse_opr,
 	IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-	IMdIdArray *mdid_opfamilies_array, gpos::Ref<IMDId> mdid_hash_opfamily,
+	gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+	gpos::Ref<IMDId> mdid_hash_opfamily,
 	gpos::Ref<IMDId> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -69,20 +70,8 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(
 //---------------------------------------------------------------------------
 CMDScalarOpGPDB::~CMDScalarOpGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_result->Release();
-	m_func_mdid->Release();
-
-	SafeRelease(m_mdid_type_left);
-	SafeRelease(m_mdid_type_right);
-	SafeRelease(m_mdid_commute_opr);
-	SafeRelease(m_mdid_inverse_opr);
-	SafeRelease(m_mdid_hash_opfamily);
-	SafeRelease(m_mdid_legacy_hash_opfamily);
-
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid_opfamilies_array->Release();
 }
 
 //---------------------------------------------------------------------------

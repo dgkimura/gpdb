@@ -58,9 +58,6 @@ CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::~CDXLScalarSubPlan()
 {
-	m_first_col_type_mdid->Release();
-	m_dxl_colref_array->Release();
-	SafeRelease(m_dxlnode_test_expr);
 }
 
 //---------------------------------------------------------------------------

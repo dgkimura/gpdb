@@ -126,7 +126,7 @@ CParseHandlerWindowKey::EndElement(const XMLCh *const,	// element_uri,
 		dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 	gpos::Ref<CDXLNode> sort_col_list_dxlnode =
 		sort_col_list_parse_handler->CreateDXLNode();
-	sort_col_list_dxlnode->AddRef();
+
 	m_dxl_window_key_gen->SetSortColList(sort_col_list_dxlnode);
 
 	if (2 == this->Length())

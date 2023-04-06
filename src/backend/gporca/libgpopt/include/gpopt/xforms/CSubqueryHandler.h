@@ -107,7 +107,7 @@ private:
 	// helper for creating a groupby node above or below the apply
 	static gpos::Ref<CExpression> CreateGroupByNode(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		CColRefArray *colref_array, BOOL fExistential,
+		gpos::Ref<CColRefArray> colref_array, BOOL fExistential,
 		gpos::Ref<CColRef> colref, gpos::Ref<CExpression> pexprPredicate,
 		gpos::Ref<CColRef> *pcrCount, gpos::Ref<CColRef> *pcrSum);
 
@@ -129,8 +129,9 @@ private:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
 		gpos::Ref<CExpression> pexprInner, BOOL fExistential,
 		BOOL fOuterRefsUnderInner,
-		CColRefArray **ppdrgpcr,  // output: constructed grouping columns
-		BOOL *pfGbOnInner		  // output: is Gb created on inner expression
+		gpos::Ref<CColRefArray>
+			*ppdrgpcr,	   // output: constructed grouping columns
+		BOOL *pfGbOnInner  // output: is Gb created on inner expression
 	);
 
 	// helper for creating outer apply expression for existential/quantified subqueries

@@ -58,7 +58,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalLeftOuterNLJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLeftOuterNLJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalLeftOuterNLJoin>(pop);
 	}
 
 

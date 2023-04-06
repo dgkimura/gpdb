@@ -59,7 +59,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level,
 //
 //---------------------------------------------------------------------------
 CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-							 CDXLNodeArray *cte_dxl_arr)
+							 gpos::Ref<CDXLNodeArray> cte_dxl_arr)
 	: m_query_level(query_level), m_cte_info(nullptr)
 {
 	GPOS_ASSERT(nullptr != cte_dxl_arr);

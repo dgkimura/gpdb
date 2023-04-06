@@ -48,8 +48,6 @@ CMDIdCast::CMDIdCast(gpos::Ref<CMDIdGPDB> mdid_src,
 //---------------------------------------------------------------------------
 CMDIdCast::~CMDIdCast()
 {
-	m_mdid_src->Release();
-	m_mdid_dest->Release();
 }
 
 //---------------------------------------------------------------------------

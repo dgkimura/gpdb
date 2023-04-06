@@ -72,7 +72,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 
-		return dynamic_cast<const gpos::Ref<CMDIdGPDBCtas> >(mdid);
+		return gpos::dyn_cast<CMDIdGPDBCtas>(mdid);
 	}
 };
 

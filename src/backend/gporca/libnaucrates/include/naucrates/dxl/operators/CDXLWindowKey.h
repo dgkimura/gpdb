@@ -70,7 +70,7 @@ public:
 	}
 };
 
-using CDXLWindowKeyArray = CDynamicPtrArray<CDXLWindowKey, CleanupRelease>;
+using CDXLWindowKeyArray = gpos::Vector<gpos::Ref<CDXLWindowKey>>;
 }  // namespace gpdxl
 #endif	// !GPDXL_CDXLWindowKey_H
 

@@ -47,7 +47,6 @@ CCTEReq::CCTEReqEntry::CCTEReqEntry(ULONG id, CCTEMap::ECteType ect,
 //---------------------------------------------------------------------------
 CCTEReq::CCTEReqEntry::~CCTEReqEntry()
 {
-	SafeRelease(m_pdpplan);
 }
 
 //---------------------------------------------------------------------------
@@ -154,8 +153,6 @@ CCTEReq::CCTEReq(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CCTEReq::~CCTEReq()
 {
-	m_phmcter->Release();
-	m_pdrgpulRequired->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -192,7 +189,7 @@ CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
 //
 //---------------------------------------------------------------------------
 void
-CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
+CCTEReq::InsertConsumer(ULONG id, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	ULONG ulProducerId = gpos::ulong_max;
 	gpos::Ref<CDrvdPropPlan> pdpplan = CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])
@@ -202,7 +199,7 @@ CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
 	GPOS_ASSERT(ulProducerId == id &&
 				"unexpected CTE producer plan properties");
 
-	pdpplan->AddRef();
+
 	Insert(id, CCTEMap::EctConsumer, true /*fRequired*/, pdpplan);
 }
 
@@ -345,7 +342,6 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm)
 		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
-			pdpplan->AddRef();
 		}
 
 		pcterUnresolved->Insert(id, pcre->Ect(), fRequired, pdpplan);
@@ -366,7 +362,7 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm)
 gpos::Ref<CCTEReq>
 CCTEReq::PcterUnresolvedSequence(
 	CMemoryPool *mp, gpos::Ref<CCTEMap> pcm,
-	CDrvdPropArray *
+	gpos::Ref<CDrvdPropArray>
 		pdrgpdpCtxt	 // context contains derived plan properties of producer tree
 )
 {
@@ -390,7 +386,7 @@ CCTEReq::PcterUnresolvedSequence(
 			// already found, so mark it as optional
 			gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 			GPOS_ASSERT(nullptr != pdpplan);
-			pdpplan->AddRef();
+
 			pcterUnresolved->Insert(id, ect, false /*fReqiored*/, pdpplan);
 		}
 		else if (!fRequired && CCTEMap::EctProducer == ect &&
@@ -410,7 +406,6 @@ CCTEReq::PcterUnresolvedSequence(
 			GPOS_ASSERT_IMP(nullptr == pdpplan, CCTEMap::EctProducer == ect);
 			if (nullptr != pdpplan)
 			{
-				pdpplan->AddRef();
 			}
 			pcterUnresolved->Insert(id, ect, fRequired, pdpplan);
 		}
@@ -418,14 +413,15 @@ CCTEReq::PcterUnresolvedSequence(
 
 	// if something is in pcm and not in the requirments, it has to be a producer
 	// in which case, add the corresponding consumer as unresolved
-	ULongPtrArray *pdrgpulProducers = pcm->PdrgpulAdditionalProducers(mp, this);
+	gpos::Ref<ULongPtrArray> pdrgpulProducers =
+		pcm->PdrgpulAdditionalProducers(mp, this);
 	const ULONG length = pdrgpulProducers->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		ULONG *pulId = (*pdrgpulProducers)[ul];
 		pcterUnresolved->InsertConsumer(*pulId, pdrgpdpCtxt);
 	}
-	pdrgpulProducers->Release();
+
 
 	return pcterUnresolved;
 }
@@ -450,7 +446,6 @@ CCTEReq::PcterAllOptional(CMemoryPool *mp)
 		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
-			pdpplan->AddRef();
 		}
 		pcter->Insert(pcre->Id(), pcre->Ect(), false /*fRequired*/, pdpplan);
 	}

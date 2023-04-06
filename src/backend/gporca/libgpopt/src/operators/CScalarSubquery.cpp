@@ -117,9 +117,9 @@ CScalarSubquery::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CScalarSubquery::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist)
+CScalarSubquery::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRef> colref =
 		CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
@@ -170,7 +170,7 @@ CScalarSubquery::PpartinfoDerive(CMemoryPool *,	 // mp,
 {
 	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
-	ppartinfoChild->AddRef();
+
 	return ppartinfoChild;
 }
 

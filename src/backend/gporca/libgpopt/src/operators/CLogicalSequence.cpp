@@ -55,10 +55,10 @@ CLogicalSequence::Matches(gpos::Ref<COperator> pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSequence);
 	return xform_set;
 }
@@ -81,7 +81,7 @@ CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 	// get output columns of last child
 	gpos::Ref<CColRefSet> pcrs =
 		exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
-	pcrs->AddRef();
+
 
 	return pcrs;
 }

@@ -103,9 +103,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -121,7 +121,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBitmapIndexProbe == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarBitmapIndexProbe> >(pop);
+		return gpos::dyn_cast<CScalarBitmapIndexProbe>(pop);
 	}
 
 };	// class CScalarBitmapIndexProbe

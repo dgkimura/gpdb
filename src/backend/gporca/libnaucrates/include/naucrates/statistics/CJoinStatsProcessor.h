@@ -29,7 +29,8 @@ protected:
 	static CDouble CalcJoinCardinality(
 		CMemoryPool *mp, gpos::Ref<CStatisticsConfig> stats_config,
 		CDouble left_num_rows, CDouble right_num_rows,
-		CScaleFactorUtils::SJoinConditionArray *join_conds_scale_factors,
+		gpos::Ref<CScaleFactorUtils::SJoinConditionArray>
+			join_conds_scale_factors,
 		IStatistics::EStatsJoinType join_type);
 
 
@@ -59,18 +60,18 @@ public:
 		CMemoryPool *mp, gpos::Ref<CStatisticsConfig> stats_config,
 		const gpos::Ref<IStatistics> outer_stats_input,
 		const gpos::Ref<IStatistics> inner_stats_input,
-		CStatsPredJoinArray *join_preds_stats,
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats,
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);
 
 	static gpos::Ref<IStatistics> CalcAllJoinStats(
-		CMemoryPool *mp, IStatisticsArray *statistics_array,
+		CMemoryPool *mp, gpos::Ref<IStatisticsArray> statistics_array,
 		gpos::Ref<CExpression> expr, gpos::Ref<COperator> pop);
 
 	// derive statistics for join operation given array of statistics object
-	static gpos::Ref<IStatistics> DeriveJoinStats(CMemoryPool *mp,
-												  CExpressionHandle &exprhdl,
-												  IStatisticsArray *stats_ctxt);
+	static gpos::Ref<IStatistics> DeriveJoinStats(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<IStatisticsArray> stats_ctxt);
 
 	// derive statistics when scalar expression has outer references
 	static gpos::Ref<IStatistics> DeriveStatsWithOuterRefs(
@@ -81,7 +82,7 @@ public:
 			expr,  // scalar condition used for stats derivation
 		gpos::Ref<IStatistics>
 			stats,	// statistics object of attached expression
-		IStatisticsArray *
+		gpos::Ref<IStatisticsArray>
 			all_outer_stats	 // array of stats objects where outer references are defined
 	);
 

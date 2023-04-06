@@ -21,8 +21,9 @@ namespace gpopt
 class CStrictHashedDistributions : public CDistributionSpecArray
 {
 public:
-	CStrictHashedDistributions(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							   CColRef2dArray *pdrgpdrgpcrInput);
+	CStrictHashedDistributions(CMemoryPool *mp,
+							   gpos::Ref<CColRefArray> pdrgpcrOutput,
+							   gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 };
 }  // namespace gpopt
 

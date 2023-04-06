@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarArrayRef_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -106,7 +106,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayRef == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarArrayRef> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarArrayRef>(dxl_op);
 	}
 };
 }  // namespace gpdxl

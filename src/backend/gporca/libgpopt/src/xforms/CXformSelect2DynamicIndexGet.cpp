@@ -80,7 +80,7 @@ CXformSelect2DynamicIndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalDynamicGet> popGet =
@@ -107,7 +107,7 @@ CXformSelect2DynamicIndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
@@ -141,13 +141,10 @@ CXformSelect2DynamicIndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 			gpos::Ref<CExpression> pexprRedundantSelect =
 				CXformUtils::PexprRedundantSelectForDynamicIndex(
 					mp, pexprDynamicIndexGet);
-			pexprDynamicIndexGet->Release();
+
 			pxfres->Add(pexprRedundantSelect);
 		}
 	}
-
-	pcrsReqd->Release();
-	pdrgpexpr->Release();
 }
 
 // EOF

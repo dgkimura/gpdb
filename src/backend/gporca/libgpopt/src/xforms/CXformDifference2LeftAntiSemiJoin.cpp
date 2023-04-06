@@ -54,7 +54,7 @@ CXformDifference2LeftAntiSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 											 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -69,15 +69,15 @@ CXformDifference2LeftAntiSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CLogicalDifference> popDifference =
 		CLogicalDifference::PopConvert(pexpr->Pop());
-	CColRefArray *pdrgpcrOutput = popDifference->PdrgpcrOutput();
-	CColRef2dArray *pdrgpdrgpcrInput = popDifference->PdrgpdrgpcrInput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popDifference->PdrgpcrOutput();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
+		popDifference->PdrgpdrgpcrInput();
 
 	// generate the scalar condition for the left anti-semi join
 	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
-	pexprLeftChild->AddRef();
-	pexprRightChild->AddRef();
+
 
 	// assemble the new left anti-semi join logical operator
 	gpos::Ref<CExpression> pexprLASJ =
@@ -87,7 +87,7 @@ CXformDifference2LeftAntiSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	if (pdrgpcrOutput->Size() > 0)
 	{
 		// assemble the aggregate operator
-		pdrgpcrOutput->AddRef();
+
 
 		gpos::Ref<CExpression> pexprProjList =
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),

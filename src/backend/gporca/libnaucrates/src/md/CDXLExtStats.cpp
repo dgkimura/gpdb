@@ -41,9 +41,6 @@ CDXLExtStats::~CDXLExtStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_rel_stats_mdid->Release();
-	m_dependency_array->Release();
-	m_ndistinct_array->Release();
 }
 
 //---------------------------------------------------------------------------

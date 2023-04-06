@@ -38,10 +38,10 @@ private:
 	gpos::Ref<CDXLNode> m_dxl_node;
 
 	// list of output columns (represented as scalar ident nodes)
-	CDXLNodeArray *m_output_colums_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_output_colums_dxl_array;
 
 	// list of CTE priducers
-	CDXLNodeArray *m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	// process the start of an element
 	void StartElement(
@@ -72,10 +72,10 @@ public:
 	gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// returns the dxl representation of the query output
-	CDXLNodeArray *GetOutputColumnsDXLArray() const;
+	gpos::Ref<CDXLNodeArray> GetOutputColumnsDXLArray() const;
 
 	// returns the CTEs
-	CDXLNodeArray *GetCTEProducerDXLArray() const;
+	gpos::Ref<CDXLNodeArray> GetCTEProducerDXLArray() const;
 
 	EDxlParseHandlerType GetParseHandlerType() const override;
 };

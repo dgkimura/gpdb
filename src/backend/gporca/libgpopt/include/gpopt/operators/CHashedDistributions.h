@@ -20,8 +20,8 @@ namespace gpopt
 class CHashedDistributions : public CDistributionSpecArray
 {
 public:
-	CHashedDistributions(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-						 CColRef2dArray *pdrgpdrgpcrInput);
+	CHashedDistributions(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+						 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 };
 }  // namespace gpopt
 

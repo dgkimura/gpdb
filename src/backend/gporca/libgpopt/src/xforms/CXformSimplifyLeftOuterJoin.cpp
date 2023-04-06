@@ -85,7 +85,7 @@ CXformSimplifyLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -95,15 +95,16 @@ CXformSimplifyLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprScalar->AddRef();
+
+
 	gpos::Ref<CExpression> pexprResult = nullptr;
 
 	// inner child of LOJ can be replaced with empty table
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
 
 	// extract output columns of inner child
-	CColRefArray *colref_array = pexprInner->DeriveOutputColumns()->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> colref_array =
+		pexprInner->DeriveOutputColumns()->Pdrgpcr(mp);
 
 	// generate empty constant table with the same columns
 	gpos::Ref<COperator> popCTG = GPOS_NEW(mp)

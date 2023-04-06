@@ -48,7 +48,6 @@ CParseHandlerCtasStorageOptions::CParseHandlerCtasStorageOptions(
 //---------------------------------------------------------------------------
 CParseHandlerCtasStorageOptions::~CParseHandlerCtasStorageOptions()
 {
-	SafeRelease(m_dxl_ctas_storage_option);
 }
 
 //---------------------------------------------------------------------------

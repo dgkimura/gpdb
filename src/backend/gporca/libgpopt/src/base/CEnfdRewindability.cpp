@@ -52,7 +52,6 @@ CEnfdRewindability::CEnfdRewindability(gpos::Ref<CRewindabilitySpec> prs,
 //---------------------------------------------------------------------------
 CEnfdRewindability::~CEnfdRewindability()
 {
-	SafeRelease(m_prs);
 }
 
 

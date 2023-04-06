@@ -43,7 +43,6 @@ CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalGet::~CDXLLogicalGet()
 {
-	SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------

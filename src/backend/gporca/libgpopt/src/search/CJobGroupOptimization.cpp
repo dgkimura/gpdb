@@ -162,7 +162,6 @@ CJobGroupOptimization::Init(
 	if (poc == m_poc)
 	{
 		// pin down context in hash table
-		m_poc->AddRef();
 	}
 	SetJobQueue(m_poc->PjqOptimization());
 

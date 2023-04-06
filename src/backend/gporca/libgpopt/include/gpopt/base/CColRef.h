@@ -29,8 +29,8 @@ using namespace gpmd;
 class CColRef;
 
 // colref array
-using CColRefArray = CDynamicPtrArray<CColRef, CleanupNULL>;
-using CColRef2dArray = CDynamicPtrArray<CColRefArray, CleanupRelease>;
+using CColRefArray = gpos::Vector<gpos::Ref<CColRef>>;
+using CColRef2dArray = gpos::Vector<gpos::Ref<CColRefArray>>;
 
 // hash map mapping ULONG -> CColRef
 using UlongToColRefMap =
@@ -152,15 +152,16 @@ public:
 	}
 
 	// extract array of colids from array of colrefs
-	static ULongPtrArray *Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array);
+	static gpos::Ref<ULongPtrArray> Pdrgpul(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// check if the the array of column references are equal
-	static BOOL Equals(const CColRefArray *pdrgpcr1,
-					   const CColRefArray *pdrgpcr2);
+	static BOOL Equals(const gpos::Ref<CColRefArray> pdrgpcr1,
+					   const gpos::Ref<CColRefArray> pdrgpcr2);
 
 	// check if the the array of column reference arrays are equal
-	static BOOL Equals(const CColRef2dArray *pdrgdrgpcr1,
-					   const CColRef2dArray *pdrgdrgpcr2);
+	static BOOL Equals(const gpos::Ref<CColRef2dArray> pdrgdrgpcr1,
+					   const gpos::Ref<CColRef2dArray> pdrgdrgpcr2);
 
 	// type of column reference (base/computed)
 	virtual Ecolreftype Ecrt() const = 0;
@@ -242,8 +243,7 @@ using ColRefToUlongMap =
 	CHashMap<CColRef, ULONG, CColRef::HashValue, gpos::Equals<CColRef>,
 			 CleanupNULL<CColRef>, CleanupDelete<ULONG>>;
 
-using ColRefToUlongMapArray =
-	CDynamicPtrArray<ColRefToUlongMap, CleanupRelease>;
+using ColRefToUlongMapArray = gpos::Vector<gpos::Ref<ColRefToUlongMap>>;
 
 }  // namespace gpopt
 

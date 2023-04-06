@@ -23,7 +23,7 @@ public:
 	static gpos::Ref<CStatistics> CalcInnerJoinStatsStatic(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
 		const gpos::Ref<IStatistics> inner_stats_input,
-		CStatsPredJoinArray *join_preds_stats);
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats);
 };
 }  // namespace gpnaucrates
 

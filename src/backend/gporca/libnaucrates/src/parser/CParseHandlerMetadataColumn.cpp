@@ -53,7 +53,6 @@ CParseHandlerMetadataColumn::CParseHandlerMetadataColumn(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataColumn::~CParseHandlerMetadataColumn()
 {
-	SafeRelease(m_mdcol);
 }
 
 //---------------------------------------------------------------------------
@@ -175,7 +174,6 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,	 // element_uri,
 
 	if (nullptr != m_dxl_default_val)
 	{
-		m_dxl_default_val->AddRef();
 	}
 
 	m_mdcol = GPOS_NEW(m_mp)

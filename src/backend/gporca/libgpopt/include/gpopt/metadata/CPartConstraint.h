@@ -66,7 +66,7 @@ private:
 	BOOL m_fUninterpreted;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcr;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcr;
 
 	// combined constraint
 	gpos::Ref<CConstraint> m_pcnstrCombined;
@@ -112,7 +112,7 @@ public:
 	// ctors
 	CPartConstraint(CMemoryPool *mp, UlongToConstraintMap *phmulcnstr,
 					gpos::Ref<CBitSet> pbsDefaultParts, BOOL is_unbounded,
-					CColRef2dArray *pdrgpdrgpcr);
+					gpos::Ref<CColRef2dArray> pdrgpdrgpcr);
 	CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,
 					BOOL fDefaultPartition, BOOL is_unbounded);
 
@@ -139,7 +139,7 @@ public:
 	}
 
 	// partition keys
-	CColRef2dArray *
+	gpos::Ref<CColRef2dArray>
 	Pdrgpdrgpcr() const
 	{
 		return m_pdrgpdrgpcr;
@@ -173,7 +173,8 @@ public:
 
 	// return a copy of the part constraint with remapped columns
 	gpos::Ref<CPartConstraint> PpartcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

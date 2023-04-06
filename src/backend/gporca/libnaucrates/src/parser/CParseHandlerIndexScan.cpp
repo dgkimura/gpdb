@@ -186,7 +186,7 @@ CParseHandlerIndexScan::StartElementHelper(
 void
 CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 										 Edxltoken token_type,
-										 ULongPtrArray *selector_ids)
+										 gpos::Ref<ULongPtrArray> selector_ids)
 {
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(token_type),
 									  element_local_name))
@@ -215,11 +215,11 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 
 	gpos::Ref<CDXLTableDescr> dxl_table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	dxl_table_descr->AddRef();
+
 
 	gpos::Ref<CDXLIndexDescr> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
-	dxl_index_descr->AddRef();
+
 
 	gpos::Ref<CDXLPhysical> dxl_op = nullptr;
 	if (EdxltokenPhysicalIndexOnlyScan == token_type)
@@ -238,9 +238,9 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	{
 		GPOS_ASSERT(EdxltokenPhysicalDynamicIndexScan == token_type);
 
-		IMdIdArray *mdid_partitions_array =
+		gpos::Ref<IMdIdArray> mdid_partitions_array =
 			partition_mdids_parse_handler->GetMdIdArray();
-		mdid_partitions_array->AddRef();
+
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDynamicIndexScan(
 			m_mp, dxl_table_descr, dxl_index_descr, m_index_scan_dir,
 			mdid_partitions_array, selector_ids);

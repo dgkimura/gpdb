@@ -132,7 +132,7 @@ CDXLScalarBooleanTest::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								   BOOL validate_children) const
 {
 	EdxlBooleanTestType dxl_bool_type =
-		((gpos::Ref<CDXLScalarBooleanTest>) dxlnode->GetOperator())
+		gpos::dyn_cast<CDXLScalarBooleanTest>(dxlnode->GetOperator())
 			->GetDxlBoolTypeStr();
 
 	GPOS_ASSERT((EdxlbooleantestIsTrue == dxl_bool_type) ||

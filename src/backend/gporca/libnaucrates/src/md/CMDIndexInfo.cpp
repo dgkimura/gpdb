@@ -26,7 +26,6 @@ CMDIndexInfo::CMDIndexInfo(gpos::Ref<IMDId> mdid, BOOL is_partial)
 // dtor
 CMDIndexInfo::~CMDIndexInfo()
 {
-	m_mdid->Release();
 }
 
 // returns the metadata id of this index

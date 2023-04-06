@@ -29,7 +29,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 							   gpos::Ref<IMDId> mdid_return_type,
-							   CMDName *mdname, CDXLColDescrArray *pdrgdxlcd)
+							   CMDName *mdname,
+							   gpos::Ref<CDXLColDescrArray> pdrgdxlcd)
 	: CDXLLogical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -49,9 +50,6 @@ CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 //---------------------------------------------------------------------------
 CDXLLogicalTVF::~CDXLLogicalTVF()
 {
-	m_dxl_col_descr_array->Release();
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 	GPOS_DELETE(m_mdname);
 }
 

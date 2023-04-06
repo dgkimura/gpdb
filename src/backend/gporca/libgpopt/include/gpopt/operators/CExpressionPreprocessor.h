@@ -132,8 +132,10 @@ private:
 	// helper method for PexprCollapseJoins, collect children and make recursive calls
 	static void CollectJoinChildrenRecursively(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CExpressionArray *logicalLeafNodes, ULongPtrArray *lojChildPredIndexes,
-		CExpressionArray *innerJoinPredicates, CExpressionArray *lojPredicates);
+		gpos::Ref<CExpressionArray> logicalLeafNodes,
+		gpos::Ref<ULongPtrArray> lojChildPredIndexes,
+		gpos::Ref<CExpressionArray> innerJoinPredicates,
+		gpos::Ref<CExpressionArray> lojPredicates);
 
 	// collapse cascaded logical project operators
 	static gpos::Ref<CExpression> PexprCollapseProjects(
@@ -165,7 +167,8 @@ private:
 
 	static gpos::Ref<CExpression> PexprReplaceColWithConst(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		ExprToConstantMap *phmExprToConst, BOOL checkFilterForConstants);
+		gpos::Ref<ExprToConstantMap> phmExprToConst,
+		BOOL checkFilterForConstants);
 
 	// collect CTE predicates from consumers
 	static void CollectCTEPredicates(CMemoryPool *mp,
@@ -205,7 +208,7 @@ private:
 	// generate a scalar bool op expression or return the only child expression in array
 	static gpos::Ref<CExpression> PexprScalarBoolOpConvert2In(
 		CMemoryPool *mp, CScalarBoolOp::EBoolOperator eboolop,
-		CExpressionArray *pdrgpexpr);
+		gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// determines if the expression is likely convertible to an array expression
 	static BOOL FConvert2InIsConvertable(gpos::Ref<CExpression> pexpr,
@@ -219,8 +222,9 @@ private:
 												  gpos::Ref<CExpression> expr);
 
 	static gpos::Ref<CConstraint> PcnstrFromChildPartition(
-		const gpos::Ref<IMDRelation> partrel, CColRefArray *pdrgpcrOutput,
-		ColRefToUlongMap *col_mapping);
+		const gpos::Ref<IMDRelation> partrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput,
+		gpos::Ref<ColRefToUlongMap> col_mapping);
 
 	// swap logical select over logical project
 	static gpos::Ref<CExpression> PexprTransposeSelectAndProject(

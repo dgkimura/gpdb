@@ -89,17 +89,18 @@ public:
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
+				 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+				 ULONG ulOptReq) override;
 
 	// required columns computation function
 	void ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-						 CDrvdPropArray *pdrgpdpCtxt);
+						 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required ctes computation function
 	void ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-						 CDrvdPropArray *pdrgpdpCtxt);
+						 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required columns accessor
 	gpos::Ref<CColRefSet>
@@ -172,7 +173,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != prp);
 
-		return dynamic_cast<gpos::Ref<CReqdPropPlan> >(prp);
+		return gpos::dyn_cast<CReqdPropPlan>(prp);
 	}
 
 	//generate empty required properties
@@ -189,7 +190,7 @@ public:
 	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(
 		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
 		gpos::Ref<CDrvdPropPlan> pdpplanInput,
-		UlongToColRefMap *colref_mapping);
+		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

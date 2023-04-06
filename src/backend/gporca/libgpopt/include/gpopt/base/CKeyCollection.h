@@ -35,7 +35,7 @@ class CKeyCollection : public CRefCount<CKeyCollection>,
 {
 private:
 	// array of key sets
-	CColRefSetArray *m_pdrgpcrs;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrs;
 
 public:
 	CKeyCollection(const CKeyCollection &) = delete;
@@ -43,7 +43,7 @@ public:
 	// ctors
 	explicit CKeyCollection(CMemoryPool *mp);
 	CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
-	CKeyCollection(CMemoryPool *mp, CColRefArray *colref_array);
+	CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CKeyCollection() override;
@@ -55,20 +55,21 @@ public:
 	BOOL FKey(const gpos::Ref<CColRefSet> pcrs, BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
-	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;
+	BOOL FKey(CMemoryPool *mp,
+			  const gpos::Ref<CColRefArray> colref_array) const;
 
 	// trim off non-key columns
-	CColRefArray *PdrgpcrTrim(CMemoryPool *mp,
-							  const CColRefArray *colref_array) const;
+	gpos::Ref<CColRefArray> PdrgpcrTrim(
+		CMemoryPool *mp, const gpos::Ref<CColRefArray> colref_array) const;
 
 	// extract a key
-	CColRefArray *PdrgpcrKey(CMemoryPool *mp) const;
+	gpos::Ref<CColRefArray> PdrgpcrKey(CMemoryPool *mp) const;
 
 	// extract a hashable key
-	CColRefArray *PdrgpcrHashableKey(CMemoryPool *mp) const;
+	gpos::Ref<CColRefArray> PdrgpcrHashableKey(CMemoryPool *mp) const;
 
 	// extract key at given position
-	CColRefArray *PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::Ref<CColRefArray> PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
 
 	// extract key at given position
 	gpos::Ref<CColRefSet> PcrsKey(CMemoryPool *mp, ULONG ul) const;

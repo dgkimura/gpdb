@@ -22,7 +22,7 @@ namespace gpopt
 using namespace gpos;
 using namespace gpmd;
 
-using CScalarConstArray = CDynamicPtrArray<CScalarConst, CleanupRelease>;
+using CScalarConstArray = gpos::Vector<gpos::Ref<CScalarConst>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -45,7 +45,7 @@ private:
 	BOOL m_fMultiDimensional;
 
 	// const values
-	CScalarConstArray *m_pdrgPconst;
+	gpos::Ref<CScalarConstArray> m_pdrgPconst;
 
 public:
 	CScalarArray(const CScalarArray &) = delete;
@@ -57,7 +57,7 @@ public:
 	// ctor
 	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional,
-				 CScalarConstArray *pdrgPconst);
+				 gpos::Ref<CScalarConstArray> pdrgPconst);
 
 	// dtor
 	~CScalarArray() override;
@@ -92,9 +92,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -107,7 +107,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArray == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarArray> >(pop);
+		return gpos::dyn_cast<CScalarArray>(pop);
 	}
 
 	// element type id
@@ -123,7 +123,7 @@ public:
 	gpos::Ref<IMDId> MdidType() const override;
 
 	// CScalarConst array
-	CScalarConstArray *PdrgPconst() const;
+	gpos::Ref<CScalarConstArray> PdrgPconst() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

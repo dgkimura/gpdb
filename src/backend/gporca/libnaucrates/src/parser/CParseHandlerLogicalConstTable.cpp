@@ -136,9 +136,9 @@ CParseHandlerLogicalConstTable::EndElement(
 		GPOS_ASSERT(nullptr !=
 					col_descr_parse_handler->GetDXLColumnDescrArray());
 
-		CDXLColDescrArray *dxl_col_descr_array =
+		gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 			col_descr_parse_handler->GetDXLColumnDescrArray();
-		dxl_col_descr_array->AddRef();
+
 
 		gpos::Ref<CDXLLogicalConstTable> lg_const_table_get_dxl_op =
 			GPOS_NEW(m_mp) CDXLLogicalConstTable(m_mp, dxl_col_descr_array,

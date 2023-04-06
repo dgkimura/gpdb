@@ -51,8 +51,6 @@ CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 //---------------------------------------------------------------------------
 CDXLPhysicalTVF::~CDXLPhysicalTVF()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 	GPOS_DELETE(func_name);
 }
 

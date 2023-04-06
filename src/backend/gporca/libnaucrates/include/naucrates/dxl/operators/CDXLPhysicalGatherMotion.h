@@ -15,9 +15,9 @@
 #define GPDXL_CDXLPhysicalGatherMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalMotion.h"
-
 namespace gpdxl
 {
 // indices of gather motion elements in the children array
@@ -72,7 +72,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalMotionGather == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalGatherMotion> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalGatherMotion>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

@@ -13,9 +13,9 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -33,14 +33,14 @@ private:
 	ULONG m_id;
 
 	// output column ids
-	ULongPtrArray *m_output_colids_array;
+	gpos::Ref<ULongPtrArray> m_output_colids_array;
 
 public:
 	CDXLPhysicalCTEProducer(CDXLPhysicalCTEProducer &) = delete;
 
 	// ctor
 	CDXLPhysicalCTEProducer(CMemoryPool *mp, ULONG id,
-							ULongPtrArray *output_colids_array);
+							gpos::Ref<ULongPtrArray> output_colids_array);
 
 	// dtor
 	~CDXLPhysicalCTEProducer() override;
@@ -58,7 +58,7 @@ public:
 		return m_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetOutputColIdsArray() const
 	{
 		return m_output_colids_array;
@@ -81,7 +81,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalCTEProducer == dxl_op->GetDXLOperator());
-		return dynamic_cast<gpos::Ref<CDXLPhysicalCTEProducer> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalCTEProducer>(dxl_op);
 	}
 };
 }  // namespace gpdxl

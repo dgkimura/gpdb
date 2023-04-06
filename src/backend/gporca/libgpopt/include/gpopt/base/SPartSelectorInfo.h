@@ -33,8 +33,6 @@ struct SPartSelectorInfoEntry
 
 	~SPartSelectorInfoEntry()
 	{
-		m_filter_expr->Release();
-		m_stats->Release();
 	}
 };
 

@@ -36,8 +36,9 @@ public:
 	// ctor
 	explicit CLogicalDifferenceAll(CMemoryPool *mp);
 
-	CLogicalDifferenceAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-						  CColRef2dArray *pdrgpdrgpcrInput);
+	CLogicalDifferenceAll(CMemoryPool *mp,
+						  gpos::Ref<CColRefArray> pdrgpcrOutput,
+						  gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalDifferenceAll() override;
@@ -65,7 +66,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -106,7 +107,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// conversion function
 	static gpos::Ref<CLogicalDifferenceAll>
@@ -115,7 +116,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDifferenceAll == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalDifferenceAll> >(pop);
+		return gpos::dyn_cast<CLogicalDifferenceAll>(pop);
 	}
 
 };	// class CLogicalDifferenceAll

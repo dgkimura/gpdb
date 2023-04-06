@@ -102,7 +102,7 @@ CXformExpandNAryJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -119,22 +119,21 @@ CXformExpandNAryJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	//	   |  +--CScalarConst (1)
 	//	   |--CLogicalGet "t3"
 	//	   +--CScalarConst (1)
-	(*pexpr)[0]->AddRef();
-	(*pexpr)[1]->AddRef();
+
+
 	gpos::Ref<CExpression> pexprJoin =
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, (*pexpr)[0], (*pexpr)[1],
 			CPredicateUtils::PexprConjunction(mp, nullptr));
 	for (ULONG ul = 2; ul < arity - 1; ul++)
 	{
-		(*pexpr)[ul]->AddRef();
 		pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, pexprJoin, (*pexpr)[ul],
 			CPredicateUtils::PexprConjunction(mp, nullptr));
 	}
 
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
-	pexprScalar->AddRef();
+
 
 	// create a logical select with the join expression and scalar condition child
 	gpos::Ref<CExpression> pexprSelect =
@@ -143,7 +142,7 @@ CXformExpandNAryJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// normalize the tree and push down the predicates
 	gpos::Ref<CExpression> pexprNormalized =
 		CNormalizer::PexprNormalize(mp, pexprSelect);
-	pexprSelect->Release();
+
 	pxfres->Add(pexprNormalized);
 }
 

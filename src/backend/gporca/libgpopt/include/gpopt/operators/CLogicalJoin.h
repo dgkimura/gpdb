@@ -56,9 +56,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -70,7 +70,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<gpos::Ref<CLogicalJoin> >(pop);
+		return gpos::dyn_cast<CLogicalJoin>(pop);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Relational Properties

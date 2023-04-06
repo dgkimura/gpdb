@@ -22,7 +22,7 @@ namespace gpopt
 {
 // type definition of corresponding dynamic pointer array
 class CWindowFrame;
-using CWindowFrameArray = CDynamicPtrArray<CWindowFrame, CleanupRelease>;
+using CWindowFrameArray = gpos::Vector<gpos::Ref<CWindowFrame>>;
 
 using namespace gpos;
 
@@ -182,7 +182,8 @@ public:
 
 	// return a copy of the window frame with remapped columns
 	virtual gpos::Ref<CWindowFrame> PwfCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// return columns used by frame edges
 	gpos::Ref<CColRefSet>
@@ -195,15 +196,16 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// matching function over frame arrays
-	static BOOL Equals(const CWindowFrameArray *pdrgpwfFirst,
-					   const CWindowFrameArray *pdrgpwfSecond);
+	static BOOL Equals(const gpos::Ref<CWindowFrameArray> pdrgpwfFirst,
+					   const gpos::Ref<CWindowFrameArray> pdrgpwfSecond);
 
 	// combine hash values of a maximum number of entries
-	static ULONG HashValue(const CWindowFrameArray *pdrgpwfFirst,
+	static ULONG HashValue(const gpos::Ref<CWindowFrameArray> pdrgpwfFirst,
 						   ULONG ulMaxSize);
 
 	// print array of window frame objects
-	static IOstream &OsPrint(IOstream &os, const CWindowFrameArray *pdrgpwf);
+	static IOstream &OsPrint(IOstream &os,
+							 const gpos::Ref<CWindowFrameArray> pdrgpwf);
 
 	// check if a given window frame is empty
 	static BOOL

@@ -138,7 +138,6 @@ public:
 
 	~CKHeap() override
 	{
-		m_topk->Release();
 	}
 
 	void

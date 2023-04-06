@@ -60,7 +60,6 @@ CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCoerceBase::~CDXLScalarCoerceBase()
 {
-	m_result_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -82,13 +82,13 @@ private:
 	ULONG m_ulOptReq;
 
 	// array of child groups optimization contexts
-	COptimizationContextArray *m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> m_pdrgpoc;
 
 	// stats context to be used during costing
-	IStatisticsArray *m_pdrgpstatCurrentCtxt;
+	gpos::Ref<IStatisticsArray> m_pdrgpstatCurrentCtxt;
 
 	// array of derived properties of optimal implementations of child groups
-	CDrvdPropArray *m_pdrgpdp;
+	gpos::Ref<CDrvdPropArray> m_pdrgpdp;
 
 	// optimization order of children
 	CPhysical::EChildExecOrder m_eceo;

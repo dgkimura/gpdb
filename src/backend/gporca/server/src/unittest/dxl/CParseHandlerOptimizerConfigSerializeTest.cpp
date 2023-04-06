@@ -76,7 +76,7 @@ SerializeOptimizerConfig(CMemoryPool *mp,
 	// Add DXL document footer
 	CDXLUtils::SerializeFooter(&xml_serializer);
 
-	pbs->Release();
+
 	return;
 }
 
@@ -121,7 +121,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 
 	GPOS_ASSERT(strExpected.Equals(&str));
 
-	poc->Release();
+
 
 	return GPOS_OK;
 }

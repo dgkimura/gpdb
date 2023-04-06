@@ -60,7 +60,6 @@ public:
 	// dtor
 	~CScalarCmp() override
 	{
-		m_mdid_op->Release();
 		GPOS_DELETE(m_pstrOp);
 	}
 
@@ -98,9 +97,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -110,7 +109,8 @@ public:
 	BOOL FCommutative() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// name of the comparison operator
 	const CWStringConst *Pstr() const;
@@ -131,7 +131,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCmp == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarCmp> >(pop);
+		return gpos::dyn_cast<CScalarCmp>(pop);
 	}
 
 	// get commuted scalar comparision operator

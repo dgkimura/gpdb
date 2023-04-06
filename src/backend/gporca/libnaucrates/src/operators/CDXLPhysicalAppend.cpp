@@ -37,7 +37,7 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 									   BOOL fIsZapped, ULONG scan_id,
 									   gpos::Ref<CDXLTableDescr> dxl_table_desc,
-									   ULongPtrArray *selector_ids)
+									   gpos::Ref<ULongPtrArray> selector_ids)
 	: CDXLPhysical(mp),
 	  m_used_in_upd_del(fIsTarget),
 	  m_is_zapped(fIsZapped),
@@ -49,8 +49,6 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 
 CDXLPhysicalAppend::~CDXLPhysicalAppend()
 {
-	SafeRelease(m_dxl_table_descr);
-	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------

@@ -68,7 +68,7 @@ CXformImplementDML::Transform(gpos::Ref<CXformContext> pxfctxt,
 							  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalDML> popDML = CLogicalDML::PopConvert(pexpr->Pop());
@@ -79,12 +79,12 @@ CXformImplementDML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CLogicalDML::EDMLOperator edmlop = popDML->Edmlop();
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popDML->Ptabdesc();
-	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrSource = popDML->PdrgpcrSource();
-	pdrgpcrSource->AddRef();
+
+	gpos::Ref<CColRefArray> pdrgpcrSource = popDML->PdrgpcrSource();
+
 	gpos::Ref<CBitSet> pbsModified = popDML->PbsModified();
-	pbsModified->AddRef();
+
 
 	gpos::Ref<CColRef> pcrAction = popDML->PcrAction();
 	gpos::Ref<CColRef> pcrCtid = popDML->PcrCtid();
@@ -93,7 +93,7 @@ CXformImplementDML::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// child of DML operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 
 	// create physical DML
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(

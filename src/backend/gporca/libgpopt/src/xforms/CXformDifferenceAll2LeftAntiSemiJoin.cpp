@@ -53,7 +53,7 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -68,7 +68,8 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(
 
 	gpos::Ref<CLogicalDifferenceAll> popDifferenceAll =
 		CLogicalDifferenceAll::PopConvert(pexpr->Pop());
-	CColRef2dArray *pdrgpdrgpcrInput = popDifferenceAll->PdrgpdrgpcrInput();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
+		popDifferenceAll->PdrgpdrgpcrInput();
 
 	gpos::Ref<CExpression> pexprLeftWindow =
 		CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild,
@@ -77,13 +78,14 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(
 		CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild,
 											  (*pdrgpdrgpcrInput)[1]);
 
-	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
-	CColRefArray *pdrgpcrLeftNew =
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInputNew =
+		GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcrLeftNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(
 		pexprLeftWindow, 0 /* row_number window function*/));
 
-	CColRefArray *pdrgpcrRightNew =
+	gpos::Ref<CColRefArray> pdrgpcrRightNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[1]);
 	pdrgpcrRightNew->Append(CXformUtils::PcrProjectElement(
 		pexprRightWindow, 0 /* row_number window function*/));
@@ -101,7 +103,7 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(
 					pexprLeftWindow, pexprRightWindow, pexprScCond);
 
 	// clean up
-	pdrgpdrgpcrInputNew->Release();
+
 
 	// add alternative to results
 	pxfres->Add(pexprLASJ);

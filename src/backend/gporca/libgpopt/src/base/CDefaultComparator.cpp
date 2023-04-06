@@ -75,16 +75,15 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp,
 		CUtils::PexprScalarCmp(mp, pexpr1, pexpr2, cmp_type);
 
 	gpos::Ref<CExpression> pexprResult = m_pceeval->PexprEval(pexprComp);
-	pexprComp->Release();
+
 	gpos::Ref<CScalarConst> popScalarConst =
 		CScalarConst::PopConvert(pexprResult->Pop());
 	gpos::Ref<IDatum> datum = popScalarConst->GetDatum();
 
 	GPOS_ASSERT(IMDType::EtiBool == datum->GetDatumType());
-	gpos::Ref<IDatumBool> pdatumBool =
-		dynamic_cast<gpos::Ref<IDatumBool> >(datum);
+	gpos::Ref<IDatumBool> pdatumBool = gpos::dyn_cast<IDatumBool>(datum);
 	BOOL result = pdatumBool->GetValue();
-	pexprResult->Release();
+
 
 	return result;
 }

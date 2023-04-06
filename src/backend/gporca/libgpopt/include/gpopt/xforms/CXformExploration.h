@@ -75,7 +75,7 @@ public:
 		GPOS_ASSERT(nullptr != pxform);
 		GPOS_ASSERT(pxform->FExploration());
 
-		return dynamic_cast<gpos::Ref<CXformExploration> >(pxform);
+		return gpos::dyn_cast<CXformExploration>(pxform);
 	}
 
 };	// class CXformExploration

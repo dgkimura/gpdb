@@ -54,9 +54,6 @@ CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarArrayRef::~CDXLScalarArrayRef()
 {
-	m_elem_type_mdid->Release();
-	m_array_type_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

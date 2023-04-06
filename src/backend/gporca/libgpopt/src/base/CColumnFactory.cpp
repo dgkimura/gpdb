@@ -61,8 +61,6 @@ CColumnFactory::CColumnFactory()
 //---------------------------------------------------------------------------
 CColumnFactory::~CColumnFactory()
 {
-	SafeRelease(m_phmcrcrs);
-
 	// dealloc hash table
 	m_sht.Cleanup();
 
@@ -320,8 +318,6 @@ CColumnFactory::Destroy(gpos::Ref<CColRef> colref)
 		// unlink from hashtable
 		shtacc.Remove(pcrFound);
 	}
-
-	colref->Release();
 }
 
 

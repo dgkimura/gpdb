@@ -20,7 +20,7 @@
 using namespace gpopt;
 
 CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
-	CMemoryPool *mp, CColRefArray *colref_array,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 	gpos::Ref<CExpression> origJoinPred)
 	: CPhysicalLeftOuterNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
@@ -29,15 +29,12 @@ CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
 	GPOS_ASSERT(nullptr != colref_array);
 	if (nullptr != origJoinPred)
 	{
-		origJoinPred->AddRef();
 	}
 }
 
 
 CPhysicalLeftOuterIndexNLJoin::~CPhysicalLeftOuterIndexNLJoin()
 {
-	m_pdrgpcrOuterRefs->Release();
-	SafeRelease(m_origJoinPred);
 }
 
 
@@ -81,7 +78,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::Ref<CDistributionSpec>,  //pdsRequired,
-	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED,
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 	ULONG  // ulOptReq
 ) const
 {
@@ -96,7 +94,8 @@ gpos::Ref<CEnfdDistribution>
 CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   gpos::Ref<CReqdPropPlan> prppInput,
 								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+								   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+								   ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -157,7 +156,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		if (pdshashed->HasCompleteEquivSpec(mp))
 		{
 			// request hashed distribution from outer
-			pdshashedEquiv->Pdrgpexpr()->AddRef();
+
 			gpos::Ref<CDistributionSpecHashed> pdsHashedRequired = GPOS_NEW(mp)
 				CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
 										pdshashedEquiv->FNullsColocated());
@@ -170,7 +169,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		// though this spec will fail to produce a plan during property
 		// enforcement, it is still better than falling back to planner, since
 		// there may be other alternatives that will succeed.
-		pdshashed->AddRef();
+
 		return GPOS_NEW(mp) CEnfdDistribution(pdshashed, dmatch);
 	}
 

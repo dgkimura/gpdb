@@ -14,11 +14,10 @@
 #define GPDXL_CDXLLogicalGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -64,7 +63,7 @@ public:
 		GPOS_ASSERT(EdxlopLogicalGet == dxl_op->GetDXLOperator() ||
 					EdxlopLogicalForeignGet == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalGet> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalGet>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

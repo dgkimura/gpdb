@@ -64,7 +64,7 @@ CleanupRelease(T *elem)
 // arrays of unsigned integers
 using ULongPtrArray = CDynamicPtrArray<ULONG, CleanupDelete>;
 // array of unsigned integer arrays
-using ULongPtr2dArray = CDynamicPtrArray<ULongPtrArray, CleanupRelease>;
+using ULongPtr2dArray = gpos::Vector<gpos::Ref<ULongPtrArray>>;
 
 // arrays of integers
 using IntPtrArray = CDynamicPtrArray<INT, CleanupDelete>;
@@ -358,13 +358,13 @@ public:
 	// in the second array if the first array is not included in the second,
 	// return null
 	// equality comparison between elements is via the "==" operator
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	IndexesOfSubsequence(CDynamicPtrArray<T, CleanupFn> *subsequence)
 	{
 		GPOS_ASSERT(nullptr != subsequence);
 
 		ULONG subsequence_length = subsequence->Size();
-		ULongPtrArray *indexes = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		gpos::Ref<ULongPtrArray> indexes = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 		for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
 		{
@@ -384,7 +384,7 @@ public:
 
 	// Eliminate members from an array that are not contained in a given list of indexes
 	CDynamicPtrArray<T, CleanupFn> *
-	CreateReducedArray(ULongPtrArray *indexes_to_choose)
+	CreateReducedArray(gpos::Ref<ULongPtrArray> indexes_to_choose)
 	{
 		CDynamicPtrArray<T, CleanupFn> *result =
 			GPOS_NEW(m_mp) CDynamicPtrArray<T, CleanupFn>(m_mp, m_min_size,

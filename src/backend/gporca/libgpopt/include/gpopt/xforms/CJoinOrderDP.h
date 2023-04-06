@@ -113,7 +113,7 @@ private:
 	ExpressionToCostMap *m_phmexprcost;
 
 	// array of top-k join expression
-	CExpressionArray *m_pdrgpexprTopKOrders;
+	gpos::Ref<CExpressionArray> m_pdrgpexprTopKOrders;
 
 	// dummy expression to used for non-joinable components
 	gpos::Ref<CExpression> m_pexprDummy;
@@ -169,16 +169,17 @@ private:
 	// generate all subsets of the given array of elements
 	static void GenerateSubsets(CMemoryPool *mp, gpos::Ref<CBitSet> pbsCurrent,
 								ULONG *pulElems, ULONG size, ULONG ulIndex,
-								CBitSetArray *pdrgpbsSubsets);
+								gpos::Ref<CBitSetArray> pdrgpbsSubsets);
 
 	// driver of subset generation
-	static CBitSetArray *PdrgpbsSubsets(CMemoryPool *mp,
-										gpos::Ref<CBitSet> pbs);
+	static gpos::Ref<CBitSetArray> PdrgpbsSubsets(CMemoryPool *mp,
+												  gpos::Ref<CBitSet> pbs);
 
 public:
 	// ctor
-	CJoinOrderDP(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-				 CExpressionArray *pdrgpexprConjuncts);
+	CJoinOrderDP(CMemoryPool *mp,
+				 gpos::Ref<CExpressionArray> pdrgpexprComponents,
+				 gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderDP() override;
@@ -187,7 +188,7 @@ public:
 	virtual gpos::Ref<CExpression> PexprExpand();
 
 	// best join orders
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprTopK() const
 	{
 		return m_pdrgpexprTopKOrders;

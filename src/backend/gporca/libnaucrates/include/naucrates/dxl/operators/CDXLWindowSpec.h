@@ -40,7 +40,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// partition-by column identifiers
-	ULongPtrArray *m_partition_by_colid_array;
+	gpos::Ref<ULongPtrArray> m_partition_by_colid_array;
 
 	// name of window specification
 	CMDName *m_mdname;
@@ -56,7 +56,8 @@ private:
 
 public:
 	// ctor
-	CDXLWindowSpec(CMemoryPool *mp, ULongPtrArray *partition_by_colid_array,
+	CDXLWindowSpec(CMemoryPool *mp,
+				   gpos::Ref<ULongPtrArray> partition_by_colid_array,
 				   CMDName *mdname, gpos::Ref<CDXLNode> sort_col_list_dxlnode,
 				   gpos::Ref<CDXLWindowFrame> window_frame);
 
@@ -77,7 +78,7 @@ public:
 	}
 
 	// partition-by column identifiers
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetPartitionByColIdArray() const
 	{
 		return m_partition_by_colid_array;
@@ -98,7 +99,7 @@ public:
 	}
 };
 
-using CDXLWindowSpecArray = CDynamicPtrArray<CDXLWindowSpec, CleanupRelease>;
+using CDXLWindowSpecArray = gpos::Vector<gpos::Ref<CDXLWindowSpec>>;
 }  // namespace gpdxl
 #endif	// !GPDXL_CDXLWindowSpec_H
 

@@ -30,9 +30,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalLeftOuterHashJoin::CPhysicalLeftOuterHashJoin(
-	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-	BOOL is_null_aware, CXform::EXformId origin_xform)
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+	gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+	gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware,
+	CXform::EXformId origin_xform)
 	: CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
 						hash_opfamilies, is_null_aware, origin_xform)
 {
@@ -82,7 +83,7 @@ CPhysicalLeftOuterHashJoin::PdsDeriveFromHashedChildren(
 			pdshashedInner->Copy(mp, false);
 		gpos::Ref<CDistributionSpecHashed> combined_hashed_spec =
 			pdshashedOuter->Combine(mp, pdshashedInnerCopy);
-		pdshashedInnerCopy->Release();
+
 		return combined_hashed_spec;
 	}
 
@@ -148,20 +149,19 @@ CPhysicalLeftOuterHashJoin::PdsDerive(CMemoryPool *mp,
 		// Note that, since this is done at the lowest join, no relevant equivalent specs are lost.
 		if (!pdsHashed->HasCompleteEquivSpec(mp))
 		{
-			CExpressionArray *pdrgpexpr = pdsHashed->Pdrgpexpr();
-			IMdIdArray *opfamilies = pdsHashed->Opfamilies();
+			gpos::Ref<CExpressionArray> pdrgpexpr = pdsHashed->Pdrgpexpr();
+			gpos::Ref<IMdIdArray> opfamilies = pdsHashed->Opfamilies();
 
 			if (nullptr != opfamilies)
 			{
-				opfamilies->AddRef();
 			}
-			pdrgpexpr->AddRef();
+
 			return GPOS_NEW(mp) CDistributionSpecHashed(
 				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
 		}
 	}
 
-	pds->AddRef();
+
 	return pds;
 }
 // EOF

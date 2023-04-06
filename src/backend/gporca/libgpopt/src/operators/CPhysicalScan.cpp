@@ -35,7 +35,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalScan::CPhysicalScan(CMemoryPool *mp, const CName *pnameAlias,
 							 gpos::Ref<CTableDescriptor> ptabdesc,
-							 CColRefArray *pdrgpcrOutput)
+							 gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -71,10 +71,6 @@ CPhysicalScan::CPhysicalScan(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CPhysicalScan::~CPhysicalScan()
 {
-	m_ptabdesc->Release();
-	m_pdrgpcrOutput->Release();
-	m_pds->Release();
-	m_pstatsBaseTable->Release();
 	GPOS_DELETE(m_pnameAlias);
 }
 
@@ -115,7 +111,7 @@ CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
 	pcrs->Include(m_pdrgpcrOutput);
 
 	BOOL result = pcrs->ContainsAll(pcrsRequired);
-	pcrs->Release();
+
 
 	return result;
 }
@@ -193,11 +189,11 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 		if (nullptr != pdshashedEquiv)
 		{
-			CExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
-			pdrgpexprHashed->AddRef();
+			gpos::Ref<CExpressionArray> pdrgpexprHashed =
+				pdshashed->Pdrgpexpr();
+
 			if (nullptr != pdshashed->Opfamilies())
 			{
-				pdshashed->Opfamilies()->AddRef();
 			}
 			gpos::Ref<CDistributionSpecHashed> pdshashedResult =
 				GPOS_NEW(mp) CDistributionSpecHashed(
@@ -208,7 +204,7 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		}
 	}
 
-	m_pds->AddRef();
+
 
 	return m_pds;
 }
@@ -261,9 +257,6 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 	m_pstatsBaseTable =
 		md_accessor->Pstats(mp, m_ptabdesc->MDId(), pcrsHist, pcrsWidth);
 	GPOS_ASSERT(nullptr != m_pstatsBaseTable);
-
-	pcrsHist->Release();
-	pcrsWidth->Release();
 }
 
 
@@ -281,7 +274,7 @@ CPhysicalScan::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop));
 
-	return dynamic_cast<gpos::Ref<CPhysicalScan> >(pop);
+	return gpos::dyn_cast<CPhysicalScan>(pop);
 }
 
 

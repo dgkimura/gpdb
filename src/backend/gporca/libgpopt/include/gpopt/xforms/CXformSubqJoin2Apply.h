@@ -42,9 +42,10 @@ private:
 				   BOOL fEnforceCorrelatedApply) const override;
 
 	// collect subqueries that exclusively use outer/inner child
-	static void CollectSubqueries(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-								  CColRefSetArray *pdrgpcrs,
-								  CExpressionArrays *pdrgpdrgpexprSubqs);
+	static void CollectSubqueries(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRefSetArray> pdrgpcrs,
+		gpos::Ref<CExpressionArrays> pdrgpdrgpexprSubqs);
 
 	// replace subqueries with scalar identifier based on given map
 	static gpos::Ref<CExpression> PexprReplaceSubqueries(

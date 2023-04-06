@@ -38,18 +38,18 @@ class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 {
 private:
 	// helper for splitting correlations into external and residual
-	static BOOL FSplitCorrelations(CMemoryPool *mp,
-								   gpos::Ref<CExpression> pexprOuter,
-								   gpos::Ref<CExpression> pexprInner,
-								   CExpressionArray *pdrgpexprAllCorr,
-								   CExpressionArray **ppdrgpexprExternal,
-								   CExpressionArray **ppdrgpexprResidual,
-								   gpos::Ref<CColRefSet> *ppcrsInnerUsed);
+	static BOOL FSplitCorrelations(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		gpos::Ref<CExpression> pexprInner,
+		gpos::Ref<CExpressionArray> pdrgpexprAllCorr,
+		gpos::Ref<CExpressionArray> *ppdrgpexprExternal,
+		gpos::Ref<CExpressionArray> *ppdrgpexprResidual,
+		gpos::Ref<CColRefSet> *ppcrsInnerUsed);
 
 	// helper for collecting correlations
 	static BOOL FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 gpos::Ref<CExpression> *ppexprInnerNew,
-							 CExpressionArray **ppdrgpexprCorr);
+							 gpos::Ref<CExpressionArray> *ppdrgpexprCorr);
 
 	// decorrelate semi apply with external correlations
 	static gpos::Ref<CExpression> PexprDecorrelate(

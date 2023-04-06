@@ -47,8 +47,6 @@ CFunctionalDependency::CFunctionalDependency(
 //---------------------------------------------------------------------------
 CFunctionalDependency::~CFunctionalDependency()
 {
-	m_pcrsKey->Release();
-	m_pcrsDetermined->Release();
 }
 
 
@@ -130,7 +128,8 @@ CFunctionalDependency::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 ULONG
-CFunctionalDependency::HashValue(const CFunctionalDependencyArray *pdrgpfd)
+CFunctionalDependency::HashValue(
+	const gpos::Ref<CFunctionalDependencyArray> pdrgpfd)
 {
 	ULONG ulHash = 0;
 	if (nullptr != pdrgpfd)
@@ -155,8 +154,9 @@ CFunctionalDependency::HashValue(const CFunctionalDependencyArray *pdrgpfd)
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
-							  const CFunctionalDependencyArray *pdrgpfdSnd)
+CFunctionalDependency::Equals(
+	const gpos::Ref<CFunctionalDependencyArray> pdrgpfdFst,
+	const gpos::Ref<CFunctionalDependencyArray> pdrgpfdSnd)
 {
 	if (nullptr == pdrgpfdFst && nullptr == pdrgpfdSnd)
 	{
@@ -203,8 +203,8 @@ CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CFunctionalDependency::PcrsKeys(CMemoryPool *mp,
-								const CFunctionalDependencyArray *pdrgpfd)
+CFunctionalDependency::PcrsKeys(
+	CMemoryPool *mp, const gpos::Ref<CFunctionalDependencyArray> pdrgpfd)
 {
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
@@ -229,13 +229,13 @@ CFunctionalDependency::PcrsKeys(CMemoryPool *mp,
 //		Create an array of all keys
 //
 //---------------------------------------------------------------------------
-CColRefArray *
-CFunctionalDependency::PdrgpcrKeys(CMemoryPool *mp,
-								   const CFunctionalDependencyArray *pdrgpfd)
+gpos::Ref<CColRefArray>
+CFunctionalDependency::PdrgpcrKeys(
+	CMemoryPool *mp, const gpos::Ref<CFunctionalDependencyArray> pdrgpfd)
 {
 	gpos::Ref<CColRefSet> pcrs = PcrsKeys(mp, pdrgpfd);
-	CColRefArray *colref_array = pcrs->Pdrgpcr(mp);
-	pcrs->Release();
+	gpos::Ref<CColRefArray> colref_array = pcrs->Pdrgpcr(mp);
+
 
 	return colref_array;
 }

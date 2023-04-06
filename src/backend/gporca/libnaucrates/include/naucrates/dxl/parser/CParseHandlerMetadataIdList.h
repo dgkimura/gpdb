@@ -36,7 +36,7 @@ class CParseHandlerMetadataIdList : public CParseHandlerBase
 {
 private:
 	// list of metadata identifiers
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 
 	// process the start of an element
@@ -71,7 +71,7 @@ public:
 	~CParseHandlerMetadataIdList() override;
 
 	// return the constructed list of metadata identifiers
-	IMdIdArray *GetMdIdArray();
+	gpos::Ref<IMdIdArray> GetMdIdArray();
 };
 }  // namespace gpdxl
 

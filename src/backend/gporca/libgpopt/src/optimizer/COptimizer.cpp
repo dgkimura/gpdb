@@ -66,7 +66,7 @@ COptimizer::PrintQuery(CMemoryPool *mp, gpos::Ref<CExpression> pexprTranslated,
 			<< "Algebrized query: " << std::endl
 			<< *pexprTranslated;
 
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PdrgPexpr(mp);
 	const ULONG ulCTEs = pdrgpexpr->Size();
 	if (0 < ulCTEs)
@@ -77,7 +77,7 @@ COptimizer::PrintQuery(CMemoryPool *mp, gpos::Ref<CExpression> pexprTranslated,
 			at.Os() << std::endl << *(*pdrgpexpr)[ul];
 		}
 	}
-	pdrgpexpr->Release();
+
 
 	gpos::Ref<CExpression> pexprPreprocessed = pqc->Pexpr();
 	(void) pexprPreprocessed->PdpDerive();
@@ -175,7 +175,7 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 				gpos::Ref<CScalarConst> popScalarConst =
 					CScalarConst::PopConvert(pop);
 				gpos::Ref<CDatumGenericGPDB> datum =
-					dynamic_cast<gpos::Ref<CDatumGenericGPDB> >(
+					gpos::dyn_cast<CDatumGenericGPDB>(
 						popScalarConst->GetDatum());
 
 				if (NULL != datum && !datum->IsNull())
@@ -231,10 +231,12 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 gpos::Ref<CDXLNode>
 COptimizer::PdxlnOptimize(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const gpos::Ref<CDXLNode> query,
-	const CDXLNodeArray *query_output_dxlnode_array,
-	const CDXLNodeArray *cte_producers, gpos::Ref<IConstExprEvaluator> pceeval,
+	const gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+	const gpos::Ref<CDXLNodeArray> cte_producers,
+	gpos::Ref<IConstExprEvaluator> pceeval,
 	ULONG ulHosts,	// actual number of data nodes in the system
-	ULONG ulSessionId, ULONG ulCmdId, CSearchStageArray *search_stage_array,
+	ULONG ulSessionId, ULONG ulCmdId,
+	gpos::Ref<CSearchStageArray> search_stage_array,
 	gpos::Ref<COptimizerConfig> optimizer_config,
 	const CHAR *szMinidumpFileName	// name of minidump file to be created
 )
@@ -279,10 +281,8 @@ COptimizer::PdxlnOptimize(
 									cte_producers);
 
 		{
-			optimizer_config->AddRef();
 			if (nullptr != pceeval)
 			{
-				pceeval->AddRef();
 			}
 
 			// install opt context in TLS
@@ -293,8 +293,9 @@ COptimizer::PdxlnOptimize(
 			gpos::Ref<CExpression> pexprTranslated = dxltr.PexprTranslateQuery(
 				query, query_output_dxlnode_array, cte_producers);
 			GPOS_CHECK_ABORT;
-			gpdxl::ULongPtrArray *pdrgpul = dxltr.PdrgpulOutputColRefs();
-			gpmd::CMDNameArray *pdrgpmdname = dxltr.Pdrgpmdname();
+			gpos::Ref<gpdxl::ULongPtrArray> pdrgpul =
+				dxltr.PdrgpulOutputColRefs();
+			gpos::Ref<gpmd::CMDNameArray> pdrgpmdname = dxltr.Pdrgpmdname();
 
 			CQueryContext *pqc =
 				CQueryContext::PqcGenerate(mp, pexprTranslated, pdrgpul,
@@ -344,8 +345,8 @@ COptimizer::PdxlnOptimize(
 			}
 
 			// cleanup
-			pexprTranslated->Release();
-			pexprPlan->Release();
+
+
 			GPOS_DELETE(pqc);
 		}
 	}
@@ -399,14 +400,13 @@ COptimizer::HandleExceptionAfterFinalizingMinidump(CException &ex)
 void
 COptimizer::CheckCTEConsistency(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
-	UlongToUlongMap *phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
+	gpos::Ref<UlongToUlongMap> phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
 	gpos::Ref<CDrvdPropPlan> pdpplanChild =
 		CDrvdPropPlan::Pdpplan(pexpr->PdpDerive());
 	gpos::Ref<CDistributionSpec> pdsChild = pdpplanChild->Pds();
 
 	CUtils::EExecLocalityType eelt = CUtils::ExecLocalityType(pdsChild);
 	CUtils::ValidateCTEProducerConsumerLocality(mp, pexpr, eelt, phmulul);
-	phmulul->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -419,7 +419,7 @@ COptimizer::CheckCTEConsistency(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 COptimizer::PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
-						  CSearchStageArray *search_stage_array)
+						  gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CEngine eng(mp);
 	eng.Init(pqc, search_stage_array);
@@ -454,11 +454,11 @@ COptimizer::PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
 gpos::Ref<CDXLNode>
 COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 						  gpos::Ref<CExpression> pexpr,
-						  CColRefArray *colref_array, CMDNameArray *pdrgpmdname,
-						  ULONG ulHosts)
+						  gpos::Ref<CColRefArray> colref_array,
+						  gpos::Ref<CMDNameArray> pdrgpmdname, ULONG ulHosts)
 {
 	GPOS_ASSERT(0 < ulHosts);
-	IntPtrArray *pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::Ref<IntPtrArray> pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);
 
 	for (ULONG ul = 0; ul < ulHosts; ul++)
 	{

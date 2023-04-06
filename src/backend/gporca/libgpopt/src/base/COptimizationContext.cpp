@@ -48,9 +48,6 @@ const OPTCTXT_PTR COptimizationContext::m_pocInvalid = nullptr;
 //---------------------------------------------------------------------------
 COptimizationContext::~COptimizationContext()
 {
-	SafeRelease(m_prpp);
-	SafeRelease(m_prprel);
-	SafeRelease(m_pdrgpstatCtxt);
 }
 
 
@@ -207,8 +204,9 @@ COptimizationContext::FOptimize(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-									   COptimizationContextArray *pdrgpocSnd)
+COptimizationContext::FEqualContextIds(
+	gpos::Ref<COptimizationContextArray> pdrgpocFst,
+	gpos::Ref<COptimizationContextArray> pdrgpocSnd)
 {
 	if (nullptr == pdrgpocFst || nullptr == pdrgpocSnd)
 	{
@@ -374,7 +372,7 @@ COptimizationContext::FOptimizeNLJoin(
 			->GetOutputColumns();
 	pcrs->Include(pcrsOuterChild);
 	BOOL fIncluded = pcrs->ContainsAll(poc->Prpp()->PcrsRequired());
-	pcrs->Release();
+
 
 	return fIncluded;
 }
@@ -439,18 +437,16 @@ COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
 			->GetOutputColumns();
 	gpos::Ref<CPhysicalCTEProducer> popProducer =
 		CPhysicalCTEProducer::PopConvert(pccProducer->Pgexpr()->Pop());
-	UlongToColRefMap *colref_mapping =
+	gpos::Ref<UlongToColRefMap> colref_mapping =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PhmulcrConsumerToProducer(
 			mp, popProducer->UlCTEId(), pcrsInnerOutput,
 			popProducer->Pdrgpcr());
 	gpos::Ref<CReqdPropPlan> prppProducer = CReqdPropPlan::PrppRemapForCTE(
 		mp, pocProducer->Prpp(), pccConsumer->Pdpplan(), colref_mapping);
-	colref_mapping->Release();
+
 
 	if (prppProducer->Equals(pocProducer->Prpp()))
 	{
-		prppProducer->Release();
-
 		return nullptr;
 	}
 

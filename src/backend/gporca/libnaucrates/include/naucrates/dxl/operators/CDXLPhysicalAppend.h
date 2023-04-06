@@ -17,10 +17,10 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 // indices of append elements in the children array
@@ -56,7 +56,7 @@ private:
 	// table descr of the root partitioned table (when translated from a CPhysicalDynamicTableScan)
 	gpos::Ref<CDXLTableDescr> m_dxl_table_descr = nullptr;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalAppend(const CDXLPhysicalAppend &) = delete;
@@ -67,7 +67,7 @@ public:
 	// ctor for partitioned table scan
 	CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped,
 					   ULONG scan_id, gpos::Ref<CDXLTableDescr> dxl_table_desc,
-					   ULongPtrArray *selector_ids);
+					   gpos::Ref<ULongPtrArray> selector_ids);
 
 	// dtor
 	~CDXLPhysicalAppend() override;
@@ -97,7 +97,7 @@ public:
 		return m_scan_id;
 	}
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -114,7 +114,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalAppend == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalAppend> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalAppend>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

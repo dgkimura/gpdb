@@ -34,7 +34,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalTableScan::CPhysicalTableScan(CMemoryPool *mp, const CName *pnameAlias,
 									   gpos::Ref<CTableDescriptor> ptabdesc,
-									   CColRefArray *pdrgpcrOutput)
+									   gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 }

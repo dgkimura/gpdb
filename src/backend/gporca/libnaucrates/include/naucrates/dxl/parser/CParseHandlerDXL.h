@@ -52,31 +52,31 @@ private:
 	gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// list of query output columns
-	CDXLNodeArray *m_output_colums_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_output_colums_dxl_array;
 
 	// list of CTE producers
-	CDXLNodeArray *m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	// the root of the parsed DXL plan
 	gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// list of parsed metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::Ref<IMDCacheObjectArray> m_mdid_cached_obj_array;
 
 	// list of parsed metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// the root of the parsed scalar expression
 	gpos::Ref<CDXLNode> m_scalar_expr_dxl;
 
 	// list of source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::Ref<CSystemIdArray> m_system_id_array;
 
 	// list of parsed statistics objects
 	CDXLStatsDerivedRelationArray *m_dxl_stats_derived_rel_array;
 
 	// search strategy
-	CSearchStageArray *m_search_stage_array;
+	gpos::Ref<CSearchStageArray> m_search_stage_array;
 
 	// plan Id
 	ULLONG m_plan_id;
@@ -154,19 +154,19 @@ public:
 	gpos::Ref<CDXLNode> GetQueryDXLRoot() const;
 
 	// returns the list of query output columns
-	CDXLNodeArray *GetOutputColumnsDXLArray() const;
+	gpos::Ref<CDXLNodeArray> GetOutputColumnsDXLArray() const;
 
 	// returns the list of CTE producers
-	CDXLNodeArray *GetCTEProducerDXLArray() const;
+	gpos::Ref<CDXLNodeArray> GetCTEProducerDXLArray() const;
 
 	// returns the root of the parsed DXL plan
 	gpos::Ref<CDXLNode> PdxlnPlan() const;
 
 	// return the list of parsed metadata objects
-	IMDCacheObjectArray *GetMdIdCachedObjArray() const;
+	gpos::Ref<IMDCacheObjectArray> GetMdIdCachedObjArray() const;
 
 	// return the list of parsed metadata ids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::Ref<IMdIdArray> GetMdIdArray() const;
 
 	// return the MD request object
 	gpos::Ref<CMDRequest> GetMiniDumper() const;
@@ -175,13 +175,13 @@ public:
 	gpos::Ref<CDXLNode> GetScalarExprDXLRoot() const;
 
 	// return the list of parsed source system id objects
-	CSystemIdArray *GetSysidPtrArray() const;
+	gpos::Ref<CSystemIdArray> GetSysidPtrArray() const;
 
 	// return the list of statistics objects
 	CDXLStatsDerivedRelationArray *GetStatsDerivedRelDXLArray() const;
 
 	// return search strategy
-	CSearchStageArray *GetSearchStageArray() const;
+	gpos::Ref<CSearchStageArray> GetSearchStageArray() const;
 
 	// return plan id
 	ULLONG GetPlanId() const;

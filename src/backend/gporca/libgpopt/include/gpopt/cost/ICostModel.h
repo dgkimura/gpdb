@@ -82,7 +82,6 @@ public:
 		// dtor
 		~CCostingStats() override
 		{
-			m_pstats->Release();
 		}
 
 		// the risk of errors in cardinality estimation
@@ -190,11 +189,9 @@ public:
 
 			for (ULONG ul = 0; ul < m_ulChildren; ul++)
 			{
-				SafeRelease(m_pdrgstatsChildren[ul]);
 			}
 
 			GPOS_DELETE_ARRAY(m_pdrgstatsChildren);
-			m_pcstats->Release();
 		}
 
 		// children accessor

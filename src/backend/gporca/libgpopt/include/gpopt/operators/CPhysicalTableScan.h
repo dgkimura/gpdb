@@ -35,7 +35,7 @@ public:
 	// ctors
 	explicit CPhysicalTableScan(CMemoryPool *mp);
 	CPhysicalTableScan(CMemoryPool *, const CName *,
-					   gpos::Ref<CTableDescriptor>, CColRefArray *);
+					   gpos::Ref<CTableDescriptor>, gpos::Ref<CColRefArray>);
 
 	// ident accessors
 	EOperatorId
@@ -73,15 +73,15 @@ public:
 		GPOS_ASSERT(EopPhysicalTableScan == pop->Eopid() ||
 					EopPhysicalForeignScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalTableScan> >(pop);
+		return gpos::dyn_cast<CPhysicalTableScan>(pop);
 	}
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
-	PstatsDerive(CMemoryPool *,				// mp
-				 CExpressionHandle &,		// exprhdl
-				 gpos::Ref<CReqdPropPlan>,	// prpplan
-				 IStatisticsArray *			//stats_ctxt
+	PstatsDerive(CMemoryPool *,				  // mp
+				 CExpressionHandle &,		  // exprhdl
+				 gpos::Ref<CReqdPropPlan>,	  // prpplan
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

@@ -50,8 +50,8 @@ CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalConstTableGet::CLogicalConstTableGet(
-	CMemoryPool *mp, CColumnDescriptorArray *pdrgpcoldesc,
-	IDatum2dArray *pdrgpdrgpdatum)
+	CMemoryPool *mp, gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc,
+	gpos::Ref<IDatum2dArray> pdrgpdrgpdatum)
 	: CLogical(mp),
 	  m_pdrgpcoldesc(pdrgpcoldesc),
 	  m_pdrgpdrgpdatum(pdrgpdrgpdatum),
@@ -66,7 +66,7 @@ CLogicalConstTableGet::CLogicalConstTableGet(
 #ifdef GPOS_DEBUG
 	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
 	{
-		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
+		gpos::Ref<IDatumArray> pdrgpdatum = (*pdrgpdrgpdatum)[ul];
 		GPOS_ASSERT(pdrgpdatum->Size() == pdrgpcoldesc->Size());
 	}
 #endif
@@ -80,9 +80,9 @@ CLogicalConstTableGet::CLogicalConstTableGet(
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp,
-											 CColRefArray *pdrgpcrOutput,
-											 IDatum2dArray *pdrgpdrgpdatum)
+CLogicalConstTableGet::CLogicalConstTableGet(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<IDatum2dArray> pdrgpdrgpdatum)
 	: CLogical(mp),
 	  m_pdrgpcoldesc(nullptr),
 	  m_pdrgpdrgpdatum(pdrgpdrgpdatum),
@@ -97,7 +97,7 @@ CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp,
 #ifdef GPOS_DEBUG
 	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
 	{
-		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
+		gpos::Ref<IDatumArray> pdrgpdatum = (*pdrgpdrgpdatum)[ul];
 		GPOS_ASSERT(pdrgpdatum->Size() == m_pdrgpcoldesc->Size());
 	}
 #endif
@@ -113,9 +113,6 @@ CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalConstTableGet::~CLogicalConstTableGet()
 {
-	SafeRelease(m_pdrgpcoldesc);
-	SafeRelease(m_pdrgpdrgpdatum);
-	SafeRelease(m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -175,9 +172,10 @@ CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalConstTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array = nullptr;
+	gpos::Ref<CColRefArray> colref_array = nullptr;
 	if (must_exist)
 	{
 		colref_array =
@@ -188,7 +186,7 @@ CLogicalConstTableGet::PopCopyWithRemappedColumns(
 		colref_array = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping,
 											must_exist);
 	}
-	m_pdrgpdrgpdatum->AddRef();
+
 
 	return GPOS_NEW(mp)
 		CLogicalConstTableGet(mp, colref_array, m_pdrgpdrgpdatum);
@@ -254,10 +252,10 @@ CLogicalConstTableGet::FInputOrderSensitive() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalConstTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementConstTableGet);
 	return xform_set;
 }
@@ -271,12 +269,12 @@ CLogicalConstTableGet::PxfsCandidates(CMemoryPool *mp) const
 //		Construct column descriptors from column references
 //
 //---------------------------------------------------------------------------
-CColumnDescriptorArray *
+gpos::Ref<CColumnDescriptorArray>
 CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
-										   CColRefArray *colref_array)
+										   gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
-	CColumnDescriptorArray *pdrgpcoldesc =
+	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 
 	const ULONG length = colref_array->Size();
@@ -312,23 +310,24 @@ CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalConstTableGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									IStatisticsArray *	// not used
+									gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<CReqdPropRelational> prprel =
 		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
-	ULongPtrArray *pdrgpulColWidth = CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
+	gpos::Ref<ULongPtrArray> pdrgpulColWidth =
+		CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
 
 	gpos::Ref<IStatistics> stats = CStatistics::MakeDummyStats(
 		mp, colids, pdrgpulColWidth, m_pdrgpdrgpdatum->Size());
 
 	// clean up
-	colids->Release();
-	pdrgpulColWidth->Release();
+
+
 
 	return stats;
 }
@@ -362,7 +361,7 @@ CLogicalConstTableGet::OsPrint(IOstream &os) const
 				os << "; ";
 			}
 			os << "(";
-			IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
+			gpos::Ref<IDatumArray> pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
 
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)

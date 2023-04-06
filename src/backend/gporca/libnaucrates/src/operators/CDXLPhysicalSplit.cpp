@@ -27,11 +27,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSplit::CDXLPhysicalSplit(CMemoryPool *mp,
-									 ULongPtrArray *delete_colid_array,
-									 ULongPtrArray *insert_colid_array,
-									 ULONG action_colid, ULONG ctid_colid,
-									 ULONG segid_colid)
+CDXLPhysicalSplit::CDXLPhysicalSplit(
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> delete_colid_array,
+	gpos::Ref<ULongPtrArray> insert_colid_array, ULONG action_colid,
+	ULONG ctid_colid, ULONG segid_colid)
 	: CDXLPhysical(mp),
 	  m_deletion_colid_array(delete_colid_array),
 	  m_insert_colid_array(insert_colid_array),
@@ -53,8 +52,6 @@ CDXLPhysicalSplit::CDXLPhysicalSplit(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalSplit::~CDXLPhysicalSplit()
 {
-	m_deletion_colid_array->Release();
-	m_insert_colid_array->Release();
 }
 
 //---------------------------------------------------------------------------

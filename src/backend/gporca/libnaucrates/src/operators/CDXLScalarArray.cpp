@@ -48,8 +48,6 @@ CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarArray::~CDXLScalarArray()
 {
-	m_elem_type_mdid->Release();
-	m_array_type_mdid->Release();
 }
 
 

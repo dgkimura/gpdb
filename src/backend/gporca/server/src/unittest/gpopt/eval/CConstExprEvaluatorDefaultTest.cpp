@@ -50,7 +50,7 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -70,9 +70,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 		gpos::Ref<CScalarConst> pscalarconstUlResult =
 			CScalarConst::PopConvert(pexprUlResult->Pop());
 		GPOS_ASSERT(pscalarconstUl->Matches(pscalarconstUlResult));
-		pexprUlResult->Release();
+
 #endif	// GPOS_DEBUG
-		pexprUl->Release();
 	}
 
 	// Test evaluation of a null test expression
@@ -87,11 +86,10 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 		gpos::Ref<gpopt::CScalarNullTest> pscalarnulltest =
 			CScalarNullTest::PopConvert(pexprIsNull->Pop());
 		GPOS_ASSERT(pscalarnulltest->Matches(pexprResult->Pop()));
-		pexprResult->Release();
+
 #endif	// GPOS_DEBUG
-		pexprIsNull->Release();
 	}
-	pceevaldefault->Release();
+
 
 	return GPOS_OK;
 }

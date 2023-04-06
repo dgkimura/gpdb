@@ -108,7 +108,7 @@ public:
 };	// class CStatsPred
 
 // array of filters
-using CStatsPredPtrArry = CDynamicPtrArray<CStatsPred, CleanupRelease>;
+using CStatsPredPtrArry = gpos::Vector<gpos::Ref<CStatsPred>>;
 
 // comparison function for sorting predicates
 INT

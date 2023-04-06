@@ -159,7 +159,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 	GPOS_TRACE(str.GetBuffer());
 
 	// cleanup
-	node->Release();
+
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;

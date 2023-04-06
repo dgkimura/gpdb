@@ -24,7 +24,8 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredDisj::CStatsPredDisj(CStatsPredPtrArry *disj_pred_stats_array)
+CStatsPredDisj::CStatsPredDisj(
+	gpos::Ref<CStatsPredPtrArry> disj_pred_stats_array)
 	: CStatsPred(gpos::ulong_max),
 	  m_disj_pred_stats_array(disj_pred_stats_array)
 {

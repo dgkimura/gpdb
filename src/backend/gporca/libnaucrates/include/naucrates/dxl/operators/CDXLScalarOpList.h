@@ -13,9 +13,9 @@
 #define GPDXL_CDXLScalarOpList_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -83,7 +83,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOpList == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarOpList> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarOpList>(dxl_op);
 	}
 };
 }  // namespace gpdxl

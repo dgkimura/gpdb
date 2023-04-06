@@ -73,7 +73,7 @@ CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CXformUtils::ImplementHashJoin<CPhysicalLeftAntiSemiHashJoinNotIn>(
@@ -88,7 +88,6 @@ CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(
 			// try again after simplifying join predicate
 			CXformUtils::ImplementHashJoin<CPhysicalLeftAntiSemiHashJoinNotIn>(
 				pxfctxt, pxfres, pexprProcessed);
-			pexprProcessed->Release();
 		}
 	}
 }

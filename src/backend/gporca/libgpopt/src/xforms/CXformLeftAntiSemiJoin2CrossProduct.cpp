@@ -100,7 +100,7 @@ CXformLeftAntiSemiJoin2CrossProduct::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -109,9 +109,8 @@ CXformLeftAntiSemiJoin2CrossProduct::Transform(
 	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+
+
 
 	gpos::Ref<CExpression> pexprNegatedScalar =
 		CUtils::PexprNegate(mp, pexprScalar);
@@ -134,7 +133,7 @@ CXformLeftAntiSemiJoin2CrossProduct::Transform(
 													pexprNegatedScalar);
 	gpos::Ref<CExpression> pexprNormalized =
 		CNormalizer::PexprNormalize(mp, pexprJoin);
-	pexprJoin->Release();
+
 
 	pxfres->Add(pexprNormalized);
 }

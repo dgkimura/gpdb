@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarAggref_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -74,7 +74,7 @@ private:
 
 	EdxlAggrefKind m_aggkind;
 
-	ULongPtrArray *m_argtypes;
+	gpos::Ref<ULongPtrArray> m_argtypes;
 
 public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
@@ -83,7 +83,7 @@ public:
 	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
 					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
 					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
-					 ULongPtrArray *argtypes);
+					 gpos::Ref<ULongPtrArray> argtypes);
 
 	~CDXLScalarAggref() override;
 
@@ -110,7 +110,7 @@ public:
 		return m_aggkind;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetArgTypes() const
 	{
 		return m_argtypes;
@@ -132,7 +132,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarAggref == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarAggref> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarAggref>(dxl_op);
 	}
 
 	// does the operator return a boolean result

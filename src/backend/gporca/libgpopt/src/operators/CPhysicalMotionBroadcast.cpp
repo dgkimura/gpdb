@@ -46,7 +46,6 @@ CPhysicalMotionBroadcast::CPhysicalMotionBroadcast(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CPhysicalMotionBroadcast::~CPhysicalMotionBroadcast()
 {
-	m_pdsReplicated->Release();
 }
 
 
@@ -73,12 +72,11 @@ CPhysicalMotionBroadcast::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::Ref<CColRefSet> pcrsRequired,
-									   ULONG child_index,
-									   CDrvdPropArray *,  // pdrgpdpCtxt
-									   ULONG			  // ulOptReq
+CPhysicalMotionBroadcast::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -87,7 +85,7 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 
 	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
-	pcrs->Release();
+
 
 	return pcrsChildReqd;
 }
@@ -144,8 +142,8 @@ CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
 										  child_index
 #endif	// GPOS_DEBUG
 									  ,
-									  CDrvdPropArray *,	 // pdrgpdpCtxt
-									  ULONG				 // ulOptReq
+									  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+									  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -202,7 +200,7 @@ CPhysicalMotionBroadcast::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionBroadcast == pop->Eopid());
 
-	return dynamic_cast<gpos::Ref<CPhysicalMotionBroadcast> >(pop);
+	return gpos::dyn_cast<CPhysicalMotionBroadcast>(pop);
 }
 
 // EOF

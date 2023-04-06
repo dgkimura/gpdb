@@ -65,8 +65,8 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp,
-									 IMDCacheObjectArray *mdcache_obj_array)
+CMDProviderMemory::CMDProviderMemory(
+	CMemoryPool *mp, gpos::Ref<IMDCacheObjectArray> mdcache_obj_array)
 	: m_mdmap(nullptr)
 {
 	LoadMetadataObjectsFromArray(mp, mdcache_obj_array);
@@ -82,7 +82,7 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CMDProviderMemory::LoadMetadataObjectsFromArray(
-	CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array)
+	CMemoryPool *mp, gpos::Ref<IMDCacheObjectArray> mdcache_obj_array)
 {
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
 
@@ -100,7 +100,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 
 		gpos::Ref<IMDCacheObject> mdcache_obj = (*mdcache_obj_array)[ul];
 		gpos::Ref<IMDId> mdid_key = mdcache_obj->MDId();
-		mdid_key->AddRef();
+
 		CAutoRef<IMDId> mdid_key_autoref;
 		mdid_key_autoref = mdid_key;
 
@@ -133,7 +133,6 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 //---------------------------------------------------------------------------
 CMDProviderMemory::~CMDProviderMemory()
 {
-	SafeRelease(m_mdmap);
 }
 
 //---------------------------------------------------------------------------
@@ -167,7 +166,6 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 		{
 			case IMDId::EmdidRelStats:
 			{
-				mdid->AddRef();
 				CAutoRef<CDXLRelStats> a_pdxlrelstats;
 				a_pdxlrelstats = CDXLRelStats::CreateDXLDummyRelStats(mp, mdid);
 				a_pstrResult = CDXLUtils::SerializeMDObj(
@@ -181,7 +179,7 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 				a_pstr = GPOS_NEW(mp) CWStringDynamic(mp, mdid->GetBuffer());
 				CAutoP<CMDName> a_pmdname;
 				a_pmdname = GPOS_NEW(mp) CMDName(mp, a_pstr.Value());
-				mdid->AddRef();
+
 				CAutoRef<CDXLColStats> a_pdxlcolstats;
 				a_pdxlcolstats = CDXLColStats::CreateDXLDummyColStats(
 					mp, mdid, a_pmdname.Value(),
@@ -194,7 +192,6 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 			}
 			case IMDId::EmdidExtStatsInfo:
 			{
-				mdid->AddRef();
 				CAutoRef<CDXLExtStatsInfo> a_pdxlrelstats;
 				a_pdxlrelstats =
 					CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(mp, mdid);

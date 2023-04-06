@@ -88,7 +88,7 @@ CXformSplitLimit::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -107,7 +107,7 @@ CXformSplitLimit::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	// addref all components
-	pexprRelational->AddRef();
+
 
 	// assemble local limit operator
 	gpos::Ref<CExpression> pexprLimitLocal =
@@ -141,10 +141,6 @@ CXformSplitLimit::PexprLimit(CMemoryPool *mp,
 							 gpos::Ref<COrderSpec> pos, BOOL fGlobal,
 							 BOOL fHasCount, BOOL fTopLimitUnderDML)
 {
-	pexprScalarStart->AddRef();
-	pexprScalarRows->AddRef();
-	pos->AddRef();
-
 	// assemble global limit operator
 	gpos::Ref<CExpression> pexprLimit = GPOS_NEW(mp) CExpression(
 		mp,

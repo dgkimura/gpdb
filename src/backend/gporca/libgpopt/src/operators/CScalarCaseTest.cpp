@@ -40,7 +40,6 @@ CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 //---------------------------------------------------------------------------
 CScalarCaseTest::~CScalarCaseTest()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

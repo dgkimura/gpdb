@@ -92,8 +92,6 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 //---------------------------------------------------------------------------
 CScalarFunc::~CScalarFunc()
 {
-	SafeRelease(m_func_mdid);
-	SafeRelease(m_return_type_mdid);
 	GPOS_DELETE(m_pstrFunc);
 }
 
@@ -242,7 +240,7 @@ CScalarFunc::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarFunc::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarFunc::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

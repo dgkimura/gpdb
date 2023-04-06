@@ -73,7 +73,7 @@ CXformImplementDynamicBitmapTableGet::Transform(
 	gpos::Ref<CExpression> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -81,20 +81,18 @@ CXformImplementDynamicBitmapTableGet::Transform(
 		CLogicalDynamicBitmapTableGet::PopConvert(pexpr->Pop());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popLogical->Ptabdesc();
-	ptabdesc->AddRef();
+
 
 	CName *pname = GPOS_NEW(mp) CName(mp, popLogical->Name());
 
-	CColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popLogical->PdrgpcrOutput();
 
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
-	pdrgpdrgpcrPart->AddRef();
 
-	popLogical->GetPartitionMdids()->AddRef();
-	popLogical->GetRootColMappingPerPart()->AddRef();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
+
+
 
 	gpos::Ref<CPhysicalDynamicBitmapTableScan> popPhysical =
 		GPOS_NEW(mp) CPhysicalDynamicBitmapTableScan(
@@ -104,8 +102,8 @@ CXformImplementDynamicBitmapTableGet::Transform(
 
 	gpos::Ref<CExpression> pexprCondition = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprIndexPath = (*pexpr)[1];
-	pexprCondition->AddRef();
-	pexprIndexPath->AddRef();
+
+
 
 	gpos::Ref<CExpression> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);

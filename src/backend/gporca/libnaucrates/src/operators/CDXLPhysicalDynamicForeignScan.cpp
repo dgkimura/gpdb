@@ -31,7 +31,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicForeignScan::CDXLPhysicalDynamicForeignScan(
 	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
-	IMdIdArray *part_mdids, ULongPtrArray *selector_ids, OID foreign_server_oid)
+	gpos::Ref<IMdIdArray> part_mdids, gpos::Ref<ULongPtrArray> selector_ids,
+	OID foreign_server_oid)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_part_mdids(part_mdids),
@@ -53,9 +54,6 @@ CDXLPhysicalDynamicForeignScan::CDXLPhysicalDynamicForeignScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicForeignScan::~CDXLPhysicalDynamicForeignScan()
 {
-	m_dxl_table_descr->Release();
-	m_part_mdids->Release();
-	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +99,7 @@ CDXLPhysicalDynamicForeignScan::GetDXLTableDescr() const
 	return m_dxl_table_descr;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CDXLPhysicalDynamicForeignScan::GetParts() const
 {
 	return m_part_mdids;

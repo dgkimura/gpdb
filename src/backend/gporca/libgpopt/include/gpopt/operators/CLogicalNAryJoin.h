@@ -40,7 +40,7 @@ private:
 	// of an LOJ, the corresponding index indicates the child index of the
 	// CScalarNAryJoinPredList expression that contains the ON predicate for the
 	// LOJ.
-	ULongPtrArray *m_lojChildPredIndexes;
+	gpos::Ref<ULongPtrArray> m_lojChildPredIndexes;
 
 public:
 	CLogicalNAryJoin(const CLogicalNAryJoin &) = delete;
@@ -48,12 +48,11 @@ public:
 	// ctor
 	explicit CLogicalNAryJoin(CMemoryPool *mp);
 
-	CLogicalNAryJoin(CMemoryPool *mp, ULongPtrArray *lojChildIndexes);
+	CLogicalNAryJoin(CMemoryPool *mp, gpos::Ref<ULongPtrArray> lojChildIndexes);
 
 	// dtor
 	~CLogicalNAryJoin() override
 	{
-		SafeRelease(m_lojChildPredIndexes);
 	}
 
 	// ident accessors
@@ -104,7 +103,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -116,7 +115,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<gpos::Ref<CLogicalNAryJoin> >(pop);
+		return gpos::dyn_cast<CLogicalNAryJoin>(pop);
 	}
 
 	// conversion function, only if the NAryJoin has LOJ children
@@ -136,7 +135,7 @@ public:
 				*((*m_lojChildPredIndexes)[child_num]) == 0);
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetLojChildPredIndexes() const
 	{
 		return m_lojChildPredIndexes;

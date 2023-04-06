@@ -36,7 +36,7 @@ class CDXLPhysicalDynamicForeignScan;
 class CParseHandlerDynamicForeignScan : public CParseHandlerPhysicalOp
 {
 private:
-	ULongPtrArray *m_selector_ids;
+	gpos::Ref<ULongPtrArray> m_selector_ids;
 
 	OID m_foreign_server_oid;
 

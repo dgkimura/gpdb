@@ -64,7 +64,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// histogram buckets
-	CDXLBucketArray *m_dxl_stats_bucket_array;
+	gpos::Ref<CDXLBucketArray> m_dxl_stats_bucket_array;
 
 	// is column statistics missing in the database
 	BOOL m_is_col_stats_missing;
@@ -79,7 +79,7 @@ public:
 	CDXLColStats(CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats,
 				 CMDName *mdname, CDouble width, CDouble null_freq,
 				 CDouble distinct_remaining, CDouble freq_remaining,
-				 CDXLBucketArray *dxl_stats_bucket_array,
+				 gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array,
 				 BOOL is_col_stats_missing);
 
 	// dtor
@@ -151,7 +151,7 @@ public:
 };
 
 // array of dxl column stats
-using CDXLColStatsArray = CDynamicPtrArray<CDXLColStats, CleanupRelease>;
+using CDXLColStatsArray = gpos::Vector<gpos::Ref<CDXLColStats>>;
 }  // namespace gpmd
 
 

@@ -47,7 +47,6 @@ CDXLScalarIdent::CDXLScalarIdent(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarIdent::~CDXLScalarIdent()
 {
-	m_dxl_colref->Release();
 }
 
 //---------------------------------------------------------------------------

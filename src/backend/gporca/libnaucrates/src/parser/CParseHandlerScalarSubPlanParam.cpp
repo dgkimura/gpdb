@@ -50,7 +50,6 @@ CParseHandlerScalarSubPlanParam::CParseHandlerScalarSubPlanParam(
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanParam::~CParseHandlerScalarSubPlanParam()
 {
-	m_dxl_colref->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -89,7 +89,7 @@ CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalIndexGet> pop =
@@ -111,9 +111,9 @@ CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	const gpos::Ref<IMDIndex> pmdindex =
 		md_accessor->RetrieveIndex(pindexdesc->MDId());
 
-	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
+
 
 	gpos::Ref<CColRefSet> matched_cols =
 		CXformUtils::PcrsIndexKeys(mp, pdrgpcrOutput, pmdindex, pmdrel);
@@ -141,26 +141,18 @@ CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	if (!matched_cols->ContainsAll(output_cols))
 	{
-		matched_cols->Release();
-		output_cols->Release();
-		pdrgpcrOutput->Release();
 		return;
 	}
 
-	matched_cols->Release();
-	output_cols->Release();
 
-	pindexdesc->AddRef();
-	ptabdesc->AddRef();
 
 	gpos::Ref<COrderSpec> pos = pop->Pos();
 	GPOS_ASSERT(nullptr != pos);
-	pos->AddRef();
 
 
 
 	// addref all children
-	pexprIndexCond->AddRef();
+
 
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,

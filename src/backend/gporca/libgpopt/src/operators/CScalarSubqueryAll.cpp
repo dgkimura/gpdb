@@ -42,15 +42,15 @@ CScalarSubqueryAll::CScalarSubqueryAll(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CScalarSubqueryAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CScalarSubqueryAll::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRef> colref =
 		CUtils::PcrRemap(Pcr(), colref_mapping, must_exist);
 
 	gpos::Ref<IMDId> scalar_op_mdid = MdIdOp();
-	scalar_op_mdid->AddRef();
+
 
 	CWStringConst *pstrScalarOp =
 		GPOS_NEW(mp) CWStringConst(mp, PstrOp()->GetBuffer());

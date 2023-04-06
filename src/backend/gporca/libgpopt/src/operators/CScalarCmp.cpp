@@ -157,7 +157,7 @@ CScalarCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarCmp::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{
@@ -171,8 +171,7 @@ CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 gpos::Ref<IMDId>
 CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, gpos::Ref<COperator> pop)
 {
-	gpos::Ref<CScalarCmp> popScalarCmp =
-		dynamic_cast<gpos::Ref<CScalarCmp> >(pop);
+	gpos::Ref<CScalarCmp> popScalarCmp = gpos::dyn_cast<CScalarCmp>(pop);
 	const gpos::Ref<IMDScalarOp> pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
@@ -185,7 +184,6 @@ CWStringConst *
 CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
 				 gpos::Ref<IMDId> mdid)
 {
-	mdid->AddRef();
 	return GPOS_NEW(mp) CWStringConst(
 		mp,
 		(md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName())->GetBuffer());

@@ -63,8 +63,6 @@ CParseHandlerOptimizerConfig::CParseHandlerOptimizerConfig(
 //---------------------------------------------------------------------------
 CParseHandlerOptimizerConfig::~CParseHandlerOptimizerConfig()
 {
-	SafeRelease(m_pbs);
-	SafeRelease(m_optimizer_config);
 }
 
 //---------------------------------------------------------------------------
@@ -194,24 +192,24 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerEnumeratorConfig *pphEnumeratorConfig =
 		dynamic_cast<CParseHandlerEnumeratorConfig *>((*this)[0]);
 	gpos::Ref<CEnumeratorConfig> pec = pphEnumeratorConfig->GetEnumeratorCfg();
-	pec->AddRef();
+
 
 	CParseHandlerStatisticsConfig *pphStatisticsConfig =
 		dynamic_cast<CParseHandlerStatisticsConfig *>((*this)[1]);
 	gpos::Ref<CStatisticsConfig> stats_config =
 		pphStatisticsConfig->GetStatsConf();
-	stats_config->AddRef();
+
 
 	CParseHandlerCTEConfig *pphCTEConfig =
 		dynamic_cast<CParseHandlerCTEConfig *>((*this)[2]);
 	gpos::Ref<CCTEConfig> pcteconfig = pphCTEConfig->GetCteConf();
-	pcteconfig->AddRef();
+
 
 	CParseHandlerWindowOids *pphDefoidsGPDB =
 		dynamic_cast<CParseHandlerWindowOids *>((*this)[3]);
 	gpos::Ref<CWindowOids> pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
 	GPOS_ASSERT(nullptr != pwindowoidsGPDB);
-	pwindowoidsGPDB->AddRef();
+
 
 	gpos::Ref<ICostModel> pcm = nullptr;
 	gpos::Ref<CHint> phint = nullptr;
@@ -227,7 +225,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerCostModel *>((*this)[4]);
 		pcm = pphCostModelConfig->GetCostModel();
 		GPOS_ASSERT(nullptr != pcm);
-		pcm->AddRef();
+
 
 		if (6 == this->Length())
 		{
@@ -239,7 +237,6 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 				dynamic_cast<CParseHandlerHint *>((*this)[5]);
 			phint = pphHint->GetHint();
 			GPOS_ASSERT(nullptr != phint);
-			phint->AddRef();
 		}
 	}
 
@@ -248,7 +245,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerTraceFlags *pphTraceFlags =
 		dynamic_cast<CParseHandlerTraceFlags *>((*this)[this->Length() - 1]);
-	pphTraceFlags->GetTraceFlagBitSet()->AddRef();
+
 	m_pbs = pphTraceFlags->GetTraceFlagBitSet();
 
 	// deactivate handler

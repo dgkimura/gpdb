@@ -30,10 +30,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalScalarAgg::CPhysicalScalarAgg(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-	CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	BOOL fGeneratesDuplicates, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
 				   fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution)
@@ -69,8 +70,8 @@ CPhysicalScalarAgg::PosRequired(CMemoryPool *mp,
 									child_index
 #endif	// GPOS_DEBUG
 								,
-								CDrvdPropArray *,  // pdrgpdpCtxt
-								ULONG			   // ulOptReq
+								gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+								ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

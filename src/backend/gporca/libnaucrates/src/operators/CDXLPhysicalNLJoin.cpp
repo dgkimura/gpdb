@@ -38,7 +38,6 @@ CDXLPhysicalNLJoin::CDXLPhysicalNLJoin(CMemoryPool *mp, EdxlJoinType join_type,
 
 CDXLPhysicalNLJoin::~CDXLPhysicalNLJoin()
 {
-	SafeRelease(m_nest_params_col_refs);
 }
 
 //---------------------------------------------------------------------------

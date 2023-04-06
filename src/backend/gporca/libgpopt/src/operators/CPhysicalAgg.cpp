@@ -35,11 +35,13 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalAgg::CPhysicalAgg(
-	CMemoryPool *mp, CColRefArray *colref_array,
-	CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray>
+		pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-	CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
+	BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysical(mp),
 	  m_pdrgpcr(colref_array),
 	  m_egbaggtype(egbaggtype),
@@ -58,12 +60,10 @@ CPhysicalAgg::CPhysicalAgg(
 	ULONG ulDistrReqs = 1;
 	if (pdrgpcrMinimal == nullptr || 0 == pdrgpcrMinimal->Size())
 	{
-		colref_array->AddRef();
 		m_pdrgpcrMinimal = colref_array;
 	}
 	else
 	{
-		pdrgpcrMinimal->AddRef();
 		m_pdrgpcrMinimal = pdrgpcrMinimal;
 	}
 
@@ -136,9 +136,6 @@ CPhysicalAgg::CPhysicalAgg(
 //---------------------------------------------------------------------------
 CPhysicalAgg::~CPhysicalAgg()
 {
-	m_pdrgpcr->Release();
-	m_pdrgpcrMinimal->Release();
-	SafeRelease(m_pdrgpcrArgDQA);
 }
 
 
@@ -155,8 +152,8 @@ gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG child_index,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 )
 {
 	return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index, m_pdrgpcr);
@@ -175,7 +172,8 @@ CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  gpos::Ref<CColRefSet> pcrsRequired,
-							  ULONG child_index, CColRefArray *pdrgpcrGrp)
+							  ULONG child_index,
+							  gpos::Ref<CColRefArray> pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	GPOS_ASSERT(
@@ -190,7 +188,7 @@ CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsOutput =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
-	pcrs->Release();
+
 
 	return pcrsOutput;
 }
@@ -207,8 +205,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CDistributionSpec> pdsInput,
 							 ULONG child_index, ULONG ulOptReq,
-							 CColRefArray *pdrgpcgGrp,
-							 CColRefArray *pdrgpcrGrpMinimal) const
+							 gpos::Ref<CColRefArray> pdrgpcgGrp,
+							 gpos::Ref<CColRefArray> pdrgpcrGrpMinimal) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -240,12 +238,13 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		{
 			GPOS_ASSERT(1 == ulOptReq);
 			GPOS_ASSERT(0 < m_pdrgpcr->Size());
-			CColRefArray *grpAndDistinctCols = GPOS_NEW(mp) CColRefArray(mp);
+			gpos::Ref<CColRefArray> grpAndDistinctCols =
+				GPOS_NEW(mp) CColRefArray(mp);
 			grpAndDistinctCols->AppendArray(m_pdrgpcr);
 			grpAndDistinctCols->AppendArray(m_pdrgpcrArgDQA);
 			gpos::Ref<CDistributionSpec> pdsSpec =
 				PdsMaximalHashed(mp, grpAndDistinctCols);
-			grpAndDistinctCols->Release();
+
 			return pdsSpec;
 		}
 	}
@@ -271,7 +270,8 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
+CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp,
+							   gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -300,8 +300,9 @@ CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   gpos::Ref<CDistributionSpec> pdsInput,
-								   ULONG child_index, CColRefArray *pdrgpcrGrp,
-								   CColRefArray *pdrgpcrGrpMinimal,
+								   ULONG child_index,
+								   gpos::Ref<CColRefArray> pdrgpcrGrp,
+								   gpos::Ref<CColRefArray> pdrgpcrGrpMinimal,
 								   ULONG ulOptReq) const
 {
 	GPOS_ASSERT(FGlobal());
@@ -318,7 +319,7 @@ CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		if (CDistributionSpec::EdtSingleton == pdsInput->Edt())
 		{
 			// pass through input distribution if it is a singleton
-			pdsInput->AddRef();
+
 			return pdsInput;
 		}
 
@@ -357,7 +358,7 @@ CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 		return PdsMaximalHashed(mp, m_pdrgpcr);
 	}
 
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	const ULONG length = m_pdrgpcr->Size() - m_pdrgpcrArgDQA->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -366,7 +367,7 @@ CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 	}
 
 	gpos::Ref<CDistributionSpec> pds = PdsMaximalHashed(mp, colref_array);
-	colref_array->Release();
+
 
 	return pds;
 }
@@ -384,8 +385,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  gpos::Ref<CRewindabilitySpec> prsRequired,
 						  ULONG child_index,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -417,8 +418,8 @@ CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 							   child_index
 #endif
 						   ,
-						   CDrvdPropArray *,  //pdrgpdpCtxt,
-						   ULONG			  //ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+						   ULONG					   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -450,7 +451,7 @@ CPhysicalAgg::FProvidesReqdCols(CExpressionHandle &exprhdl,
 	// include defined columns by scalar child
 	pcrs->Union(exprhdl.DeriveDefinedColumns(1));
 	BOOL fProvidesCols = pcrs->ContainsAll(pcrsRequired);
-	pcrs->Release();
+
 
 	return fProvidesCols;
 }
@@ -496,7 +497,7 @@ CPhysicalAgg::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 			CDistributionSpec::EdtTaintedReplicated);
 	}
 
-	pds->AddRef();
+
 	return pds;
 }
 
@@ -559,8 +560,7 @@ CPhysicalAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	gpos::Ref<CPhysicalAgg> popAgg =
-		dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
+	gpos::Ref<CPhysicalAgg> popAgg = gpos::dyn_cast<CPhysicalAgg>(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
 	{

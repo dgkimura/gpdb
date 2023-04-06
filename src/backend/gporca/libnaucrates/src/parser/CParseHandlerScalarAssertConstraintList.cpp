@@ -144,7 +144,7 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 		gpos::Ref<CDXLNode> child_dxlnode =
 			child_parse_handler->CreateDXLNode();
 		GPOS_ASSERT(nullptr != child_dxlnode);
-		child_dxlnode->AddRef();
+
 
 		gpos::Ref<CDXLNode> pdxlnAssertConstraint = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, m_dxl_op_assert_constraint, child_dxlnode);

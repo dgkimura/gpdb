@@ -78,7 +78,7 @@ private:
 
 	EAggfuncKind m_aggkind;
 
-	ULongPtrArray *m_argtypes;
+	gpos::Ref<ULongPtrArray> m_argtypes;
 
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
@@ -97,17 +97,13 @@ public:
 				   gpos::Ref<IMDId> resolved_rettype,
 				   const CWStringConst *pstrAggFunc, BOOL is_distinct,
 				   EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   EAggfuncKind aggkind, ULongPtrArray *argtypes,
+				   EAggfuncKind aggkind, gpos::Ref<ULongPtrArray> argtypes,
 				   BOOL fRepSafe);
 
 	// dtor
 	~CScalarAggFunc() override
 	{
-		m_pmdidAggFunc->Release();
-		SafeRelease(m_pmdidResolvedRetType);
-		SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrAggFunc);
-		SafeRelease(m_argtypes);
 	}
 
 
@@ -141,9 +137,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -156,7 +152,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAggFunc == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarAggFunc> >(pop);
+		return gpos::dyn_cast<CScalarAggFunc>(pop);
 	}
 
 
@@ -185,7 +181,7 @@ public:
 		return m_aggkind;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetArgTypes() const
 	{
 		return m_argtypes;

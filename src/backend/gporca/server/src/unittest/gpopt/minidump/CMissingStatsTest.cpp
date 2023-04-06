@@ -101,7 +101,7 @@ CMissingStatsTest::EresUnittest_RunTests()
 		gpos::Ref<CStatisticsConfig> stats_config =
 			optimizer_config->GetStatsConf();
 
-		IMdIdArray *pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
+		gpos::Ref<IMdIdArray> pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
 		stats_config->CollectMissingStatsColumns(pdrgmdidCol);
 		ULONG ulMissingStats = pdrgmdidCol->Size();
 
@@ -125,8 +125,8 @@ CMissingStatsTest::EresUnittest_RunTests()
 		}
 
 		GPOS_CHECK_ABORT;
-		optimizer_config->Release();
-		pdxlnPlan->Release();
+
+
 
 		m_ulMissingStatsTestCounter++;
 	}

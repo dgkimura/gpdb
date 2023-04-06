@@ -71,7 +71,6 @@ CSerializableOptimizerConfig::Serialize(COstream &oos)
 	gpos::Ref<CBitSet> pbs =
 		CTask::Self()->GetTaskCtxt()->copy_trace_flags(m_mp);
 	m_optimizer_config->Serialize(m_mp, &xml_serializer, pbs);
-	pbs->Release();
 }
 
 // EOF

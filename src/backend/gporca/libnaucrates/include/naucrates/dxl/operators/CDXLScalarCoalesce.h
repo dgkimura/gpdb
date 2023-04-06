@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarCoalesce_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -79,7 +79,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCoalesce == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarCoalesce> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarCoalesce>(dxl_op);
 	}
 };
 }  // namespace gpdxl

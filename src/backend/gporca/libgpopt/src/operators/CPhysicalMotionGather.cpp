@@ -71,9 +71,6 @@ CPhysicalMotionGather::CPhysicalMotionGather(
 //---------------------------------------------------------------------------
 CPhysicalMotionGather::~CPhysicalMotionGather()
 {
-	m_pos->Release();
-	m_pdssSingeton->Release();
-	m_pcrsSort->Release();
 }
 
 
@@ -111,8 +108,8 @@ gpos::Ref<CColRefSet>
 CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CColRefSet> pcrsRequired,
 									ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
-									ULONG			   // ulOptReq
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -122,7 +119,7 @@ CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
-	pcrs->Release();
+
 
 	return pcrsChildReqd;
 }
@@ -188,8 +185,8 @@ gpos::Ref<COrderSpec>
 CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   gpos::Ref<COrderSpec>,  //posInput,
 								   ULONG child_index,
-								   CDrvdPropArray *,  // pdrgpdpCtxt
-								   ULONG			  // ulOptReq
+								   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+								   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -215,7 +212,6 @@ CPhysicalMotionGather::PosDerive(CMemoryPool *,		  // mp
 								 CExpressionHandle &  // exprhdl
 ) const
 {
-	m_pos->AddRef();
 	return m_pos;
 }
 
@@ -256,7 +252,7 @@ CPhysicalMotionGather::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionGather == pop->Eopid());
 
-	return dynamic_cast<gpos::Ref<CPhysicalMotionGather> >(pop);
+	return gpos::dyn_cast<CPhysicalMotionGather>(pop);
 }
 
 // EOF

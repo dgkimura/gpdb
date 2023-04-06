@@ -36,7 +36,7 @@ CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp,
 								   gpos::Ref<IMDId> resolved_rettype_mdid,
 								   BOOL is_distinct, EdxlAggrefStage agg_stage,
 								   EdxlAggrefKind aggkind,
-								   ULongPtrArray *argtypes)
+								   gpos::Ref<ULongPtrArray> argtypes)
 	: CDXLScalar(mp),
 	  m_agg_func_mdid(agg_func_mdid),
 	  m_resolved_rettype_mdid(resolved_rettype_mdid),
@@ -61,9 +61,6 @@ CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarAggref::~CDXLScalarAggref()
 {
-	m_agg_func_mdid->Release();
-	SafeRelease(m_resolved_rettype_mdid);
-	SafeRelease(m_argtypes);
 }
 
 
@@ -291,7 +288,7 @@ CDXLScalarAggref::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							  BOOL validate_children) const
 {
 	EdxlAggrefStage aggrefstage =
-		((gpos::Ref<CDXLScalarAggref>) dxlnode->GetOperator())
+		gpos::dyn_cast<CDXLScalarAggref>(dxlnode->GetOperator())
 			->GetDXLAggStage();
 
 	GPOS_ASSERT((EdxlaggstageFinal >= aggrefstage) &&

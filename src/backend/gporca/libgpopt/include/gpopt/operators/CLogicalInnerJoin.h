@@ -83,7 +83,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalInnerJoin> >(pop);
+		return gpos::dyn_cast<CLogicalInnerJoin>(pop);
 	}
 
 	// determine if an innerJoin group expression has

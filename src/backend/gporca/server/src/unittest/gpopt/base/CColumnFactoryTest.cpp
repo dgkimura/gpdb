@@ -61,7 +61,7 @@ CColumnFactoryTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 

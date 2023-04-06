@@ -163,7 +163,7 @@ CRewindabilitySpec::HashValue() const
 void
 CRewindabilitySpec::AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CReqdPropPlan> prpp,
-									CExpressionArray *pdrgpexpr,
+									gpos::Ref<CExpressionArray> pdrgpexpr,
 									gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != prpp);
@@ -188,7 +188,7 @@ CRewindabilitySpec::AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		eager = true;
 	}
 
-	pexpr->AddRef();
+
 	gpos::Ref<CExpression> pexprSpool = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalSpool(mp, eager), pexpr);
 	pdrgpexpr->Append(pexprSpool);

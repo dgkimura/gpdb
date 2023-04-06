@@ -30,7 +30,7 @@ using namespace gpdxl;
 
 // ctor
 CPartPruneStepsBuilder::CPartPruneStepsBuilder(
-	Relation relation, Index rtindex, ULongPtrArray *part_indexes,
+	Relation relation, Index rtindex, gpos::Ref<ULongPtrArray> part_indexes,
 	CMappingColIdVarPlStmt *colid_var_mapping,
 	CTranslatorDXLToScalar *translator_dxl_to_scalar)
 	: m_relation(relation),
@@ -44,7 +44,8 @@ CPartPruneStepsBuilder::CPartPruneStepsBuilder(
 List *
 CPartPruneStepsBuilder::CreatePartPruneInfos(
 	gpos::Ref<CDXLNode> filterNode, Relation relation, Index rtindex,
-	ULongPtrArray *part_indexes, CMappingColIdVarPlStmt *colid_var_mapping,
+	gpos::Ref<ULongPtrArray> part_indexes,
+	CMappingColIdVarPlStmt *colid_var_mapping,
 	CTranslatorDXLToScalar *translator_dxl_to_scalar)
 {
 	CPartPruneStepsBuilder builder(relation, rtindex, part_indexes,

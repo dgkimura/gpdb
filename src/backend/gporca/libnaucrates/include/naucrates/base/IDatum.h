@@ -86,10 +86,11 @@ public:
 	virtual BOOL
 	StatsAreGreaterThan(const gpos::Ref<IDatum> datum) const
 	{
-		BOOL stats_are_comparable = datum->StatsAreComparable(this);
+		BOOL stats_are_comparable = datum->StatsAreComparable(SharedFromThis());
 		GPOS_ASSERT(stats_are_comparable &&
 					"Invalid invocation of StatsAreGreaterThan");
-		return stats_are_comparable && datum->StatsAreLessThan(this);
+		return stats_are_comparable &&
+			   datum->StatsAreLessThan(SharedFromThis());
 	}
 
 	// does the datum need to be padded before statistical derivation
@@ -112,7 +113,7 @@ public:
 	virtual BOOL
 	StatsMappable()
 	{
-		return this->StatsAreComparable(this);
+		return this->StatsAreComparable(SharedFromThis());
 	}
 
 	// can datum be mapped to a double
@@ -146,7 +147,7 @@ public:
 };	// class IDatum
 
 // array of idatums
-using IDatumArray = CDynamicPtrArray<IDatum, CleanupRelease>;
+using IDatumArray = gpos::Vector<gpos::Ref<IDatum>>;
 }  // namespace gpnaucrates
 
 

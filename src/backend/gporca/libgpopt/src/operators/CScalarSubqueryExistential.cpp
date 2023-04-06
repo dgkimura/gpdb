@@ -93,7 +93,7 @@ CScalarSubqueryExistential::PpartinfoDerive(CMemoryPool *,	// mp,
 {
 	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
-	ppartinfoChild->AddRef();
+
 	return ppartinfoChild;
 }
 

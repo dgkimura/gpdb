@@ -71,9 +71,10 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// construct an array of ranges to be used to create an interval
-	static CRangeArray *Pdrgprng(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
-								 const SRangeInfo rgRangeInfo[],
-								 ULONG ulRanges);
+	static gpos::Ref<CRangeArray> Pdrgprng(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid,
+										   const SRangeInfo rgRangeInfo[],
+										   ULONG ulRanges);
 
 	static gpos::Ref<CConstraintInterval> PciFirstInterval(
 		CMemoryPool *mp, gpos::Ref<IMDId> mdid, gpos::Ref<CColRef> colref);
@@ -129,7 +130,8 @@ public:
 	static GPOS_RESULT EresUnittest_ConstraintsOnDates();
 
 	// print equivalence classes
-	static void PrintEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+	static void PrintEquivClasses(CMemoryPool *mp,
+								  gpos::Ref<CColRefSetArray> pdrgpcrs,
 								  BOOL fExpected = false);
 };	// class CConstraintTest
 }  // namespace gpopt

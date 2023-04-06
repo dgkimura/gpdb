@@ -42,7 +42,7 @@ class CSearchStage : public DbgPrintMixin<CSearchStage>
 {
 private:
 	// set of xforms to be applied during stage
-	CXformSet *m_xforms;
+	gpos::Ref<CXformSet> m_xforms;
 
 	// time threshold in milliseconds
 	ULONG m_time_threshold;
@@ -61,7 +61,8 @@ private:
 
 public:
 	// ctor
-	CSearchStage(CXformSet *xform_set, ULONG ulTimeThreshold = gpos::ulong_max,
+	CSearchStage(gpos::Ref<CXformSet> xform_set,
+				 ULONG ulTimeThreshold = gpos::ulong_max,
 				 CCost costThreshold = CCost(0.0));
 
 	// dtor
@@ -105,7 +106,7 @@ public:
 	}
 
 	// xforms set accessor
-	CXformSet *
+	gpos::Ref<CXformSet>
 	GetXformSet() const
 	{
 		return m_xforms;
@@ -146,7 +147,7 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// generate default search strategy
-	static CSearchStageArray *PdrgpssDefault(CMemoryPool *mp);
+	static gpos::Ref<CSearchStageArray> PdrgpssDefault(CMemoryPool *mp);
 };
 
 // shorthand for printing

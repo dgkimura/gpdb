@@ -35,7 +35,7 @@ public:
 	static gpos::Ref<CStatistics> CalcLASJoinStatsStatic(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
 		const gpos::Ref<IStatistics> inner_stats_input,
-		CStatsPredJoinArray *join_preds_stats,
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
 		// "true" since LASJ stats computation is very aggressive

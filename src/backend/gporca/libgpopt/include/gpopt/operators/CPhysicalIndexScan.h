@@ -50,7 +50,8 @@ public:
 	// ctors
 	CPhysicalIndexScan(CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
 					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-					   const CName *pnameAlias, CColRefArray *colref_array,
+					   const CName *pnameAlias,
+					   gpos::Ref<CColRefArray> colref_array,
 					   gpos::Ref<COrderSpec> pos);
 
 	// dtor
@@ -115,7 +116,6 @@ public:
 			  CExpressionHandle &  //exprhdl
 	) const override
 	{
-		m_pos->AddRef();
 		return m_pos;
 	}
 
@@ -146,15 +146,15 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalIndexScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalIndexScan> >(pop);
+		return gpos::dyn_cast<CPhysicalIndexScan>(pop);
 	}
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
-	PstatsDerive(CMemoryPool *,				// mp
-				 CExpressionHandle &,		// exprhdl
-				 gpos::Ref<CReqdPropPlan>,	// prpplan
-				 IStatisticsArray *			//stats_ctxt
+	PstatsDerive(CMemoryPool *,				  // mp
+				 CExpressionHandle &,		  // exprhdl
+				 gpos::Ref<CReqdPropPlan>,	  // prpplan
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

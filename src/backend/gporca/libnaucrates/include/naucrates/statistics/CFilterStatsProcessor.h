@@ -58,23 +58,23 @@ private:
 		CDouble *last_scale_factor, ULONG *target_last_colid);
 
 	// create a new hash map of histograms after applying a conjunctive or disjunctive filter
-	static UlongToHistogramMap *MakeHistHashMapConjOrDisjFilter(
+	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapConjOrDisjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *input_histograms, CDouble input_rows,
+		gpos::Ref<UlongToHistogramMap> input_histograms, CDouble input_rows,
 		gpos::Ref<CStatsPred> pred_stats, CDouble *scale_factor,
 		const gpos::Ref<CStatistics> input_stats);
 
 	// create new hash map of histograms after applying the conjunction predicate
-	static UlongToHistogramMap *MakeHistHashMapConjFilter(
+	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapConjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *intermediate_histograms, CDouble input_rows,
-		gpos::Ref<CStatsPredConj> conjunctive_pred_stats, CDouble *scale_factor,
-		const gpos::Ref<CStatistics> input_stats);
+		gpos::Ref<UlongToHistogramMap> intermediate_histograms,
+		CDouble input_rows, gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
+		CDouble *scale_factor, const gpos::Ref<CStatistics> input_stats);
 
 	// create new hash map of histograms after applying the disjunctive predicate
-	static UlongToHistogramMap *MakeHistHashMapDisjFilter(
+	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapDisjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *input_histograms, CDouble input_rows,
+		gpos::Ref<UlongToHistogramMap> input_histograms, CDouble input_rows,
 		gpos::Ref<CStatsPredDisj> pred_stats, CDouble *scale_factor,
 		const gpos::Ref<CStatistics> input_stats);
 
@@ -95,7 +95,7 @@ public:
 			*local_scalar_expr,	 // filter expression on local columns only
 		gpos::Ref<CExpression>
 			outer_refs_scalar_expr,	 // filter expression involving outer references
-		IStatisticsArray *all_outer_stats);
+		gpos::Ref<IStatisticsArray> all_outer_stats);
 
 	static CDouble SelectivityOfPredicate(CMemoryPool *mp,
 										  gpos::Ref<CExpression> pred,

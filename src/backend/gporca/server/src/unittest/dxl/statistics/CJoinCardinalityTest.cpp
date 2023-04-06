@@ -46,7 +46,7 @@ CJoinCardinalityTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -75,7 +75,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		 500}  // distinct values spread in both buckets and NDVRemain
 	};
 
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG ulHist = GPOS_ARRAY_SIZE(rghisttc);
@@ -176,7 +176,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		GPOS_DELETE(join_histogram);
 	}
 	// clean up
-	col_histogram_mapping->Release();
+
 
 	return eres;
 }
@@ -215,7 +215,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
-	ULongPtrArray *cols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> cols = GPOS_NEW(mp) ULongPtrArray(mp);
 	cols->Append(GPOS_NEW(mp) ULONG(0));
 	cols->Append(GPOS_NEW(mp) ULONG(1));
 	cols->Append(GPOS_NEW(mp) ULONG(2));
@@ -240,7 +240,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 										  false /*IsDistCol*/, false);
 		}
 	}
-	cols->Release();
+
 
 	const ULONG ulTestCases = GPOS_ARRAY_SIZE(rgstatsjointc);
 	for (ULONG ul = 0; ul < ulTestCases; ul++)
@@ -260,7 +260,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		CStatisticsArray *pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				mp, md_accessor, dxl_derived_rel_stats_array);
-		dxl_derived_rel_stats_array->Release();
+
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
@@ -272,7 +272,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		// generate the join conditions
 		FnPdrgpstatjoin *pf = elem.m_pf;
 		GPOS_ASSERT(nullptr != pf);
-		CStatsPredJoinArray *join_preds_stats = pf(mp);
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats = pf(mp);
 
 		// calculate the output stats
 		gpos::Ref<IStatistics> pstatsOutput = nullptr;
@@ -317,9 +317,8 @@ CJoinCardinalityTest::EresUnittest_Join()
 		}
 
 		// clean up
-		pdrgpstatBefore->Release();
-		pdrgpstatOutput->Release();
-		join_preds_stats->Release();
+
+
 
 		GPOS_DELETE_ARRAY(szDXLInput);
 		GPOS_DELETE_ARRAY(szDXLOutput);
@@ -335,10 +334,10 @@ CJoinCardinalityTest::EresUnittest_Join()
 }
 
 //	helper method to generate a single join predicate
-CStatsPredJoinArray *
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 8));
@@ -347,10 +346,10 @@ CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 }
 
 //	helper method to generate generate multiple join predicates
-CStatsPredJoinArray *
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(16, CStatsPred::EstatscmptEq, 32));
@@ -365,10 +364,10 @@ CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 }
 
 // helper method to generate join predicate over columns that contain null values
-CStatsPredJoinArray *
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinNullableCols(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(1, CStatsPred::EstatscmptEq, 2));

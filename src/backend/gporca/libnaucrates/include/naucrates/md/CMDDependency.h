@@ -39,13 +39,13 @@ private:
 
 	CDouble m_degree;
 
-	IntPtrArray *m_from_attno;
+	gpos::Ref<IntPtrArray> m_from_attno;
 
 	INT m_to_attno;
 
 public:
-	CMDDependency(CMemoryPool *mp, DOUBLE degree, IntPtrArray *from_attno,
-				  INT to_attno)
+	CMDDependency(CMemoryPool *mp, DOUBLE degree,
+				  gpos::Ref<IntPtrArray> from_attno, INT to_attno)
 		: m_mp(mp),
 		  m_degree(degree),
 		  m_from_attno(from_attno),
@@ -55,7 +55,6 @@ public:
 
 	~CMDDependency() override
 	{
-		m_from_attno->Release();
 	}
 
 	CWStringDynamic *
@@ -95,7 +94,7 @@ public:
 			CDXLTokens::GetDXLTokenStr(EdxltokenMVDependency));
 	}
 
-	IntPtrArray *
+	gpos::Ref<IntPtrArray>
 	GetFromAttno() const
 	{
 		return m_from_attno;
@@ -121,7 +120,7 @@ public:
 	}
 };
 
-using CMDDependencyArray = CDynamicPtrArray<CMDDependency, CleanupRelease>;
+using CMDDependencyArray = gpos::Vector<gpos::Ref<CMDDependency>>;
 }  // namespace gpmd
 
 

@@ -136,7 +136,8 @@ private:
 		DistributionHashOpsKind distribution_hashops);
 
 	// load search strategy from given path
-	static CSearchStageArray *LoadSearchStrategy(CMemoryPool *mp, char *path);
+	static gpos::Ref<CSearchStageArray> LoadSearchStrategy(CMemoryPool *mp,
+														   char *path);
 
 	// helper for converting wide character string to regular string
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
@@ -151,7 +152,7 @@ private:
 	// print warning messages for columns with missing statistics
 	static void PrintMissingStatsWarning(CMemoryPool *mp,
 										 CMDAccessor *md_accessor,
-										 IMdIdArray *col_stats,
+										 gpos::Ref<IMdIdArray> col_stats,
 										 MdidHashSet *phsmdidRel);
 
 public:

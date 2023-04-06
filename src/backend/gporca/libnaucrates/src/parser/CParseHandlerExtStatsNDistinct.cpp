@@ -35,8 +35,6 @@ CParseHandlerExtStatsNDistinct::CParseHandlerExtStatsNDistinct(
 
 CParseHandlerExtStatsNDistinct::~CParseHandlerExtStatsNDistinct()
 {
-	m_attnos->Release();
-	m_ndistinct_md->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -114,7 +112,7 @@ CParseHandlerExtStatsNDistinct::EndElement(
 				   str->GetBuffer());
 	}
 
-	m_attnos->AddRef();
+
 	m_ndistinct_md =
 		GPOS_NEW(m_mp) CMDNDistinct(m_mp, m_ndistinct.Get(), m_attnos);
 

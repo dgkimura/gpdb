@@ -60,7 +60,7 @@ CKeyCollectionTest::EresUnittest_Basics()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -90,15 +90,13 @@ CKeyCollectionTest::EresUnittest_Basics()
 	pkc->Add(pcrs);
 	GPOS_ASSERT(pkc->FKey(pcrs));
 
-	CColRefArray *colref_array = pkc->PdrgpcrKey(mp);
+	gpos::Ref<CColRefArray> colref_array = pkc->PdrgpcrKey(mp);
 	GPOS_ASSERT(pkc->FKey(mp, colref_array));
 
 	pcrs->Include(colref_array);
 	GPOS_ASSERT(pkc->FKey(pcrs));
 
-	colref_array->Release();
 
-	pkc->Release();
 
 	return GPOS_OK;
 }
@@ -119,7 +117,7 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -168,12 +166,13 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	GPOS_ASSERT(pkc->FKey(pcrs2));
 
 	// get the second key
-	CColRefArray *colref_array = pkc->PdrgpcrKey(mp, 1);
+	gpos::Ref<CColRefArray> colref_array = pkc->PdrgpcrKey(mp, 1);
 	GPOS_ASSERT(ulLen1 == colref_array->Size());
 	GPOS_ASSERT(pkc->FKey(mp, colref_array));
 
 	// get the subsumed key
-	CColRefArray *pdrgpcrSubsumed = pkc->PdrgpcrTrim(mp, colref_array);
+	gpos::Ref<CColRefArray> pdrgpcrSubsumed =
+		pkc->PdrgpcrTrim(mp, colref_array);
 	GPOS_ASSERT(colref_array->Size() >= pdrgpcrSubsumed->Size());
 
 	gpos::Ref<CColRefSet> pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
@@ -188,10 +187,7 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	}
 #endif	// GPOS_DEBUG
 
-	pcrsSubsumed->Release();
-	colref_array->Release();
-	pdrgpcrSubsumed->Release();
-	pkc->Release();
+
 
 	return GPOS_OK;
 }

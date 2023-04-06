@@ -42,13 +42,13 @@ private:
 	CMDName *m_mdname;
 
 	// list of distribution column positions
-	ULongPtrArray *m_distr_column_pos_array;
+	gpos::Ref<ULongPtrArray> m_distr_column_pos_array;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 	// list of vartypmod
-	IntPtrArray *m_vartypemod_array;
+	gpos::Ref<IntPtrArray> m_vartypemod_array;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;

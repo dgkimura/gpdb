@@ -63,8 +63,6 @@ CDXLTranslateContext::CDXLTranslateContext(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLTranslateContext::~CDXLTranslateContext()
 {
-	m_colid_to_target_entry_map->Release();
-	m_colid_to_paramid_map->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +99,7 @@ CDXLTranslateContext::CopyParamHashmap(ULongToColParamMap *original)
 
 		const ULONG colid = colidparamid->GetColId();
 		ULONG *key = GPOS_NEW(m_mp) ULONG(colid);
-		colidparamid->AddRef();
+
 		m_colid_to_paramid_map->Insert(key, colidparamid);
 	}
 }

@@ -75,7 +75,6 @@ public:
 	// dtor
 	~CDXLDatum() override
 	{
-		m_mdid_type->Release();
 	}
 
 	// mdid type of the datum
@@ -105,10 +104,10 @@ public:
 };
 
 // array of datums
-using CDXLDatumArray = CDynamicPtrArray<CDXLDatum, CleanupRelease>;
+using CDXLDatumArray = gpos::Vector<gpos::Ref<CDXLDatum>>;
 
 // dynamic array of datum arrays -- array owns elements
-using CDXLDatum2dArray = CDynamicPtrArray<CDXLDatumArray, CleanupRelease>;
+using CDXLDatum2dArray = gpos::Vector<gpos::Ref<CDXLDatumArray>>;
 }  // namespace gpdxl
 
 #endif	// !GPDXL_CDXLDatum_H

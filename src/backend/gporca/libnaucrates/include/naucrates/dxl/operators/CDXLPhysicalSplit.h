@@ -14,9 +14,9 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -31,10 +31,10 @@ class CDXLPhysicalSplit : public CDXLPhysical
 {
 private:
 	// list of deletion column ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 	// list of insertion column ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::Ref<ULongPtrArray> m_insert_colid_array;
 
 	// action column id
 	ULONG m_action_colid;
@@ -49,9 +49,10 @@ public:
 	CDXLPhysicalSplit(const CDXLPhysicalSplit &) = delete;
 
 	// ctor
-	CDXLPhysicalSplit(CMemoryPool *mp, ULongPtrArray *delete_colid_array,
-					  ULongPtrArray *insert_colid_array, ULONG action_colid,
-					  ULONG ctid_colid, ULONG segid_colid);
+	CDXLPhysicalSplit(CMemoryPool *mp,
+					  gpos::Ref<ULongPtrArray> delete_colid_array,
+					  gpos::Ref<ULongPtrArray> insert_colid_array,
+					  ULONG action_colid, ULONG ctid_colid, ULONG segid_colid);
 
 	// dtor
 	~CDXLPhysicalSplit() override;
@@ -63,14 +64,14 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// deletion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDeletionColIdArray() const
 	{
 		return m_deletion_colid_array;
 	}
 
 	// insertion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetInsertionColIdArray() const
 	{
 		return m_insert_colid_array;
@@ -115,7 +116,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSplit == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalSplit> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSplit>(dxl_op);
 	}
 };
 }  // namespace gpdxl

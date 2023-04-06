@@ -47,7 +47,6 @@ CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarBitmapBoolOp::~CDXLScalarBitmapBoolOp()
 {
-	m_mdid_type->Release();
 }
 
 
@@ -171,7 +170,7 @@ CDXLScalarBitmapBoolOp::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									BOOL validate_children) const
 {
 	EdxlBitmapBoolOp bitmap_bool_dxlop =
-		((gpos::Ref<CDXLScalarBitmapBoolOp>) dxlnode->GetOperator())
+		gpos::dyn_cast<CDXLScalarBitmapBoolOp>(dxlnode->GetOperator())
 			->GetDXLBitmapOpType();
 
 	GPOS_ASSERT((bitmap_bool_dxlop == EdxlbitmapAnd) ||

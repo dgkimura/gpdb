@@ -42,7 +42,7 @@ protected:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// distribution
 	gpos::Ref<CDistributionSpec> m_pds;
@@ -59,7 +59,7 @@ private:
 	// one side equal to given expression
 	static gpos::Ref<CExpression> PexprMatchEqualitySide(
 		gpos::Ref<CExpression> pexprToMatch,
-		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
+		gpos::Ref<CExpressionArray> pdrgpexpr  // array of predicates to inspect
 	);
 
 	// private copy ctor
@@ -68,7 +68,8 @@ private:
 public:
 	// ctors
 	CPhysicalScan(CMemoryPool *mp, const CName *pname,
-				  gpos::Ref<CTableDescriptor>, CColRefArray *colref_array);
+				  gpos::Ref<CTableDescriptor>,
+				  gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CPhysicalScan() override;
@@ -81,7 +82,7 @@ public:
 	}
 
 	// output columns
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -96,12 +97,12 @@ public:
 
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet>
-	PcrsRequired(CMemoryPool *,			 // mp
-				 CExpressionHandle &,	 // exprhdl
-				 gpos::Ref<CColRefSet>,	 // pcrsRequired
-				 ULONG,					 // child_index
-				 CDrvdPropArray *,		 // pdrgpdpCtxt
-				 ULONG					 // ulOptReq
+	PcrsRequired(CMemoryPool *,				 // mp
+				 CExpressionHandle &,		 // exprhdl
+				 gpos::Ref<CColRefSet>,		 // pcrsRequired
+				 ULONG,						 // child_index
+				 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+				 ULONG						 // ulOptReq
 				 ) override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -110,12 +111,12 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq>
-	PcteRequired(CMemoryPool *,		   //mp,
-				 CExpressionHandle &,  //exprhdl,
-				 gpos::Ref<CCTEReq>,   //pcter,
-				 ULONG,				   //child_index,
-				 CDrvdPropArray *,	   //pdrgpdpCtxt,
-				 ULONG				   //ulOptReq
+	PcteRequired(CMemoryPool *,				 //mp,
+				 CExpressionHandle &,		 //exprhdl,
+				 gpos::Ref<CCTEReq>,		 //pcter,
+				 ULONG,						 //child_index,
+				 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+				 ULONG						 //ulOptReq
 	) const override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -124,12 +125,12 @@ public:
 
 	// compute required sort columns of the n-th child
 	gpos::Ref<COrderSpec>
-	PosRequired(CMemoryPool *,			// mp
-				CExpressionHandle &,	// exprhdl
-				gpos::Ref<COrderSpec>,	// posRequired
-				ULONG,					// child_index
-				CDrvdPropArray *,		// pdrgpdpCtxt
-				ULONG					// ulOptReq
+	PosRequired(CMemoryPool *,				// mp
+				CExpressionHandle &,		// exprhdl
+				gpos::Ref<COrderSpec>,		// posRequired
+				ULONG,						// child_index
+				gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+				ULONG						// ulOptReq
 	) const override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -142,7 +143,7 @@ public:
 				CExpressionHandle &,		   // exprhdl
 				gpos::Ref<CDistributionSpec>,  // pdsRequired
 				ULONG,						   // child_index
-				CDrvdPropArray *,			   // pdrgpdpCtxt
+				gpos::Ref<CDrvdPropArray>,	   // pdrgpdpCtxt
 				ULONG						   // ulOptReq
 	) const override
 	{
@@ -156,7 +157,7 @@ public:
 				CExpressionHandle &,			//exprhdl
 				gpos::Ref<CRewindabilitySpec>,	//prsRequired
 				ULONG,							// child_index
-				CDrvdPropArray *,				// pdrgpdpCtxt
+				gpos::Ref<CDrvdPropArray>,		// pdrgpdpCtxt
 				ULONG							// ulOptReq
 	) const override
 	{
@@ -260,7 +261,7 @@ public:
 	virtual gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prpplan,
-		IStatisticsArray *stats_ctxt) const = 0;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const = 0;
 
 	// conversion function
 	static gpos::Ref<CPhysicalScan> PopConvert(gpos::Ref<COperator> pop);

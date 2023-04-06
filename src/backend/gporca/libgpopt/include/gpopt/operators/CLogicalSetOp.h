@@ -30,16 +30,16 @@ class CLogicalSetOp : public CLogical
 {
 protected:
 	// output column array
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// input column array
-	CColRef2dArray *m_pdrgpdrgpcrInput;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcrInput;
 
 	// set representation of output columns
 	gpos::Ref<CColRefSet> m_pcrsOutput;
 
 	// set representation of input columns
-	CColRefSetArray *m_pdrgpcrsInput;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrsInput;
 
 	// private copy ctor
 	CLogicalSetOp(const CLogicalSetOp &);
@@ -48,19 +48,19 @@ protected:
 	void BuildColumnSets(CMemoryPool *mp);
 
 	// output equivalence classes
-	CColRefSetArray *PdrgpcrsOutputEquivClasses(CMemoryPool *mp,
-												CExpressionHandle &exprhdl,
-												BOOL fIntersect) const;
+	gpos::Ref<CColRefSetArray> PdrgpcrsOutputEquivClasses(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, BOOL fIntersect) const;
 
 	// equivalence classes from one input child, mapped to output columns
-	CColRefSetArray *PdrgpcrsInputMapped(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 ULONG ulChild) const;
+	gpos::Ref<CColRefSetArray> PdrgpcrsInputMapped(CMemoryPool *mp,
+												   CExpressionHandle &exprhdl,
+												   ULONG ulChild) const;
 
 	// constraints for a given output column from all children
-	CConstraintArray *PdrgpcnstrColumn(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   ULONG ulColIndex, ULONG ulStart) const;
+	gpos::Ref<CConstraintArray> PdrgpcnstrColumn(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 ULONG ulColIndex,
+												 ULONG ulStart) const;
 
 	// get constraint for a given output column from a given children
 	gpos::Ref<CConstraint> PcnstrColumn(CMemoryPool *mp,
@@ -76,11 +76,12 @@ public:
 	// ctor
 	explicit CLogicalSetOp(CMemoryPool *mp);
 
-	CLogicalSetOp(CMemoryPool *mp, CColRefArray *pdrgOutput,
-				  CColRefArray *pdrgpcrLeft, CColRefArray *pdrgpcrRight);
+	CLogicalSetOp(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgOutput,
+				  gpos::Ref<CColRefArray> pdrgpcrLeft,
+				  gpos::Ref<CColRefArray> pdrgpcrRight);
 
-	CLogicalSetOp(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-				  CColRef2dArray *pdrgpdrgpcrInput);
+	CLogicalSetOp(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+				  gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalSetOp() override;
@@ -92,7 +93,7 @@ public:
 	const CHAR *SzId() const override = 0;
 
 	// accessor of output column array
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
@@ -100,7 +101,7 @@ public:
 	}
 
 	// accessor of input column array
-	CColRef2dArray *
+	gpos::Ref<CColRef2dArray>
 	PdrgpdrgpcrInput() const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpdrgpcrInput);
@@ -153,7 +154,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLogicalSetOp(pop));
 
-		return dynamic_cast<gpos::Ref<CLogicalSetOp> >(pop);
+		return gpos::dyn_cast<CLogicalSetOp>(pop);
 	}
 
 };	// class CLogicalSetOp

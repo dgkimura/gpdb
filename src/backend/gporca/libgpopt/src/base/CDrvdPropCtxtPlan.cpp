@@ -44,7 +44,6 @@ CDrvdPropCtxtPlan::CDrvdPropCtxtPlan(CMemoryPool *mp, BOOL fUpdateCTEMap)
 //---------------------------------------------------------------------------
 CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 {
-	m_phmulpdpCTEs->Release();
 }
 
 
@@ -68,7 +67,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 		ULONG id = *(hmulpdpiter.Key());
 		gpos::Ref<CDrvdPropPlan> pdpplan =
 			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
-		pdpplan->AddRef();
+
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif	// GPOS_DEBUG
@@ -110,7 +109,6 @@ CDrvdPropCtxtPlan::AddProps(gpos::Ref<CDrvdProp> pdp)
 
 	if (m_fUpdateCTEMap)
 	{
-		pdpplanProducer->AddRef();
 		BOOL fInserted GPOS_ASSERTS_ONLY = m_phmulpdpCTEs->Insert(
 			GPOS_NEW(m_mp) ULONG(ulProducerId), pdpplanProducer);
 		GPOS_ASSERT(fInserted);
@@ -175,7 +173,7 @@ CDrvdPropCtxtPlan::CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan,
 {
 	GPOS_ASSERT(nullptr != pdpplan);
 
-	pdpplan->AddRef();
+
 	BOOL fInserted GPOS_ASSERTS_ONLY =
 		m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(ulCTEId), pdpplan);
 	GPOS_ASSERT(fInserted);

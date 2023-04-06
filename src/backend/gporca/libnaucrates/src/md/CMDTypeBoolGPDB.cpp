@@ -75,7 +75,7 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	m_mdid->AddRef();
+
 
 	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 	m_datum_null = GPOS_NEW(mp)
@@ -92,24 +92,6 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeBoolGPDB::~CMDTypeBoolGPDB()
 {
-	m_mdid->Release();
-	SafeRelease(m_distr_opfamily);
-	SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	m_datum_null->Release();
 	GPOS_DELETE(m_dxl_str);
 }
 
@@ -296,8 +278,8 @@ gpos::Ref<CDXLDatum>
 CMDTypeBoolGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	gpos::Ref<CDatumBoolGPDB> datum_bool =
-		dynamic_cast<gpos::Ref<CDatumBoolGPDB> >(datum);
-	m_mdid->AddRef();
+		gpos::dyn_cast<CDatumBoolGPDB>(datum);
+
 	return GPOS_NEW(mp)
 		CDXLDatumBool(mp, m_mdid, datum_bool->IsNull(), datum_bool->GetValue());
 }
@@ -314,9 +296,9 @@ gpos::Ref<CDXLScalarConstValue>
 CMDTypeBoolGPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	gpos::Ref<CDatumBoolGPDB> datum_bool_gpdb =
-		dynamic_cast<gpos::Ref<CDatumBoolGPDB> >(datum);
+		gpos::dyn_cast<CDatumBoolGPDB>(datum);
 
-	m_mdid->AddRef();
+
 	gpos::Ref<CDXLDatumBool> dxl_datum = GPOS_NEW(mp) CDXLDatumBool(
 		mp, m_mdid, datum_bool_gpdb->IsNull(), datum_bool_gpdb->GetValue());
 
@@ -334,8 +316,6 @@ CMDTypeBoolGPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 gpos::Ref<CDXLDatum>
 CMDTypeBoolGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
-
 	return GPOS_NEW(mp) CDXLDatumBool(mp, m_mdid, true /*is_null*/, false);
 }
 

@@ -48,7 +48,7 @@ private:
 	const CName *m_pnameAlias;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// set representation of output columns
 	gpos::Ref<CColRefSet> m_pcrsOutput;
@@ -67,7 +67,8 @@ public:
 
 	CLogicalIndexGet(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
 					 gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-					 const CName *pnameAlias, CColRefArray *pdrgpcrOutput);
+					 const CName *pnameAlias,
+					 gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalIndexGet() override;
@@ -94,7 +95,7 @@ public:
 	}
 
 	// array of output columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -153,7 +154,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -218,14 +219,14 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -244,7 +245,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIndexGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalIndexGet> >(pop);
+		return gpos::dyn_cast<CLogicalIndexGet>(pop);
 	}
 
 

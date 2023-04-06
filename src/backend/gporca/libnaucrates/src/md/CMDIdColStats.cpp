@@ -46,7 +46,6 @@ CMDIdColStats::CMDIdColStats(gpos::Ref<CMDIdGPDB> rel_mdid, ULONG pos)
 //---------------------------------------------------------------------------
 CMDIdColStats::~CMDIdColStats()
 {
-	m_rel_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

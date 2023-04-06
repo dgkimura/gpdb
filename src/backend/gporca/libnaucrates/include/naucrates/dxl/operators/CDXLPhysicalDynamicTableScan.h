@@ -15,11 +15,10 @@
 #define GPDXL_CDXLPhysicalDynamicTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
-
 namespace gpdxl
 {
 // indices of dynamic table scan elements in the children array
@@ -44,9 +43,9 @@ private:
 	// table descriptor for the scanned table
 	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan &) = delete;
@@ -54,8 +53,8 @@ public:
 	// ctor
 	CDXLPhysicalDynamicTableScan(CMemoryPool *mp,
 								 gpos::Ref<CDXLTableDescr> table_descr,
-								 IMdIdArray *part_mdids,
-								 ULongPtrArray *selector_ids);
+								 gpos::Ref<IMdIdArray> part_mdids,
+								 gpos::Ref<ULongPtrArray> selector_ids);
 
 	// dtor
 	~CDXLPhysicalDynamicTableScan() override;
@@ -69,9 +68,9 @@ public:
 	// table descriptor
 	const gpos::Ref<CDXLTableDescr> GetDXLTableDescr() const;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -87,7 +86,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDynamicTableScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalDynamicTableScan> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalDynamicTableScan>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

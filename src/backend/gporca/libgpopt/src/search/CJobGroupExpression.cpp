@@ -55,7 +55,7 @@ CJobGroupExpression::Init(gpos::Ref<CGroupExpression> pgexpr)
 //---------------------------------------------------------------------------
 void
 CJobGroupExpression::ScheduleTransformations(CSchedulerContext *psc,
-											 CXformSet *xform_set)
+											 gpos::Ref<CXformSet> xform_set)
 {
 	// iterate on xforms
 	CXformSetIter xsi(*(xform_set));

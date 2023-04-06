@@ -47,7 +47,6 @@ CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 {
-	m_dxl_stats_derived_col_array->Release();
 }
 
 //---------------------------------------------------------------------------

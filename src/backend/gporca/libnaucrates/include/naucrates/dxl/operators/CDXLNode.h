@@ -28,7 +28,7 @@ using namespace gpos;
 class CDXLNode;
 class CXMLSerializer;
 
-using CDXLNodeArray = CDynamicPtrArray<CDXLNode, CleanupRelease>;
+using CDXLNodeArray = gpos::Vector<gpos::Ref<CDXLNode>>;
 
 // arrays of OID
 using OidArray = CDynamicPtrArray<OID, CleanupDelete>;
@@ -56,7 +56,7 @@ private:
 	gpos::Ref<CDXLProperties> m_dxl_properties;
 
 	// array of children
-	CDXLNodeArray *m_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_dxl_array;
 
 	// direct dispatch spec
 	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;
@@ -77,7 +77,8 @@ public:
 			 gpos::Ref<CDXLNode> first_child_dxlnode,
 			 gpos::Ref<CDXLNode> second_child_dxlnode,
 			 gpos::Ref<CDXLNode> third_child_dxlnode);
-	CDXLNode(gpos::Ref<CDXLOperator> dxl_op, CDXLNodeArray *dxl_array);
+	CDXLNode(gpos::Ref<CDXLOperator> dxl_op,
+			 gpos::Ref<CDXLNodeArray> dxl_array);
 
 	// dtor
 	~CDXLNode() override;
@@ -114,7 +115,7 @@ public:
 	}
 
 	// accessor for children nodes
-	const CDXLNodeArray *
+	const gpos::Ref<CDXLNodeArray>
 	GetChildDXLNodeArray() const
 	{
 		return m_dxl_array;

@@ -48,7 +48,7 @@ CLogicalDelete::CLogicalDelete(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalDelete::CLogicalDelete(CMemoryPool *mp,
 							   gpos::Ref<CTableDescriptor> ptabdesc,
-							   CColRefArray *colref_array,
+							   gpos::Ref<CColRefArray> colref_array,
 							   gpos::Ref<CColRef> pcrCtid,
 							   gpos::Ref<CColRef> pcrSegmentId)
 	: CLogical(mp),
@@ -78,8 +78,6 @@ CLogicalDelete::CLogicalDelete(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalDelete::~CLogicalDelete()
 {
-	SafeRelease(m_ptabdesc);
-	SafeRelease(m_pdrgpcr);
 }
 
 //---------------------------------------------------------------------------
@@ -136,17 +134,17 @@ CLogicalDelete::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalDelete::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalDelete::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
 	gpos::Ref<CColRef> pcrCtid =
 		CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	gpos::Ref<CColRef> pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
-	m_ptabdesc->AddRef();
+
 
 	return GPOS_NEW(mp)
 		CLogicalDelete(mp, m_ptabdesc, colref_array, pcrCtid, pcrSegmentId);
@@ -209,10 +207,10 @@ CLogicalDelete::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDelete::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDelete2DML);
 	return xform_set;
 }
@@ -228,7 +226,7 @@ CLogicalDelete::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalDelete::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

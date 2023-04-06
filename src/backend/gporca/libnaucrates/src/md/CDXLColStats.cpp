@@ -34,7 +34,7 @@ CDXLColStats::CDXLColStats(CMemoryPool *mp,
 						   gpos::Ref<CMDIdColStats> mdid_col_stats,
 						   CMDName *mdname, CDouble width, CDouble null_freq,
 						   CDouble distinct_remaining, CDouble freq_remaining,
-						   CDXLBucketArray *dxl_stats_bucket_array,
+						   gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array,
 						   BOOL is_col_stats_missing)
 	: m_mp(mp),
 	  m_mdid_col_stats(mdid_col_stats),
@@ -64,8 +64,6 @@ CDXLColStats::~CDXLColStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid_col_stats->Release();
-	m_dxl_stats_bucket_array->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -45,7 +45,6 @@ CDXLIndexDescr::CDXLIndexDescr(gpos::Ref<IMDId> mdid, CMDName *mdname)
 //---------------------------------------------------------------------------
 CDXLIndexDescr::~CDXLIndexDescr()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname);
 }
 

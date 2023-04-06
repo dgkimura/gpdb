@@ -71,9 +71,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -148,7 +148,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -161,13 +161,13 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalMaxOneRow == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalMaxOneRow> >(pop);
+		return gpos::dyn_cast<CLogicalMaxOneRow>(pop);
 	}
 
 	// derive statistics
-	gpos::Ref<IStatistics> PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										IStatisticsArray *	// stats_ctxt
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<IStatisticsArray>	 // stats_ctxt
 	) const override;
 
 

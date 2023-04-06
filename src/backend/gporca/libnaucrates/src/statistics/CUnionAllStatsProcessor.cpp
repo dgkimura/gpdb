@@ -21,8 +21,9 @@ gpos::Ref<CStatistics>
 CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> stats_first_child,
 	const gpos::Ref<CStatistics> stats_second_child,
-	ULongPtrArray *output_colids, ULongPtrArray *first_child_colids,
-	ULongPtrArray *second_child_colids)
+	gpos::Ref<ULongPtrArray> output_colids,
+	gpos::Ref<ULongPtrArray> first_child_colids,
+	gpos::Ref<ULongPtrArray> second_child_colids)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != stats_second_child);
@@ -32,10 +33,12 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	GPOS_ASSERT(output_colids->Size() == second_child_colids->Size());
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::Ref<UlongToHistogramMap> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongToDoubleMap *column_to_width_map = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::Ref<UlongToDoubleMap> column_to_width_map =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	BOOL is_empty_unionall =
 		stats_first_child->IsEmpty() && stats_second_child->IsEmpty();
@@ -98,9 +101,8 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	}
 
 	// release inputs
-	output_colids->Release();
-	first_child_colids->Release();
-	second_child_colids->Release();
+
+
 
 	// create an output stats object
 	gpos::Ref<CStatistics> unionall_stats = GPOS_NEW(mp)

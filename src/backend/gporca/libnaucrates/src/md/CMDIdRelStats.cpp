@@ -42,7 +42,6 @@ CMDIdRelStats::CMDIdRelStats(gpos::Ref<CMDIdGPDB> rel_mdid)
 //---------------------------------------------------------------------------
 CMDIdRelStats::~CMDIdRelStats()
 {
-	m_rel_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

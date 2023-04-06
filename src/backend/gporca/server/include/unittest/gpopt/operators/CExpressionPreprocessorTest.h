@@ -100,7 +100,7 @@ private:
 
 	// create a conjunction of comparisons using the given columns
 	static gpos::Ref<CExpression> PexprCreateConjunction(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// Helper for preprocessing window functions with outer references
 	static void PreprocessWinFuncWithOuterRefs(const CHAR *szFilePath,

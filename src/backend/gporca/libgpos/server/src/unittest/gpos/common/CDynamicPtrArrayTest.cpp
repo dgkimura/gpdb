@@ -96,7 +96,6 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// all elements were inserted in ascending order
 	GPOS_ASSERT(pdrg->IsSorted());
 
-	pdrg->Release();
 
 
 	// test with ULONG array
@@ -125,7 +124,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	{
 		GPOS_ASSERT((ULONG *) ulpJ == (*pdrgULONG)[(ULONG) ulpJ]);
 	}
-	pdrgULONG->Release();
+
 
 
 	return GPOS_OK;
@@ -160,7 +159,7 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 		GPOS_ASSERT(k + 1 == pdrgULONG->Size());
 		GPOS_ASSERT(pul == (*pdrgULONG)[k]);
 	}
-	pdrgULONG->Release();
+
 
 	// test with CHAR array
 
@@ -179,7 +178,7 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 	pdrgCHAR->Clear();
 	GPOS_ASSERT(0 == pdrgCHAR->Size());
 
-	pdrgCHAR->Release();
+
 
 	return GPOS_OK;
 }
@@ -226,8 +225,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	pdrgULONG1->Release();
-	pdrgULONG2->Release();
+
 
 	return GPOS_OK;
 }
@@ -279,9 +277,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 	pdrgULONG1->AppendArray(pdrgULONG3);
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 
-	pdrgULONG1->Release();
-	pdrgULONG2->Release();
-	pdrgULONG3->Release();
+
 
 	return GPOS_OK;
 }
@@ -329,7 +325,7 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgULONGTarget->Append(pul3);
 	pdrgULONGTarget->Append(pul2);
 
-	ULongPtrArray *pdrgpulIndexes =
+	gpos::Ref<ULongPtrArray> pdrgpulIndexes =
 		pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup);
 
 	GPOS_ASSERT(nullptr != pdrgpulIndexes);
@@ -342,9 +338,8 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	GPOS_DELETE(pul1);
 	GPOS_DELETE(pul2);
 	GPOS_DELETE(pul3);
-	pdrgpulIndexes->Release();
-	pdrgULONGTarget->Release();
-	pdrgULONGLookup->Release();
+
+
 
 	return GPOS_OK;
 }

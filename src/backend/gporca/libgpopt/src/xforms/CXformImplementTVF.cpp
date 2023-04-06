@@ -91,7 +91,7 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 							  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalTVF> popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
@@ -99,22 +99,22 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// create/extract components for alternative
 	gpos::Ref<IMDId> mdid_func = popTVF->FuncMdId();
-	mdid_func->AddRef();
+
 
 	gpos::Ref<IMDId> mdid_return_type = popTVF->ReturnTypeMdId();
-	mdid_return_type->AddRef();
+
 
 	CWStringConst *str =
 		GPOS_NEW(mp) CWStringConst(popTVF->Pstr()->GetBuffer());
 
-	CColumnDescriptorArray *pdrgpcoldesc = popTVF->Pdrgpcoldesc();
-	pdrgpcoldesc->AddRef();
+	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 
-	CColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
+
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popTVF->PdrgpcrOutput();
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
-	CExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
+	gpos::Ref<CExpressionArray> pdrgpexpr = pexpr->PdrgPexpr();
 
 	gpos::Ref<CPhysicalTVF> pphTVF = GPOS_NEW(mp)
 		CPhysicalTVF(mp, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
@@ -127,7 +127,6 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 	else
 	{
-		pdrgpexpr->AddRef();
 		pexprAlt = GPOS_NEW(mp) CExpression(mp, pphTVF, pdrgpexpr);
 	}
 

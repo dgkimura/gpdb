@@ -401,7 +401,7 @@ CDXLOperatorFactory::MakeDXLAppend(CDXLMemoryManager *dxl_memory_manager,
 		EdxltokenPhysicalAppend, true /* is_optional */,
 		gpos::ulong_max /* default_value */);
 
-	ULongPtrArray *selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> selector_ids = nullptr;
 	if (scan_id != gpos::ulong_max)
 	{
 		selector_ids = ExtractConvertValuesToArray(dxl_memory_manager, attrs,
@@ -1068,7 +1068,7 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 	const XMLCh *agg_kind_xml =
 		ExtractAttrValue(attrs, EdxltokenAggrefKind, EdxltokenScalarAggref);
 
-	ULongPtrArray *argtypelist = ExtractConvertValuesToArray(
+	gpos::Ref<ULongPtrArray> argtypelist = ExtractConvertValuesToArray(
 		dxl_memory_manager, attrs, EdxltokenAggrefArgTypes,
 		EdxltokenScalarAggref);
 
@@ -2240,7 +2240,6 @@ CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 	{
 		if (nullptr != default_val)
 		{
-			default_val->AddRef();
 		}
 
 		return default_val;
@@ -2274,7 +2273,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 	XMLCh *mdid_type = mdid_components.nextToken();
 
 	// collect the remaining tokens in an array
-	XMLChArray *remaining_tokens = GPOS_NEW(dxl_memory_manager->Pmp())
+	gpos::Ref<XMLChArray> remaining_tokens = GPOS_NEW(dxl_memory_manager->Pmp())
 		XMLChArray(dxl_memory_manager->Pmp());
 
 	XMLCh *xml_val = nullptr;
@@ -2328,7 +2327,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 			GPOS_ASSERT(!"Unrecognized mdid type");
 	}
 
-	remaining_tokens->Release();
+
 
 	return mdid;
 }
@@ -2343,7 +2342,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdGPDB>
 CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *dxl_memory_manager,
-								 XMLChArray *remaining_tokens,
+								 gpos::Ref<XMLChArray> remaining_tokens,
 								 Edxltoken target_attr, Edxltoken target_elem,
 								 IMDId::EMDIdType mdidType)
 {
@@ -2377,7 +2376,7 @@ CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdGPDB>
 CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
+									 gpos::Ref<XMLChArray> remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2401,7 +2400,7 @@ CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdColStats>
 CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
+									 gpos::Ref<XMLChArray> remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2429,7 +2428,7 @@ CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdRelStats>
 CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
+									 gpos::Ref<XMLChArray> remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2453,7 +2452,7 @@ CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdCast>
 CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
+									 gpos::Ref<XMLChArray> remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2461,7 +2460,7 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
 
 	gpos::Ref<CMDIdGPDB> mdid_src = GetGPDBMdId(
 		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
-	XMLChArray *dest_xml = GPOS_NEW(dxl_memory_manager->Pmp())
+	gpos::Ref<XMLChArray> dest_xml = GPOS_NEW(dxl_memory_manager->Pmp())
 		XMLChArray(dxl_memory_manager->Pmp());
 
 	for (ULONG ul = GPDXL_GPDB_MDID_COMPONENTS;
@@ -2472,7 +2471,7 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
 
 	gpos::Ref<CMDIdGPDB> mdid_dest =
 		GetGPDBMdId(dxl_memory_manager, dest_xml, target_attr, target_elem);
-	dest_xml->Release();
+
 
 	return GPOS_NEW(dxl_memory_manager->Pmp()) CMDIdCast(mdid_src, mdid_dest);
 }
@@ -2487,14 +2486,14 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDIdScCmp>
 CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
-								  XMLChArray *remaining_tokens,
+								  gpos::Ref<XMLChArray> remaining_tokens,
 								  Edxltoken target_attr, Edxltoken target_elem)
 {
 	GPOS_ASSERT(2 * GPDXL_GPDB_MDID_COMPONENTS + 1 == remaining_tokens->Size());
 
 	gpos::Ref<CMDIdGPDB> left_mdid = GetGPDBMdId(
 		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
-	XMLChArray *right_xml = GPOS_NEW(dxl_memory_manager->Pmp())
+	gpos::Ref<XMLChArray> right_xml = GPOS_NEW(dxl_memory_manager->Pmp())
 		XMLChArray(dxl_memory_manager->Pmp());
 
 	for (ULONG ul = GPDXL_GPDB_MDID_COMPONENTS;
@@ -2512,7 +2511,7 @@ CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
 		dxl_memory_manager, xml_str_comp_type, target_attr, target_elem);
 	GPOS_ASSERT(IMDType::EcmptOther > cmp_type);
 
-	right_xml->Release();
+
 
 	return GPOS_NEW(dxl_memory_manager->Pmp())
 		CMDIdScCmp(left_mdid, right_mdid, cmp_type);
@@ -2927,7 +2926,7 @@ CDXLOperatorFactory::GetDatumStatsDoubleMappable(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CDXLOperatorFactory::ExtractConvertValuesToArray(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2939,7 +2938,7 @@ CDXLOperatorFactory::ExtractConvertValuesToArray(
 								   target_elem);
 }
 
-IntPtrArray *
+gpos::Ref<IntPtrArray>
 CDXLOperatorFactory::ExtractConvertValuesToIntArray(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2972,7 +2971,7 @@ CDXLOperatorFactory::ExtractConvertValuesToIntBitSet(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *mdid_list_xml,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2980,7 +2979,7 @@ CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	IMdIdArray *mdid_array = GPOS_NEW(mp) IMdIdArray(mp);
+	gpos::Ref<IMdIdArray> mdid_array = GPOS_NEW(mp) IMdIdArray(mp);
 
 	XMLStringTokenizer mdid_components(mdid_list_xml,
 									   CDXLTokens::XmlstrToken(EdxltokenComma));
@@ -3020,7 +3019,7 @@ CDXLOperatorFactory::ExtractConvertPartitionTypeToArray(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-ULongPtr2dArray *
+gpos::Ref<ULongPtr2dArray>
 CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -3028,7 +3027,7 @@ CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	ULongPtr2dArray *array_2D = GPOS_NEW(mp) ULongPtr2dArray(mp);
+	gpos::Ref<ULongPtr2dArray> array_2D = GPOS_NEW(mp) ULongPtr2dArray(mp);
 
 	XMLStringTokenizer mdid_components(
 		xml_val, CDXLTokens::XmlstrToken(EdxltokenSemicolon));
@@ -3040,7 +3039,7 @@ CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 
 		GPOS_ASSERT(nullptr != comp_xml);
 
-		ULongPtrArray *array_1D = ExtractIntsToUlongArray(
+		gpos::Ref<ULongPtrArray> array_1D = ExtractIntsToUlongArray(
 			dxl_memory_manager, comp_xml, target_attr, target_elem);
 		array_2D->Append(array_1D);
 	}
@@ -3057,7 +3056,7 @@ CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-IntPtrArray *
+gpos::Ref<IntPtrArray>
 CDXLOperatorFactory::ExtractConvertSegmentIdsToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *seg_id_list_xml,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -3067,7 +3066,7 @@ CDXLOperatorFactory::ExtractConvertSegmentIdsToArray(
 
 	GPOS_ASSERT(nullptr != seg_id_list_xml);
 
-	IntPtrArray *seg_ids = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::Ref<IntPtrArray> seg_ids = GPOS_NEW(mp) IntPtrArray(mp);
 
 	XMLStringTokenizer mdid_components(seg_id_list_xml,
 									   CDXLTokens::XmlstrToken(EdxltokenComma));
@@ -3140,14 +3139,14 @@ CDXLOperatorFactory::SetSegmentInfo(CDXLMemoryManager *dxl_memory_manager,
 {
 	const XMLCh *input_seglist_xml =
 		ExtractAttrValue(attrs, EdxltokenInputSegments, target_elem);
-	IntPtrArray *input_segments =
+	gpos::Ref<IntPtrArray> input_segments =
 		ExtractConvertSegmentIdsToArray(dxl_memory_manager, input_seglist_xml,
 										EdxltokenInputSegments, target_elem);
 	motion->SetInputSegIds(input_segments);
 
 	const XMLCh *output_seglist_xml =
 		ExtractAttrValue(attrs, EdxltokenOutputSegments, target_elem);
-	IntPtrArray *output_segments =
+	gpos::Ref<IntPtrArray> output_segments =
 		ExtractConvertSegmentIdsToArray(dxl_memory_manager, output_seglist_xml,
 										EdxltokenOutputSegments, target_elem);
 	motion->SetOutputSegIds(output_segments);

@@ -223,7 +223,7 @@ private:
 		// like distribution spec, partition selectors
 
 		// Stores part keys for atoms that are partitioned tables. NULL otherwise.
-		CPartKeysArray *m_atom_part_keys_array;
+		gpos::Ref<CPartKeysArray> m_atom_part_keys_array;
 
 		// cost of the expression
 		CDouble m_cost;
@@ -272,8 +272,6 @@ private:
 
 		~SExpressionInfo() override
 		{
-			m_expr->Release();
-			SafeRelease(m_contain_PS);
 		}
 
 		// cost (use -1 for greedy solutions to ensure we keep all of them)
@@ -331,8 +329,6 @@ private:
 
 		~SGroupInfo() override
 		{
-			m_atoms->Release();
-			m_best_expr_info_array->Release();
 		}
 
 		BOOL
@@ -355,18 +351,16 @@ private:
 	struct SLevelInfo : public CRefCount<SLevelInfo>
 	{
 		ULONG m_level;
-		SGroupInfoArray *m_groups;
+		gpos::Ref<SGroupInfoArray> m_groups;
 		CKHeap<SGroupInfoArray, SGroupInfo> *m_top_k_groups;
 
-		SLevelInfo(ULONG level, SGroupInfoArray *groups)
+		SLevelInfo(ULONG level, gpos::Ref<SGroupInfoArray> groups)
 			: m_level(level), m_groups(groups), m_top_k_groups(nullptr)
 		{
 		}
 
 		~SLevelInfo() override
 		{
-			m_groups->Release();
-			SafeRelease(m_top_k_groups);
 		}
 	};
 
@@ -412,29 +406,31 @@ private:
 	DPv2Levels *m_join_levels;
 
 	// map to find the associated edge in the join graph from a join predicate
-	ExpressionToEdgeMap *m_expression_to_edge_map;
+	gpos::Ref<ExpressionToEdgeMap> m_expression_to_edge_map;
 
 	// map to check whether a DPv2 group already exists
-	BitSetToGroupInfoMap *m_bitset_to_group_info_map;
+	gpos::Ref<BitSetToGroupInfoMap> m_bitset_to_group_info_map;
 
 	// ON predicates for NIJs (non-inner joins, e.g. LOJs)
 	// currently NIJs are LOJs only, this may change in the future
 	// if/when we add semijoins, anti-semijoins and relatives
-	CExpressionArray *m_on_pred_conjuncts;
+	gpos::Ref<CExpressionArray> m_on_pred_conjuncts;
 
 	// association between logical children and inner join/ON preds
 	// (which of the logical children are right children of NIJs and what ON predicates are they using)
-	ULongPtrArray *m_child_pred_indexes;
+	gpos::Ref<ULongPtrArray> m_child_pred_indexes;
 
 	// for each non-inner join (entry in m_on_pred_conjuncts), the required atoms on the left
-	CBitSetArray *m_non_inner_join_dependencies;
+	gpos::Ref<CBitSetArray> m_non_inner_join_dependencies;
 
 	// top K expressions at the top level
-	CKHeap<SExpressionInfoArray, SExpressionInfo> *m_top_k_expressions;
+	gpos::Ref<CKHeap<SExpressionInfoArray, SExpressionInfo>>
+		m_top_k_expressions;
 
 	// top K expressions at top level that contain promising dynamic partiion selectors
 	// if there are no promising dynamic partition selectors, this will be empty
-	CKHeap<SExpressionInfoArray, SExpressionInfo> *m_top_k_part_expressions;
+	gpos::Ref<CKHeap<SExpressionInfoArray, SExpressionInfo>>
+		m_top_k_part_expressions;
 
 	// current penalty for cross products (depends on enumeration algorithm)
 	CDouble m_cross_prod_penalty;
@@ -522,7 +518,7 @@ private:
 
 	void FinalizeDPLevel(ULONG level);
 
-	SGroupInfoArray *
+	gpos::Ref<SGroupInfoArray>
 	GetGroupsForLevel(ULONG level) const
 	{
 		return (*m_join_levels)[level]->m_groups;
@@ -540,10 +536,10 @@ private:
 
 public:
 	// ctor
-	CJoinOrderDPv2(CMemoryPool *mp, CExpressionArray *pdrgpexprAtoms,
-				   CExpressionArray *innerJoinConjuncts,
-				   CExpressionArray *onPredConjuncts,
-				   ULongPtrArray *childPredIndexes,
+	CJoinOrderDPv2(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprAtoms,
+				   gpos::Ref<CExpressionArray> innerJoinConjuncts,
+				   gpos::Ref<CExpressionArray> onPredConjuncts,
+				   gpos::Ref<ULongPtrArray> childPredIndexes,
 				   gpos::Ref<CColRefSet> outerRefs);
 
 	// dtor

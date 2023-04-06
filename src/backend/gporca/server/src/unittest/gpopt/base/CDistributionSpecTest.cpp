@@ -91,7 +91,7 @@ CDistributionSpecTest::EresUnittest_Any()
 	at.Os() << std::endl;
 	at.Os() << *pdsany << std::endl;
 
-	pdsany->Release();
+
 
 	return GPOS_OK;
 }
@@ -112,7 +112,7 @@ CDistributionSpecTest::EresUnittest_Random()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -155,10 +155,7 @@ CDistributionSpecTest::EresUnittest_Random()
 	at.Os() << std::endl;
 	at.Os() << *pdsRandomDuplicateSensitive << std::endl;
 
-	pdsRandomDuplicateSensitive->Release();
-	pdsRandomNonDuplicateSensitive->Release();
-	pdsUniversal->Release();
-	pdsany->Release();
+
 
 	return GPOS_OK;
 }
@@ -179,7 +176,7 @@ CDistributionSpecTest::EresUnittest_Replicated()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -211,9 +208,7 @@ CDistributionSpecTest::EresUnittest_Replicated()
 	at.Os() << std::endl;
 	at.Os() << *pdsreplicated << std::endl;
 
-	pdsreplicated->Release();
-	pdsrandom->Release();
-	pdsany->Release();
+
 
 	return GPOS_OK;
 }
@@ -234,7 +229,7 @@ CDistributionSpecTest::EresUnittest_Singleton()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -286,11 +281,7 @@ CDistributionSpecTest::EresUnittest_Singleton()
 	at.Os() << *pdssMaster << std::endl;
 	at.Os() << *pdssSegment << std::endl;
 
-	pdssMaster->Release();
-	pdssSegment->Release();
-	pdsreplicated->Release();
-	pdsrandom->Release();
-	pdsany->Release();
+
 
 	return GPOS_OK;
 }
@@ -311,7 +302,7 @@ CDistributionSpecTest::EresUnittest_Universal()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -353,11 +344,7 @@ CDistributionSpecTest::EresUnittest_Universal()
 	at.Os() << std::endl;
 	at.Os() << *pdsuniversal << std::endl;
 
-	pdsuniversal->Release();
-	pdssSegment->Release();
-	pdsreplicated->Release();
-	pdsrandom->Release();
-	pdsany->Release();
+
 
 	return GPOS_OK;
 }
@@ -377,7 +364,7 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	CMemoryPool *mp = amp.Pmp();
 
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context
@@ -430,31 +417,31 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	gpos::Ref<CExpression> pexprScalarF = CUtils::PexprScalarIdent(mp, pcrF);
 	gpos::Ref<CExpression> pexprScalarG = CUtils::PexprScalarIdent(mp, pcrG);
 
-	CExpressionArray *prgpexpr1 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr1 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr1->Append(pexprScalarA);
 	prgpexpr1->Append(pexprScalarB);
 
-	CExpressionArray *prgpexpr2 = GPOS_NEW(mp) CExpressionArray(mp);
-	pexprScalarA->AddRef();
+	gpos::Ref<CExpressionArray> prgpexpr2 = GPOS_NEW(mp) CExpressionArray(mp);
+
 	prgpexpr2->Append(pexprScalarA);
 
-	CExpressionArray *prgpexpr3 = GPOS_NEW(mp) CExpressionArray(mp);
-	pexprScalarB->AddRef();
+	gpos::Ref<CExpressionArray> prgpexpr3 = GPOS_NEW(mp) CExpressionArray(mp);
+
 	prgpexpr3->Append(pexprScalarB);
 
-	CExpressionArray *prgpexpr4 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr4 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr4->Append(pexprScalarC);
 
-	CExpressionArray *prgpexpr5 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr5 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr5->Append(pexprScalarD);
 
-	CExpressionArray *prgpexpr6 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr6 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr6->Append(pexprScalarE);
 
-	CExpressionArray *prgpexpr7 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr7 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr7->Append(pexprScalarF);
 
-	CExpressionArray *prgpexpr8 = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> prgpexpr8 = GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr8->Append(pexprScalarG);
 
 	// basic hash distribution tests
@@ -474,7 +461,7 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	GPOS_RTL_ASSERT(pdshashed2->Matches(pdshashed2));
 
 	// pdshashed3: HD{A}, false
-	prgpexpr2->AddRef();
+
 	gpos::Ref<CDistributionSpecHashed> pdshashed3 = GPOS_NEW(mp)
 		CDistributionSpecHashed(prgpexpr2, false /* fNullsCollocated */);
 	GPOS_RTL_ASSERT(pdshashed3->FSatisfies(pdshashed3));
@@ -701,30 +688,7 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	at.Os() << *pdshashed17 << std::endl;
 	at.Os() << *pdshashed18 << std::endl;
 
-	pdshashed1->Release();
-	pdshashed2->Release();
-	pdshashed3->Release();
-	pdshashed4->Release();
-	pdshashed5->Release();
-	pdshashed6->Release();
-	pdshashed7->Release();
-	pdshashed8->Release();
-	pdshashed9->Release();
-	pdshashed10->Release();
-	pdshashed11->Release();
-	pdshashed12->Release();
-	pdshashed13->Release();
-	pdshashed14->Release();
-	pdshashed15->Release();
-	pdshashed16->Release();
-	pdshashed17->Release();
-	pdshashed18->Release();
 
-	pdssSegment->Release();
-	pdsreplicated->Release();
-	pdsrandom->Release();
-	pdsany->Release();
-	pdsuniversal->Release();
 
 	return GPOS_OK;
 }
@@ -750,7 +714,7 @@ CDistributionSpecTest::EresUnittest_NegativeAny()
 	CExpressionHandle *pexprhdl = GPOS_NEW(mp) CExpressionHandle(mp);
 	pdsany->AppendEnforcers(nullptr /*mp*/, *pexprhdl, nullptr /*prpp*/,
 							nullptr /*pdrgpexpr*/, nullptr /*pexpr*/);
-	pdsany->Release();
+
 	GPOS_DELETE(pexprhdl);
 
 	return GPOS_FAILED;
@@ -778,7 +742,7 @@ CDistributionSpecTest::EresUnittest_NegativeUniversal()
 
 	pdsuniversal->AppendEnforcers(nullptr /*mp*/, *pexprhdl, nullptr /*prpp*/,
 								  nullptr /*pdrgpexpr*/, nullptr /*pexpr*/);
-	pdsuniversal->Release();
+
 	GPOS_DELETE(pexprhdl);
 
 	return GPOS_FAILED;
@@ -800,7 +764,7 @@ CDistributionSpecTest::EresUnittest_NegativeRandom()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -814,7 +778,7 @@ CDistributionSpecTest::EresUnittest_NegativeRandom()
 
 	pdsrandom->AppendEnforcers(nullptr /*mp*/, *pexprhdl, nullptr /*prpp*/,
 							   nullptr /*pdrgpexpr*/, nullptr /*pexpr*/);
-	pdsrandom->Release();
+
 	GPOS_DELETE(pexprhdl);
 
 	return GPOS_FAILED;

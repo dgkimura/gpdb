@@ -26,9 +26,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalWindow::CDXLPhysicalWindow(CMemoryPool *mp,
-									   ULongPtrArray *part_by_colid_array,
-									   CDXLWindowKeyArray *window_key_array)
+CDXLPhysicalWindow::CDXLPhysicalWindow(
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> part_by_colid_array,
+	CDXLWindowKeyArray *window_key_array)
 	: CDXLPhysical(mp),
 	  m_part_by_colid_array(part_by_colid_array),
 	  m_dxl_window_key_array(window_key_array)
@@ -47,8 +47,6 @@ CDXLPhysicalWindow::CDXLPhysicalWindow(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalWindow::~CDXLPhysicalWindow()
 {
-	m_part_by_colid_array->Release();
-	m_dxl_window_key_array->Release();
 }
 
 //---------------------------------------------------------------------------

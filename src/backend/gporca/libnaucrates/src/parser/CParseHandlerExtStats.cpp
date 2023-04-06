@@ -42,7 +42,6 @@ CParseHandlerExtStats::CParseHandlerExtStats(
 
 CParseHandlerExtStats::~CParseHandlerExtStats()
 {
-	m_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -129,13 +128,13 @@ CParseHandlerExtStats::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerExtStatsDependencies *dependencies_parse_handler =
 		dynamic_cast<CParseHandlerExtStatsDependencies *>((*this)[1]);
-	dependencies_parse_handler->GetDependencies()->AddRef();
+
 
 	CParseHandlerExtStatsNDistinctList *ndistincts_parse_handler =
 		dynamic_cast<CParseHandlerExtStatsNDistinctList *>((*this)[0]);
-	ndistincts_parse_handler->GetNDistinctList()->AddRef();
 
-	m_mdid->AddRef();
+
+
 	m_imd_obj = GPOS_NEW(m_mp) CDXLExtStats(
 		m_mp, m_mdid, m_mdname, dependencies_parse_handler->GetDependencies(),
 		ndistincts_parse_handler->GetNDistinctList());

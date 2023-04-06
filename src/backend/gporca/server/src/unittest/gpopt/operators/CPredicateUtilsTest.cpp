@@ -62,7 +62,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -70,7 +70,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 					 CTestUtils::GetCostModel(mp));
 
 	// build conjunction
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulConjs = 3;
 	for (ULONG ul = 0; ul < ulConjs; ul++)
 	{
@@ -80,7 +80,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
 
 	// break into conjuncts
-	CExpressionArray *pdrgpexprExtract =
+	gpos::Ref<CExpressionArray> pdrgpexprExtract =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprConjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulConjs);
 
@@ -89,15 +89,14 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 		CPredicateUtils::PexprConjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarConstTrue(pexpr));
-	pexpr->Release();
+
 
 	// collapse empty input array to conjunct
 	gpos::Ref<CExpression> pexprSingleton =
 		CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/);
 	GPOS_ASSERT(nullptr != pexprSingleton);
-	pexprSingleton->Release();
 
-	pexprConjunction->Release();
+
 
 	// conjunction on scalar comparisons
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -114,12 +113,8 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 		CPredicateUtils::PexprConjunction(mp, pexprCmp1, pexprCmp2);
 	pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(mp, pexprConj);
 	GPOS_ASSERT(2 == pdrgpexprExtract->Size());
-	pdrgpexprExtract->Release();
 
-	pexprCmp1->Release();
-	pexprCmp2->Release();
-	pexprConj->Release();
-	pexprGet->Release();
+
 
 	return GPOS_OK;
 }
@@ -141,7 +136,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -149,7 +144,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 					 CTestUtils::GetCostModel(mp));
 
 	// build disjunction
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulDisjs = 3;
 	for (ULONG ul = 0; ul < ulDisjs; ul++)
 	{
@@ -159,7 +154,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopOr, pdrgpexpr);
 
 	// break into disjuncts
-	CExpressionArray *pdrgpexprExtract =
+	gpos::Ref<CExpressionArray> pdrgpexprExtract =
 		CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulDisjs);
 
@@ -168,15 +163,14 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 		CPredicateUtils::PexprDisjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexpr));
-	pexpr->Release();
+
 
 	// collapse empty input array to disjunct
 	gpos::Ref<CExpression> pexprSingleton =
 		CPredicateUtils::PexprDisjunction(mp, nullptr /*pdrgpexpr*/);
 	GPOS_ASSERT(nullptr != pexprSingleton);
-	pexprSingleton->Release();
 
-	pexprDisjunction->Release();
+
 
 	// disjunction on scalar comparisons
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -212,20 +206,19 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 			CPredicateUtils::PexprDisjunction(mp, pexprCmp1, pexprCmp2);
 		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
 		GPOS_ASSERT(2 == pdrgpexprExtract->Size());
-		pdrgpexprExtract->Release();
-		pexprDisj->Release();
 	}
 
 
 	{
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		gpos::Ref<CExpression> pexprCmp3 =
 			CUtils::PexprScalarCmp(mp, pcr2, pcr1, IMDType::EcmptG);
 		gpos::Ref<CExpression> pexprCmp4 = CUtils::PexprScalarCmp(
 			mp, CUtils::PexprScalarConstInt4(mp, 200 /*val*/), pcr3,
 			IMDType::EcmptL);
-		pexprCmp1->AddRef();
-		pexprCmp2->AddRef();
+
+
 
 		pdrgpexpr->Append(pexprCmp3);
 		pdrgpexpr->Append(pexprCmp4);
@@ -236,13 +229,9 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 			CPredicateUtils::PexprDisjunction(mp, pdrgpexpr);
 		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
 		GPOS_ASSERT(4 == pdrgpexprExtract->Size());
-		pdrgpexprExtract->Release();
-		pexprDisj->Release();
 	}
 
-	pexprCmp1->Release();
-	pexprCmp2->Release();
-	pexprGet->Release();
+
 
 	return GPOS_OK;
 }
@@ -264,7 +253,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -274,7 +263,8 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	gpos::Ref<CExpression> pexprLeft = CTestUtils::PexprLogicalGet(mp);
 	gpos::Ref<CExpression> pexprRight = CTestUtils::PexprLogicalGet(mp);
 
-	CExpressionArray *pdrgpexprOriginal = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprOriginal =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
@@ -286,7 +276,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	gpos::Ref<CExpression> pexprScIdentEquality =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
-	pexprScIdentEquality->AddRef();
+
 	pdrgpexprOriginal->Append(pexprScIdentEquality);
 
 	// generate a non-equality predicate between two column reference
@@ -294,7 +284,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 		mp, pcrLeft, pcrRight, CWStringConst(GPOS_WSZ_LIT("<")),
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_LT_OP));
 
-	pexprScIdentInequality->AddRef();
+
 	pdrgpexprOriginal->Append(pexprScIdentInequality);
 
 	// generate an equality predicate between a column reference and a constant value
@@ -307,18 +297,14 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 
 	GPOS_ASSERT(3 == pdrgpexprOriginal->Size());
 
-	CExpressionArray *pdrgpexprResult =
+	gpos::Ref<CExpressionArray> pdrgpexprResult =
 		CPredicateUtils::PdrgpexprPlainEqualities(mp, pdrgpexprOriginal);
 
 	GPOS_ASSERT(1 == pdrgpexprResult->Size());
 
 	// clean up
-	pdrgpexprOriginal->Release();
-	pdrgpexprResult->Release();
-	pexprLeft->Release();
-	pexprRight->Release();
-	pexprScIdentEquality->Release();
-	pexprScIdentInequality->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -339,7 +325,7 @@ CPredicateUtilsTest::EresUnittest_Implication()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -412,20 +398,17 @@ CPredicateUtilsTest::EresUnittest_Implication()
 				<< *pexprMinimizedPred << std::endl;
 	}
 
-	CExpressionArray *pdrgpexprOriginalConjuncts =
+	gpos::Ref<CExpressionArray> pdrgpexprOriginalConjuncts =
 		CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprConstraints)[2]);
-	CExpressionArray *pdrgpexprNewConjuncts =
+	gpos::Ref<CExpressionArray> pdrgpexprNewConjuncts =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprMinimizedPred);
 
 	GPOS_ASSERT(pdrgpexprNewConjuncts->Size() <
 				pdrgpexprOriginalConjuncts->Size());
 
 	// clean up
-	pdrgpexprOriginalConjuncts->Release();
-	pdrgpexprNewConjuncts->Release();
-	pexprJoin2->Release();
-	pexprConstraints->Release();
-	pexprMinimizedPred->Release();
+
+
 
 	return GPOS_OK;
 }

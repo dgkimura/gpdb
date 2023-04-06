@@ -52,7 +52,6 @@ CParseHandlerStatsDerivedRelation::CParseHandlerStatsDerivedRelation(
 //---------------------------------------------------------------------------
 CParseHandlerStatsDerivedRelation::~CParseHandlerStatsDerivedRelation()
 {
-	m_dxl_stats_derived_relation->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -168,7 +167,7 @@ CParseHandlerStatsDerivedRelation::EndElement(
 
 		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatdercol =
 			stats_derived_col_parse_handler->GetDxlStatsDerivedCol();
-		pdxlstatdercol->AddRef();
+
 		dxl_stats_derived_col_array->Append(pdxlstatdercol);
 	}
 

@@ -25,8 +25,8 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CQueryToDXLResult::CQueryToDXLResult(gpos::Ref<CDXLNode> query,
-									 CDXLNodeArray *query_output,
-									 CDXLNodeArray *cte_producers)
+									 gpos::Ref<CDXLNodeArray> query_output,
+									 gpos::Ref<CDXLNodeArray> cte_producers)
 	: m_query_dxl(query),
 	  m_query_output(query_output),
 	  m_cte_producers(cte_producers)
@@ -44,9 +44,6 @@ CQueryToDXLResult::CQueryToDXLResult(gpos::Ref<CDXLNode> query,
 //---------------------------------------------------------------------------
 CQueryToDXLResult::~CQueryToDXLResult()
 {
-	m_query_dxl->Release();
-	SafeRelease(m_query_output);
-	SafeRelease(m_cte_producers);
 }
 
 //---------------------------------------------------------------------------
@@ -57,7 +54,7 @@ CQueryToDXLResult::~CQueryToDXLResult()
 //		Return the array of dxl nodes representing the query output
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+const gpos::Ref<CDXLNodeArray>
 CQueryToDXLResult::GetOutputColumnsDXLArray() const
 {
 	return m_query_output;
@@ -71,7 +68,7 @@ CQueryToDXLResult::GetOutputColumnsDXLArray() const
 //		Return the array of CTEs
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+const gpos::Ref<CDXLNodeArray>
 CQueryToDXLResult::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;

@@ -41,7 +41,7 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 						   gpos::Ref<IMDId> array_type_mdid,
 						   BOOL is_multidimenstional,
-						   CScalarConstArray *pdrgPconst)
+						   gpos::Ref<CScalarConstArray> pdrgPconst)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_pmdidArray(array_type_mdid),
@@ -55,9 +55,6 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 // Dtor
 CScalarArray::~CScalarArray()
 {
-	m_pmdidElem->Release();
-	m_pmdidArray->Release();
-	m_pdrgPconst->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -171,7 +168,7 @@ CScalarArray::MdidType() const
 	return m_pmdidArray;
 }
 
-CScalarConstArray *
+gpos::Ref<CScalarConstArray>
 CScalarArray::PdrgPconst() const
 {
 	return m_pdrgPconst;

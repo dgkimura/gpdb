@@ -224,7 +224,6 @@ CJobGroupExpressionOptimization::Init(gpos::Ref<CGroupExpression> pgexpr,
 		 (*pgexpr)[0]->FHasCTEProducer());
 	if (nullptr != prppCTEProducer)
 	{
-		prppCTEProducer->AddRef();
 	}
 	m_prppCTEProducer = prppCTEProducer;
 	m_fScheduledCTEOptimization = false;
@@ -243,10 +242,6 @@ CJobGroupExpressionOptimization::Init(gpos::Ref<CGroupExpression> pgexpr,
 void
 CJobGroupExpressionOptimization::Cleanup()
 {
-	SafeRelease(m_pdrgpoc);
-	SafeRelease(m_pdrgpstatCurrentCtxt);
-	SafeRelease(m_pdrgpdp);
-	SafeRelease(m_prppCTEProducer);
 	GPOS_DELETE(m_pexprhdlPlan);
 	GPOS_DELETE(m_pexprhdlRel);
 }
@@ -397,12 +392,12 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 	CExpressionHandle exprhdl(psc->GetGlobalMemoryPool());
 	exprhdl.Attach(pccChildBest);
 	exprhdl.DerivePlanPropsForCostContext();
-	exprhdl.Pdp()->AddRef();
+
 	m_pdrgpdp->Append(exprhdl.Pdp());
 
 	// copy stats of child's best cost context to current stats context
 	gpos::Ref<IStatistics> pstat = pccChildBest->Pstats();
-	pstat->AddRef();
+
 	m_pdrgpstatCurrentCtxt->Append(pstat);
 }
 
@@ -435,7 +430,7 @@ CJobGroupExpressionOptimization::ComputeCurrentChildRequirements(
 		GPOS_ASSERT(m_fOptimizeCTESequence);
 		GPOS_ASSERT((*m_pgexpr)[m_ulChildIndex]->FHasCTEProducer());
 
-		m_prppCTEProducer->AddRef();
+
 		m_pexprhdlPlan->CopyChildReqdProps(m_ulChildIndex, m_prppCTEProducer);
 	}
 	else
@@ -477,11 +472,12 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 	{
 		return;
 	}
-	m_pexprhdlPlan->Prpp(m_ulChildIndex)->AddRef();
+
 
 	// use current stats for optimizing current child
-	IStatisticsArray *stats_ctxt = GPOS_NEW(psc->GetGlobalMemoryPool())
-		IStatisticsArray(psc->GetGlobalMemoryPool());
+	gpos::Ref<IStatisticsArray> stats_ctxt =
+		GPOS_NEW(psc->GetGlobalMemoryPool())
+			IStatisticsArray(psc->GetGlobalMemoryPool());
 	CUtils::AddRefAppend(stats_ctxt, m_pdrgpstatCurrentCtxt);
 
 	// compute required relational properties
@@ -497,7 +493,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 		prprel = m_pexprhdlRel->GetReqdRelationalProps(m_ulChildIndex);
 	}
 	GPOS_ASSERT(nullptr != prprel);
-	prprel->AddRef();
+
 
 	// schedule optimization job for current child group
 	gpos::Ref<COptimizationContext> pocChild =
@@ -510,14 +506,14 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 	{
 		// this is to prevent deadlocks, child context cannot be the same as parent context
 		m_fChildOptimizationFailed = true;
-		pocChild->Release();
+
 
 		return;
 	}
 
 	CJobGroupOptimization::ScheduleJob(psc, pgroupChild, m_pgexpr, pocChild,
 									   this);
-	pocChild->Release();
+
 
 	// advance to next child
 	if (!m_pexprhdlPlan->FNextChildIndex(&m_ulChildIndex))
@@ -627,7 +623,7 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 	// compute group expression cost under current context
 	gpos::Ref<COptimizationContext> poc = pjgeo->m_poc;
 	gpos::Ref<CGroupExpression> pgexpr = pjgeo->m_pgexpr;
-	COptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
 	gpos::Ref<CCostContext> pcc =
@@ -778,7 +774,7 @@ CJobGroupExpressionOptimization::FScheduleCTEOptimization(
 	// initialize job
 	pjgeo->Init(pgexpr, poc, ulOptReq, prppCTEProducer);
 	psc->Psched()->Add(pjgeo, pjParent);
-	prppCTEProducer->Release();
+
 
 	return true;
 }

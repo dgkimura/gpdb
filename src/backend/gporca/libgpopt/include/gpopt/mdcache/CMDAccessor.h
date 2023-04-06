@@ -255,8 +255,8 @@ private:
 	void RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 						   ULONG colid, ULONG ulPos, BOOL isSystemCol,
 						   BOOL isEmptyTable,
-						   UlongToHistogramMap *col_histogram_mapping,
-						   UlongToDoubleMap *colid_width_mapping,
+						   gpos::Ref<UlongToHistogramMap> col_histogram_mapping,
+						   gpos::Ref<UlongToDoubleMap> colid_width_mapping,
 						   gpos::Ref<CStatisticsConfig> stats_config);
 
 	// construct a stats histogram from an MD column stats object
@@ -279,7 +279,7 @@ public:
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache, CSystemId sysid,
 				gpos::Ref<IMDProvider> pmdp);
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache,
-				const CSystemIdArray *pdrgpsysid,
+				const gpos::Ref<CSystemIdArray> pdrgpsysid,
 				const CMDProviderArray *pdrgpmdp);
 
 	//dtor
@@ -296,7 +296,7 @@ public:
 	void RegisterProvider(CSystemId sysid, gpos::Ref<IMDProvider> pmdp);
 
 	// register given MD providers
-	void RegisterProviders(const CSystemIdArray *pdrgpsysid,
+	void RegisterProviders(const gpos::Ref<CSystemIdArray> pdrgpsysid,
 						   const CMDProviderArray *pdrgpmdp);
 
 	// interface to an extended stats object from the MD cache
@@ -314,22 +314,22 @@ public:
 
 	// obtain the specified base type given by the template parameter
 	template <class T>
-	const T *
+	const gpos::Ref<T>
 	PtMDType()
 	{
 		IMDType::ETypeInfo type_info = T::GetTypeInfo();
 		GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-		return dynamic_cast<const T *>(RetrieveType(type_info));
+		return gpos::dyn_cast<T>(RetrieveType(type_info));
 	}
 
 	// obtain the specified base type given by the template parameter
 	template <class T>
-	const T *
+	const gpos::Ref<T>
 	PtMDType(CSystemId sysid)
 	{
 		IMDType::ETypeInfo type_info = T::GetTypeInfo();
 		GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-		return dynamic_cast<const T *>(RetrieveType(sysid, type_info));
+		return gpos::dyn_cast<T>(RetrieveType(sysid, type_info));
 	}
 
 	// interface to a scalar operator from the MD cache

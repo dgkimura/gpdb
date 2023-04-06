@@ -175,7 +175,7 @@ public:
 };
 
 // common structures over metadata id elements
-using IMdIdArray = CDynamicPtrArray<IMDId, CleanupRelease>;
+using IMdIdArray = gpos::Vector<gpos::Ref<IMDId>>;
 
 // hash set for mdid
 using MdidHashSet =

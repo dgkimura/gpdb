@@ -131,7 +131,6 @@ COperator::PfpDeriveFromChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<COperator>
 COperator::PopCopyDefault()
 {
-	this->AddRef();
 	return this;
 }
 

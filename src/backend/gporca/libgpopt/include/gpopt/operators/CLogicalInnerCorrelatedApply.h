@@ -34,7 +34,8 @@ public:
 	CLogicalInnerCorrelatedApply(const CLogicalInnerCorrelatedApply &) = delete;
 
 	// ctor
-	CLogicalInnerCorrelatedApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalInnerCorrelatedApply(CMemoryPool *mp,
+								 gpos::Ref<CColRefArray> pdrgpcrInner,
 								 EOperatorId eopidOriginSubq);
 
 	// ctor for patterns
@@ -58,14 +59,14 @@ public:
 	}
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// return true if operator is a correlated apply
@@ -82,7 +83,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalInnerCorrelatedApply> >(pop);
+		return gpos::dyn_cast<CLogicalInnerCorrelatedApply>(pop);
 	}
 
 };	// class CLogicalInnerCorrelatedApply

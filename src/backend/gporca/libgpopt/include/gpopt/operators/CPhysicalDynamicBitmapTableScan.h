@@ -48,9 +48,10 @@ public:
 	CPhysicalDynamicBitmapTableScan(
 		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
 		ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-		CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
-		IMdIdArray *partition_mdids,
-		ColRefToUlongMapArray *root_col_mapping_per_part);
+		gpos::Ref<CColRefArray> pdrgpcrOutput,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// ident accessors
 	EOperatorId
@@ -73,7 +74,7 @@ public:
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prpplan,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// conversion function
 	static gpos::Ref<CPhysicalDynamicBitmapTableScan>
@@ -82,7 +83,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicBitmapTableScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalDynamicBitmapTableScan> >(pop);
+		return gpos::dyn_cast<CPhysicalDynamicBitmapTableScan>(pop);
 	}
 };
 }  // namespace gpopt

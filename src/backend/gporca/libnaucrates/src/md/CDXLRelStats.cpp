@@ -59,7 +59,6 @@ CDXLRelStats::~CDXLRelStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_rel_stats_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

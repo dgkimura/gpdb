@@ -62,9 +62,8 @@ CBucket::CBucket(gpos::Ref<CPoint> bucket_lower_bound,
 //---------------------------------------------------------------------------
 CBucket::~CBucket()
 {
-	m_bucket_lower_bound->Release();
 	m_bucket_lower_bound = nullptr;
-	m_bucket_upper_bound->Release();
+
 	m_bucket_upper_bound = nullptr;
 }
 
@@ -280,7 +279,6 @@ CBucket::MakeBucketGreaterThan(CMemoryPool *mp, gpos::Ref<CPoint> point) const
 			result_bucket =
 				MakeBucketScaleLower(mp, point_new, true /* include_lower */);
 		}
-		point_new->Release();
 	}
 	else
 	{
@@ -339,8 +337,8 @@ CBucket::MakeBucketScaleUpper(CMemoryPool *mp,
 
 
 	// reuse the lower from this bucket
-	this->m_bucket_lower_bound->AddRef();
-	point_upper_new->AddRef();
+
+
 
 	return GPOS_NEW(mp) CBucket(this->m_bucket_lower_bound, point_upper_new,
 								this->m_is_lower_closed, include_upper,
@@ -389,8 +387,8 @@ CBucket::MakeBucketScaleLower(CMemoryPool *mp,
 	}
 
 	// reuse the lower from this bucket
-	this->m_bucket_upper_bound->AddRef();
-	point_lower_new->AddRef();
+
+
 
 	return GPOS_NEW(mp)
 		CBucket(point_lower_new, this->m_bucket_upper_bound, include_lower,
@@ -429,8 +427,8 @@ CBucket::MakeBucketSingleton(CMemoryPool *mp,
 	}
 
 	// singleton point is both lower and upper
-	point_singleton->AddRef();
-	point_singleton->AddRef();
+
+
 
 	return GPOS_NEW(mp)
 		CBucket(point_singleton, point_singleton, true /* is_lower_closed */,
@@ -449,8 +447,8 @@ CBucket *
 CBucket::MakeBucketCopy(CMemoryPool *mp)
 {
 	// reuse the points
-	m_bucket_lower_bound->AddRef();
-	m_bucket_upper_bound->AddRef();
+
+
 
 	return GPOS_NEW(mp)
 		CBucket(m_bucket_lower_bound, m_bucket_upper_bound, m_is_lower_closed,
@@ -486,8 +484,8 @@ CBucket::MakeBucketUpdateFrequency(CMemoryPool *mp, CDouble rows_old,
 								   CDouble rows_new)
 {
 	// reuse the points
-	m_bucket_lower_bound->AddRef();
-	m_bucket_upper_bound->AddRef();
+
+
 
 	CDouble frequency_new = (this->m_frequency * rows_old) / rows_new;
 
@@ -858,8 +856,6 @@ CBucket::MakeBucketIntersect(CMemoryPool *mp, CBucket *bucket,
 									DOUBLE(1.0) / distinct_max);
 
 
-	lower_new->AddRef();
-	upper_new->AddRef();
 
 	*result_freq_intersect1 = freq_intersect1;
 	*result_freq_intersect2 = freq_intersect2;
@@ -1095,8 +1091,8 @@ CBucket::SplitAndMergeBuckets(
 						 (this_bucket_rows + bucket_other_rows) / total_rows);
 		}
 
-		minLower->AddRef();
-		maxUpper->AddRef();
+
+
 		*result_rows = total_rows;
 		return GPOS_NEW(mp)
 			CBucket(minLower, maxUpper, true, true, freq, CDouble(1.0) /*ndv*/);
@@ -1133,8 +1129,8 @@ CBucket::SplitAndMergeBuckets(
 				*result_rows = total_rows;
 			}
 
-			this->GetLowerBound()->AddRef();
-			maxLower->AddRef();
+
+
 			lower_third = GPOS_NEW(mp)
 				CBucket(this->GetLowerBound(), maxLower, this->IsLowerClosed(),
 						include_upper, lower_freq, lower_ndv);
@@ -1160,8 +1156,8 @@ CBucket::SplitAndMergeBuckets(
 				*result_rows = total_rows;
 			}
 
-			bucket_other->GetLowerBound()->AddRef();
-			maxLower->AddRef();
+
+
 			lower_third =
 				GPOS_NEW(mp) CBucket(bucket_other->GetLowerBound(), maxLower,
 									 bucket_other->IsLowerClosed(),
@@ -1313,8 +1309,8 @@ CBucket::SplitAndMergeBuckets(
 	}
 
 	// create the merged bucket
-	maxLower->AddRef();
-	minUpper->AddRef();
+
+
 	middle_third = GPOS_NEW(mp) CBucket(maxLower, minUpper, isLowerClosed,
 										isUpperClosed, merged_freq, merged_ndv);
 
@@ -1401,8 +1397,7 @@ CBucket::MakeBucketSingleton(CMemoryPool *mp, gpos::Ref<IDatum> datum)
 {
 	GPOS_ASSERT(nullptr != datum);
 
-	datum->AddRef();
-	datum->AddRef();
+
 
 	return GPOS_NEW(mp)
 		CBucket(GPOS_NEW(mp) CPoint(datum), GPOS_NEW(mp) CPoint(datum),

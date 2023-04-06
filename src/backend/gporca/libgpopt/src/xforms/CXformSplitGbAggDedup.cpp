@@ -62,7 +62,7 @@ CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -79,7 +79,7 @@ CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 		return;
 	}
 
-	pexprRelational->AddRef();
+
 
 	gpos::Ref<CExpression> pexprProjectListLocal = nullptr;
 	gpos::Ref<CExpression> pexprProjectListGlobal = nullptr;
@@ -89,20 +89,18 @@ CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(nullptr != pexprProjectListLocal &&
 				nullptr != pexprProjectListLocal);
 
-	CColRefArray *colref_array = popAggDedup->Pdrgpcr();
-	colref_array->AddRef();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popAggDedup->Pdrgpcr();
 
-	CColRefArray *pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
+
+
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
-		pdrgpcrMinimal->AddRef();
-		pdrgpcrMinimal->AddRef();
 	}
 
-	CColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
-	pdrgpcrKeys->AddRef();
-	pdrgpcrKeys->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+
+
 
 	gpos::Ref<CExpression> local_expr = GPOS_NEW(mp)
 		CExpression(mp,

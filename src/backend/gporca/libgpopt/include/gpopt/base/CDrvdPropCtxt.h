@@ -26,7 +26,7 @@ class CDrvdPropCtxt;
 class CDrvdProp;
 
 // dynamic array for properties
-using CDrvdPropCtxtArray = CDynamicPtrArray<CDrvdPropCtxt, CleanupRelease>;
+using CDrvdPropCtxtArray = gpos::Vector<gpos::Ref<CDrvdPropCtxt>>;
 
 //---------------------------------------------------------------------------
 //	@class:

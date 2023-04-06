@@ -58,9 +58,6 @@ CParseHandlerQuery::CParseHandlerQuery(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerQuery::~CParseHandlerQuery()
 {
-	SafeRelease(m_dxl_node);
-	SafeRelease(m_output_colums_dxl_array);
-	SafeRelease(m_cte_producers);
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +82,7 @@ CParseHandlerQuery::CreateDXLNode() const
 //		Returns the list of query output columns
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::Ref<CDXLNodeArray>
 CParseHandlerQuery::GetOutputColumnsDXLArray() const
 {
 	return m_output_colums_dxl_array;
@@ -99,7 +96,7 @@ CParseHandlerQuery::GetOutputColumnsDXLArray() const
 //		Returns the list of CTEs
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::Ref<CDXLNodeArray>
 CParseHandlerQuery::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;
@@ -204,7 +201,7 @@ CParseHandlerQuery::EndElement(const XMLCh *const,	// element_uri,
 	// store constructed node
 	m_output_colums_dxl_array =
 		parse_handler_query_output->GetOutputColumnsDXLArray();
-	m_output_colums_dxl_array->AddRef();
+
 
 	CParseHandlerCTEList *parse_handler_cte =
 		dynamic_cast<CParseHandlerCTEList *>((*this)[1]);
@@ -212,7 +209,7 @@ CParseHandlerQuery::EndElement(const XMLCh *const,	// element_uri,
 				nullptr != parse_handler_cte->GetDxlCteArray());
 
 	m_cte_producers = parse_handler_cte->GetDxlCteArray();
-	m_cte_producers->AddRef();
+
 
 	CParseHandlerLogicalOp *parse_handler_logical_op =
 		dynamic_cast<CParseHandlerLogicalOp *>((*this)[2]);
@@ -221,7 +218,7 @@ CParseHandlerQuery::EndElement(const XMLCh *const,	// element_uri,
 
 	// store constructed node
 	m_dxl_node = parse_handler_logical_op->CreateDXLNode();
-	m_dxl_node->AddRef();
+
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

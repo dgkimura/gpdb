@@ -58,7 +58,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoinNotIn == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLeftAntiSemiNLJoinNotIn> >(pop);
+		return gpos::dyn_cast<CPhysicalLeftAntiSemiNLJoinNotIn>(pop);
 	}
 
 };	// class CPhysicalLeftAntiSemiNLJoinNotIn

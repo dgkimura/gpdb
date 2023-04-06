@@ -15,9 +15,9 @@
 #define GPDXL_CDXLPhysicalHashJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalJoin.h"
-
 namespace gpdxl
 {
 // indices of hash join elements in the children array
@@ -63,7 +63,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalHashJoin == dxl_op->GetDXLOperator());
-		return dynamic_cast<gpos::Ref<CDXLPhysicalHashJoin> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalHashJoin>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

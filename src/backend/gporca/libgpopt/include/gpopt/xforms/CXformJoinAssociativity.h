@@ -32,8 +32,8 @@ class CXformJoinAssociativity : public CXformExploration
 private:
 	// helper function for creating the new join predicate
 	static void CreatePredicates(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexprLower,
-								 CExpressionArray *pdrgpexprUpper);
+								 gpos::Ref<CExpressionArray> pdrgpexprLower,
+								 gpos::Ref<CExpressionArray> pdrgpexprUpper);
 
 public:
 	CXformJoinAssociativity(const CXformJoinAssociativity &) = delete;

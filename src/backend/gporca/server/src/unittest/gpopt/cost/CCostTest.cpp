@@ -139,7 +139,8 @@ CCostTest::TestParams(CMemoryPool *mp)
 	IOstream &os(at.Os());
 
 	gpos::Ref<ICostModelParams> pcp =
-		((gpos::Ref<CCostModelGPDB>) COptCtxt::PoctxtFromTLS()->GetCostModel())
+		gpos::dyn_cast<CCostModelGPDB>(
+			COptCtxt::PoctxtFromTLS()->GetCostModel())
 			->GetCostModelParams();
 
 	CDouble dSeqIOBandwidth =
@@ -215,7 +216,7 @@ CCostTest::EresUnittest_Params()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -293,7 +294,7 @@ CCostTest::EresUnittest_SetParams()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<ICostModel> pcm =
@@ -376,9 +377,8 @@ CCostTest::EresUnittest_SetParams()
 		"expected NLJ cost in PLAN2 to be larger than NLJ cost in PLAN1");
 
 	// clean up
-	pexpr->Release();
-	pexprPlan1->Release();
-	pexprPlan2->Release();
+
+
 
 	return GPOS_OK;
 }

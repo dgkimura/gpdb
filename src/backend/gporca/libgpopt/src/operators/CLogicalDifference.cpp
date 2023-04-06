@@ -43,9 +43,9 @@ CLogicalDifference::CLogicalDifference(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalDifference::CLogicalDifference(CMemoryPool *mp,
-									   CColRefArray *pdrgpcrOutput,
-									   CColRef2dArray *pdrgpdrgpcrInput)
+CLogicalDifference::CLogicalDifference(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 }
@@ -90,13 +90,13 @@ CLogicalDifference::DeriveMaxCard(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalDifference::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::Ref<CColRefArray> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalDifference(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
@@ -111,10 +111,10 @@ CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDifference2LeftAntiSemiJoin);
 	return xform_set;
 }
@@ -129,14 +129,15 @@ CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 
 	// difference is transformed into an aggregate over a LASJ,
 	// we follow the same route to compute statistics
-	CColRefSetArray *output_colrefsets = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::Ref<CColRefSetArray> output_colrefsets =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -154,7 +155,7 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// compute the statistics for LASJ
 	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is an LASJ
@@ -165,11 +166,12 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		);
 
 	// clean up
-	pexprScCond->Release();
-	join_preds_stats->Release();
+
+
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, LASJ_stats,
 		(*m_pdrgpdrgpcrInput)[0],  // we group by the columns of the first child
@@ -178,9 +180,8 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	);
 
 	// clean up
-	pdrgpulComputedCols->Release();
-	LASJ_stats->Release();
-	output_colrefsets->Release();
+
+
 
 	return stats;
 }

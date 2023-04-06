@@ -157,11 +157,11 @@ CParseHandlerDynamicTableScan::EndElement(const XMLCh *const,  // element_uri,
 	// set table descriptor
 	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
 
-	IMdIdArray *mdid_partitions_array =
+
+	gpos::Ref<IMdIdArray> mdid_partitions_array =
 		partition_mdids_parse_handler->GetMdIdArray();
-	mdid_partitions_array->AddRef();
+
 	gpos::Ref<CDXLPhysicalDynamicTableScan> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalDynamicTableScan(
 			m_mp, table_descr, mdid_partitions_array, m_selector_ids);

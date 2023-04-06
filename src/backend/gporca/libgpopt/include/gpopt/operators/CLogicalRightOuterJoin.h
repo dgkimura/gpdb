@@ -73,7 +73,7 @@ public:
 		GPOS_ASSERT(1 <= exprhdl.Arity());
 
 		gpos::Ref<CColRefSet> pcrs = exprhdl.DeriveNotNullColumns(1);
-		pcrs->AddRef();
+
 
 		return pcrs;
 	}
@@ -106,7 +106,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalRightOuterJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalRightOuterJoin> >(pop);
+		return gpos::dyn_cast<CLogicalRightOuterJoin>(pop);
 	}
 
 };	// class CLogicalRightOuterJoin

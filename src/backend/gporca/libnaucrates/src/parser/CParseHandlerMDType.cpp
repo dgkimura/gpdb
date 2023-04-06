@@ -81,23 +81,6 @@ CParseHandlerMDType::CParseHandlerMDType(
 //---------------------------------------------------------------------------
 CParseHandlerMDType::~CParseHandlerMDType()
 {
-	m_mdid->Release();
-	SafeRelease(m_distr_opfamily);
-	SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_eq_op->Release();
-	m_mdid_neq_op->Release();
-	m_mdid_lt_op->Release();
-	m_mdid_lteq_op->Release();
-	m_mdid_gt_op->Release();
-	m_mdid_gteq_op->Release();
-	m_mdid_cmp_op->Release();
-	m_mdid_array_type->Release();
-	m_mdid_min_op->Release();
-	m_mdid_max_op->Release();
-	m_mdid_avg_op->Release();
-	m_mdid_sum_op->Release();
-	m_mdid_count_op->Release();
-	SafeRelease(m_mdid_base_rel);
 }
 
 //---------------------------------------------------------------------------
@@ -266,7 +249,6 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 		m_mdid_avg_op == *token_mdid || m_mdid_sum_op == *token_mdid ||
 		m_mdid_count_op == *token_mdid)
 	{
-		(*token_mdid)->Release();
 	}
 
 	*token_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
@@ -352,32 +334,20 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 				break;
 
 			default:
-				m_mdid->AddRef();
+
 				if (nullptr != m_distr_opfamily)
 				{
-					m_distr_opfamily->AddRef();
 				}
 				if (nullptr != m_legacy_distr_opfamily)
 				{
-					m_legacy_distr_opfamily->AddRef();
 				}
-				m_mdid_eq_op->AddRef();
-				m_mdid_neq_op->AddRef();
-				m_mdid_lt_op->AddRef();
-				m_mdid_lteq_op->AddRef();
-				m_mdid_gt_op->AddRef();
-				m_mdid_gteq_op->AddRef();
-				m_mdid_cmp_op->AddRef();
-				m_mdid_min_op->AddRef();
-				m_mdid_max_op->AddRef();
-				m_mdid_avg_op->AddRef();
-				m_mdid_sum_op->AddRef();
-				m_mdid_count_op->AddRef();
+
+
+
 				if (nullptr != m_mdid_base_rel)
 				{
-					m_mdid_base_rel->AddRef();
 				}
-				m_mdid_array_type->AddRef();
+
 
 				ULONG length = 0;
 				if (0 < m_type_length)

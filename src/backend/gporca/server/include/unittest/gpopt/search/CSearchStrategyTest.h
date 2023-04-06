@@ -34,18 +34,18 @@ private:
 
 	// type definition for of optimize function
 	using PfnOptimize = void (*)(CMemoryPool *, gpos::Ref<CExpression>,
-								 CSearchStageArray *);
+								 gpos::Ref<CSearchStageArray>);
 
 	// generate random search strategy
-	static CSearchStageArray *PdrgpssRandom(CMemoryPool *mp);
+	static gpos::Ref<CSearchStageArray> PdrgpssRandom(CMemoryPool *mp);
 
 	// run optimize function on given expression
 	static void Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
-						 CSearchStageArray *search_stage_array,
+						 gpos::Ref<CSearchStageArray> search_stage_array,
 						 PfnOptimize pfnOptimize);
 
 	static void BuildMemo(CMemoryPool *mp, gpos::Ref<CExpression> pexprInput,
-						  CSearchStageArray *search_stage_array);
+						  gpos::Ref<CSearchStageArray> search_stage_array);
 
 public:
 	// unittests driver

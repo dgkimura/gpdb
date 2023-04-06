@@ -106,10 +106,10 @@ CXformRemoveSubqDistinct::Transform(gpos::Ref<CXformContext> pxfctxt,
 		{
 			gpos::Ref<CExpression> pexprNewScalar = nullptr;
 			gpos::Ref<CExpression> pexprRelChild = (*pexprGbAgg)[0];
-			pexprRelChild->AddRef();
+
 
 			gpos::Ref<COperator> pop = pexprScalar->Pop();
-			pop->AddRef();
+
 			if (CUtils::FExistentialSubquery(pop))
 			{
 				// EXIST/NOT EXIST scalar subquery
@@ -120,13 +120,13 @@ CXformRemoveSubqDistinct::Transform(gpos::Ref<CXformContext> pxfctxt,
 			{
 				// IN/NOT IN scalar subquery
 				gpos::Ref<CExpression> pexprScalarIdent = (*pexprScalar)[1];
-				pexprScalarIdent->AddRef();
+
 				pexprNewScalar = GPOS_NEW(mp)
 					CExpression(mp, pop, pexprRelChild, pexprScalarIdent);
 			}
 
-			pexpr->Pop()->AddRef();	 // logical select operator
-			(*pexpr)[0]->AddRef();	 // relational child of logical select
+			// logical select operator
+			// relational child of logical select
 
 			// new logical select expression
 			gpos::Ref<CExpression> ppexprNew = GPOS_NEW(mp)

@@ -76,7 +76,7 @@ CMDTypeOidGPDB::CMDTypeOidGPDB(CMemoryPool *mp) : m_mp(mp)
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
 	GPOS_ASSERT(GPDB_OID_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
-	m_mdid->AddRef();
+
 	m_datum_null =
 		GPOS_NEW(mp) CDatumOidGPDB(m_mdid, 1 /* value */, true /* is_null */);
 }
@@ -91,25 +91,6 @@ CMDTypeOidGPDB::CMDTypeOidGPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeOidGPDB::~CMDTypeOidGPDB()
 {
-	m_mdid->Release();
-	SafeRelease(m_distr_opfamily);
-	SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	m_datum_null->Release();
-
 	GPOS_DELETE(m_dxl_str);
 }
 
@@ -292,9 +273,7 @@ CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 gpos::Ref<CDXLDatum>
 CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
-	m_mdid->AddRef();
-	gpos::Ref<CDatumOidGPDB> oid_datum =
-		dynamic_cast<gpos::Ref<CDatumOidGPDB> >(datum);
+	gpos::Ref<CDatumOidGPDB> oid_datum = gpos::dyn_cast<CDatumOidGPDB>(datum);
 
 	return GPOS_NEW(mp)
 		CDXLDatumOid(mp, m_mdid, oid_datum->IsNull(), oid_datum->OidValue());
@@ -312,9 +291,9 @@ gpos::Ref<CDXLScalarConstValue>
 CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	gpos::Ref<CDatumOidGPDB> datum_oidGPDB =
-		dynamic_cast<gpos::Ref<CDatumOidGPDB> >(datum);
+		gpos::dyn_cast<CDatumOidGPDB>(datum);
 
-	m_mdid->AddRef();
+
 	gpos::Ref<CDXLDatumOid> dxl_datum = GPOS_NEW(mp) CDXLDatumOid(
 		mp, m_mdid, datum_oidGPDB->IsNull(), datum_oidGPDB->OidValue());
 
@@ -332,8 +311,6 @@ CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 gpos::Ref<CDXLDatum>
 CMDTypeOidGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
-
 	return GPOS_NEW(mp) CDXLDatumOid(mp, m_mdid, true /*is_null*/, 1);
 }
 

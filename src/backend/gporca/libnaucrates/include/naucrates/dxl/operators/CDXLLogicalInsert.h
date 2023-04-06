@@ -13,10 +13,10 @@
 #define GPDXL_CDXLLogicalInsert_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -36,14 +36,14 @@ private:
 	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 public:
 	CDXLLogicalInsert(const CDXLLogicalInsert &) = delete;
 
 	// ctor/dtor
 	CDXLLogicalInsert(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
-					  ULongPtrArray *src_colids_array);
+					  gpos::Ref<ULongPtrArray> src_colids_array);
 
 	~CDXLLogicalInsert() override;
 
@@ -61,7 +61,7 @@ public:
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetSrcColIdsArray() const
 	{
 		return m_src_colids_array;
@@ -85,7 +85,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalInsert == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalInsert> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalInsert>(dxl_op);
 	}
 };
 }  // namespace gpdxl

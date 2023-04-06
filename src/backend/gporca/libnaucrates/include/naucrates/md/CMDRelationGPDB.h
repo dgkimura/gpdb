@@ -67,36 +67,36 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::Ref<CMDColumnArray> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::Ref<ULongPtrArray> m_distr_col_array;
 
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// indices of partition columns
-	ULongPtrArray *m_partition_cols_array;
+	gpos::Ref<ULongPtrArray> m_partition_cols_array;
 
 	// partition types
 	CharPtrArray *m_str_part_types_array;
 
 	// Child partition oids
-	IMdIdArray *m_partition_oids;
+	gpos::Ref<IMdIdArray> m_partition_oids;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::Ref<ULongPtr2dArray> m_keyset_array;
 
 	// array of index info
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::Ref<CMDIndexInfoArray> m_mdindex_info_array;
 
 	// array of check constraint mdids
-	IMdIdArray *m_mdid_check_constraint_array;
+	gpos::Ref<IMdIdArray> m_mdid_check_constraint_array;
 
 	// partition constraint
 	gpos::Ref<CDXLNode> m_mdpart_constraint;
@@ -108,32 +108,37 @@ private:
 	gpos::Ref<IMDId> m_foreign_server;
 
 	// mapping of column position to positions excluding dropped columns
-	UlongToUlongMap *m_colpos_nondrop_colpos_map;
+	gpos::Ref<UlongToUlongMap> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::Ref<IntToUlongMap> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::Ref<ULongPtrArray> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	CDoubleArray *m_col_width_array;
+	gpos::Ref<CDoubleArray> m_col_width_array;
 
 public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
 
 	// ctor
-	CMDRelationGPDB(
-		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
-		BOOL is_temp_table, Erelstoragetype rel_storage_type,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-		ULongPtrArray *partition_cols_array, CharPtrArray *str_part_types_array,
-		IMdIdArray *partition_oids, BOOL convert_hash_to_random,
-		ULongPtr2dArray *keyset_array, CMDIndexInfoArray *md_index_info_array,
-		IMdIdArray *mdid_check_constraint_array,
-		gpos::Ref<CDXLNode> mdpart_constraint, gpos::Ref<IMDId> foreign_server);
+	CMDRelationGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+					BOOL is_temp_table, Erelstoragetype rel_storage_type,
+					Ereldistrpolicy rel_distr_policy,
+					gpos::Ref<CMDColumnArray> mdcol_array,
+					gpos::Ref<ULongPtrArray> distr_col_array,
+					gpos::Ref<IMdIdArray> distr_opfamilies,
+					gpos::Ref<ULongPtrArray> partition_cols_array,
+					CharPtrArray *str_part_types_array,
+					gpos::Ref<IMdIdArray> partition_oids,
+					BOOL convert_hash_to_random,
+					gpos::Ref<ULongPtr2dArray> keyset_array,
+					gpos::Ref<CMDIndexInfoArray> md_index_info_array,
+					gpos::Ref<IMdIdArray> mdid_check_constraint_array,
+					gpos::Ref<CDXLNode> mdpart_constraint,
+					gpos::Ref<IMDId> foreign_server);
 
 	// dtor
 	~CMDRelationGPDB() override;
@@ -179,7 +184,7 @@ public:
 	ULONG GetPosFromAttno(INT attno) const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::Ref<ULongPtrArray> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -191,7 +196,7 @@ public:
 	ULONG KeySetCount() const override;
 
 	// key set at given position
-	const ULongPtrArray *KeySetAt(ULONG pos) const override;
+	const gpos::Ref<ULongPtrArray> KeySetAt(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
@@ -238,7 +243,7 @@ public:
 	gpos::Ref<CDXLNode> MDPartConstraint() const override;
 
 	// child partition oids
-	IMdIdArray *ChildPartitionMdids() const override;
+	gpos::Ref<IMdIdArray> ChildPartitionMdids() const override;
 
 	gpos::Ref<IMDId> ForeignServer() const override;
 

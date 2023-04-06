@@ -44,10 +44,10 @@ private:
 	CName m_name;
 
 	// array of index key columns
-	CColumnDescriptorArray *m_pdrgpcoldescKeyCols;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldescKeyCols;
 
 	// array of index included columns
-	CColumnDescriptorArray *m_pdrgpcoldescIncludedCols;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldescIncludedCols;
 
 	// clustered index
 	BOOL m_clustered;
@@ -61,8 +61,8 @@ public:
 	// ctor
 	CIndexDescriptor(CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex,
 					 const CName &name,
-					 CColumnDescriptorArray *pdrgcoldescKeyCols,
-					 CColumnDescriptorArray *pdrgcoldescIncludedCols,
+					 gpos::Ref<CColumnDescriptorArray> pdrgcoldescKeyCols,
+					 gpos::Ref<CColumnDescriptorArray> pdrgcoldescIncludedCols,
 					 BOOL is_clustered, IMDIndex::EmdindexType emdindt);
 
 	// dtor
@@ -89,14 +89,14 @@ public:
 	}
 
 	// key column descriptors
-	CColumnDescriptorArray *
+	gpos::Ref<CColumnDescriptorArray>
 	PdrgpcoldescKey() const
 	{
 		return m_pdrgpcoldescKeyCols;
 	}
 
 	// included column descriptors
-	CColumnDescriptorArray *
+	gpos::Ref<CColumnDescriptorArray>
 	PdrgpcoldescIncluded() const
 	{
 		return m_pdrgpcoldescIncludedCols;

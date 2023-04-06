@@ -55,8 +55,6 @@ CDXLBucket::CDXLBucket(gpos::Ref<CDXLDatum> dxl_datum_lower,
 //---------------------------------------------------------------------------
 CDXLBucket::~CDXLBucket()
 {
-	m_lower_bound_dxl_datum->Release();
-	m_upper_bound_dxl_datum->Release();
 }
 
 //---------------------------------------------------------------------------

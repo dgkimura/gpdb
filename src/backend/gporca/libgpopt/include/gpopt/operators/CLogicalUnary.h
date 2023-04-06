@@ -37,7 +37,7 @@ protected:
 	// derive statistics for projection operators
 	gpos::Ref<IStatistics> PstatsDeriveProject(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		UlongToIDatumMap *phmuldatum = nullptr) const;
+		gpos::Ref<UlongToIDatumMap> phmuldatum = nullptr) const;
 
 public:
 	CLogicalUnary(const CLogicalUnary &) = delete;
@@ -62,9 +62,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();

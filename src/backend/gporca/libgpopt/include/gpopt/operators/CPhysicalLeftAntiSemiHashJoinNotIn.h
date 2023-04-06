@@ -34,9 +34,9 @@ public:
 
 	// ctor
 	CPhysicalLeftAntiSemiHashJoinNotIn(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-		BOOL is_null_aware = true,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+		gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+		gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware = true,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// ident accessors
@@ -61,13 +61,13 @@ public:
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
@@ -80,8 +80,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiHashJoinNotIn == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLeftAntiSemiHashJoinNotIn> >(
-			pop);
+		return gpos::dyn_cast<CPhysicalLeftAntiSemiHashJoinNotIn>(pop);
 	}
 
 };	// class CPhysicalLeftAntiSemiHashJoinNotIn

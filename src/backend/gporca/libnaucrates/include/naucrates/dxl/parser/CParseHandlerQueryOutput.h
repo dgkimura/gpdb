@@ -36,7 +36,7 @@ class CParseHandlerQueryOutput : public CParseHandlerBase
 {
 private:
 	// list of scalar ident nodes representing the query output
-	CDXLNodeArray *m_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_dxl_array;
 
 	// process the start of an element
 	void StartElement(
@@ -65,7 +65,7 @@ public:
 
 
 	// return the list of output scalar ident nodes
-	CDXLNodeArray *GetOutputColumnsDXLArray();
+	gpos::Ref<CDXLNodeArray> GetOutputColumnsDXLArray();
 };
 }  // namespace gpdxl
 

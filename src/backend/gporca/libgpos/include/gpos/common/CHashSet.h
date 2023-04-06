@@ -119,7 +119,7 @@ private:
 	using Elements = CDynamicPtrArray<T, CleanupNULL>;
 	Elements *const m_elements;
 
-	IntPtrArray *const m_filled_chains;
+	gpos::Ref<IntPtrArray> const m_filled_chains;
 
 	// lookup appropriate hash chain in static table, may be NULL if
 	// no elements have been inserted yet
@@ -137,7 +137,6 @@ private:
 		for (ULONG i = 0; i < m_filled_chains->Size(); i++)
 		{
 			// release each hash chain
-			m_chains[*(*m_filled_chains)[i]]->Release();
 		}
 		m_size = 0;
 		m_filled_chains->Clear();
@@ -183,8 +182,6 @@ public:
 		Clear();
 
 		GPOS_DELETE_ARRAY(m_chains);
-		m_elements->Release();
-		m_filled_chains->Release();
 	}
 
 	// insert an element if not present

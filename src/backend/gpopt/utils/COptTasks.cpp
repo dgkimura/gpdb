@@ -300,10 +300,10 @@ COptTasks::ConvertToPlanStmtFromDXL(
 //		Load search strategy from given file
 //
 //---------------------------------------------------------------------------
-CSearchStageArray *
+gpos::Ref<CSearchStageArray>
 COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 {
-	CSearchStageArray *search_strategy_arr = nullptr;
+	gpos::Ref<CSearchStageArray> search_strategy_arr = nullptr;
 	CParseHandlerDXL *dxl_parse_handler = nullptr;
 
 	GPOS_TRY
@@ -317,7 +317,6 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 				elog(DEBUG2, "\n[OPT]: Using search strategy in (%s)", path);
 
 				search_strategy_arr = dxl_parse_handler->GetSearchStageArray();
-				search_strategy_arr->AddRef();
 			}
 		}
 	}
@@ -495,7 +494,7 @@ COptTasks::OptimizeTask(void *ptr)
 
 
 	// load search strategy
-	CSearchStageArray *search_strategy_arr =
+	gpos::Ref<CSearchStageArray> search_strategy_arr =
 		LoadSearchStrategy(mp, optimizer_search_strategy_path);
 
 	gpos::Ref<CBitSet> trace_flags = nullptr;
@@ -503,7 +502,7 @@ COptTasks::OptimizeTask(void *ptr)
 	gpos::Ref<CBitSet> disabled_trace_flags = nullptr;
 	gpos::Ref<CDXLNode> plan_dxl = nullptr;
 
-	IMdIdArray *col_stats = nullptr;
+	gpos::Ref<IMdIdArray> col_stats = nullptr;
 	MdidHashSet *rel_stats = nullptr;
 
 	GPOS_TRY
@@ -544,9 +543,9 @@ COptTasks::OptimizeTask(void *ptr)
 
 			gpos::Ref<CDXLNode> query_dxl =
 				query_to_dxl_translator->TranslateQueryToDXL();
-			CDXLNodeArray *query_output_dxlnode_array =
+			gpos::Ref<CDXLNodeArray> query_output_dxlnode_array =
 				query_to_dxl_translator->GetQueryOutputCols();
-			CDXLNodeArray *cte_dxlnode_array =
+			gpos::Ref<CDXLNodeArray> cte_dxlnode_array =
 				query_to_dxl_translator->GetCTEs();
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
 
@@ -600,25 +599,14 @@ COptTasks::OptimizeTask(void *ptr)
 
 			rel_stats = GPOS_NEW(mp) MdidHashSet(mp);
 			PrintMissingStatsWarning(mp, &mda, col_stats, rel_stats);
-
-			rel_stats->Release();
-			col_stats->Release();
-
-			expr_evaluator->Release();
-			query_dxl->Release();
-			optimizer_config->Release();
-			plan_dxl->Release();
 		}
 	}
 	GPOS_CATCH_EX(ex)
 	{
 		ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-		SafeRelease(rel_stats);
-		SafeRelease(col_stats);
-		SafeRelease(enabled_trace_flags);
-		SafeRelease(disabled_trace_flags);
-		SafeRelease(trace_flags);
-		SafeRelease(plan_dxl);
+
+
+
 		CMDCache::Shutdown();
 
 		IErrorContext *errctxt = CTask::Self()->GetErrCtxt();
@@ -634,9 +622,9 @@ COptTasks::OptimizeTask(void *ptr)
 
 	// cleanup
 	ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-	SafeRelease(enabled_trace_flags);
-	SafeRelease(disabled_trace_flags);
-	SafeRelease(trace_flags);
+
+
+
 	if (!optimizer_metadata_caching)
 	{
 		CMDCache::Shutdown();
@@ -656,7 +644,7 @@ COptTasks::OptimizeTask(void *ptr)
 //---------------------------------------------------------------------------
 void
 COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
-									IMdIdArray *col_stats,
+									gpos::Ref<IMdIdArray> col_stats,
 									MdidHashSet *rel_stats)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
@@ -685,7 +673,7 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 					oss << ", ";
 				}
 
-				rel_mdid->AddRef();
+
 				rel_stats->Insert(rel_mdid);
 				oss << rel->Mdname().GetMDName()->GetBuffer();
 			}

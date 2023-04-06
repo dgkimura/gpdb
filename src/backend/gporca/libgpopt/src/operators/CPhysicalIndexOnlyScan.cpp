@@ -31,7 +31,7 @@ using namespace gpopt;
 CPhysicalIndexOnlyScan::CPhysicalIndexOnlyScan(
 	CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, CColRefArray *pdrgpcrOutput,
+	const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
 	gpos::Ref<COrderSpec> pos)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	  m_pindexdesc(pindexdesc),
@@ -53,8 +53,6 @@ CPhysicalIndexOnlyScan::CPhysicalIndexOnlyScan(
 //---------------------------------------------------------------------------
 CPhysicalIndexOnlyScan::~CPhysicalIndexOnlyScan()
 {
-	m_pindexdesc->Release();
-	m_pos->Release();
 }
 
 //---------------------------------------------------------------------------

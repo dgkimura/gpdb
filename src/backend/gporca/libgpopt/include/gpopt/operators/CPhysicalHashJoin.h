@@ -34,14 +34,14 @@ class CPhysicalHashJoin : public CPhysicalJoin
 private:
 	// the array of expressions from the outer relation
 	// that are extracted from the hashing condition
-	CExpressionArray *m_pdrgpexprOuterKeys;
+	gpos::Ref<CExpressionArray> m_pdrgpexprOuterKeys;
 
 	// the array of expressions from the inner relation
 	// that are extracted from the hashing condition
-	CExpressionArray *m_pdrgpexprInnerKeys;
+	gpos::Ref<CExpressionArray> m_pdrgpexprInnerKeys;
 
 	// Hash op families of the operators used in the join conditions
-	IMdIdArray *m_hash_opfamilies;
+	gpos::Ref<IMdIdArray> m_hash_opfamilies;
 
 	// if the join condition is null-aware
 	// true by default, and false if the join condition doesn't contain
@@ -49,7 +49,7 @@ private:
 	BOOL m_is_null_aware;
 
 	// array redistribute request sent to the first hash join child
-	CDistributionSpecArray *m_pdrgpdsRedistributeRequests;
+	gpos::Ref<CDistributionSpecArray> m_pdrgpdsRedistributeRequests;
 
 	// compute a distribution matching the distribution delivered by given child
 	gpos::Ref<CDistributionSpec> PdsMatch(CMemoryPool *mp,
@@ -64,7 +64,7 @@ protected:
 	gpos::Ref<CDistributionSpec> PdsRequiredRedistribute(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	// create the set of redistribute requests to send to first hash join child
 	void CreateHashRedistributeRequests(CMemoryPool *mp);
@@ -74,7 +74,7 @@ private:
 	gpos::Ref<CDistributionSpec> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq,
 		gpos::Ref<CReqdPropPlan> prppInput);
 
 	// create a child hashed distribution request based on input hashed distribution,
@@ -82,7 +82,7 @@ private:
 	static gpos::Ref<CDistributionSpecHashed> PdshashedPassThru(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpecHashed> pdshashedInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check whether a hash key is nullable
 	BOOL FNullableHashKey(ULONG ulKey, gpos::Ref<CColRefSet> pcrsNotNullInner,
@@ -98,7 +98,7 @@ protected:
 	gpos::Ref<CDistributionSpec> PdsRequiredSingleton(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt) const;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
 	BOOL FNullableHashKeys(gpos::Ref<CColRefSet> pcrsNotNullInner,
@@ -116,11 +116,11 @@ protected:
 	gpos::Ref<CPartitionPropagationSpec> PppsRequiredForJoins(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	gpos::Ref<CExpression> PexprJoinPredOnPartKeys(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-		CPartKeysArray *pdrgppartkeys,
+		gpos::Ref<CPartKeysArray> pdrgppartkeys,
 		gpos::Ref<CColRefSet> pcrsAllowedRefs) const;
 
 	gpos::Ref<CPartitionPropagationSpec> PppsDeriveForJoins(
@@ -130,23 +130,25 @@ public:
 	CPhysicalHashJoin(const CPhysicalHashJoin &) = delete;
 
 	// ctor
-	CPhysicalHashJoin(CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-					  CExpressionArray *pdrgpexprInnerKeys,
-					  IMdIdArray *hash_opfamilies, BOOL is_null_aware = true,
+	CPhysicalHashJoin(CMemoryPool *mp,
+					  gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+					  gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+					  gpos::Ref<IMdIdArray> hash_opfamilies,
+					  BOOL is_null_aware = true,
 					  CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
 	~CPhysicalHashJoin() override;
 
 	// inner keys
-	const CExpressionArray *
+	const gpos::Ref<CExpressionArray>
 	PdrgpexprInnerKeys() const
 	{
 		return m_pdrgpexprInnerKeys;
 	}
 
 	// outer keys
-	const CExpressionArray *
+	const gpos::Ref<CExpressionArray>
 	PdrgpexprOuterKeys() const
 	{
 		return m_pdrgpexprOuterKeys;
@@ -161,26 +163,26 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posInput,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
@@ -229,7 +231,7 @@ public:
 	{
 		GPOS_ASSERT(CUtils::FHashJoin(pop));
 
-		return dynamic_cast<gpos::Ref<CPhysicalHashJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalHashJoin>(pop);
 	}
 
 };	// class CPhysicalHashJoin

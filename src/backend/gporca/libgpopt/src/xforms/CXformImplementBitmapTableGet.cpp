@@ -71,7 +71,7 @@ CXformImplementBitmapTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 										 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -79,10 +79,10 @@ CXformImplementBitmapTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 		CLogicalBitmapTableGet::PopConvert(pexpr->Pop());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popLogical->Ptabdesc();
-	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
-	pdrgpcrOutput->AddRef();
+
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popLogical->PdrgpcrOutput();
+
 
 	gpos::Ref<CPhysicalBitmapTableScan> popPhysical = GPOS_NEW(mp)
 		CPhysicalBitmapTableScan(mp, ptabdesc, pexpr->Pop()->UlOpId(),
@@ -92,8 +92,8 @@ CXformImplementBitmapTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CExpression> pexprCondition = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprIndexPath = (*pexpr)[1];
-	pexprCondition->AddRef();
-	pexprIndexPath->AddRef();
+
+
 
 	gpos::Ref<CExpression> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);

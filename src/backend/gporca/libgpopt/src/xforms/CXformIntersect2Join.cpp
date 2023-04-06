@@ -64,7 +64,7 @@ CXformIntersect2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -77,18 +77,16 @@ CXformIntersect2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CLogicalIntersect> popIntersect =
 		CLogicalIntersect::PopConvert(pexpr->Pop());
-	CColRef2dArray *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
+		popIntersect->PdrgpdrgpcrInput();
 
 	// construct group by over the left and right expressions
 
 	gpos::Ref<CExpression> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
-	pexprProjList->AddRef();
-	pexprLeftChild->AddRef();
-	pexprRightChild->AddRef();
-	(*pdrgpdrgpcrInput)[0]->AddRef();
-	(*pdrgpdrgpcrInput)[1]->AddRef();
+
+
 
 	gpos::Ref<CExpression> pexprLeftAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, (*pdrgpdrgpcrInput)[0], pexprLeftChild, pexprProjList);

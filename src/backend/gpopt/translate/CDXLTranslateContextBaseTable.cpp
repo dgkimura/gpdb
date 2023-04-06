@@ -46,7 +46,6 @@ CDXLTranslateContextBaseTable::CDXLTranslateContextBaseTable(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CDXLTranslateContextBaseTable::~CDXLTranslateContextBaseTable()
 {
-	SafeRelease(m_colid_to_attno_map);
 }
 
 

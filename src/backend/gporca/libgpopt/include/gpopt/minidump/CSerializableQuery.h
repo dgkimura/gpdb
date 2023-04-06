@@ -39,19 +39,20 @@ private:
 	const gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// query output
-	const CDXLNodeArray *m_query_output;
+	const gpos::Ref<CDXLNodeArray> m_query_output;
 
 	// CTE DXL nodes
-	const CDXLNodeArray *m_cte_producers;
+	const gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 
 public:
 	CSerializableQuery(const CSerializableQuery &) = delete;
 
 	// ctor
-	CSerializableQuery(CMemoryPool *mp, const gpos::Ref<CDXLNode> query,
-					   const CDXLNodeArray *query_output_dxlnode_array,
-					   const CDXLNodeArray *cte_producers);
+	CSerializableQuery(
+		CMemoryPool *mp, const gpos::Ref<CDXLNode> query,
+		const gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+		const gpos::Ref<CDXLNodeArray> cte_producers);
 
 	// dtor
 	~CSerializableQuery() override;

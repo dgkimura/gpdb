@@ -49,7 +49,6 @@ CParseHandlerCTEConfig::CParseHandlerCTEConfig(
 //---------------------------------------------------------------------------
 CParseHandlerCTEConfig::~CParseHandlerCTEConfig()
 {
-	SafeRelease(m_cte_conf);
 }
 
 //---------------------------------------------------------------------------

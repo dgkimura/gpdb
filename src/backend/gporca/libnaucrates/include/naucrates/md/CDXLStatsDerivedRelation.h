@@ -87,7 +87,7 @@ public:
 
 // array of dxl buckets
 using CDXLStatsDerivedRelationArray =
-	CDynamicPtrArray<CDXLStatsDerivedRelation, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CDXLStatsDerivedRelation>>;
 }  // namespace gpmd
 
 #endif	// !GPMD_CDXLStatsDerivedRelation_H

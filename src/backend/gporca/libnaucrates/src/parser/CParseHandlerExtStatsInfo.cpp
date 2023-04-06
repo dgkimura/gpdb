@@ -35,7 +35,6 @@ CParseHandlerExtStatsInfo::CParseHandlerExtStatsInfo(
 
 CParseHandlerExtStatsInfo::~CParseHandlerExtStatsInfo()
 {
-	m_extinfo->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -117,16 +116,17 @@ CParseHandlerExtStatsInfo::StartElement(
 	CMDName *stat_name = GPOS_NEW(m_mp) CMDName(m_mp, stat_name_str);
 	GPOS_DELETE(stat_name_str);
 
-	ULongPtrArray *keys = CDXLOperatorFactory::ExtractConvertValuesToArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenKeys,
-		EdxltokenExtendedStatsInfo);
+	gpos::Ref<ULongPtrArray> keys =
+		CDXLOperatorFactory::ExtractConvertValuesToArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenKeys,
+			EdxltokenExtendedStatsInfo);
 
 	gpos::Ref<CBitSet> bs_keys = GPOS_NEW(m_mp) CBitSet(m_mp);
 	for (ULONG i = 0; i < keys->Size(); i++)
 	{
 		bs_keys->ExchangeSet(*(*keys)[i]);
 	}
-	keys->Release();
+
 
 	m_extinfo = GPOS_NEW(m_mp) CMDExtStatsInfo(m_mp, stat_oid, stat_name,
 											   ParseStatKind(attrs), bs_keys);

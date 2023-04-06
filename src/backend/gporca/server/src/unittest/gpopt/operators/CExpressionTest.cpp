@@ -155,7 +155,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
@@ -202,10 +202,10 @@ CExpressionTest::EresUnittest_SimpleOps()
 		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
 		gpos::Ref<CLogicalGet> popGet =
-			dynamic_cast<gpos::Ref<CLogicalGet> >(pexpr->Pop());
+			gpos::dyn_cast<CLogicalGet> > (pexpr - Pop());
 		gpos::Ref<CLogicalDynamicGetBase> popDynGet =
-			dynamic_cast<gpos::Ref<CLogicalDynamicGetBase> >(pexpr->Pop());
-		CColRefArray *colrefs = nullptr;
+			gpos::dyn_cast<CLogicalDynamicGetBase> > (pexpr - Pop());
+		gpos::Ref<CColRefArray> colrefs = nullptr;
 
 		if (nullptr != popGet)
 		{
@@ -246,26 +246,28 @@ CExpressionTest::EresUnittest_SimpleOps()
 		gpos::Ref<CColRef> pcrOld = pexpr->DeriveOutputColumns()->PcrAny();
 		gpos::Ref<CColRef> new_colref =
 			COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pcrOld);
-		UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
+		gpos::Ref<UlongToColRefMap> colref_mapping =
+			GPOS_NEW(mp) UlongToColRefMap(mp);
 
 		BOOL result = colref_mapping->Insert(GPOS_NEW(mp) ULONG(pcrOld->Id()),
 											 new_colref);
 		GPOS_ASSERT(result);
 		gpos::Ref<CExpression> pexprCopy = pexpr->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, true /*must_exist*/);
-		colref_mapping->Release();
+
 		oss << std::endl
 			<< "COPIED EXPRESSION (AFTER MAPPING " << *pcrOld << " TO "
 			<< *new_colref << "):" << std::endl;
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 		pexprCopy->DbgPrint();
-		pexprCopy->Release();
+
 
 		// derive stats on expression
 		gpos::Ref<CReqdPropRelational> prprel =
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-		IStatisticsArray *stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
+		gpos::Ref<IStatisticsArray> stats_ctxt =
+			GPOS_NEW(mp) IStatisticsArray(mp);
 		gpos::Ref<IStatistics> stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 		GPOS_ASSERT(nullptr != stats);
 
@@ -275,12 +277,11 @@ CExpressionTest::EresUnittest_SimpleOps()
 
 		GPOS_ASSERT(rgulRisk[i] == stats->StatsEstimationRisk());
 
-		prprel->Release();
-		stats_ctxt->Release();
+
+
 #endif	// GPOS_DEBUG
 
 		// cleanup
-		pexpr->Release();
 	}
 
 	return GPOS_OK;
@@ -301,7 +302,7 @@ CExpressionTest::EresUnittest_Union()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -324,18 +325,18 @@ CExpressionTest::EresUnittest_Union()
 #ifdef GPOS_DEBUG
 	gpos::Ref<CReqdPropRelational> prprel =
 		GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-	IStatisticsArray *stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
+	gpos::Ref<IStatisticsArray> stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
 	gpos::Ref<IStatistics> stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 	GPOS_ASSERT(nullptr != stats);
 
 	// We expect a risk of 3 because every Union increments the risk.
 	GPOS_ASSERT(3 == stats->StatsEstimationRisk());
-	stats_ctxt->Release();
-	prprel->Release();
+
+
 #endif	// GPOS_DEBUG
 
 	// cleanup
-	pexpr->Release();
+
 
 	return GPOS_OK;
 }
@@ -355,7 +356,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -401,7 +402,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 		mp, GPOS_NEW(mp) CScalarBitmapIndexProbe(mp, pindexdesc, mdid),
 		pexprIndexCond);
 
-	CColRefArray *pdrgpcrTable = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcrTable = GPOS_NEW(mp) CColRefArray(mp);
 	for (ULONG ul = 0; ul < num_cols; ++ul)
 	{
 		const gpos::Ref<IMDColumn> pmdcol = pmdrel->GetMdCol(ul);
@@ -467,17 +468,16 @@ CExpressionTest::EresUnittest_BitmapGet()
 	GPOS_ASSERT(strIndex2.Equals(&strExpectedDebugPrintIndex2));
 	GPOS_ASSERT(pexprBitmapIndex2->Matches(pexprBitmapIndex));
 
-	mdid->AddRef();
-	pexprBitmapIndex->AddRef();
-	pexprBitmapIndex2->AddRef();
+
+
 	gpos::Ref<CExpression> pexprBitmapBoolOp1 = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd, mdid),
 		pexprBitmapIndex, pexprBitmapIndex2);
 
-	mdid->AddRef();
-	pexprBitmapIndex->AddRef();
+
+
 	gpos::Ref<CExpression> pexprBitmapBoolOp2 = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
@@ -486,9 +486,8 @@ CExpressionTest::EresUnittest_BitmapGet()
 	GPOS_ASSERT(pexprBitmapBoolOp2->Matches(pexprBitmapBoolOp1));
 
 	// cleanup
-	pexprBitmapBoolOp2->Release();
-	pexprBitmapBoolOp1->Release();
-	pexprBitmapTableGet->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -509,7 +508,7 @@ CExpressionTest::EresUnittest_Const()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -555,11 +554,7 @@ CExpressionTest::EresUnittest_Const()
 	GPOS_ASSERT(!pscalarconstTrue->Matches(pscalarconstFalse));
 	GPOS_ASSERT(!pscalarconstTrue->Matches(pscalarconstUlOne));
 
-	pexprTrue->Release();
-	pexprFalse->Release();
-	pexprUl->Release();
-	pexprUl2nd->Release();
-	pexprUlOne->Release();
+
 
 	GPOS_TRACE(str.GetBuffer());
 
@@ -584,7 +579,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -677,7 +672,7 @@ CExpressionTest::EresUnittest_FValidPlan()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -699,10 +694,6 @@ CExpressionTest::EresUnittest_FValidPlan()
 
 		// Test that prpp is actually satisfied.
 		GPOS_ASSERT(pexprPlan->FValidPlan(prpp, pdpctxtplan));
-		pdpctxtplan->Release();
-		pexprPlan->Release();
-		prpp->Release();
-		pexprGby->Release();
 	}
 	// Create a group-by with a get child. Properties required contain one column that doesn't exist.
 	// Test that the plan is NOT valid.
@@ -738,10 +729,6 @@ CExpressionTest::EresUnittest_FValidPlan()
 
 		// Test that prpp is actually unsatisfied.
 		GPOS_ASSERT(!pexprPlan->FValidPlan(prpp, pdpctxtplan));
-		pdpctxtplan->Release();
-		pexprPlan->Release();
-		prpp->Release();
-		pexprGby->Release();
 	}
 
 	return GPOS_OK;
@@ -763,7 +750,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -785,14 +772,14 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	gpos::Ref<CColRefSet> pcrsGet = pexprGet->DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsGetCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrsGet);
 
-	CColRefArray *pdrgpcrGet = pcrsGetCopy->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> pdrgpcrGet = pcrsGetCopy->Pdrgpcr(mp);
 	GPOS_ASSERT(2 <= pdrgpcrGet->Size());
 
 	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 	const gpos::Ref<IMDType> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 	gpos::Ref<IMDId> pmdidInt4LT =
 		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
-	pmdidInt4LT->AddRef();
+
 	pos->Append(pmdidInt4LT, (*pdrgpcrGet)[1], COrderSpec::EntFirst);
 	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
@@ -816,13 +803,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 
 	// Test that the plan is not valid.
 	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleOrder, pdpctxtplan));
-	pdpctxtplan->Release();
-	prppIncompatibleOrder->Release();
-	pdrgpcrGet->Release();
-	prpp->Release();
-	pexprGet->Release();
-	pexprPlan->Release();
-	pexprGby->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -843,7 +825,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -880,11 +862,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 	// Test that the plan is not valid.
 	GPOS_ASSERT(
 		!pexprPlan->FValidPlan(prppIncompatibleDistribution, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleDistribution->Release();
-	prpp->Release();
-	pexprGby->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -905,7 +884,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -944,11 +923,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 	// Test that the plan is not valid.
 	GPOS_ASSERT(
 		!pexprPlan->FValidPlan(prppIncompatibleRewindability, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleRewindability->Release();
-	prpp->Release();
-	pexprGby->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -969,7 +945,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -1007,7 +983,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 		CTestUtils::PexprLogicalCTEProducerOverSelect(mp, ulCTEId);
 	gpos::Ref<CDrvdPropPlan> pdpplan =
 		CDrvdPropPlan::Pdpplan(pexprPlan->PdpDerive());
-	pdpplan->AddRef();
+
 	pcter->Insert(ulCTEId, CCTEMap::EctProducer /*ect*/, true /*fRequired*/,
 				  pdpplan);
 	gpos::Ref<CColRefSet> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
@@ -1016,12 +992,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 
 	// Test that the plan is not valid.
 	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleCTE, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleCTE->Release();
-	prpp->Release();
-	pexprGby->Release();
-	pexprProducer->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -1045,7 +1017,7 @@ CExpressionTest::EresUnittest_FValidPlanError()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -1078,11 +1050,9 @@ CExpressionTest::EresUnittest_FValidPlanError()
 			{
 				eres = GPOS_FAILED;
 			}
-			pdpctxtplan->Release();
 		}
 		GPOS_CATCH_EX(ex)
 		{
-			pdpctxtplan->Release();
 			if (!GPOS_MATCH_EX(ex, CException::ExmaSystem,
 							   CException::ExmiAssert))
 			{
@@ -1094,9 +1064,6 @@ CExpressionTest::EresUnittest_FValidPlanError()
 			}
 		}
 		GPOS_CATCH_END;
-
-		pexpr->Release();
-		prpp->Release();
 	}
 
 	return eres;
@@ -1135,7 +1102,7 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 	exprhdl.InitReqdProps(prppInput);
 
 	// create array of child derived properties
-	CDrvdPropArray *pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
+	gpos::Ref<CDrvdPropArray> pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
 
 	GPOS_RESULT eres = GPOS_OK;
 	const ULONG arity = pexpr->Arity();
@@ -1181,11 +1148,11 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 
 		// add plan props of current child to derived props array
 		gpos::Ref<CDrvdProp> pdp = pexprChild->PdpDerive();
-		pdp->AddRef();
+
 		pdrgpdp->Append(pdp);
 	}
 
-	pdrgpdp->Release();
+
 
 	return eres;
 }
@@ -1236,8 +1203,8 @@ CExpressionTest::EresComputeReqdCols(const CHAR *szFilePath)
 		// we make sure that we reuse cached required columns at each operator
 		eres = EresCheckCachedReqdCols(mp, pexprPlan, pqc->Prpp());
 
-		pexpr->Release();
-		pexprPlan->Release();
+
+
 		GPOS_DELETE(pqc);
 	}
 
@@ -1311,7 +1278,7 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	{
@@ -1339,17 +1306,18 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 			CTestUtils::PexprLogicalGet(mp, ptabdesc2, &strAlias2);
 
 		// create output columns of SetOp from output columns of first Get expression
-		CColRefArray *pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
 		pdrgpcrOutput->Append(pcrsOutput1->PcrFirst());
 
 		// create input columns of SetOp while including an outer reference in inner child
-		CColRef2dArray *pdrgpdrgpcrInput = GPOS_NEW(mp) CColRef2dArray(mp);
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
+			GPOS_NEW(mp) CColRef2dArray(mp);
 
-		CColRefArray *pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
 		pdrgpcr1->Append(pcrsOutput1->PcrFirst());
 		pdrgpdrgpcrInput->Append(pdrgpcr1);
 
-		CColRefArray *pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
 		gpos::Ref<CColRef> pcrOuterRef =
 			COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 				pcrsOutput1->PcrFirst());
@@ -1369,8 +1337,6 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 
 		// deriving relational properties must fail
 		(void) pexprSetOp->PdpDerive();
-
-		pexprSetOp->Release();
 	}
 
 	return GPOS_FAILED;

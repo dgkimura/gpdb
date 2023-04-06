@@ -79,7 +79,7 @@ public:
 protected:
 	// serialize an array of column ids into a comma-separated string
 	static CWStringDynamic *ColumnsToStr(CMemoryPool *mp,
-										 ULongPtrArray *colid_array);
+										 gpos::Ref<ULongPtrArray> colid_array);
 
 public:
 	// object type
@@ -117,7 +117,7 @@ public:
 	virtual ULONG GetPosFromAttno(INT attno) const = 0;
 
 	// return the original positions of all the non-dropped columns
-	virtual ULongPtrArray *NonDroppedColsArray() const = 0;
+	virtual gpos::Ref<ULongPtrArray> NonDroppedColsArray() const = 0;
 
 	// number of system columns
 	virtual ULONG SystemColumnsCount() const = 0;
@@ -129,7 +129,7 @@ public:
 	virtual ULONG KeySetCount() const = 0;
 
 	// key set at given position
-	virtual const ULongPtrArray *KeySetAt(ULONG pos) const = 0;
+	virtual const gpos::Ref<ULongPtrArray> KeySetAt(ULONG pos) const = 0;
 
 	// number of distribution columns
 	virtual ULONG DistrColumnCount() const = 0;
@@ -173,7 +173,7 @@ public:
 	virtual gpos::Ref<CDXLNode> MDPartConstraint() const = 0;
 
 	// child partition oids
-	virtual IMdIdArray *
+	virtual gpos::Ref<IMdIdArray>
 	ChildPartitionMdids() const
 	{
 		return nullptr;
@@ -200,7 +200,7 @@ public:
 };
 
 // common structure over relation and external relation metadata for index info
-using CMDIndexInfoArray = CDynamicPtrArray<CMDIndexInfo, CleanupRelease>;
+using CMDIndexInfoArray = gpos::Vector<gpos::Ref<CMDIndexInfo>>;
 
 }  // namespace gpmd
 

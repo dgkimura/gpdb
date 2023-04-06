@@ -46,7 +46,6 @@ CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr(
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanTestExpr::~CParseHandlerScalarSubPlanTestExpr()
 {
-	SafeRelease(m_dxl_test_expr);
 }
 
 //---------------------------------------------------------------------------
@@ -115,7 +114,6 @@ CParseHandlerScalarSubPlanTestExpr::EndElement(
 		if (nullptr != child_parse_handler->CreateDXLNode())
 		{
 			m_dxl_test_expr = child_parse_handler->CreateDXLNode();
-			m_dxl_test_expr->AddRef();
 		}
 	}
 

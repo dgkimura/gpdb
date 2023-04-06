@@ -62,18 +62,19 @@ private:
 	// construct a left anti semi join with the CTE consumer (ulCTEJoinId) as outer
 	// and a group by as inner
 	static gpos::Ref<CExpression> PexprLeftAntiSemiJoinWithInnerGroupBy(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
-		CColRefArray *pdrgpcrOuterCopy, gpos::Ref<CColRefSet> pcrsScalar,
-		gpos::Ref<CColRefSet> pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOuter,
+		gpos::Ref<CColRefArray> pdrgpcrOuterCopy,
+		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
+		gpos::Ref<CColRefArray> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+		ULONG ulCTEOuterId);
 
 	// return a project over a left anti semi join that appends nulls for all
 	// columns in the original inner child
 	static gpos::Ref<CExpression> PexprProjectOverLeftAntiSemiJoin(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOuter,
 		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
-		CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId,
-		CColRefArray **ppdrgpcrProjectOutput);
+		gpos::Ref<CColRefArray> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+		ULONG ulCTEOuterId, gpos::Ref<CColRefArray> *ppdrgpcrProjectOutput);
 
 public:
 	CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(

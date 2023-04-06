@@ -29,7 +29,7 @@ class CPhysicalInnerIndexNLJoin : public CPhysicalInnerNLJoin
 {
 private:
 	// columns from outer child used for index lookup in inner child
-	CColRefArray *m_pdrgpcrOuterRefs;
+	gpos::Ref<CColRefArray> m_pdrgpcrOuterRefs;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
 	gpos::Ref<CExpression> m_origJoinPred;
@@ -38,7 +38,8 @@ public:
 	CPhysicalInnerIndexNLJoin(const CPhysicalInnerIndexNLJoin &) = delete;
 
 	// ctor
-	CPhysicalInnerIndexNLJoin(CMemoryPool *mp, CColRefArray *colref_array,
+	CPhysicalInnerIndexNLJoin(CMemoryPool *mp,
+							  gpos::Ref<CColRefArray> colref_array,
 							  gpos::Ref<CExpression> origJoinPred);
 
 	// dtor
@@ -62,7 +63,7 @@ public:
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs;
@@ -72,13 +73,13 @@ public:
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 	// execution order of children
@@ -95,7 +96,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalInnerIndexNLJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalInnerIndexNLJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalInnerIndexNLJoin>(pop);
 	}
 
 	gpos::Ref<CExpression>

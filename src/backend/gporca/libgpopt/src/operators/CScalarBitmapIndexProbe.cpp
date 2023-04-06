@@ -56,8 +56,6 @@ CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(
 //---------------------------------------------------------------------------
 CScalarBitmapIndexProbe::~CScalarBitmapIndexProbe()
 {
-	m_pindexdesc->Release();
-	m_pmdidBitmapType->Release();
 }
 
 //---------------------------------------------------------------------------

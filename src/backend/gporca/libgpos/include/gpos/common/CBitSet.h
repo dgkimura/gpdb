@@ -49,7 +49,7 @@ protected:
 		ULONG m_offset;
 
 		// bitvector
-		CBitVector *m_vec;
+		gpos::Ref<CBitVector> m_vec;
 
 	public:
 		CBitSetLink(const CBitSetLink &) = delete;
@@ -70,7 +70,7 @@ protected:
 		}
 
 		// accessor
-		CBitVector *
+		gpos::Ref<CBitVector>
 		GetVec() const
 		{
 			return m_vec;

@@ -52,7 +52,6 @@ CDXLColDescr::CDXLColDescr(CMDName *md_name, ULONG column_id, INT attr_no,
 //---------------------------------------------------------------------------
 CDXLColDescr::~CDXLColDescr()
 {
-	m_column_mdid_type->Release();
 	GPOS_DELETE(m_md_name);
 }
 

@@ -33,7 +33,7 @@ private:
 	ULONG m_id;
 
 	// cte columns
-	CColRefArray *m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// output columns, same as cte columns but in CColRefSet
 	gpos::Ref<CColRefSet> m_pcrsOutput;
@@ -45,7 +45,8 @@ public:
 	explicit CLogicalCTEProducer(CMemoryPool *mp);
 
 	// ctor
-	CLogicalCTEProducer(CMemoryPool *mp, ULONG id, CColRefArray *colref_array);
+	CLogicalCTEProducer(CMemoryPool *mp, ULONG id,
+						gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CLogicalCTEProducer() override;
@@ -71,7 +72,7 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
@@ -99,7 +100,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -155,7 +156,7 @@ public:
 	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 //stats_ctxt
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		return PstatsPassThruOuter(exprhdl);
@@ -173,7 +174,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 
@@ -184,7 +185,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEProducer == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalCTEProducer> >(pop);
+		return gpos::dyn_cast<CLogicalCTEProducer>(pop);
 	}
 
 	// debug print

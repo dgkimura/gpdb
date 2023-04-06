@@ -69,13 +69,9 @@ CXformFactory::~CXformFactory()
 			break;
 		}
 
-		m_rgpxf[i]->Release();
+
 		m_rgpxf[i] = nullptr;
 	}
-
-	m_phmszxform->Release();
-	m_pxfsExploration->Release();
-	m_pxfsImplementation->Release();
 }
 
 
@@ -110,7 +106,7 @@ CXformFactory::Add(gpos::Ref<CXform> pxform)
 		m_phmszxform->Insert(szXformName, pxform);
 	GPOS_ASSERT(fInserted);
 
-	CXformSet *xform_set = m_pxfsExploration;
+	gpos::Ref<CXformSet> xform_set = m_pxfsExploration;
 	if (pxform->FImplementation())
 	{
 		xform_set = m_pxfsImplementation;

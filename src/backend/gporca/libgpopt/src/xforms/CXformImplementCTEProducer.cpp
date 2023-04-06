@@ -67,7 +67,7 @@ CXformImplementCTEProducer::Transform(gpos::Ref<CXformContext> pxfctxt,
 									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalCTEProducer> popCTEProducer =
@@ -77,12 +77,12 @@ CXformImplementCTEProducer::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 	ULONG id = popCTEProducer->UlCTEId();
 
-	CColRefArray *colref_array = popCTEProducer->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popCTEProducer->Pdrgpcr();
+
 
 	// child of CTEProducer operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 
 	// create physical CTE Producer
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)

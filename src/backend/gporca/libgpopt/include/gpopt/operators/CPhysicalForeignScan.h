@@ -33,7 +33,7 @@ public:
 
 	// ctor
 	CPhysicalForeignScan(CMemoryPool *, const CName *,
-						 gpos::Ref<CTableDescriptor>, CColRefArray *);
+						 gpos::Ref<CTableDescriptor>, gpos::Ref<CColRefArray>);
 
 	// ident accessors
 	EOperatorId
@@ -87,7 +87,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalForeignScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalForeignScan> >(pop);
+		return gpos::dyn_cast<CPhysicalForeignScan>(pop);
 	}
 
 };	// class CPhysicalForeignScan

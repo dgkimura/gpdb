@@ -39,10 +39,10 @@ private:
 	CWStringConst *m_pstr;
 
 	// array of column descriptors: the schema of the function result
-	CColumnDescriptorArray *m_pdrgpcoldesc;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// function stability
 	IMDFunction::EFuncStbl m_efs;
@@ -58,12 +58,12 @@ public:
 
 	CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 				gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
-				CColumnDescriptorArray *pdrgpcoldesc);
+				gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc);
 
 	CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 				gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
-				CColumnDescriptorArray *pdrgpcoldesc,
-				CColRefArray *pdrgpcrOutput);
+				gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc,
+				gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalTVF() override;
@@ -104,14 +104,14 @@ public:
 	}
 
 	// col descr accessor
-	CColumnDescriptorArray *
+	gpos::Ref<CColumnDescriptorArray>
 	Pdrgpcoldesc() const
 	{
 		return m_pdrgpcoldesc;
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -128,7 +128,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -198,7 +198,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalTVF == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalTVF> >(pop);
+		return gpos::dyn_cast<CLogicalTVF>(pop);
 	}
 
 

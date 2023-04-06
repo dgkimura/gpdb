@@ -72,7 +72,6 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
 		if (nullptr != pgexprForStats)
 		{
-			pgexprForStats->AddRef();
 			m_pgexprForStats = pgexprForStats;
 		}
 	}
@@ -89,12 +88,6 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 //---------------------------------------------------------------------------
 CCostContext::~CCostContext()
 {
-	SafeRelease(m_pgexpr);
-	SafeRelease(m_pgexprForStats);
-	SafeRelease(m_poc);
-	SafeRelease(m_pdrgpoc);
-	SafeRelease(m_pdpplan);
-	SafeRelease(m_pstats);
 }
 
 
@@ -205,7 +198,7 @@ CCostContext::DeriveStats()
 				   GPOS_WSZ_LIT("CCostContext"));
 	}
 
-	exprhdl.Pstats()->AddRef();
+
 	m_pstats = exprhdl.Pstats();
 }
 
@@ -234,7 +227,7 @@ CCostContext::DerivePlanProps(CMemoryPool *mp)
 		GPOS_ASSERT(nullptr != pdpplan);
 
 		// set derived plan properties
-		pdpplan->AddRef();
+
 		m_pdpplan = pdpplan;
 		GPOS_ASSERT(nullptr != m_pdpplan);
 	}
@@ -568,7 +561,8 @@ CCostContext::IsThreeStageScalarDQACostCtxt(const gpos::Ref<CCostContext> pcc)
 //
 //---------------------------------------------------------------------------
 CCost
-CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
+CCostContext::CostCompute(CMemoryPool *mp,
+						  gpos::Ref<CCostArray> pdrgpcostChildren)
 {
 	// derive context stats
 	DeriveStats();
@@ -579,7 +573,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 		arity = Pdrgpoc()->Size();
 	}
 
-	m_pstats->AddRef();
+
 	ICostModel::SCostingInfo ci(
 		mp, arity, GPOS_NEW(mp) ICostModel::CCostingStats(m_pstats));
 
@@ -616,7 +610,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 
 		gpos::Ref<IStatistics> child_stats = pccChild->Pstats();
 
-		child_stats->AddRef();
+
 		ci.SetChildStats(ul,
 						 GPOS_NEW(mp) ICostModel::CCostingStats(child_stats));
 
@@ -668,7 +662,7 @@ CCostContext::DRowsPerHost() const
 	{
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			CDistributionSpecHashed::PdsConvert(pds);
-		CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
+		gpos::Ref<CExpressionArray> pdrgpexpr = pdshashed->Pdrgpexpr();
 		gpos::Ref<CColRefSet> pcrsUsed =
 			CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
 
@@ -679,20 +673,20 @@ CCostContext::DRowsPerHost() const
 			// statistics not available for distribution columns, therefore
 			// assume uniform distribution across hosts
 			// clean up
-			pcrsUsed->Release();
+
 
 			return CDouble(rows / ulHosts);
 		}
 
-		ULongPtrArray *pdrgpul = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 		pcrsUsed->ExtractColIds(m_mp, pdrgpul);
-		pcrsUsed->Release();
+
 
 		gpos::Ref<CStatisticsConfig> stats_config =
 			poptctxt->GetOptimizerConfig()->GetStatsConf();
 		CDouble dNDVs = CStatisticsUtils::Groups(m_mp, Pstats(), stats_config,
 												 pdrgpul, nullptr /*keys*/);
-		pdrgpul->Release();
+
 
 		if (dNDVs < ulHosts)
 		{

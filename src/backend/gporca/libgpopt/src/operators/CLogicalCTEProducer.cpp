@@ -41,7 +41,7 @@ CLogicalCTEProducer::CLogicalCTEProducer(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalCTEProducer::CLogicalCTEProducer(CMemoryPool *mp, ULONG id,
-										 CColRefArray *colref_array)
+										 gpos::Ref<CColRefArray> colref_array)
 	: CLogical(mp), m_id(id), m_pdrgpcr(colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
@@ -62,8 +62,6 @@ CLogicalCTEProducer::CLogicalCTEProducer(CMemoryPool *mp, ULONG id,
 //---------------------------------------------------------------------------
 CLogicalCTEProducer::~CLogicalCTEProducer()
 {
-	SafeRelease(m_pdrgpcr);
-	SafeRelease(m_pcrsOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -79,7 +77,6 @@ CLogicalCTEProducer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 )
 {
-	m_pcrsOutput->AddRef();
 	return m_pcrsOutput;
 }
 
@@ -190,9 +187,10 @@ CLogicalCTEProducer::HashValue() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalCTEProducer::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalCTEProducer(mp, m_id, colref_array);
@@ -206,10 +204,10 @@ CLogicalCTEProducer::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalCTEProducer::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementCTEProducer);
 	return xform_set;
 }

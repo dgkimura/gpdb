@@ -90,7 +90,8 @@ protected:
 	virtual void ScheduleChildGroupsJobs(CSchedulerContext *psc) = 0;
 
 	// schedule transformation jobs for the given set of xforms
-	void ScheduleTransformations(CSchedulerContext *psc, CXformSet *xform_set);
+	void ScheduleTransformations(CSchedulerContext *psc,
+								 gpos::Ref<CXformSet> xform_set);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override = 0;

@@ -61,10 +61,6 @@ CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //---------------------------------------------------------------------------
 CMDScCmpGPDB::~CMDScCmpGPDB()
 {
-	m_mdid->Release();
-	m_mdid_left->Release();
-	m_mdid_right->Release();
-	m_mdid_op->Release();
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }

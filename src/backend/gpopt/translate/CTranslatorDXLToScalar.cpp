@@ -555,7 +555,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	gpos::Ref<CMDIdGPDB> agg_mdid =
 		GPOS_NEW(m_mp) CMDIdGPDB(IMDId::EmdidGeneral, aggref->aggfnoid);
 	const gpos::Ref<IMDAggregate> pmdagg = m_md_accessor->RetrieveAgg(agg_mdid);
-	agg_mdid->Release();
+
 
 	EdxlAggrefStage edxlaggstage = dxlop->GetDXLAggStage();
 	if (nullptr != dxlop->GetDXLResolvedRetTypeMDid())
@@ -667,7 +667,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 		}
 	}
 
-	ULongPtrArray *argtypes = dxlop->GetArgTypes();
+	gpos::Ref<ULongPtrArray> argtypes = dxlop->GetArgTypes();
 	for (ULONG ul = 0; ul < argtypes->Size(); ul++)
 	{
 		aggref->aggargtypes =
@@ -857,7 +857,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 		GPOS_NEW(m_mp) CDXLTranslationContextArray(m_mp);
 	Plan *plan_child = dxl_to_plstmt_translator.TranslateDXLOperatorToPlan(
 		child_dxl, &subplan_translate_ctxt, prev_siblings_ctxt_arr);
-	prev_siblings_ctxt_arr->Release();
+
 
 	GPOS_ASSERT(nullptr != plan_child->targetlist &&
 				1 <= gpdb::ListLength(plan_child->targetlist));
@@ -1078,7 +1078,7 @@ CTranslatorDXLToScalar::TranslateSubplanParams(
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		gpos::Ref<CDXLColRef> dxl_colref = (*outer_refs)[ul];
-		dxl_colref->AddRef();
+
 		const CMappingElementColIdParamId *colid_to_param_id_map =
 			dxl_translator_ctxt->GetParamIdMappingElement(dxl_colref->Id());
 
@@ -1100,7 +1100,7 @@ CTranslatorDXLToScalar::TranslateSubplanParams(
 			GPOS_ASSERT(nullptr != arg);
 		}
 
-		scalar_ident_dxl->Release();
+
 		subplan->args = gpdb::LAppend(subplan->args, arg);
 	}
 }
@@ -2277,7 +2277,7 @@ CTranslatorDXLToScalar::HasBoolResult(gpos::Ref<CDXLNode> dxlnode,
 	}
 
 	gpos::Ref<CDXLScalar> dxlop =
-		dynamic_cast<gpos::Ref<CDXLScalar> >(dxlnode->GetOperator());
+		gpos::dyn_cast<CDXLScalar> > (dxlnode - GetOperator());
 
 	return dxlop->HasBoolResult(md_accessor);
 }

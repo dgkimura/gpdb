@@ -65,22 +65,21 @@ CLogicalUnary::Esp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   UlongToIDatumMap *phmuldatum) const
+								   gpos::Ref<UlongToIDatumMap> phmuldatum) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 	gpos::Ref<CReqdPropRelational> prprel =
 		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 
 	gpos::Ref<IStatistics> stats = CProjectStatsProcessor::CalcProjStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), colids,
-		phmuldatum);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), colids, phmuldatum);
 
 	// clean up
-	colids->Release();
+
 
 	return stats;
 }

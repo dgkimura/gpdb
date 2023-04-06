@@ -67,7 +67,7 @@ public:
 };
 
 // IMDColumn array
-//	typedef CDynamicPtrArray<IMDColumn, CleanupRelease> CMDColumnArray;
+//	typedef gpos::Vector<gpos::Ref<IMDColumn>> CMDColumnArray;
 
 }  // namespace gpmd
 

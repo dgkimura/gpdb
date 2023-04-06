@@ -127,10 +127,10 @@ private:
 	CMemoryPool *m_mp;
 
 	// cte map
-	UlongToCTEReqEntryMap *m_phmcter;
+	gpos::Ref<UlongToCTEReqEntryMap> m_phmcter;
 
 	// required cte ids (not optional)
-	ULongPtrArray *m_pdrgpulRequired;
+	gpos::Ref<ULongPtrArray> m_pdrgpulRequired;
 
 	// lookup info for given cte id
 	gpos::Ref<CCTEReqEntry> PcreLookup(ULONG ulCteId) const;
@@ -145,7 +145,7 @@ public:
 	~CCTEReq() override;
 
 	// required cte ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	PdrgpulRequired() const
 	{
 		return m_pdrgpulRequired;
@@ -160,7 +160,7 @@ public:
 
 	// insert a new consumer entry with the given id. The plan properties are
 	// taken from the given context
-	void InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt);
+	void InsertConsumer(ULONG id, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// check if two cte requirements are equal
 	BOOL
@@ -186,9 +186,9 @@ public:
 
 	// unresolved CTE requirements given a derived CTE map for a sequence
 	// operator
-	gpos::Ref<CCTEReq> PcterUnresolvedSequence(CMemoryPool *mp,
-											   gpos::Ref<CCTEMap> pcm,
-											   CDrvdPropArray *pdrgpdpCtxt);
+	gpos::Ref<CCTEReq> PcterUnresolvedSequence(
+		CMemoryPool *mp, gpos::Ref<CCTEMap> pcm,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// create a copy of the current requirement where all the entries are marked optional
 	gpos::Ref<CCTEReq> PcterAllOptional(CMemoryPool *mp);

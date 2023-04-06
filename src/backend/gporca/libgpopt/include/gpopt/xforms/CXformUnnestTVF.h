@@ -31,7 +31,7 @@ class CXformUnnestTVF : public CXformExploration
 {
 private:
 	// helper for mapping subquery function arguments into columns
-	static CColRefArray *PdrgpcrSubqueries(
+	static gpos::Ref<CColRefArray> PdrgpcrSubqueries(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprCTEProducer,
 		gpos::Ref<CExpression> pexprCTEConsumer);
 

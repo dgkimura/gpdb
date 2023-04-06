@@ -111,10 +111,10 @@ CLogicalAssert::DeriveKeyCollection(CMemoryPool *,	// mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalAssert::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementAssert);
 	return xform_set;
 }
@@ -163,7 +163,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	CMaxCard maxcard =

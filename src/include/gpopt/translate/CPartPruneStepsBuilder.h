@@ -33,7 +33,7 @@ private:
 	Index m_rtindex;
 
 	// list of pruned scan nodes denoted as an index of the relation's partition_mdids
-	ULongPtrArray *m_part_indexes;
+	gpos::Ref<ULongPtrArray> m_part_indexes;
 
 	// colid -> var mapping from the subtree
 	CMappingColIdVarPlStmt *m_colid_var_mapping;
@@ -43,7 +43,7 @@ private:
 
 	// ctor
 	CPartPruneStepsBuilder(Relation relation, Index rtindex,
-						   ULongPtrArray *part_indexes,
+						   gpos::Ref<ULongPtrArray> part_indexes,
 						   CMappingColIdVarPlStmt *colid_var_mapping,
 						   CTranslatorDXLToScalar *translator_dxl_to_scalar);
 
@@ -55,7 +55,8 @@ public:
 
 	static List *CreatePartPruneInfos(
 		gpos::Ref<CDXLNode> filterNode, Relation relation, Index rtindex,
-		ULongPtrArray *part_indexes, CMappingColIdVarPlStmt *colid_var_mapping,
+		gpos::Ref<ULongPtrArray> part_indexes,
+		CMappingColIdVarPlStmt *colid_var_mapping,
 		CTranslatorDXLToScalar *translator_dxl_to_scalar);
 
 	PartitionedRelPruneInfo *CreatePartPruneInfoForOneLevel(

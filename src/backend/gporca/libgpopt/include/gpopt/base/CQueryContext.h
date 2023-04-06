@@ -55,13 +55,13 @@ private:
 	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// required array of output columns
-	CColRefArray *m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// required system columns, collected from of output columns
-	CColRefArray *m_pdrgpcrSystemCols;
+	gpos::Ref<CColRefArray> m_pdrgpcrSystemCols;
 
 	// array of output column names
-	CMDNameArray *m_pdrgpmdname;
+	gpos::Ref<CMDNameArray> m_pdrgpmdname;
 
 	// logical expression tree to be optimized
 	gpos::Ref<CExpression> m_pexpr;
@@ -80,8 +80,9 @@ public:
 
 	// ctor
 	CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-				  gpos::Ref<CReqdPropPlan> prpp, CColRefArray *colref_array,
-				  CMDNameArray *pdrgpmdname, BOOL fDeriveStats);
+				  gpos::Ref<CReqdPropPlan> prpp,
+				  gpos::Ref<CColRefArray> colref_array,
+				  gpos::Ref<CMDNameArray> pdrgpmdname, BOOL fDeriveStats);
 
 	// dtor
 	virtual ~CQueryContext();
@@ -107,21 +108,21 @@ public:
 	}
 
 	// return the array of output column references
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// system columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSystemCols() const
 	{
 		return m_pdrgpcrSystemCols;
 	}
 
 	// return the array of output column names
-	CMDNameArray *
+	gpos::Ref<CMDNameArray>
 	Pdrgpmdname() const
 	{
 		return m_pdrgpmdname;
@@ -133,7 +134,7 @@ public:
 		gpos::Ref<CExpression> pexpr,  // expression representing the query
 		ULongPtrArray
 			*pdrgpulQueryOutputColRefId,  // array of output column reference id
-		CMDNameArray *pdrgpmdname,		  // array of output column names
+		gpos::Ref<CMDNameArray> pdrgpmdname,  // array of output column names
 		BOOL fDeriveStats);
 
 #ifdef GPOS_DEBUG

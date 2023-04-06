@@ -24,7 +24,7 @@ class CColRefSet;
 class CPartKeys;
 
 // array of part keys
-using CPartKeysArray = CDynamicPtrArray<CPartKeys, CleanupRelease>;
+using CPartKeysArray = gpos::Vector<gpos::Ref<CPartKeys>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -38,7 +38,7 @@ class CPartKeys : public CRefCount<CPartKeys>, public DbgPrintMixin<CPartKeys>
 {
 private:
 	// partitioning keys
-	CColRef2dArray *m_pdrgpdrgpcr;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcr;
 
 	// number of levels
 	ULONG m_num_of_part_levels;
@@ -47,7 +47,7 @@ public:
 	CPartKeys(const CPartKeys &) = delete;
 
 	// ctor
-	explicit CPartKeys(CColRef2dArray *pdrgpdrgpcr);
+	explicit CPartKeys(gpos::Ref<CColRef2dArray> pdrgpdrgpcr);
 
 	// dtor
 	~CPartKeys() override;
@@ -56,7 +56,7 @@ public:
 	gpos::Ref<CColRef> PcrKey(ULONG ulLevel) const;
 
 	// return array of keys
-	CColRef2dArray *
+	gpos::Ref<CColRef2dArray>
 	Pdrgpdrgpcr() const
 	{
 		return m_pdrgpdrgpcr;
@@ -77,15 +77,15 @@ public:
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
-	gpos::Ref<CPartKeys> PpartkeysRemap(CMemoryPool *mp,
-										UlongToColRefMap *colref_mapping) const;
+	gpos::Ref<CPartKeys> PpartkeysRemap(
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;
 
 	// copy array of part keys into given memory pool
-	static CPartKeysArray *PdrgppartkeysCopy(
-		CMemoryPool *mp, const CPartKeysArray *pdrgppartkeys);
+	static gpos::Ref<CPartKeysArray> PdrgppartkeysCopy(
+		CMemoryPool *mp, const gpos::Ref<CPartKeysArray> pdrgppartkeys);
 
 };	// CPartKeys
 

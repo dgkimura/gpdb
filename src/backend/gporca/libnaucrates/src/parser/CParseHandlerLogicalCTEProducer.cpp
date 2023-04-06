@@ -65,7 +65,7 @@ CParseHandlerLogicalCTEProducer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenLogicalCTEProducer);
 
-	ULongPtrArray *output_colids_array =
+	gpos::Ref<ULongPtrArray> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenLogicalCTEProducer);

@@ -13,11 +13,10 @@
 #define GPDXL_CDXLPhysicalSequence_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLSpoolInfo.h"
-
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -55,7 +54,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSequence == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalSequence> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSequence>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

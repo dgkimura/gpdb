@@ -46,18 +46,18 @@ CConstExprEvaluatorForDates::PexprEval(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[1]->Pop()->Eopid());
 
 	gpos::Ref<CScalarConst> popScalarLeft =
-		dynamic_cast<gpos::Ref<CScalarConst> >((*pexpr)[0]->Pop());
+		gpos::dyn_cast<CScalarConst> > ((*pexpr)[0] - Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarLeft->GetDatum()->MDId()));
 	gpos::Ref<CScalarConst> popScalarRight =
-		dynamic_cast<gpos::Ref<CScalarConst> >((*pexpr)[1]->Pop());
+		gpos::dyn_cast<CScalarConst> > ((*pexpr)[1] - Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarRight->GetDatum()->MDId()));
 
 	gpos::Ref<CScalarCmp> popScCmp =
-		dynamic_cast<gpos::Ref<CScalarCmp> >(pexpr->Pop());
+		gpos::dyn_cast<CScalarCmp> > (pexpr - Pop());
 	LINT dLeft = popScalarLeft->GetDatum()->GetLINTMapping();
 	LINT dRight = popScalarRight->GetDatum()->GetLINTMapping();
 	BOOL result = false;

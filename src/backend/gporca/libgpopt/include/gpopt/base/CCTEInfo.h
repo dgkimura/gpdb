@@ -123,7 +123,7 @@ private:
 		gpos::Ref<CExpression> m_pexprCTEProducer;
 
 		// map columns of all created consumers of current CTE to their positions in consumer output
-		ColRefToUlongMap *m_phmcrulConsumers;
+		gpos::Ref<ColRefToUlongMap> m_phmcrulConsumers;
 
 		// is this CTE used
 		BOOL m_fUsed;
@@ -162,7 +162,7 @@ private:
 		}
 
 		// add given columns to consumers column map
-		void AddConsumerCols(CColRefArray *colref_array);
+		void AddConsumerCols(gpos::Ref<CColRefArray> colref_array);
 
 		// return position of given consumer column in consumer output
 		ULONG UlConsumerColPos(gpos::Ref<CColRef> colref);
@@ -257,7 +257,7 @@ public:
 	gpos::Ref<CCTEReq> PcterProducers(CMemoryPool *mp) const;
 
 	// return an array of all stored CTE expressions
-	CExpressionArray *PdrgPexpr(CMemoryPool *mp) const;
+	gpos::Ref<CExpressionArray> PdrgPexpr(CMemoryPool *mp) const;
 
 	// disable CTE inlining
 	void
@@ -281,15 +281,15 @@ public:
 	void MapComputedToUsedCols(CColumnFactory *col_factory) const;
 
 	// add given columns to consumers column map
-	void AddConsumerCols(ULONG ulCTEId, CColRefArray *colref_array);
+	void AddConsumerCols(ULONG ulCTEId, gpos::Ref<CColRefArray> colref_array);
 
 	// return position of given consumer column in consumer output
 	ULONG UlConsumerColPos(ULONG ulCTEId, gpos::Ref<CColRef> colref);
 
 	// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
-	UlongToColRefMap *PhmulcrConsumerToProducer(CMemoryPool *mp, ULONG ulCTEId,
-												gpos::Ref<CColRefSet> pcrs,
-												CColRefArray *pdrgpcrProducer);
+	gpos::Ref<UlongToColRefMap> PhmulcrConsumerToProducer(
+		CMemoryPool *mp, ULONG ulCTEId, gpos::Ref<CColRefSet> pcrs,
+		gpos::Ref<CColRefArray> pdrgpcrProducer);
 
 };	// CCTEInfo
 }  // namespace gpopt

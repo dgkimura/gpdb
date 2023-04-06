@@ -49,7 +49,7 @@ private:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// source columns
-	CColRefArray *m_pdrgpcrSource;
+	gpos::Ref<CColRefArray> m_pdrgpcrSource;
 
 	// set of modified columns from the target table
 	gpos::Ref<CBitSet> m_pbsModified;
@@ -75,9 +75,10 @@ public:
 	// ctor
 	CLogicalDML(CMemoryPool *mp, EDMLOperator edmlop,
 				gpos::Ref<CTableDescriptor> ptabdesc,
-				CColRefArray *colref_array, gpos::Ref<CBitSet> pbsModified,
-				gpos::Ref<CColRef> pcrAction, gpos::Ref<CColRef> pcrCtid,
-				gpos::Ref<CColRef> pcrSegmentId, BOOL fSplit);
+				gpos::Ref<CColRefArray> colref_array,
+				gpos::Ref<CBitSet> pbsModified, gpos::Ref<CColRef> pcrAction,
+				gpos::Ref<CColRef> pcrCtid, gpos::Ref<CColRef> pcrSegmentId,
+				BOOL fSplit);
 
 	// dtor
 	~CLogicalDML() override;
@@ -104,7 +105,7 @@ public:
 	}
 
 	// source columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSource() const
 	{
 		return m_pdrgpcrSource;
@@ -167,7 +168,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -210,7 +211,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(
@@ -219,7 +220,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -239,7 +240,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDML == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalDML> >(pop);
+		return gpos::dyn_cast<CLogicalDML>(pop);
 	}
 
 	// debug print

@@ -52,9 +52,6 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CScalarArrayRef::~CScalarArrayRef()
 {
-	m_pmdidElem->Release();
-	m_pmdidArray->Release();
-	m_mdid_type->Release();
 }
 
 

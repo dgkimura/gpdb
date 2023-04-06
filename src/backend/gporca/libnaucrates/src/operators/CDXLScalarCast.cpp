@@ -47,8 +47,6 @@ CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarCast::~CDXLScalarCast()
 {
-	m_mdid_type->Release();
-	m_func_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -12,9 +12,9 @@
 #define GPDXL_CDXLLogicalCTEConsumer_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -32,14 +32,14 @@ private:
 	ULONG m_id;
 
 	// output column ids
-	ULongPtrArray *m_output_colids_array;
+	gpos::Ref<ULongPtrArray> m_output_colids_array;
 
 public:
 	CDXLLogicalCTEConsumer(CDXLLogicalCTEConsumer &) = delete;
 
 	// ctor
 	CDXLLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
-						   ULongPtrArray *output_colids_array);
+						   gpos::Ref<ULongPtrArray> output_colids_array);
 
 	// dtor
 	~CDXLLogicalCTEConsumer() override;
@@ -57,7 +57,7 @@ public:
 		return m_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetOutputColIdsArray() const
 	{
 		return m_output_colids_array;
@@ -83,7 +83,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTEConsumer == dxl_op->GetDXLOperator());
-		return dynamic_cast<gpos::Ref<CDXLLogicalCTEConsumer> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTEConsumer>(dxl_op);
 	}
 };
 }  // namespace gpdxl

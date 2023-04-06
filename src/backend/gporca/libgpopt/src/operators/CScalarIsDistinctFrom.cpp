@@ -25,12 +25,12 @@ CScalarIsDistinctFrom::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarIsDistinctFrom == pop->Eopid());
 
-	return dynamic_cast<gpos::Ref<CScalarIsDistinctFrom> >(pop);
+	return gpos::dyn_cast<CScalarIsDistinctFrom>(pop);
 }
 
 // perform boolean expression evaluation
 CScalar::EBoolEvalResult
-CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarIsDistinctFrom::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	GPOS_ASSERT(2 == pdrgpulChildren->Size());
 

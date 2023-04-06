@@ -30,7 +30,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLStatsDerivedColumn::CDXLStatsDerivedColumn(
 	ULONG colid, CDouble width, CDouble null_freq, CDouble distinct_remaining,
-	CDouble freq_remaining, CDXLBucketArray *dxl_stats_bucket_array)
+	CDouble freq_remaining, gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array)
 	: m_colid(colid),
 	  m_width(width),
 	  m_null_freq(null_freq),
@@ -55,7 +55,6 @@ CDXLStatsDerivedColumn::CDXLStatsDerivedColumn(
 //---------------------------------------------------------------------------
 CDXLStatsDerivedColumn::~CDXLStatsDerivedColumn()
 {
-	m_dxl_stats_bucket_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -66,7 +65,7 @@ CDXLStatsDerivedColumn::~CDXLStatsDerivedColumn()
 //		Returns the array of buckets
 //
 //---------------------------------------------------------------------------
-const CDXLBucketArray *
+const gpos::Ref<CDXLBucketArray>
 CDXLStatsDerivedColumn::TransformHistogramToDXLBucketArray() const
 {
 	return m_dxl_stats_bucket_array;

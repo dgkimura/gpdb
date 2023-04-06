@@ -81,7 +81,7 @@ choose_best_statistics(CMemoryPool *mp,
 		matched = GPOS_NEW(mp) CBitSet(mp, *attnums);
 		matched->Intersection(info->GetStatKeys());
 		num_matched = matched->Size();
-		matched->Release();
+
 
 		/*
 		 * save the actual number of keys in the stats so that we can choose
@@ -243,11 +243,11 @@ find_strongest_dependency(CMDDependencyArray *dependencies,
 //---------------------------------------------------------------------------
 void
 CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
-	CDoubleArray *scale_factors,
+	gpos::Ref<CDoubleArray> scale_factors,
 	gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
 	const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
-	UlongToIntMap *colid_to_attno_mapping, CMemoryPool *mp,
-	UlongToHistogramMap *result_histograms)
+	gpos::Ref<UlongToIntMap> colid_to_attno_mapping, CMemoryPool *mp,
+	gpos::Ref<UlongToHistogramMap> result_histograms)
 {
 	GPOS_ASSERT(scale_factors->Size() == 0);
 
@@ -312,7 +312,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidExtStats, stat->GetStatOid());
 	const gpos::Ref<IMDExtStats> extstats =
 		md_accessor->RetrieveExtStats(pmdid);
-	pmdid->Release();
+
 
 	/* load the dependency items stored in the statistics object */
 	dependencies = extstats->GetDependencies();
@@ -396,8 +396,6 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 			   (1 - dependency->GetDegree().Get()) * s2);
 	}
 	scale_factors->Append(GPOS_NEW(mp) CDouble(s1));
-
-	clauses_attnums->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -412,8 +410,8 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 bool
 CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 	CMemoryPool *mp, const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
-	const UlongToIntMap *colid_to_attno_mapping,
-	ULongPtrArray *&src_grouping_cols, DOUBLE *ndistinct)
+	const gpos::Ref<UlongToIntMap> colid_to_attno_mapping,
+	gpos::Ref<ULongPtrArray> &src_grouping_cols, DOUBLE *ndistinct)
 {
 	int nmatches;
 	OID statOid = InvalidOid;
@@ -435,7 +433,6 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		INT *attnum = colid_to_attno_mapping->Find(&colid);
 		if (!attnum)
 		{
-			attnums->Release();
 			return false;
 		}
 		attnums->ExchangeSet(*attnum);
@@ -455,7 +452,6 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		/* skip statistics of other kinds */
 		if (info->GetStatKind() != CMDExtStatsInfo::EstatNDistinct)
 		{
-			shared->Release();
 			continue;
 		}
 
@@ -472,23 +468,18 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		 */
 		if (nshared > nmatches)
 		{
-			SafeRelease(matched);
-
 			statOid = info->GetStatOid();
 			nmatches = nshared;
 			matched = shared;
 		}
 		else
 		{
-			shared->Release();
 		}
 	}
 
 	/* No match? */
 	if (statOid == InvalidOid)
 	{
-		SafeRelease(matched);
-		attnums->Release();
 		return false;
 	}
 
@@ -498,7 +489,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 	gpos::Ref<CMDIdGPDB> pmdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidExtStats, statOid);
 	stats = md_accessor->RetrieveExtStats(pmdid);
-	pmdid->Release();
+
 
 	/*
 	 * If we have a match, search it for the specific item that matches (there
@@ -521,7 +512,8 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		}
 
 		/* Form the output varinfo list, keeping only unmatched ones */
-		ULongPtrArray *new_src_grouping_cols = GPOS_NEW(mp) ULongPtrArray(mp);
+		gpos::Ref<ULongPtrArray> new_src_grouping_cols =
+			GPOS_NEW(mp) ULongPtrArray(mp);
 		for (ULONG ul = 0; ul < src_grouping_cols->Size(); ul++)
 		{
 			ULONG colid = *(*src_grouping_cols)[ul];
@@ -532,18 +524,16 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 				new_src_grouping_cols->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
-		src_grouping_cols->Release();
+
 		src_grouping_cols = new_src_grouping_cols;
 
-		matched->Release();
-		attnums->Release();
+
 
 		*ndistinct = item->GetNDistinct().Get();
 		return true;
 	}
 
-	matched->Release();
 
-	attnums->Release();
+
 	return false;
 }

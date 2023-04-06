@@ -339,7 +339,6 @@ PvExec(void *pv)
 		}
 		else
 		{
-			optimizer_config->AddRef();
 		}
 
 		if (ullPlanId != 0)
@@ -366,8 +365,8 @@ PvExec(void *pv)
 		}
 
 		GPOS_DELETE(pdxlmd);
-		optimizer_config->Release();
-		pdxlnPlan->Release();
+
+
 		CMDCache::Shutdown();
 	}
 	else

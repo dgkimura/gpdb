@@ -86,7 +86,6 @@ public:
 	// d'tor
 	~CPoint() override
 	{
-		m_datum->Release();
 	}
 
 	// translate the point into its DXL representation
@@ -103,7 +102,7 @@ public:
 };	// class CPoint
 
 // array of CPoints
-using CPointArray = CDynamicPtrArray<CPoint, CleanupRelease>;
+using CPointArray = gpos::Vector<gpos::Ref<CPoint>>;
 }  // namespace gpnaucrates
 
 #endif	// !GPNAUCRATES_CPoint_H

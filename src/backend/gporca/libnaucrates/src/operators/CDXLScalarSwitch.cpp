@@ -43,7 +43,6 @@ CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 //---------------------------------------------------------------------------
 CDXLScalarSwitch::~CDXLScalarSwitch()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

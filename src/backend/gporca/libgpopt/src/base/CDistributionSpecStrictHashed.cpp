@@ -6,7 +6,7 @@
 namespace gpopt
 {
 CDistributionSpecStrictHashed::CDistributionSpecStrictHashed(
-	CExpressionArray *pdrgpexpr, BOOL fNullsColocated)
+	gpos::Ref<CExpressionArray> pdrgpexpr, BOOL fNullsColocated)
 	: CDistributionSpecHashed(pdrgpexpr, fNullsColocated)
 {
 }

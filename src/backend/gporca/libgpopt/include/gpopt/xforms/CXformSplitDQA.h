@@ -40,24 +40,25 @@ private:
 	// generate an expression with multi-level aggregation
 	static gpos::Ref<CExpression> PexprMultiLevelAggregation(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprRelational,
-		CExpressionArray *pdrgpexprPrElFirstStage,
-		CExpressionArray *pdrgpexprPrElSecondStage,
-		CExpressionArray *pdrgpexprPrElThirdStage, CColRefArray *pdrgpcrArgDQA,
-		CColRefArray *pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+		gpos::Ref<CColRefArray> pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
 		BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage);
 
 	// split DQA into a local DQA and global non-DQA aggregate function
 	static gpos::Ref<CExpression> PexprSplitIntoLocalDQAGlobalAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// helper function to split DQA
 	static gpos::Ref<CExpression> PexprSplitHelper(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// given a scalar aggregate generate the local, intermediate and global
@@ -67,9 +68,10 @@ private:
 	static void PopulatePrLMultiPhaseAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprPrEl,
-		CExpressionArray *pdrgpexprPrElFirstStage,
-		CExpressionArray *pdrgpexprPrElSecondStage,
-		CExpressionArray *pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly);
+		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElLastStage,
+		BOOL fSplit2LevelsOnly);
 
 	// create project element for the aggregate function of a particular level
 	static gpos::Ref<CExpression> PexprPrElAgg(
@@ -80,13 +82,15 @@ private:
 	// extract arguments of distinct aggs
 	static void ExtractDistinctCols(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexpr, CExpressionArray *pdrgpexprChildPrEl,
-		ExprToColRefMap *phmexprcr, CColRefArray **ppdrgpcrArgDQA);
+		gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpressionArray> pdrgpexprChildPrEl,
+		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> *ppdrgpcrArgDQA);
 
 	// return the column reference of the argument to the aggregate function
 	static gpos::Ref<CColRef> PcrAggFuncArgument(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
-		gpos::Ref<CExpression> pexprArg, CExpressionArray *pdrgpexprChildPrEl);
+		gpos::Ref<CExpression> pexprArg,
+		gpos::Ref<CExpressionArray> pdrgpexprChildPrEl);
 
 public:
 	CXformSplitDQA(const CXformSplitDQA &) = delete;

@@ -51,7 +51,7 @@ private:
 public:
 	// type definition of optimizer test function
 	using FnOptimize = void(CMemoryPool *, gpos::Ref<CExpression>,
-							CSearchStageArray *);
+							gpos::Ref<CSearchStageArray>);
 
 	// main driver
 	static GPOS_RESULT EresUnittest();
@@ -72,9 +72,9 @@ public:
 #ifdef GPOS_DEBUG
 
 	// build memo by recursive optimization
-	static void BuildMemoRecursive(CMemoryPool *mp,
-								   gpos::Ref<CExpression> pexprInput,
-								   CSearchStageArray *search_stage_array);
+	static void BuildMemoRecursive(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprInput,
+		gpos::Ref<CSearchStageArray> search_stage_array);
 
 	// test of recursive memo building
 	static GPOS_RESULT EresUnittest_BuildMemo();

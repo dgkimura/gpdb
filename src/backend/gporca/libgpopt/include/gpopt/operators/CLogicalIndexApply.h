@@ -22,7 +22,7 @@ class CLogicalIndexApply : public CLogicalApply
 private:
 protected:
 	// columns used from Apply's outer child used by index in Apply's inner child
-	CColRefArray *m_pdrgpcrOuterRefs;
+	gpos::Ref<CColRefArray> m_pdrgpcrOuterRefs;
 
 	// is this an outer join?
 	BOOL m_fOuterJoin;
@@ -34,7 +34,8 @@ public:
 	CLogicalIndexApply(const CLogicalIndexApply &) = delete;
 
 	// ctor
-	CLogicalIndexApply(CMemoryPool *mp, CColRefArray *pdrgpcrOuterRefs,
+	CLogicalIndexApply(CMemoryPool *mp,
+					   gpos::Ref<CColRefArray> pdrgpcrOuterRefs,
 					   BOOL fOuterJoin, gpos::Ref<CExpression> origJoinPred);
 
 	// ctor for patterns
@@ -58,7 +59,7 @@ public:
 	}
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs;
@@ -111,7 +112,7 @@ public:
 	}
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
@@ -123,7 +124,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -135,7 +136,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
@@ -145,7 +146,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIndexApply == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalIndexApply> >(pop);
+		return gpos::dyn_cast<CLogicalIndexApply>(pop);
 	}
 
 };	// class CLogicalIndexApply

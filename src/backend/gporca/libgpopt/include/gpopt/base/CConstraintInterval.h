@@ -27,7 +27,7 @@
 namespace gpopt
 {
 // range array
-using CRangeArray = CDynamicPtrArray<CRange, CleanupRelease>;
+using CRangeArray = gpos::Vector<gpos::Ref<CRange>>;
 
 using namespace gpos;
 using namespace gpmd;
@@ -50,18 +50,20 @@ private:
 	const gpos::Ref<CColRef> m_pcr;
 
 	// array of ranges
-	CRangeArray *m_pdrgprng;
+	gpos::Ref<CRangeArray> m_pdrgprng;
 
 	// does the interval include the null value
 	BOOL m_fIncludesNull;
 
 	// adds ranges from a source array to a destination array, starting
 	// at the range with the given index
-	static void AddRemainingRanges(CMemoryPool *mp, CRangeArray *pdrgprngSrc,
-								   ULONG ulStart, CRangeArray *pdrgprngDest);
+	static void AddRemainingRanges(CMemoryPool *mp,
+								   gpos::Ref<CRangeArray> pdrgprngSrc,
+								   ULONG ulStart,
+								   gpos::Ref<CRangeArray> pdrgprngDest);
 
 	// append the given range to the array or extend the last element
-	static void AppendOrExtend(CMemoryPool *mp, CRangeArray *pdrgprng,
+	static void AppendOrExtend(CMemoryPool *mp, gpos::Ref<CRangeArray> pdrgprng,
 							   gpos::Ref<CRange> prange);
 
 	// difference between two ranges on the left side only -
@@ -69,7 +71,7 @@ private:
 	static gpos::Ref<CRange> PrangeDiffWithRightResidual(
 		CMemoryPool *mp, gpos::Ref<CRange> prangeFirst,
 		gpos::Ref<CRange> prangeSecond, gpos::Ref<CRange> *pprangeResidual,
-		CRangeArray *pdrgprngResidual);
+		gpos::Ref<CRangeArray> pdrgprngResidual);
 
 	// type of this interval
 	gpos::Ref<IMDId> MdidType();
@@ -110,7 +112,7 @@ private:
 		gpos::Ref<CColRef> colref);
 
 	// creates a range like [x,x] where x is a constant
-	static CRangeArray *PciRangeFromColConstCmp(
+	static gpos::Ref<CRangeArray> PciRangeFromColConstCmp(
 		CMemoryPool *mp, IMDType::ECmpType cmp_type,
 		const gpos::Ref<CScalarConst> popScConst);
 
@@ -123,7 +125,7 @@ public:
 
 	// ctor
 	CConstraintInterval(CMemoryPool *mp, const gpos::Ref<CColRef> colref,
-						CRangeArray *pdrgprng, BOOL is_null);
+						gpos::Ref<CRangeArray> pdrgprng, BOOL is_null);
 
 	// dtor
 	~CConstraintInterval() override;
@@ -143,7 +145,7 @@ public:
 	}
 
 	// all ranges in interval
-	CRangeArray *
+	gpos::Ref<CRangeArray>
 	Pdrgprng() const
 	{
 		return m_pdrgprng;
@@ -182,7 +184,7 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// interval intersection
@@ -276,8 +278,7 @@ operator<<(IOstream &os, const gpos::Ref<CConstraintInterval> interval)
 	return interval->OsPrint(os);
 }
 
-using CConstraintIntervalArray =
-	CDynamicPtrArray<CConstraintInterval, CleanupRelease>;
+using CConstraintIntervalArray = gpos::Vector<gpos::Ref<CConstraintInterval>>;
 }  // namespace gpopt
 
 #endif	// !GPOPT_CConstraintInterval_H

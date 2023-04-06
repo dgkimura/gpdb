@@ -36,7 +36,7 @@ public:
 	explicit CLogicalInnerApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalInnerApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalInnerApply(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInner,
 					   EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -58,7 +58,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerApply == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalInnerApply> >(pop);
+		return gpos::dyn_cast<CLogicalInnerApply>(pop);
 	}
 
 };	// class CLogicalInnerApply

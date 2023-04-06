@@ -46,15 +46,16 @@ protected:
 	MDIdToSerializedMDIdMap *m_mdmap;
 
 	// load MD objects in the hash map
-	void LoadMetadataObjectsFromArray(CMemoryPool *mp,
-									  IMDCacheObjectArray *mdcache_obj_array);
+	void LoadMetadataObjectsFromArray(
+		CMemoryPool *mp, gpos::Ref<IMDCacheObjectArray> mdcache_obj_array);
 
 	// private copy ctor
 	CMDProviderMemory(const CMDProviderMemory &);
 
 public:
 	// ctor
-	CMDProviderMemory(CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array);
+	CMDProviderMemory(CMemoryPool *mp,
+					  gpos::Ref<IMDCacheObjectArray> mdcache_obj_array);
 
 	// ctor
 	CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name);

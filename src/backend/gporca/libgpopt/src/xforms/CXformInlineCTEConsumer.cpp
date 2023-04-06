@@ -76,14 +76,14 @@ CXformInlineCTEConsumer::Transform(gpos::Ref<CXformContext>
 								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// inline the consumer
 	gpos::Ref<CLogicalCTEConsumer> popConsumer =
 		CLogicalCTEConsumer::PopConvert(pexpr->Pop());
 	gpos::Ref<CExpression> pexprAlt = popConsumer->PexprInlined();
-	pexprAlt->AddRef();
+
 	// add alternative to xform result
 	pxfres->Add(pexprAlt);
 }

@@ -166,18 +166,18 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerMetadataIdList *pphMdidOpfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>((*this)[0]);
-	IMdIdArray *mdid_opfamilies_array = pphMdidOpfamilies->GetMdIdArray();
-	mdid_opfamilies_array->AddRef();
+	gpos::Ref<IMdIdArray> mdid_opfamilies_array =
+		pphMdidOpfamilies->GetMdIdArray();
+
 
 	BOOL is_partitioned = false;
-	IMdIdArray *child_indexes = nullptr;
+	gpos::Ref<IMdIdArray> child_indexes = nullptr;
 	if (nullptr != m_child_indexes_parse_handler)
 	{
 		is_partitioned = true;
 		child_indexes = dynamic_cast<CParseHandlerMetadataIdList *>(
 							m_child_indexes_parse_handler)
 							->GetMdIdArray();
-		child_indexes->AddRef();
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDIndexGPDB(

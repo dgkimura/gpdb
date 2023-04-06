@@ -57,8 +57,6 @@ CDXLScalarWindowRef::CDXLScalarWindowRef(
 //---------------------------------------------------------------------------
 CDXLScalarWindowRef::~CDXLScalarWindowRef()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -193,7 +191,7 @@ CDXLScalarWindowRef::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								 BOOL validate_children) const
 {
 	EdxlWinStage edxlwinrefstage =
-		((gpos::Ref<CDXLScalarWindowRef>) dxlnode->GetOperator())
+		gpos::dyn_cast<CDXLScalarWindowRef>(dxlnode->GetOperator())
 			->GetDxlWinStage();
 
 	GPOS_ASSERT((EdxlwinstageSentinel >= edxlwinrefstage));

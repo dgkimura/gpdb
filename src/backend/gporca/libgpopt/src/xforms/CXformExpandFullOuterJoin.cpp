@@ -91,7 +91,7 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 									 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -102,16 +102,20 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// 1. create the CTE producers
 	const ULONG ulCTEIdA = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	CColRefArray *pdrgpcrOutA = pexprA->DeriveOutputColumns()->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> pdrgpcrOutA =
+		pexprA->DeriveOutputColumns()->Pdrgpcr(mp);
 	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdA, pdrgpcrOutA, pexprA);
 
 	const ULONG ulCTEIdB = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	CColRefArray *pdrgpcrOutB = pexprB->DeriveOutputColumns()->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> pdrgpcrOutB =
+		pexprB->DeriveOutputColumns()->Pdrgpcr(mp);
 	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdB, pdrgpcrOutB, pexprB);
 
 	// 2. create the right child (PROJECT over LASJ)
-	CColRefArray *pdrgpcrRightA = CUtils::PdrgpcrCopy(mp, pdrgpcrOutA);
-	CColRefArray *pdrgpcrRightB = CUtils::PdrgpcrCopy(mp, pdrgpcrOutB);
+	gpos::Ref<CColRefArray> pdrgpcrRightA =
+		CUtils::PdrgpcrCopy(mp, pdrgpcrOutA);
+	gpos::Ref<CColRefArray> pdrgpcrRightB =
+		CUtils::PdrgpcrCopy(mp, pdrgpcrOutB);
 	gpos::Ref<CExpression> pexprScalarRight = CXformUtils::PexprRemapColumns(
 		mp, pexprScalar, pdrgpcrOutA, pdrgpcrRightA, pdrgpcrOutB,
 		pdrgpcrRightB);
@@ -123,7 +127,7 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// 3. create the left child (LOJ) - this has to use the original output
 	//    columns and the original scalar expression
-	pexprScalar->AddRef();
+
 	gpos::Ref<CExpression> pexprLOJ =
 		PexprLogicalJoinOverCTEs(mp, EdxljtLeft, ulCTEIdA, pdrgpcrOutA,
 								 ulCTEIdB, pdrgpcrOutB, pexprScalar);
@@ -131,15 +135,15 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// 4. create the UNION ALL expression
 
 	// output columns of the union are the same as the outputs of the first child (LOJ)
-	CColRefArray *pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutA);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutB);
 
 	// input columns of the union
-	CColRef2dArray *pdrgdrgpcrInput = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRef2dArray> pdrgdrgpcrInput = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	// inputs from the first child (LOJ)
-	pdrgpcrOutput->AddRef();
+
 	pdrgdrgpcrInput->Append(pdrgpcrOutput);
 
 	// inputs from the second child have to be in the correct order
@@ -147,8 +151,8 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CColRefSet> pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsProjOnly->Include(pexprProject->DeriveOutputColumns());
 	pcrsProjOnly->Exclude(pdrgpcrRightB);
-	CColRefArray *pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
-	pcrsProjOnly->Release();
+	gpos::Ref<CColRefArray> pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
+
 	// b. add columns from the LASJ expression
 	pdrgpcrProj->AppendArray(pdrgpcrRightB);
 
@@ -182,12 +186,13 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 gpos::Ref<CExpression>
 CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs(
 	CMemoryPool *mp, EdxlJoinType edxljointype, ULONG ulLeftCTEId,
-	CColRefArray *pdrgpcrLeft, ULONG ulRightCTEId, CColRefArray *pdrgpcrRight,
-	gpos::Ref<CExpression> pexprScalar)
+	gpos::Ref<CColRefArray> pdrgpcrLeft, ULONG ulRightCTEId,
+	gpos::Ref<CColRefArray> pdrgpcrRight, gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	gpos::Ref<CLogicalCTEConsumer> popConsumerLeft =

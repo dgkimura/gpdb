@@ -61,7 +61,7 @@ CTableDescriptorTest::EresUnittest_Basic()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -82,7 +82,7 @@ CTableDescriptorTest::EresUnittest_Basic()
 	GPOS_TRACE(str.GetBuffer());
 #endif	// GPOS_DEBUG
 
-	ptabdesc->Release();
+
 
 	return GPOS_OK;
 }

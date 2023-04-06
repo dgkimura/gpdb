@@ -14,11 +14,11 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 enum EdxlDmlType
@@ -47,7 +47,7 @@ private:
 	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 	// action column id
 	ULONG m_action_colid;
@@ -70,8 +70,8 @@ public:
 	// ctor
 	CDXLPhysicalDML(CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
 					gpos::Ref<CDXLTableDescr> table_descr,
-					ULongPtrArray *src_colids_array, ULONG action_colid,
-					ULONG ctid_colid, ULONG segid_colid,
+					gpos::Ref<ULongPtrArray> src_colids_array,
+					ULONG action_colid, ULONG ctid_colid, ULONG segid_colid,
 					gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info,
 					BOOL fSplit);
 
@@ -99,7 +99,7 @@ public:
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetSrcColIdsArray() const
 	{
 		return m_src_colids_array;
@@ -158,7 +158,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDML == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalDML> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalDML>(dxl_op);
 	}
 };
 }  // namespace gpdxl

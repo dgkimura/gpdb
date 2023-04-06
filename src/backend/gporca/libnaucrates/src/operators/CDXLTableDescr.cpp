@@ -56,9 +56,7 @@ CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //---------------------------------------------------------------------------
 CDXLTableDescr::~CDXLTableDescr()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname);
-	SafeRelease(m_dxl_column_descr_array);
 }
 
 
@@ -135,9 +133,9 @@ CDXLTableDescr::LockMode() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLTableDescr::SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array)
+CDXLTableDescr::SetColumnDescriptors(
+	gpos::Ref<CDXLColDescrArray> dxl_column_descr_array)
 {
-	SafeRelease(m_dxl_column_descr_array);
 	m_dxl_column_descr_array = dxl_column_descr_array;
 }
 

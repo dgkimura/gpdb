@@ -48,7 +48,6 @@ public:
 
 	~CMDNDistinct() override
 	{
-		m_attrs->Release();
 	}
 
 	CWStringDynamic *
@@ -107,7 +106,7 @@ public:
 	}
 };
 
-using CMDNDistinctArray = CDynamicPtrArray<CMDNDistinct, CleanupRelease>;
+using CMDNDistinctArray = gpos::Vector<gpos::Ref<CMDNDistinct>>;
 }  // namespace gpmd
 
 

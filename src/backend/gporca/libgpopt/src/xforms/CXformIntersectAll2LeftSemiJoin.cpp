@@ -64,7 +64,7 @@ CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -79,7 +79,8 @@ CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CLogicalIntersectAll> popIntersectAll =
 		CLogicalIntersectAll::PopConvert(pexpr->Pop());
-	CColRef2dArray *pdrgpdrgpcrInput = popIntersectAll->PdrgpdrgpcrInput();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
+		popIntersectAll->PdrgpdrgpcrInput();
 
 	gpos::Ref<CExpression> pexprLeftWindow =
 		CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild,
@@ -88,13 +89,14 @@ CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 		CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild,
 											  (*pdrgpdrgpcrInput)[1]);
 
-	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
-	CColRefArray *pdrgpcrLeftNew =
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInputNew =
+		GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcrLeftNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(
 		pexprLeftWindow, 0 /* row_number window function*/));
 
-	CColRefArray *pdrgpcrRightNew =
+	gpos::Ref<CColRefArray> pdrgpcrRightNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[1]);
 	pdrgpcrRightNew->Append(CXformUtils::PcrProjectElement(
 		pexprRightWindow, 0 /* row_number window function*/));
@@ -111,7 +113,7 @@ CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 					pexprRightWindow, pexprScCond);
 
 	// clean up
-	pdrgpdrgpcrInputNew->Release();
+
 
 	pxfres->Add(pexprLSJ);
 }

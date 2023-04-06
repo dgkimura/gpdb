@@ -98,7 +98,7 @@ public:
 	// the scalar expression of the check constraint
 	gpos::Ref<CExpression> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const override;
+		gpos::Ref<CColRefArray> colref_array) const override;
 
 	// serialize MD check constraint in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;

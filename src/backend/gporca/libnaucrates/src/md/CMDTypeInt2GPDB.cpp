@@ -75,7 +75,7 @@ CMDTypeInt2GPDB::CMDTypeInt2GPDB(CMemoryPool *mp) : m_mp(mp)
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
 	GPOS_ASSERT(GPDB_INT2_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
-	m_mdid->AddRef();
+
 	m_datum_null =
 		GPOS_NEW(mp) CDatumInt2GPDB(m_mdid, 1 /* value */, true /* is_null */);
 }
@@ -90,24 +90,6 @@ CMDTypeInt2GPDB::CMDTypeInt2GPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeInt2GPDB::~CMDTypeInt2GPDB()
 {
-	m_mdid->Release();
-	SafeRelease(m_distr_opfamily);
-	SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	m_datum_null->Release();
-
 	GPOS_DELETE(m_dxl_str);
 }
 
@@ -292,9 +274,8 @@ CMDTypeInt2GPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 gpos::Ref<CDXLDatum>
 CMDTypeInt2GPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
-	m_mdid->AddRef();
 	gpos::Ref<CDatumInt2GPDB> int2_datum =
-		dynamic_cast<gpos::Ref<CDatumInt2GPDB> >(datum);
+		gpos::dyn_cast<CDatumInt2GPDB>(datum);
 
 	return GPOS_NEW(mp)
 		CDXLDatumInt2(mp, m_mdid, int2_datum->IsNull(), int2_datum->Value());
@@ -312,9 +293,9 @@ gpos::Ref<CDXLScalarConstValue>
 CMDTypeInt2GPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	gpos::Ref<CDatumInt2GPDB> int2gpdb_datum =
-		dynamic_cast<gpos::Ref<CDatumInt2GPDB> >(datum);
+		gpos::dyn_cast<CDatumInt2GPDB>(datum);
 
-	m_mdid->AddRef();
+
 	gpos::Ref<CDXLDatumInt2> dxl_datum = GPOS_NEW(mp) CDXLDatumInt2(
 		mp, m_mdid, int2gpdb_datum->IsNull(), int2gpdb_datum->Value());
 
@@ -332,8 +313,6 @@ CMDTypeInt2GPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 gpos::Ref<CDXLDatum>
 CMDTypeInt2GPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
-
 	return GPOS_NEW(mp)
 		CDXLDatumInt2(mp, m_mdid, true /*is_null*/, 1 /* a dummy value */);
 }

@@ -52,8 +52,6 @@ CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 CMDColumn::~CMDColumn()
 {
 	GPOS_DELETE(m_mdname);
-	m_mdid_type->Release();
-	SafeRelease(m_dxl_default_val);
 }
 
 

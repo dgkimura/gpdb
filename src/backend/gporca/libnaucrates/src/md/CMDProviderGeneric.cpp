@@ -55,11 +55,6 @@ CMDProviderGeneric::CMDProviderGeneric(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CMDProviderGeneric::~CMDProviderGeneric()
 {
-	m_mdid_int2->Release();
-	m_mdid_int4->Release();
-	m_mdid_int8->Release();
-	m_mdid_bool->Release();
-	m_mdid_oid->Release();
 }
 
 //---------------------------------------------------------------------------

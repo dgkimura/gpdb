@@ -50,7 +50,7 @@ CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
-										 CColRefArray *colref_array)
+										 gpos::Ref<CColRefArray> colref_array)
 	: CLogical(mp),
 	  m_id(id),
 	  m_pdrgpcr(colref_array),
@@ -76,10 +76,6 @@ CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
 //---------------------------------------------------------------------------
 CLogicalCTEConsumer::~CLogicalCTEConsumer()
 {
-	SafeRelease(m_pdrgpcr);
-	SafeRelease(m_pexprInlined);
-	SafeRelease(m_phmulcr);
-	SafeRelease(m_pcrsOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -120,7 +116,6 @@ CLogicalCTEConsumer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 )
 {
-	m_pcrsOutput->AddRef();
 	return m_pcrsOutput;
 }
 
@@ -174,7 +169,6 @@ CLogicalCTEConsumer::DeriveKeyCollection(CMemoryPool *,		  //mp,
 	gpos::Ref<CKeyCollection> pkc = pexpr->DeriveKeyCollection();
 	if (nullptr != pkc)
 	{
-		pkc->AddRef();
 	}
 
 	return pkc;
@@ -194,7 +188,7 @@ CLogicalCTEConsumer::DerivePartitionInfo(CMemoryPool *,		  //mp,
 ) const
 {
 	gpos::Ref<CPartInfo> ppartInfo = m_pexprInlined->DerivePartitionInfo();
-	ppartInfo->AddRef();
+
 
 	return ppartInfo;
 }
@@ -315,9 +309,10 @@ CLogicalCTEConsumer::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalCTEConsumer::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array = nullptr;
+	gpos::Ref<CColRefArray> colref_array = nullptr;
 	if (must_exist)
 	{
 		colref_array =
@@ -339,10 +334,10 @@ CLogicalCTEConsumer::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalCTEConsumer::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfInlineCTEConsumer);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementCTEConsumer);
 	return xform_set;
@@ -365,11 +360,12 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 	gpos::Ref<CPropConstraint> ppc = pexprProducer->DerivePropertyConstraint();
-	CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+	gpos::Ref<CColRefSetArray> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
 	gpos::Ref<CConstraint> pcnstr = ppc->Pcnstr();
 
 	// remap producer columns to consumer columns
-	CColRefSetArray *pdrgpcrsMapped = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::Ref<CColRefSetArray> pdrgpcrsMapped =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -398,9 +394,10 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalCTEConsumer::PstatsDerive(CMemoryPool *mp,
-								  CExpressionHandle &,	//exprhdl,
-								  IStatisticsArray *	// statistics_array
+CLogicalCTEConsumer::PstatsDerive(
+	CMemoryPool *mp,
+	CExpressionHandle &,		 //exprhdl,
+	gpos::Ref<IStatisticsArray>	 // statistics_array
 ) const
 {
 	gpos::Ref<CExpression> pexprProducer =

@@ -78,26 +78,25 @@ CXformGbAgg2ScalarAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
+
 
 	// extract components
 	gpos::Ref<CExpression> pexprRel = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref children
-	pexprRel->AddRef();
-	pexprScalar->AddRef();
 
-	CColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+
+
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != nullptr && 0 != pdrgpcrArgDQA->Size())
 	{
-		pdrgpcrArgDQA->AddRef();
 	}
 
 	// create alternative expression

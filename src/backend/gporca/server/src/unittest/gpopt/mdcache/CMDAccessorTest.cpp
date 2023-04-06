@@ -98,7 +98,7 @@ CMDAccessorTest::EresUnittest_Basic()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -200,11 +200,7 @@ CMDAccessorTest::EresUnittest_Basic()
 
 #endif
 
-	pmdidObject1->Release();
-	pmdidObject2->Release();
-	agg_mdid->Release();
-	mdid_op->Release();
-	mdid_type->Release();
+
 
 	return GPOS_OK;
 }
@@ -225,7 +221,7 @@ CMDAccessorTest::EresUnittest_Datum()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -276,9 +272,8 @@ CMDAccessorTest::EresUnittest_Datum()
 #endif
 
 	// cleanup
-	pdatumInt4->Release();
-	pdatumBool->Release();
-	pdatumOid->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -299,7 +294,7 @@ CMDAccessorTest::EresUnittest_DatumGeneric()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// attempt to obtain a generic type from the cache should assert
@@ -325,7 +320,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -367,7 +362,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 
 #endif
 
-	mdid_func->Release();
+
 
 	return GPOS_OK;
 }
@@ -395,7 +390,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -439,7 +434,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 #endif	// GPOS_DEBUG
 	}
 
-	rel_mdid->Release();
+
 	return GPOS_OK;
 }
 
@@ -466,7 +461,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -484,7 +479,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 
 	// create the array of column reference for the table columns
 	// for the DXL to Expr translation
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	const ULONG num_cols = pmdrel->ColumnCount() - pmdrel->SystemColumnsCount();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
@@ -517,9 +512,8 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 #endif	// GPOS_DEBUG
 
 	// clean up
-	pexpr->Release();
-	colref_array->Release();
-	rel_mdid->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -542,7 +536,7 @@ CMDAccessorTest::EresUnittest_Cast()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -603,7 +597,7 @@ CMDAccessorTest::EresUnittest_ScCmp()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -645,7 +639,7 @@ CMDAccessorTest::EresUnittest_Negative()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// lookup a non-existing objects
@@ -656,7 +650,7 @@ CMDAccessorTest::EresUnittest_Negative()
 	// call should result in an exception
 	(void) mda.RetrieveRel(pmdidNonExistingObject);
 
-	pmdidNonExistingObject->Release();
+
 
 	return GPOS_OK;
 }
@@ -692,7 +686,7 @@ CMDAccessorTest::PvLookupSingleObj(void *pv)
 
 	// lookup object
 	(void) md_accessor->RetrieveRel(mdid);
-	mdid->Release();
+
 
 	return nullptr;
 }
@@ -730,7 +724,6 @@ CMDAccessorTest::PvLookupMultipleObj(void *pv)
 			CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /*OID*/,
 					  1 /*major*/, ul + 1 /*minor*/);
 		(void) md_accessor->RetrieveRel(mdid);
-		mdid->Release();
 	}
 
 	return nullptr;
@@ -764,7 +757,7 @@ CMDAccessorTest::PvInitMDAAndLookup(void *pv)
 	{
 		// Setup an MD cache with a file-based provider
 		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-		pmdp->AddRef();
+
 		CMDAccessor mda(mp, pcache, CTestUtils::m_sysidDefault, pmdp);
 
 		// task parameters

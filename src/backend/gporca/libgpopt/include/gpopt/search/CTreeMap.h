@@ -61,7 +61,7 @@ private:
 
 	// arrays of internal nodes
 	using CTreeNodeArray = CDynamicPtrArray<CTreeNode, CleanupNULL>;
-	using CTreeNode2dArray = CDynamicPtrArray<CTreeNodeArray, CleanupRelease>;
+	using CTreeNode2dArray = gpos::Vector<gpos::Ref<CTreeNodeArray>>;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -230,7 +230,6 @@ private:
 		// dtor
 		~CTreeNode()
 		{
-			m_pdrgdrgptn->Release();
 		}
 
 		// add child alternative
@@ -415,7 +414,7 @@ private:
 	TMap *m_ptmap;
 
 	// map of nodes to outgoing links
-	LinkMap *m_plinkmap;
+	gpos::Ref<LinkMap> m_plinkmap;
 
 	// recursive count starting in given node
 	ULLONG UllCount(CTreeNode *ptn);
@@ -464,9 +463,6 @@ public:
 	// dtor
 	~CTreeMap()
 	{
-		m_ptmap->Release();
-		m_plinkmap->Release();
-
 		GPOS_DELETE(m_ptnRoot);
 	}
 

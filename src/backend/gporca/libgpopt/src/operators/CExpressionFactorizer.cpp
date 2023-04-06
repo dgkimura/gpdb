@@ -66,7 +66,8 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 
 	// recursively process children
 	const ULONG arity = pexpr->Arity();
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = PexprProcessDisjDescendents(
@@ -75,7 +76,7 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 	}
 
 	gpos::Ref<COperator> pop = pexpr->Pop();
-	pop->AddRef();
+
 	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
 }
 
@@ -91,8 +92,8 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 //---------------------------------------------------------------------------
 void
 CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexprFactors,
-								 CExpressionArray *pdrgpexprResidual,
+								 gpos::Ref<CExpressionArray> pdrgpexprFactors,
+								 gpos::Ref<CExpressionArray> pdrgpexprResidual,
 								 ExprMap *pexprmapFactors,
 								 ULONG
 #ifdef GPOS_DEBUG
@@ -115,7 +116,6 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 
 		if (!fFound)
 		{
-			pexpr->AddRef();
 			pdrgpexprFactors->Append(pexpr);
 		}
 
@@ -125,7 +125,6 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	}
 	else
 	{
-		pexpr->AddRef();
 		pdrgpexprResidual->Append(pexpr);
 	}
 }
@@ -163,14 +162,13 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 	{
 		gpos::Ref<CExpression> pexprDisj = (*pexpr)[ulOuter];
 
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-		pexprDisj->AddRef();
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
+
 		pdrgpexpr->Append(pexprDisj);
 
 		if (CPredicateUtils::FAnd(pexprDisj))
 		{
-			pdrgpexpr->Release();
-			pexprDisj->PdrgPexpr()->AddRef();
 			pdrgpexpr = pexprDisj->PdrgPexpr();
 		}
 
@@ -181,7 +179,6 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 			ULONG *pul = pexprmapGlobal->Find(pexprConj);
 			if (nullptr == pul)
 			{
-				pexprConj->AddRef();
 				(void) pexprmapGlobal->Insert(pexprConj, GPOS_NEW(mp) ULONG(1));
 			}
 			else
@@ -193,14 +190,13 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 			if (*pul == ulDisjuncts)
 			{
 				// reached the count of initial disjuncts, add expression to factors map
-				pexprConj->AddRef();
+
 				(void) pexprmapFactors->Insert(pexprConj,
 											   GPOS_NEW(mp) ULONG(ulDisjuncts));
 			}
 		}
-		pdrgpexpr->Release();
 	}
-	pexprmapGlobal->Release();
+
 
 	return pexprmapFactors;
 }
@@ -230,8 +226,10 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 	// build factors map
 	ExprMap *pexprmapFactors = PexprmapFactors(mp, pexpr);
 
-	CExpressionArray *pdrgpexprResidual = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprFactors = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprResidual =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprFactors =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	// iterate over child expressions and factorize them
 	const ULONG ulDisjuncts = pexpr->Arity();
@@ -240,7 +238,7 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 		gpos::Ref<CExpression> pexprDisj = (*pexpr)[ulOuter];
 		if (CPredicateUtils::FAnd(pexprDisj))
 		{
-			CExpressionArray *pdrgpexprConjuncts =
+			gpos::Ref<CExpressionArray> pdrgpexprConjuncts =
 				GPOS_NEW(mp) CExpressionArray(mp);
 			const ULONG size = pexprDisj->Arity();
 			for (ULONG ulInner = 0; ulInner < size; ulInner++)
@@ -257,7 +255,6 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 			}
 			else
 			{
-				pdrgpexprConjuncts->Release();
 			}
 		}
 		else
@@ -266,7 +263,7 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 					  pexprmapFactors, ulDisjuncts);
 		}
 	}
-	pexprmapFactors->Release();
+
 
 	if (0 < pdrgpexprResidual->Size())
 	{
@@ -277,7 +274,6 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 	else
 	{
 		// no residuals, release created array
-		pdrgpexprResidual->Release();
 	}
 
 	// return a conjunction of all factors
@@ -324,12 +320,12 @@ CExpressionFactorizer::PexprFactorize(CMemoryPool *mp,
 	// factorization might reveal unnested AND/OR
 	gpos::Ref<CExpression> pexprUnnested =
 		CExpressionUtils::PexprUnnest(mp, pexprFactorized);
-	pexprFactorized->Release();
+
 
 	// eliminate duplicate AND/OR children
 	gpos::Ref<CExpression> pexprDeduped =
 		CExpressionUtils::PexprDedupChildren(mp, pexprUnnested);
-	pexprUnnested->Release();
+
 
 	return pexprDeduped;
 }
@@ -443,13 +439,14 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(
 //		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-CExpressionArrays *
+gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 	CMemoryPool *mp, SourceToArrayPosMap *psrc2array, BOOL fAllowNewSources,
 	ULONG ulOpSourceId)
 {
 	GPOS_ASSERT(nullptr != psrc2array);
-	CExpressionArrays *pdrgpdrgpexpr = psrc2array->Find(&ulOpSourceId);
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr =
+		psrc2array->Find(&ulOpSourceId);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the source operator we are considering
@@ -483,13 +480,13 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 // 		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-CExpressionArrays *
+gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
 	CMemoryPool *mp, ColumnToArrayPosMap *pcol2array, BOOL fAllowNewSources,
 	gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pcol2array);
-	CExpressionArrays *pdrgpdrgpexpr = pcol2array->Find(colref);
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = pcol2array->Find(colref);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the computed column we are considering
@@ -539,7 +536,7 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 		return;
 	}
 
-	CExpressionArrays *pdrgpdrgpexpr = nullptr;
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = nullptr;
 
 	if (gpos::ulong_max != ulOpSourceId)
 	{
@@ -566,7 +563,7 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 		return;
 	}
 
-	CExpressionArray *pdrgpexpr = nullptr;
+	gpos::Ref<CExpressionArray> pdrgpexpr = nullptr;
 	// there are only two cases we need to consider
 	// the first one is that we found the current source operator in all previous disjuncts
 	// and now we are starting a new sub-array for a new disjunct
@@ -588,7 +585,7 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 		return;
 	}
 
-	pexpr->AddRef();
+
 	pdrgpexpr->Append(pexpr);
 }
 
@@ -612,8 +609,9 @@ CExpressionFactorizer::PexprAddInferredFilters(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != psrc2array);
 
 	SourceToArrayPosMapIter src2arrayIter(psrc2array);
-	CExpressionArray *pdrgpexprPrefilters = GPOS_NEW(mp) CExpressionArray(mp);
-	pexpr->AddRef();
+	gpos::Ref<CExpressionArray> pdrgpexprPrefilters =
+		GPOS_NEW(mp) CExpressionArray(mp);
+
 	pdrgpexprPrefilters->Append(pexpr);
 	const ULONG ulDisjChildren = pexpr->Arity();
 
@@ -644,18 +642,18 @@ CExpressionFactorizer::PexprAddInferredFilters(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CExpressionFactorizer::AddInferredFiltersFromArray(
-	CMemoryPool *mp, const CExpressionArrays *pdrgpdrgpexpr,
-	ULONG ulDisjChildrenLength, CExpressionArray *pdrgpexprInferredFilters)
+	CMemoryPool *mp, const gpos::Ref<CExpressionArrays> pdrgpdrgpexpr,
+	ULONG ulDisjChildrenLength,
+	gpos::Ref<CExpressionArray> pdrgpexprInferredFilters)
 {
 	const ULONG ulEntryLength =
 		(pdrgpdrgpexpr == nullptr) ? 0 : pdrgpdrgpexpr->Size();
 	if (ulEntryLength == ulDisjChildrenLength)
 	{
-		CExpressionArray *pdrgpexprDisjuncts =
+		gpos::Ref<CExpressionArray> pdrgpexprDisjuncts =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulEntryLength; ++ul)
 		{
-			(*pdrgpdrgpexpr)[ul]->AddRef();
 			gpos::Ref<CExpression> pexprConj =
 				CPredicateUtils::PexprConjunction(mp, (*pdrgpdrgpexpr)[ul]);
 			pdrgpexprDisjuncts->Append(pexprConj);
@@ -767,22 +765,18 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 
 		if (fFirst && 0 == psrc2array->Size() && 0 == pcol2array->Size())
 		{
-			psrc2array->Release();
-			pcol2array->Release();
-			SafeRelease(pcrsProducedByChildren);
-			pexpr->AddRef();
 			return pexpr;
 		}
 		GPOS_CHECK_ABORT;
 	}
 	gpos::Ref<CExpression> pexprWithPrefilters =
 		PexprAddInferredFilters(mp, pexpr, psrc2array, pcol2array);
-	psrc2array->Release();
-	pcol2array->Release();
-	SafeRelease(pcrsProducedByChildren);
+
+
+
 	gpos::Ref<CExpression> pexprDeduped =
 		CExpressionUtils::PexprDedupChildren(mp, pexprWithPrefilters);
-	pexprWithPrefilters->Release();
+
 
 	return pexprDeduped;
 }

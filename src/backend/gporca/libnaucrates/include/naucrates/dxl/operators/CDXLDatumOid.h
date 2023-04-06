@@ -19,9 +19,9 @@
 #define GPDXL_CDXLDatumOid_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -73,7 +73,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumOid == dxl_datum->GetDatumType());
 
-		return dynamic_cast<gpos::Ref<CDXLDatumOid> >(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumOid>(dxl_datum);
 	}
 };
 }  // namespace gpdxl

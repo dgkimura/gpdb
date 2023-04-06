@@ -13,10 +13,10 @@
 #define GPDXL_CDXLLogicalGroupBy_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class CDXLLogicalGroupBy : public CDXLLogical
 {
 private:
 	// grouping column ids
-	ULongPtrArray *m_grouping_colid_array;
+	gpos::Ref<ULongPtrArray> m_grouping_colid_array;
 
 	// serialize output grouping columns indices in DXL
 	void SerializeGrpColsToDXL(CXMLSerializer *) const;
@@ -41,7 +41,8 @@ public:
 
 	// ctors
 	explicit CDXLLogicalGroupBy(CMemoryPool *mp);
-	CDXLLogicalGroupBy(CMemoryPool *mp, ULongPtrArray *pdrgpulGrpColIds);
+	CDXLLogicalGroupBy(CMemoryPool *mp,
+					   gpos::Ref<ULongPtrArray> pdrgpulGrpColIds);
 
 	// dtor
 	~CDXLLogicalGroupBy() override;
@@ -49,10 +50,10 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	const gpos::Ref<ULongPtrArray> GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingColumns(ULongPtrArray *);
+	void SetGroupingColumns(gpos::Ref<ULongPtrArray>);
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
@@ -65,7 +66,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalGrpBy == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalGroupBy> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalGroupBy>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

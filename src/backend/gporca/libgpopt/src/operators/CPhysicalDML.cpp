@@ -36,7 +36,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 						   gpos::Ref<CTableDescriptor> ptabdesc,
-						   CColRefArray *pdrgpcrSource,
+						   gpos::Ref<CColRefArray> pdrgpcrSource,
 						   gpos::Ref<CBitSet> pbsModified,
 						   gpos::Ref<CColRef> pcrAction,
 						   gpos::Ref<CColRef> pcrCtid,
@@ -85,7 +85,6 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 
 		if (CLogicalDML::EdmlDelete == edmlop || !fSplit)
 		{
-			m_pds->Release();
 			m_pds = GPOS_NEW(mp) CDistributionSpecRandom();
 		}
 	}
@@ -103,12 +102,6 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 //---------------------------------------------------------------------------
 CPhysicalDML::~CPhysicalDML()
 {
-	m_ptabdesc->Release();
-	m_pdrgpcrSource->Release();
-	m_pbsModified->Release();
-	m_pds->Release();
-	m_pos->Release();
-	m_pcrsRequiredLocal->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -128,12 +121,12 @@ CPhysicalDML::PosRequired(CMemoryPool *,		  // mp
 							  child_index
 #endif	// GPOS_DEBUG
 						  ,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
-	m_pos->AddRef();
+
 	return m_pos;
 }
 
@@ -198,8 +191,8 @@ CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 							   child_index
 #endif	// GPOS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -230,8 +223,8 @@ CPhysicalDML::PdsRequired(CMemoryPool *mp,
 							  child_index
 #endif	// GPOS_DEBUG
 						  ,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -250,7 +243,7 @@ CPhysicalDML::PdsRequired(CMemoryPool *mp,
 		return GPOS_NEW(mp) CDistributionSpecRouted(m_pcrSegmentId);
 	}
 
-	m_pds->AddRef();
+
 	return m_pds;
 }
 
@@ -266,8 +259,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  gpos::Ref<CRewindabilitySpec> prsRequired,
 						  ULONG child_index,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -292,8 +285,8 @@ CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 							   child_index
 #endif
 						   ,
-						   CDrvdPropArray *,  //pdrgpdpCtxt,
-						   ULONG			  //ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+						   ULONG					   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -450,7 +443,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp,
 {
 	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 
-	const CBitSetArray *pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
+	const gpos::Ref<CBitSetArray> pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
 	if (1 < pdrgpbsKeys->Size() && CLogicalDML::EdmlUpdate == m_edmlop)
 	{
 		// if this is an update on the target table's keys, enforce order on
@@ -471,7 +464,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp,
 		{
 			gpos::Ref<IMDId> mdid =
 				m_pcrAction->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
-			mdid->AddRef();
+
 			pos->Append(mdid, m_pcrAction, COrderSpec::EntAuto);
 		}
 	}

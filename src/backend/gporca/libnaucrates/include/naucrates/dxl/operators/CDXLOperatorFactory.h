@@ -466,34 +466,39 @@ public:
 
 	// parse a GPDB mdid object from an array of its components
 	static gpos::Ref<CMDIdGPDB> GetGPDBMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem,
-		IMDId::EMDIdType mdidType = IMDId::EmdidGeneral);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem, IMDId::EMDIdType mdidType = IMDId::EmdidGeneral);
 
 	// parse a GPDB CTAS mdid object from an array of its components
 	static gpos::Ref<CMDIdGPDB> GetGPDBCTASMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a column stats mdid object from an array of its components
 	static gpos::Ref<CMDIdColStats> GetColStatsMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a relation stats mdid object from an array of its components
 	static gpos::Ref<CMDIdRelStats> GetRelStatsMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a cast func mdid from the array of its components
 	static gpos::Ref<CMDIdCast> GetCastFuncMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a comparison operator mdid from the array of its components
 	static gpos::Ref<CMDIdScCmp> GetScCmpMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::Ref<XMLChArray> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a dxl datum object
 	static gpos::Ref<CDXLDatum> GetDatumVal(
@@ -502,17 +507,17 @@ public:
 
 	// parse a comma-separated list of MDids into a dynamic array
 	// will raise an exception if list is not well-formed
-	static IMdIdArray *ExtractConvertMdIdsToArray(
+	static gpos::Ref<IMdIdArray> ExtractConvertMdIdsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *mdid_list_xml,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comma-separated list of unsigned long numbers into a dynamic array
 	// will raise an exception if list is not well-formed
-	static ULongPtrArray *ExtractConvertValuesToArray(
+	static gpos::Ref<ULongPtrArray> ExtractConvertValuesToArray(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr,
 		Edxltoken target_attr, Edxltoken target_elem);
 
-	static IntPtrArray *ExtractConvertValuesToIntArray(
+	static gpos::Ref<IntPtrArray> ExtractConvertValuesToIntArray(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr,
 		Edxltoken target_attr, Edxltoken target_elem);
 
@@ -529,7 +534,7 @@ public:
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xmlszUl,
 		Edxltoken target_attr, Edxltoken target_elem);
 
-	static ULongPtrArray *
+	static gpos::Ref<ULongPtrArray>
 	ExtractIntsToUlongArray(CDXLMemoryManager *dxl_memory_manager,
 							const XMLCh *xmlszUl, Edxltoken target_attr,
 							Edxltoken target_elem)
@@ -539,7 +544,7 @@ public:
 			dxl_memory_manager, xmlszUl, target_attr, target_elem);
 	}
 
-	static IntPtrArray *
+	static gpos::Ref<IntPtrArray>
 	ExtractIntsToIntArray(CDXLMemoryManager *dxl_memory_manager,
 						  const XMLCh *xmlszUl, Edxltoken target_attr,
 						  Edxltoken target_elem)
@@ -584,13 +589,13 @@ public:
 	// parse a semicolon-separated list of comma-separated unsigned
 	// long numbers into a dynamc array of unsigned integer arrays
 	// will raise an exception if list is not well-formed
-	static ULongPtr2dArray *ExtractConvertUlongTo2DArray(
+	static gpos::Ref<ULongPtr2dArray> ExtractConvertUlongTo2DArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comma-separated list of segment ids into a dynamic array
 	// will raise an exception if list is not well-formed
-	static IntPtrArray *ExtractConvertSegmentIdsToArray(
+	static gpos::Ref<IntPtrArray> ExtractConvertSegmentIdsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *seg_id_list_xml,
 		Edxltoken target_attr, Edxltoken target_elem);
 

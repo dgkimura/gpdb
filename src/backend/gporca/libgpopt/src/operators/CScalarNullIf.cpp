@@ -60,8 +60,6 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 //---------------------------------------------------------------------------
 CScalarNullIf::~CScalarNullIf()
 {
-	m_mdid_op->Release();
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -114,7 +112,7 @@ CScalarNullIf::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullIf::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarNullIf::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

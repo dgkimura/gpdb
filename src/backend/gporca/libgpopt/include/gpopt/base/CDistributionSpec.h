@@ -135,12 +135,11 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	virtual gpos::Ref<CDistributionSpec>
-	PdsCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PdsCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 	)
 	{
-		this->AddRef();
 		return this;
 	}
 
@@ -149,7 +148,6 @@ public:
 	virtual gpos::Ref<CDistributionSpec>
 	StripEquivColumns(CMemoryPool *)
 	{
-		AddRef();
 		return this;
 	}
 	// print
@@ -169,8 +167,7 @@ public:
 };	// class CDistributionSpec
 
 // arrays of distribution spec
-using CDistributionSpecArray =
-	CDynamicPtrArray<CDistributionSpec, CleanupRelease>;
+using CDistributionSpecArray = gpos::Vector<gpos::Ref<CDistributionSpec>>;
 }  // namespace gpopt
 
 #endif	// !GPOPT_IDistributionSpec_H

@@ -62,8 +62,6 @@ CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 //---------------------------------------------------------------------------
 CDXLWindowFrame::~CDXLWindowFrame()
 {
-	m_dxlnode_leading->Release();
-	m_dxlnode_trailing->Release();
 }
 
 //---------------------------------------------------------------------------

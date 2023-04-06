@@ -107,7 +107,7 @@ CXformTest::EresUnittest_ApplyXforms()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -124,7 +124,6 @@ CXformTest::EresUnittest_ApplyXforms()
 		ApplyExprXforms(mp, oss, pexpr);
 
 		GPOS_TRACE(str.GetBuffer());
-		pexpr->Release();
 	}
 
 	return GPOS_OK;
@@ -146,14 +145,14 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
 	// create producer
 	ULONG ulCTEId = 0;
@@ -163,9 +162,10 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 
 	pdrgpexpr->Append(pexprProducer);
 
-	CColRefArray *pdrgpcrProducer =
+	gpos::Ref<CColRefArray> pdrgpcrProducer =
 		CLogicalCTEProducer::PopConvert(pexprProducer->Pop())->Pdrgpcr();
-	CColRefArray *pdrgpcrConsumer = CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
+	gpos::Ref<CColRefArray> pdrgpcrConsumer =
+		CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
 
 	gpos::Ref<CExpression> pexprConsumer = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumer));
@@ -173,12 +173,12 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 	pdrgpexpr->Append(pexprConsumer);
 	COptCtxt::PoctxtFromTLS()->Pcteinfo()->IncrementConsumers(ulCTEId);
 
-	pexprConsumer->AddRef();
+
 	gpos::Ref<CExpression> pexprSelect =
 		CTestUtils::PexprLogicalSelect(mp, pexprConsumer);
 	pdrgpexpr->Append(pexprSelect);
 
-	pexprSelect->AddRef();
+
 	gpos::Ref<CExpression> pexprAnchor = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprSelect);
 
@@ -194,7 +194,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 
 		GPOS_TRACE(str.GetBuffer());
 	}
-	pdrgpexpr->Release();
+
 
 	return GPOS_OK;
 }
@@ -253,9 +253,6 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os,
 				(void) pxfres->OsPrint(os);
 			}
 #endif	// GPOS_DEBUG
-
-			pxfres->Release();
-			pxfctxt->Release();
 		}
 	}
 }

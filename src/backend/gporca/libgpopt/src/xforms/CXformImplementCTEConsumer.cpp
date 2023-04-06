@@ -64,7 +64,7 @@ CXformImplementCTEConsumer::Transform(gpos::Ref<CXformContext> pxfctxt,
 									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalCTEConsumer> popCTEConsumer =
@@ -74,12 +74,12 @@ CXformImplementCTEConsumer::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 	ULONG id = popCTEConsumer->UlCTEId();
 
-	CColRefArray *colref_array = popCTEConsumer->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popCTEConsumer->Pdrgpcr();
 
-	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
+
+	gpos::Ref<UlongToColRefMap> colref_mapping = popCTEConsumer->Phmulcr();
 	GPOS_ASSERT(nullptr != colref_mapping);
-	colref_mapping->AddRef();
+
 
 	// create physical CTE Consumer
 	gpos::Ref<CExpression> pexprAlt =

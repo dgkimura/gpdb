@@ -33,9 +33,10 @@ public:
 	CPhysicalDynamicForeignScan(
 		CMemoryPool *mp, const CName *pnameAlias,
 		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
-		CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
-		IMdIdArray *partition_mdids,
-		ColRefToUlongMapArray *root_col_mapping_per_part,
+		gpos::Ref<CColRefArray> pdrgpcrOutput,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part,
 		OID foreign_server_oid, BOOL is_master_only);
 
 
@@ -56,10 +57,11 @@ public:
 	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// statistics derivation during costing
-	gpos::Ref<IStatistics> PstatsDerive(CMemoryPool *,			   // mp
-										CExpressionHandle &,	   // exprhdl
-										gpos::Ref<CReqdPropPlan>,  // prpplan
-										IStatisticsArray *		   //stats_ctxt
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *,				 // mp
+		CExpressionHandle &,		 // exprhdl
+		gpos::Ref<CReqdPropPlan>,	 // prpplan
+		gpos::Ref<IStatisticsArray>	 //stats_ctxt
 	) const override;
 
 	OID

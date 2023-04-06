@@ -65,8 +65,6 @@ CPartitionPropagationSpec::CPartitionPropagationSpec(CMemoryPool *mp)
 // dtor
 CPartitionPropagationSpec::~CPartitionPropagationSpec()
 {
-	m_part_prop_spec_infos->Release();
-	m_scan_ids->Release();
 }
 
 BOOL
@@ -143,7 +141,7 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 	GPOS_RTL_ASSERT(!Contains(scan_id));
 
 	CMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
-	rool_rel_mdid->AddRef();
+
 
 	// Constructing 'SPartPropSpecInfo' for the received scan-id & PartPropSpecInfoType
 	// This structure is a data member of CPartitionPropagationSpec and hence
@@ -165,7 +163,6 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 	// we only add propagator if we have predicate on the partition key
 	if (expr != nullptr)
 	{
-		expr->AddRef();
 		info->m_filter_expr = expr;
 	}
 	m_scan_ids->ExchangeSet(scan_id);
@@ -403,11 +400,9 @@ CPartitionPropagationSpec::IsUnsupportedPartSelector(
 //
 //---------------------------------------------------------------------------
 void
-CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   gpos::Ref<CReqdPropPlan>,
-										   CExpressionArray *pdrgpexpr,
-										   gpos::Ref<CExpression> expr)
+CPartitionPropagationSpec::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::Ref<CReqdPropPlan>,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CExpression> expr)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos);
 	while (hmulpi.Advance())
@@ -422,9 +417,7 @@ CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 		gpos::Ref<COptCtxt> opt_ctxt = COptCtxt::PoctxtFromTLS();
 		ULONG selector_id = opt_ctxt->NextPartSelectorId();
 
-		info->m_root_rel_mdid->AddRef();
-		info->m_filter_expr->AddRef();
-		expr->AddRef();
+
 
 		gpos::Ref<CExpression> part_selector = GPOS_NEW(mp)
 			CExpression(mp,
@@ -435,8 +428,8 @@ CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 
 		gpos::Ref<IStatistics> stats = exprhdl.Pstats();
 
-		info->m_filter_expr->AddRef();
-		stats->AddRef();
+
+
 		opt_ctxt->AddPartSelectorInfo(
 			selector_id, GPOS_NEW(mp) SPartSelectorInfoEntry(
 							 selector_id, info->m_filter_expr, stats));

@@ -230,14 +230,15 @@ public:
 	CJoinOrder(const CJoinOrder &) = delete;
 
 	// ctor used in MinCard, Greedy and DP xforms
-	CJoinOrder(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-			   CExpressionArray *pdrgpexprConjuncts,
+	CJoinOrder(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+			   gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 			   BOOL include_outer_join_childs);
 
 	// ctor used in CXformExpandNAryJoinDPv2
-	CJoinOrder(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-			   CExpressionArray *innerJoinPredConjuncts,
-			   CExpressionArray *onPreds, ULongPtrArray *childPredIndexes);
+	CJoinOrder(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+			   gpos::Ref<CExpressionArray> innerJoinPredConjuncts,
+			   gpos::Ref<CExpressionArray> onPreds,
+			   gpos::Ref<ULongPtrArray> childPredIndexes);
 
 	// dtor
 	virtual ~CJoinOrder();

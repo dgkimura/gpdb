@@ -61,7 +61,7 @@ public:
 };
 
 // arrays of MD providers
-using CMDProviderArray = CDynamicPtrArray<IMDProvider, CleanupRelease>;
+using CMDProviderArray = gpos::Vector<gpos::Ref<IMDProvider>>;
 
 }  // namespace gpmd
 

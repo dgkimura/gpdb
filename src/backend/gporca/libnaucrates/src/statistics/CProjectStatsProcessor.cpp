@@ -19,20 +19,22 @@ using namespace gpopt;
 
 //  return a statistics object for a project operation
 gpos::Ref<CStatistics>
-CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
-									  const gpos::Ref<CStatistics> input_stats,
-									  ULongPtrArray *projection_colids,
-									  UlongToIDatumMap *datum_map)
+CProjectStatsProcessor::CalcProjStats(
+	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
+	gpos::Ref<ULongPtrArray> projection_colids,
+	gpos::Ref<UlongToIDatumMap> datum_map)
 {
 	GPOS_ASSERT(nullptr != projection_colids);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::Ref<UlongToHistogramMap> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::Ref<UlongToDoubleMap> colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG length = projection_colids->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -43,7 +45,8 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 		if (nullptr == histogram)
 		{
 			// create histogram for the new project column
-			CBucketArray *proj_col_bucket = GPOS_NEW(mp) CBucketArray(mp);
+			gpos::Ref<CBucketArray> proj_col_bucket =
+				GPOS_NEW(mp) CBucketArray(mp);
 			CDouble null_freq = 0.0;
 
 			BOOL is_well_defined = false;
@@ -72,7 +75,6 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 			if (0 == proj_col_bucket->Size() &&
 				IMDType::EtiBool == colref->RetrieveType()->GetDatumType())
 			{
-				proj_col_bucket->Release();
 				proj_col_histogram = CHistogram::MakeDefaultBoolHistogram(mp);
 			}
 			else

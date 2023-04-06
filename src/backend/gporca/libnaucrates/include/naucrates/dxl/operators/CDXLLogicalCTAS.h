@@ -13,11 +13,11 @@
 #define GPDXL_CDXLLogicalCTAS_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/md/IMDRelation.h"
-
 namespace gpdxl
 {
 // fwd decl
@@ -47,7 +47,7 @@ private:
 	CMDName *m_mdname_rel;
 
 	// list of columns
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// storage options
 	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
@@ -56,13 +56,13 @@ private:
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
 	// list of distribution column positions
-	ULongPtrArray *m_distr_column_pos_array;
+	gpos::Ref<ULongPtrArray> m_distr_column_pos_array;
 
 	// list of distribution column opfamilies
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// list of distribution column opclasses for populating dist policy of created table
-	IMdIdArray *m_distr_opclasses;
+	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;
@@ -71,11 +71,11 @@ private:
 	IMDRelation::Erelstoragetype m_rel_storage_type;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 	// list of vartypmod for target expressions
 	// typemod records type-specific, e.g. the maximum length of a character column
-	IntPtrArray *m_vartypemod_array;
+	gpos::Ref<IntPtrArray> m_vartypemod_array;
 
 public:
 	CDXLLogicalCTAS(const CDXLLogicalCTAS &) = delete;
@@ -83,15 +83,15 @@ public:
 	// ctor
 	CDXLLogicalCTAS(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 					CMDName *mdname_schema, CMDName *mdname_rel,
-					CDXLColDescrArray *dxl_col_descr_array,
+					gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
 					gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_option,
 					IMDRelation::Ereldistrpolicy rel_distr_policy,
-					ULongPtrArray *distr_column_pos_array,
-					IMdIdArray *distr_opfamilies, IMdIdArray *distr_opclasses,
-					BOOL fTemporary,
+					gpos::Ref<ULongPtrArray> distr_column_pos_array,
+					gpos::Ref<IMdIdArray> distr_opfamilies,
+					gpos::Ref<IMdIdArray> distr_opclasses, BOOL fTemporary,
 					IMDRelation::Erelstoragetype rel_storage_type,
-					ULongPtrArray *src_colids_array,
-					IntPtrArray *vartypemod_array);
+					gpos::Ref<ULongPtrArray> src_colids_array,
+					gpos::Ref<IntPtrArray> vartypemod_array);
 
 	// dtor
 	~CDXLLogicalCTAS() override;
@@ -124,7 +124,7 @@ public:
 	}
 
 	// column descriptors
-	CDXLColDescrArray *
+	gpos::Ref<CDXLColDescrArray>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -145,35 +145,35 @@ public:
 	}
 
 	// distribution column positions
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDistrColPosArray() const
 	{
 		return m_distr_column_pos_array;
 	}
 
 	// distribution column opfamilies
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetDistrOpfamilies() const
 	{
 		return m_distr_opfamilies;
 	}
 
 	// distribution column opclasses
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetDistrOpclasses() const
 	{
 		return m_distr_opclasses;
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetSrcColidsArray() const
 	{
 		return m_src_colids_array;
 	}
 
 	// list of vartypmod for target expressions
-	IntPtrArray *
+	gpos::Ref<IntPtrArray>
 	GetVarTypeModArray() const
 	{
 		return m_vartypemod_array;
@@ -214,7 +214,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTAS == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalCTAS> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTAS>(dxl_op);
 	}
 };
 }  // namespace gpdxl

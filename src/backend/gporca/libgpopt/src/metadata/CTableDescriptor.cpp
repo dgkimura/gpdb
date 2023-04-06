@@ -78,13 +78,6 @@ CTableDescriptor::CTableDescriptor(
 //---------------------------------------------------------------------------
 CTableDescriptor::~CTableDescriptor()
 {
-	m_mdid->Release();
-
-	m_pdrgpcoldesc->Release();
-	m_pdrgpcoldescDist->Release();
-	m_pdrgpulPart->Release();
-	m_pdrgpbsKeys->Release();
-	SafeRelease(m_distr_opfamilies);
 }
 
 
@@ -116,7 +109,7 @@ CTableDescriptor::ColumnCount() const
 //---------------------------------------------------------------------------
 ULONG
 CTableDescriptor::UlPos(const gpos::Ref<CColumnDescriptor> pcoldesc,
-						const CColumnDescriptorArray *pdrgpcoldesc)
+						const gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 	GPOS_ASSERT(nullptr != pdrgpcoldesc);
@@ -190,14 +183,14 @@ void
 CTableDescriptor::AddDistributionColumn(ULONG ulPos, gpos::Ref<IMDId> opfamily)
 {
 	gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
-	pcoldesc->AddRef();
+
 	m_pdrgpcoldescDist->Append(pcoldesc);
 	pcoldesc->SetAsDistCol();
 
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 	{
 		GPOS_ASSERT(nullptr != opfamily && opfamily->IsValid());
-		opfamily->AddRef();
+
 		m_distr_opfamilies->Append(opfamily);
 
 		GPOS_ASSERT(m_pdrgpcoldescDist->Size() == m_distr_opfamilies->Size());

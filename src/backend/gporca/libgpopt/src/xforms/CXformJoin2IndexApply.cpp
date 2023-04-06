@@ -137,8 +137,6 @@ CXformJoin2IndexApply::CreateHomogeneousIndexApplyAlternatives(
 	}
 
 	//clean-up
-	pcrsReqd->Release();
-	outer_refs->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -163,7 +161,7 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 	gpos::Ref<CXformResult> pxfres)
 {
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
@@ -186,7 +184,6 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 	}
 
 	//clean-up
-	pdrgpexpr->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -205,7 +202,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	gpos::Ref<CExpression> origJoinPred,
 	gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-	CMDAccessor *md_accessor, CExpressionArray *pdrgpexprConjuncts,
+	CMDAccessor *md_accessor, gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 	gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
 	gpos::Ref<CColRefSet> pcrsReqd, const gpos::Ref<IMDRelation> pmdrel,
 	const gpos::Ref<IMDIndex> pmdindex, gpos::Ref<CXformResult> pxfres)
@@ -218,7 +215,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		CColRefArray *colref_array = outer_refs->Pdrgpcr(mp);
+		gpos::Ref<CColRefArray> colref_array = outer_refs->Pdrgpcr(mp);
 		gpos::Ref<CExpression> indexGetWithOptionalSelect =
 			pexprLogicalIndexGet;
 
@@ -227,7 +224,6 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 			indexGetWithOptionalSelect =
 				CXformUtils::PexprRedundantSelectForDynamicIndex(
 					mp, pexprLogicalIndexGet);
-			pexprLogicalIndexGet->Release();
 		}
 
 		gpos::Ref<CExpression> rightChildOfApply =
@@ -251,7 +247,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 				return;
 		}
 
-		pexprOuter->AddRef();
+
 		gpos::Ref<CExpression> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
@@ -290,7 +286,7 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		CColRefArray *colref_array = outer_refs->Pdrgpcr(mp);
+		gpos::Ref<CColRefArray> colref_array = outer_refs->Pdrgpcr(mp);
 		gpos::Ref<CExpression> indexGetWithOptionalSelect =
 			pexprLogicalIndexGet;
 
@@ -299,7 +295,6 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 			indexGetWithOptionalSelect =
 				CXformUtils::PexprRedundantSelectForDynamicIndex(
 					mp, pexprLogicalIndexGet);
-			pexprLogicalIndexGet->Release();
 		}
 
 		gpos::Ref<CExpression> rightChildOfApply =
@@ -323,7 +318,7 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 				return;
 		}
 
-		pexprOuter->AddRef();
+
 		gpos::Ref<CExpression> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)

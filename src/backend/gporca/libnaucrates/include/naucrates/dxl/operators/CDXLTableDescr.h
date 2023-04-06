@@ -45,7 +45,7 @@ private:
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	CDXLColDescrArray *m_dxl_column_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_dxl_column_descr_array;
 
 	// id of user the table needs to be accessed with
 	ULONG m_execute_as_user_id;
@@ -72,7 +72,8 @@ public:
 	~CDXLTableDescr() override;
 
 	// setters
-	void SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array);
+	void SetColumnDescriptors(
+		gpos::Ref<CDXLColDescrArray> dxl_column_descr_array);
 
 	void AddColumnDescr(gpos::Ref<CDXLColDescr> pdxlcd);
 

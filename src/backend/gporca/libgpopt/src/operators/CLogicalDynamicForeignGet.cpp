@@ -49,8 +49,10 @@ CLogicalDynamicForeignGet::CLogicalDynamicForeignGet(CMemoryPool *mp)
 CLogicalDynamicForeignGet::CLogicalDynamicForeignGet(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids, OID foreign_server_oid, BOOL is_master_only)
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids, OID foreign_server_oid,
+	BOOL is_master_only)
 
 
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
@@ -93,9 +95,10 @@ CLogicalDynamicForeignGet::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalDynamicForeignGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -106,11 +109,11 @@ CLogicalDynamicForeignGet::PopCopyWithRemappedColumns(
 		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput,
 											 colref_mapping, must_exist);
 	}
-	CColRef2dArray *pdrgpdrgpcrPart =
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart =
 		PdrgpdrgpcrCreatePartCols(mp, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
-	m_ptabdesc->AddRef();
-	m_partition_mdids->AddRef();
+
+
 
 	return GPOS_NEW(mp) CLogicalDynamicForeignGet(
 		mp, pnameAlias, m_ptabdesc, m_scan_id, pdrgpcrOutput, pdrgpdrgpcrPart,
@@ -125,10 +128,10 @@ CLogicalDynamicForeignGet::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDynamicForeignGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(
 		CXform::ExfDynamicForeignGet2DynamicForeignScan);
 
@@ -138,7 +141,7 @@ CLogicalDynamicForeignGet::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalDynamicForeignGet::PstatsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										IStatisticsArray *	// not used
+										gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	// requesting stats on distribution columns to estimate data skew

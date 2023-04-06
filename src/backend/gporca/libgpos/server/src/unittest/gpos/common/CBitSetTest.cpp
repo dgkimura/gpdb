@@ -78,7 +78,7 @@ CBitSetTest::EresUnittest_Basics()
 
 	// delete old bitset to make sure we're not accidentally
 	// using any of its memory
-	pbs->Release();
+
 
 	for (ULONG i = 0; i < cInserts; i++)
 	{
@@ -91,7 +91,7 @@ CBitSetTest::EresUnittest_Basics()
 	os << *pbsCopy << std::endl;
 	GPOS_TRACE(str.GetBuffer());
 
-	pbsCopy->Release();
+
 
 	return GPOS_OK;
 }
@@ -138,8 +138,7 @@ CBitSetTest::EresUnittest_Removal()
 	GPOS_ASSERT(pbs->Equals(pbsEmpty));
 	GPOS_ASSERT(pbsEmpty->Equals(pbs));
 
-	pbs->Release();
-	pbsEmpty->Release();
+
 
 	return GPOS_OK;
 }
@@ -191,7 +190,7 @@ CBitSetTest::EresUnittest_SetOps()
 	pbs->Difference(pbs2);
 	GPOS_ASSERT(pbs->Equals(pbs1));
 
-	pbs1->Release();
+
 
 	pbs->Union(pbs2);
 	pbs->Intersection(pbs2);
@@ -200,9 +199,7 @@ CBitSetTest::EresUnittest_SetOps()
 
 	GPOS_ASSERT(pbs->Size() == pbs2->Size());
 
-	pbs2->Release();
 
-	pbs->Release();
 
 	// Test that intersection properly deletes links
 	gpos::Ref<CBitSet> pbs4 = GPOS_NEW(mp) CBitSet(mp, vector_size);
@@ -215,8 +212,8 @@ CBitSetTest::EresUnittest_SetOps()
 	pbs5->ExchangeClear(50);
 	GPOS_ASSERT(pbs4->Equals(pbs5));
 
-	pbs4->Release();
-	pbs5->Release();
+
+
 	return GPOS_OK;
 }
 
@@ -256,8 +253,7 @@ CBitSetTest::EresUnittest_Performance()
 		pbsTest->Intersection(pbsBase);
 	}
 
-	pbsTest->Release();
-	pbsBase->Release();
+
 
 	return GPOS_OK;
 }

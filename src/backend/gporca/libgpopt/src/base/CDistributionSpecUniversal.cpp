@@ -64,7 +64,7 @@ CDistributionSpecUniversal::Matches(
 void
 CDistributionSpecUniversal::AppendEnforcers(CMemoryPool *, CExpressionHandle &,
 											gpos::Ref<CReqdPropPlan>,
-											CExpressionArray *,
+											gpos::Ref<CExpressionArray>,
 											gpos::Ref<CExpression>)
 {
 	GPOS_ASSERT(!"attempt to enforce UNIVERSAL distribution");
@@ -88,6 +88,6 @@ CDistributionSpecUniversal::PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	GPOS_ASSERT(nullptr != pds);
 	GPOS_ASSERT(EdtAny == pds->Edt());
 
-	return dynamic_cast<gpos::Ref<CDistributionSpecUniversal> >(pds);
+	return gpos::dyn_cast<CDistributionSpecUniversal>(pds);
 }
 }  // namespace gpopt

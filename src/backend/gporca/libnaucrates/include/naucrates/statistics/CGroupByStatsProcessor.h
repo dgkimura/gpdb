@@ -23,7 +23,8 @@ public:
 	// group by
 	static gpos::Ref<CStatistics> CalcGroupByStats(
 		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-		ULongPtrArray *GCs, ULongPtrArray *aggs, gpos::Ref<CBitSet> keys);
+		gpos::Ref<ULongPtrArray> GCs, gpos::Ref<ULongPtrArray> aggs,
+		gpos::Ref<CBitSet> keys);
 };
 }  // namespace gpnaucrates
 

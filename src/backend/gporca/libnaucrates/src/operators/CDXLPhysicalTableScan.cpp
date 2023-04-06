@@ -57,7 +57,6 @@ CDXLPhysicalTableScan::CDXLPhysicalTableScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalTableScan::~CDXLPhysicalTableScan()
 {
-	SafeRelease(m_dxl_table_descr);
 }
 
 

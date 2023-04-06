@@ -13,9 +13,9 @@
 #define GPDXL_CDXLScalarDMLAction_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -53,7 +53,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarDMLAction == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarDMLAction> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarDMLAction>(dxl_op);
 	}
 
 	// does the operator return a boolean result

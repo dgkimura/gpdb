@@ -34,11 +34,10 @@ CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList(
 // dtor
 CParseHandlerMDIndexInfoList::~CParseHandlerMDIndexInfoList()
 {
-	SafeRelease(m_mdindex_info_array);
 }
 
 // returns array of indexinfo
-CMDIndexInfoArray *
+gpos::Ref<CMDIndexInfoArray>
 CParseHandlerMDIndexInfoList::GetMdIndexInfoArray()
 {
 	return m_mdindex_info_array;

@@ -13,10 +13,9 @@
 #define GPDXL_CDXLScalarOneTimeFilter_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalarFilter.h"
-
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -47,7 +46,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarOneTimeFilter> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarOneTimeFilter>(dxl_op);
 	}
 
 	// serialize operator in DXL format

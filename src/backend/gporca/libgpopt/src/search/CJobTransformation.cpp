@@ -139,7 +139,7 @@ CJobTransformation::EevtTransform(CSchedulerContext *psc, CJob *pjOwner)
 					  &ulNumberOfBindings);
 	psc->Peng()->InsertXformResult(pgexpr->Pgroup(), pxfres, pxform->Exfid(),
 								   pgexpr, ulElapsedTime, ulNumberOfBindings);
-	pxfres->Release();
+
 
 	return eevCompleted;
 }

@@ -41,10 +41,10 @@ protected:
 	ULONG m_scan_id;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcrPart;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for master only tables)
 	gpos::Ref<CColRefSet> m_pcrsDist;
@@ -54,19 +54,20 @@ protected:
 
 	// given a colrefset from a table, get colids and attno
 	void ExtractColIdsAttno(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-							ULongPtrArray *colids,
-							ULongPtrArray *pdrgpulPos) const;
+							gpos::Ref<ULongPtrArray> colids,
+							gpos::Ref<ULongPtrArray> pdrgpulPos) const;
 
 	// Child partitions
-	IMdIdArray *m_partition_mdids = nullptr;
+	gpos::Ref<IMdIdArray> m_partition_mdids = nullptr;
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
-	ColRefToUlongMapArray *m_root_col_mapping_per_part = nullptr;
+	gpos::Ref<ColRefToUlongMapArray> m_root_col_mapping_per_part = nullptr;
 
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
-	static ColRefToUlongMapArray *ConstructRootColMappingPerPart(
-		CMemoryPool *mp, CColRefArray *root_cols, IMdIdArray *partition_mdids);
+	static gpos::Ref<ColRefToUlongMapArray> ConstructRootColMappingPerPart(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> root_cols,
+		gpos::Ref<IMdIdArray> partition_mdids);
 
 public:
 	// ctors
@@ -74,19 +75,19 @@ public:
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
 						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
-						   CColRefArray *pdrgpcrOutput,
-						   CColRef2dArray *pdrgpdrgpcrPart,
-						   IMdIdArray *partition_mdids);
+						   gpos::Ref<CColRefArray> pdrgpcrOutput,
+						   gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
 						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
-						   IMdIdArray *partition_mdids);
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor
 	~CLogicalDynamicGetBase() override;
 
 	// accessors
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -121,7 +122,7 @@ public:
 	}
 
 	// return the partition columns
-	virtual CColRef2dArray *
+	virtual gpos::Ref<CColRef2dArray>
 	PdrgpdrgpcrPart() const
 	{
 		return m_pdrgpdrgpcrPart;
@@ -165,13 +166,13 @@ public:
 		return m_ptabdesc;
 	}
 
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetPartitionMdids() const
 	{
 		return m_partition_mdids;
 	}
 
-	ColRefToUlongMapArray *
+	gpos::Ref<ColRefToUlongMapArray>
 	GetRootColMappingPerPart() const
 	{
 		return m_root_col_mapping_per_part;

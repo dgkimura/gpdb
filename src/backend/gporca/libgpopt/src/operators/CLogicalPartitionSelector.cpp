@@ -43,7 +43,8 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::CLogicalPartitionSelector(
-	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CExpressionArray *pdrgpexprFilters)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+	gpos::Ref<CExpressionArray> pdrgpexprFilters)
 	: CLogical(mp), m_mdid(mdid), m_pdrgpexprFilters(pdrgpexprFilters)
 {
 	GPOS_ASSERT(mdid->IsValid());
@@ -61,8 +62,6 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::~CLogicalPartitionSelector()
 {
-	SafeRelease(m_mdid);
-	SafeRelease(m_pdrgpexprFilters);
 }
 
 //---------------------------------------------------------------------------
@@ -112,12 +111,13 @@ CLogicalPartitionSelector::HashValue() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL /* must_exist */)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL /* must_exist */)
 {
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		CUtils::PdrgpexprRemap(mp, m_pdrgpexprFilters, colref_mapping);
 
-	m_mdid->AddRef();
+
 
 	return GPOS_NEW(mp) CLogicalPartitionSelector(mp, m_mdid, pdrgpexpr);
 }
@@ -165,10 +165,10 @@ CLogicalPartitionSelector::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalPartitionSelector::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementPartitionSelector);
 	return xform_set;
 }

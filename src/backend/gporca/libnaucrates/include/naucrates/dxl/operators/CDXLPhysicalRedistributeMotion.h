@@ -15,9 +15,9 @@
 #define GPDXL_CDXLPhysicalRedistributeMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalMotion.h"
-
 namespace gpdxl
 {
 // indices of redistribute motion elements in the children array
@@ -86,7 +86,7 @@ public:
 		GPOS_ASSERT(EdxlopPhysicalMotionRedistribute ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalRedistributeMotion> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalRedistributeMotion>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

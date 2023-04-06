@@ -63,10 +63,10 @@ CLogicalInnerJoin::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalInnerJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfImplementInnerJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfSubqJoin2Apply);
@@ -115,16 +115,17 @@ CLogicalInnerJoin::FFewerConj(CMemoryPool *mp,
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 
-	CExpressionArray *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(
-		mp, pgroupScalarFst->PexprScalarRep());
-	CExpressionArray *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(
-		mp, pgroupScalarSnd->PexprScalarRep());
+	gpos::Ref<CExpressionArray> pdrgpexprConjFst =
+		CPredicateUtils::PdrgpexprConjuncts(mp,
+											pgroupScalarFst->PexprScalarRep());
+	gpos::Ref<CExpressionArray> pdrgpexprConjSnd =
+		CPredicateUtils::PdrgpexprConjuncts(mp,
+											pgroupScalarSnd->PexprScalarRep());
 
 	ULONG ulConjFst = pdrgpexprConjFst->Size();
 	ULONG ulConjSnd = pdrgpexprConjSnd->Size();
 
-	pdrgpexprConjFst->Release();
-	pdrgpexprConjSnd->Release();
+
 
 	return ulConjFst < ulConjSnd;
 }

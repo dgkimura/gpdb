@@ -13,11 +13,11 @@
 #define GPDXL_CDXLPhysicalWindow_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLWindowKey.h"
-
 namespace gpdxl
 {
 // indices of window elements in the children array
@@ -41,7 +41,7 @@ class CDXLPhysicalWindow : public CDXLPhysical
 {
 private:
 	// partition columns
-	ULongPtrArray *m_part_by_colid_array;
+	gpos::Ref<ULongPtrArray> m_part_by_colid_array;
 
 	// window keys
 	CDXLWindowKeyArray *m_dxl_window_key_array;
@@ -50,7 +50,8 @@ public:
 	CDXLPhysicalWindow(CDXLPhysicalWindow &) = delete;
 
 	//ctor
-	CDXLPhysicalWindow(CMemoryPool *mp, ULongPtrArray *part_by_colid_array,
+	CDXLPhysicalWindow(CMemoryPool *mp,
+					   gpos::Ref<ULongPtrArray> part_by_colid_array,
 					   CDXLWindowKeyArray *window_key_array);
 
 	//dtor
@@ -64,7 +65,7 @@ public:
 	ULONG PartByColsCount() const;
 
 	// return partition columns
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetPartByColsArray() const
 	{
 		return m_part_by_colid_array;
@@ -87,7 +88,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalWindow == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalWindow> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalWindow>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

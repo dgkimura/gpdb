@@ -84,8 +84,8 @@ CConstExprEvaluatorDXL::PexprEval(gpos::Ref<CExpression> pexpr)
 
 	gpos::Ref<CExpression> pexprResult = m_trdxl2expr.PexprTranslateScalar(
 		pdxlnResult, nullptr /*colref_array*/);
-	pdxlnResult->Release();
-	pdxlnExpr->Release();
+
+
 
 	return pexprResult;
 }

@@ -43,8 +43,8 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	COperator::EGbAggType egbaggtype, gpos::Ref<CColRefArray> pdrgpcrKeys)
 	: CLogicalGbAgg(mp, colref_array, egbaggtype), m_pdrgpcrKeys(pdrgpcrKeys)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
@@ -59,8 +59,9 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 //
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys)
 	: CLogicalGbAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype),
 	  m_pdrgpcrKeys(pdrgpcrKeys)
 {
@@ -78,7 +79,6 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 {
 	// safe release -- to allow for instances used in patterns
-	SafeRelease(m_pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------
@@ -91,19 +91,20 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, Pdrgpcr(), colref_mapping, must_exist);
 
-	CColRefArray *pdrgpcrMinimal = PdrgpcrMinimal();
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
 		pdrgpcrMinimal = CUtils::PdrgpcrRemap(mp, pdrgpcrMinimal,
 											  colref_mapping, must_exist);
 	}
 
-	CColRefArray *pdrgpcrKeys =
+	gpos::Ref<CColRefArray> pdrgpcrKeys =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrKeys, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalGbAggDeduplicate(
@@ -168,7 +169,7 @@ CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 	if (FGlobal())
 	{
 		// keys from join child are still keys
-		m_pdrgpcrKeys->AddRef();
+
 		pkc = GPOS_NEW(mp) CKeyCollection(mp, m_pdrgpcrKeys);
 	}
 
@@ -213,10 +214,10 @@ CLogicalGbAggDeduplicate::Matches(gpos::Ref<COperator> pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfPushGbDedupBelowJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfSplitGbAggDedup);
 	(void) xform_set->ExchangeSet(CXform::ExfGbAggDedup2HashAggDedup);
@@ -235,14 +236,15 @@ CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   IStatisticsArray *  // not used
+									   gpos::Ref<IStatisticsArray>	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
 	// construct bitset with keys of join child
@@ -256,8 +258,8 @@ CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
 
 	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, keys);
-	keys->Release();
-	pdrgpulComputedCols->Release();
+
+
 
 	return stats;
 }

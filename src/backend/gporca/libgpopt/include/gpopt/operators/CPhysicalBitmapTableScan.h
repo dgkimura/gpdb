@@ -49,7 +49,7 @@ public:
 	CPhysicalBitmapTableScan(CMemoryPool *mp,
 							 gpos::Ref<CTableDescriptor> ptabdesc,
 							 ULONG ulOriginOpId, const CName *pnameTableAlias,
-							 CColRefArray *pdrgpcrOutput);
+							 gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CPhysicalBitmapTableScan() override = default;
@@ -90,10 +90,10 @@ public:
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
-	PstatsDerive(CMemoryPool *,				// mp
-				 CExpressionHandle &,		// exprhdl
-				 gpos::Ref<CReqdPropPlan>,	// prpplan
-				 IStatisticsArray *			//stats_ctxt
+	PstatsDerive(CMemoryPool *,				  // mp
+				 CExpressionHandle &,		  // exprhdl
+				 gpos::Ref<CReqdPropPlan>,	  // prpplan
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -112,7 +112,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalBitmapTableScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalBitmapTableScan> >(pop);
+		return gpos::dyn_cast<CPhysicalBitmapTableScan>(pop);
 	}
 };
 }  // namespace gpopt

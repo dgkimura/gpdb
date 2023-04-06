@@ -58,7 +58,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
@@ -68,7 +68,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAll == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarSubqueryAll> >(pop);
+		return gpos::dyn_cast<CScalarSubqueryAll>(pop);
 	}
 
 };	// class CScalarSubqueryAll

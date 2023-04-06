@@ -125,8 +125,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const gpos::Ref<IMDCast> pmdcast =
 		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
-	mdid_dest->AddRef();
-	pmdcast->GetCastFuncMdId()->AddRef();
+
+
 	gpos::Ref<CExpression> pexpr;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
@@ -194,19 +194,20 @@ CCastUtils::PexprWithoutBinaryCoercibleCasts(gpos::Ref<CExpression> pexpr)
 }
 
 // add explicit casting to equality operations between compatible types
-CExpressionArray *
+gpos::Ref<CExpressionArray>
 CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
 
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexpr);
-	CExpressionArray *pdrgpexprNew = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprNew =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulPreds = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < ulPreds; ul++)
 	{
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
-		pexprPred->AddRef();
+
 		gpos::Ref<CExpression> pexprNewPred = pexprPred;
 
 		if (CPredicateUtils::IsEqualityOp(pexprPred) ||
@@ -216,14 +217,14 @@ CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 			if (nullptr != pexprCasted)
 			{
 				// release predicate since we will construct a new one
-				pexprNewPred->Release();
+
 				pexprNewPred = pexprCasted;
 			}
 		}
 		pdrgpexprNew->Append(pexprNewPred);
 	}
 
-	pdrgpexpr->Release();
+
 
 	return pdrgpexprNew;
 }
@@ -268,8 +269,7 @@ CCastUtils::PexprAddCast(CMemoryPool *mp, gpos::Ref<CExpression> pexprPred)
 		return pexprNewPred;
 	}
 
-	pexprLeft->AddRef();
-	pexprRight->AddRef();
+
 
 	gpos::Ref<CExpression> pexprNewLeft = pexprLeft;
 	gpos::Ref<CExpression> pexprNewRight = pexprRight;
@@ -309,8 +309,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const gpos::Ref<IMDCast> pmdcast =
 		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
-	mdid_dest->AddRef();
-	pmdcast->GetCastFuncMdId()->AddRef();
+
+
 	gpos::Ref<CExpression> pexprCast;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)

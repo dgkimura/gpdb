@@ -145,9 +145,9 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,	 // element_uri,
 	// set grouping cols list
 	GPOS_ASSERT(nullptr != grouping_col_parse_handler->GetGroupingColidArray());
 
-	ULongPtrArray *grouping_col_array =
+	gpos::Ref<ULongPtrArray> grouping_col_array =
 		grouping_col_parse_handler->GetGroupingColidArray();
-	grouping_col_array->AddRef();
+
 	lg_group_by_dxl->SetGroupingColumns(grouping_col_array);
 
 
