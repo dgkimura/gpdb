@@ -48,8 +48,8 @@ public:
 	~CXformLeftSemiApply2LeftSemiJoinNoCorrelations() override = default;
 
 	// ctor with a passed pattern
-	CXformLeftSemiApply2LeftSemiJoinNoCorrelations(CMemoryPool *mp,
-												   CExpression *pexprPattern)
+	CXformLeftSemiApply2LeftSemiJoinNoCorrelations(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPattern)
 		: CXformApply2Join<CLogicalLeftSemiApply, CLogicalLeftSemiJoin>(
 			  mp, pexprPattern)
 	{
@@ -72,8 +72,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 
 };	// class CXformLeftSemiApply2LeftSemiJoinNoCorrelations

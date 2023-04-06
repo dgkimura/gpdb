@@ -32,14 +32,17 @@ using namespace gpos;
 class CXformGbAggWithMDQA2Join : public CXformExploration
 {
 private:
-	static CExpression *PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprMDQAs2Join(CMemoryPool *mp,
+												  gpos::Ref<CExpression> pexpr);
 
 	// expand GbAgg with multiple distinct aggregates into a join of single distinct
 	// aggregates
-	static CExpression *PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprExpandMDQAs(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// main transformation function driver
-	static CExpression *PexprTransform(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprTransform(CMemoryPool *mp,
+												 gpos::Ref<CExpression> pexpr);
 
 public:
 	CXformGbAggWithMDQA2Join(const CXformGbAggWithMDQA2Join &) = delete;
@@ -68,8 +71,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::Ref<CXformContext>, gpos::Ref<CXformResult>,
+				   gpos::Ref<CExpression>) const override;
 
 	// return true if xform should be applied only once
 	BOOL IsApplyOnce() override;

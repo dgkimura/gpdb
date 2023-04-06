@@ -43,22 +43,22 @@ public:
 	}
 
 	// type of left operand
-	virtual IMDId *GetLeftMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetLeftMdid() const = 0;
 
 	// type of right operand
-	virtual IMDId *GetRightMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetRightMdid() const = 0;
 
 	// type of result operand
-	virtual IMDId *GetResultTypeMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetResultTypeMdid() const = 0;
 
 	// id of function which implements the operator
-	virtual IMDId *FuncMdId() const = 0;
+	virtual gpos::Ref<IMDId> FuncMdId() const = 0;
 
 	// id of commute operator
-	virtual IMDId *GetCommuteOpMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetCommuteOpMdid() const = 0;
 
 	// id of inverse operator
-	virtual IMDId *GetInverseOpMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetInverseOpMdid() const = 0;
 
 	// is this an equality operator
 	virtual BOOL IsEqualityOp() const = 0;
@@ -78,10 +78,10 @@ public:
 	virtual ULONG OpfamiliesCount() const = 0;
 
 	// operator class at given position
-	virtual IMDId *OpfamilyMdidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> OpfamilyMdidAt(ULONG pos) const = 0;
 
 	// compatible hash opfamily
-	virtual IMDId *HashOpfamilyMdid() const = 0;
+	virtual gpos::Ref<IMDId> HashOpfamilyMdid() const = 0;
 };
 }  // namespace gpmd
 

@@ -39,7 +39,7 @@ const CDouble CDatumGenericGPDB::DefaultCdbRolloffSelectivity(0.14);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid,
+CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 									 INT type_modifier, const void *src,
 									 ULONG size, BOOL is_null,
 									 LINT stats_comp_val_int,
@@ -119,7 +119,7 @@ CDatumGenericGPDB::Size() const
 //		Accessor of the type information
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDatumGenericGPDB::MDId() const
 {
 	return m_mdid;
@@ -213,15 +213,15 @@ CDatumGenericGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::Matches(const IDatum *datum) const
+CDatumGenericGPDB::Matches(const gpos::Ref<IDatum> datum) const
 {
 	if (!datum->MDId()->Equals(m_mdid) || (datum->Size() != Size()))
 	{
 		return false;
 	}
 
-	const CDatumGenericGPDB *datum_generic =
-		dynamic_cast<const CDatumGenericGPDB *>(datum);
+	const gpos::Ref<CDatumGenericGPDB> datum_generic =
+		dynamic_cast<const gpos::Ref<CDatumGenericGPDB> >(datum);
 
 	if (datum_generic->IsNull() && IsNull())
 	{
@@ -248,7 +248,7 @@ CDatumGenericGPDB::Matches(const IDatum *datum) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CDatumGenericGPDB::MakeCopy(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();
@@ -333,7 +333,7 @@ CDatumGenericGPDB::GetByteArrayValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::StatsAreEqual(const IDatum *datum) const
+CDatumGenericGPDB::StatsAreEqual(const gpos::Ref<IDatum> datum) const
 {
 	// if mapping exists, use that to compute equality
 	if (IsDatumMappableToLINT() || IsDatumMappableToDouble())
@@ -348,8 +348,8 @@ CDatumGenericGPDB::StatsAreEqual(const IDatum *datum) const
 	}
 
 	// fall back to memcmp
-	const CDatumGenericGPDB *datum_generic_gpdb =
-		dynamic_cast<const CDatumGenericGPDB *>(datum);
+	const gpos::Ref<CDatumGenericGPDB> datum_generic_gpdb =
+		dynamic_cast<const gpos::Ref<CDatumGenericGPDB> >(datum);
 
 	ULONG size = this->Size();
 	if (size == datum_generic_gpdb->Size())
@@ -411,7 +411,7 @@ CDatumGenericGPDB::NeedsPadding() const
 //		Return the padded datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CDatumGenericGPDB::MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const
 {
 	// in GPDB the first four bytes of the datum are used for the header
@@ -437,10 +437,11 @@ CDatumGenericGPDB::MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const
 
 		// create a new datum
 		this->MDId()->AddRef();
-		CDatumGenericGPDB *datum_new = GPOS_NEW(m_mp) CDatumGenericGPDB(
-			mp, this->MDId(), this->TypeModifier(), dest, adjusted_col_width,
-			this->IsNull(), this->GetLINTMapping(), 0 /* dValue */
-		);
+		gpos::Ref<CDatumGenericGPDB> datum_new = GPOS_NEW(m_mp)
+			CDatumGenericGPDB(mp, this->MDId(), this->TypeModifier(), dest,
+							  adjusted_col_width, this->IsNull(),
+							  this->GetLINTMapping(), 0 /* dValue */
+			);
 
 		// clean up the input byte array as the constructor creates a copy
 		GPOS_DELETE_ARRAY(dest);

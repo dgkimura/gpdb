@@ -49,7 +49,7 @@ CHistogramTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -74,34 +74,34 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 	CCardinalityTestUtils::PrintHist(mp, "histogram", histogram);
 
 	// test edge case of MakeBucketGreaterThan
-	CPoint *ppoint0 = CTestUtils::PpointInt4(mp, 9);
+	gpos::Ref<CPoint> ppoint0 = CTestUtils::PpointInt4(mp, 9);
 	CHistogram *phist0 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptG, ppoint0);
 	CCardinalityTestUtils::PrintHist(mp, "phist0", phist0);
 	GPOS_RTL_ASSERT(phist0->GetNumBuckets() == 9);
 
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 35);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 35);
 	CHistogram *histogram1 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptL, point1);
 	CCardinalityTestUtils::PrintHist(mp, "histogram1", histogram1);
 	GPOS_RTL_ASSERT(histogram1->GetNumBuckets() == 4);
 
 	// edge case where point is equal to upper bound
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 50);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 50);
 	CHistogram *histogram2 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptL, point2);
 	CCardinalityTestUtils::PrintHist(mp, "histogram2", histogram2);
 	GPOS_RTL_ASSERT(histogram2->GetNumBuckets() == 5);
 
 	// equality check
-	CPoint *point3 = CTestUtils::PpointInt4(mp, 100);
+	gpos::Ref<CPoint> point3 = CTestUtils::PpointInt4(mp, 100);
 	CHistogram *phist3 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptEq, point3);
 	CCardinalityTestUtils::PrintHist(mp, "phist3", phist3);
 	GPOS_RTL_ASSERT(phist3->GetNumBuckets() == 1);
 
 	// normalized output after filter
-	CPoint *ppoint4 = CTestUtils::PpointInt4(mp, 100);
+	gpos::Ref<CPoint> ppoint4 = CTestUtils::PpointInt4(mp, 100);
 	CDouble scale_factor(0.0);
 	CHistogram *phist4 = histogram->MakeHistogramFilterNormalize(
 		CStatsPred::EstatscmptEq, ppoint4, &scale_factor);
@@ -123,7 +123,7 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 	// histogram with null fraction and remaining tuples
 	CHistogram *phist7 = PhistExampleInt4Remain(mp);
 	CCardinalityTestUtils::PrintHist(mp, "phist7", phist7);
-	CPoint *ppoint5 = CTestUtils::PpointInt4(mp, 20);
+	gpos::Ref<CPoint> ppoint5 = CTestUtils::PpointInt4(mp, 20);
 
 	// equality check, hitting remaining tuples
 	CHistogram *phist8 =
@@ -193,7 +193,7 @@ CHistogramTest::EresUnittest_CHistogramBool()
 	CHistogram *histogram = GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
 
 	// equality check
-	CPoint *point1 = CTestUtils::PpointBool(mp, false);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointBool(mp, false);
 	CDouble scale_factor(0.0);
 	CHistogram *histogram1 = histogram->MakeHistogramFilterNormalize(
 		CStatsPred::EstatscmptEq, point1, &scale_factor);
@@ -388,9 +388,9 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 	CMemoryPool *mp = amp.Pmp();
 
 	// [631.82140700000002, 631.82140700000002]
-	CPoint *ppLower1 = CCardinalityTestUtils::PpointDouble(
+	gpos::Ref<CPoint> ppLower1 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140700000002));
-	CPoint *ppUpper1 = CCardinalityTestUtils::PpointDouble(
+	gpos::Ref<CPoint> ppUpper1 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140700000002));
 
 	CBucket *bucket1 = GPOS_NEW(mp)
@@ -398,9 +398,9 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 				true /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
 	// (631.82140500000003, 645.05197699999997)
-	CPoint *ppLower2 = CCardinalityTestUtils::PpointDouble(
+	gpos::Ref<CPoint> ppLower2 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140500000003));
-	CPoint *ppUpper2 = CCardinalityTestUtils::PpointDouble(
+	gpos::Ref<CPoint> ppUpper2 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(645.05197699999997));
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower2, ppUpper2, false /* is_lower_closed */,

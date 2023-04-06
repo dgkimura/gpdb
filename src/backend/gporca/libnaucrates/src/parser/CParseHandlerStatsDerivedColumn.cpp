@@ -176,7 +176,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 	{
 		CParseHandlerColStatsBucket *col_stats_bucket_parse_handler =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[idx]);
-		CDXLBucket *dxl_bucket =
+		gpos::Ref<CDXLBucket> dxl_bucket =
 			col_stats_bucket_parse_handler->GetDXLBucketAt();
 		dxl_bucket->AddRef();
 		dxl_stats_bucket_array->Append(dxl_bucket);

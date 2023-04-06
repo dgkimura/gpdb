@@ -128,21 +128,22 @@ public:
 	~CRewindabilitySpec() override;
 
 	// check if rewindability specs match
-	BOOL Matches(const CRewindabilitySpec *prs) const;
+	BOOL Matches(const gpos::Ref<CRewindabilitySpec> prs) const;
 
 	// check if rewindability spec satisfies a req'd rewindability spec
-	BOOL FSatisfies(const CRewindabilitySpec *prs) const;
+	BOOL FSatisfies(const gpos::Ref<CRewindabilitySpec> prs) const;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function
 	ULONG HashValue() const override;
 
 	// extract columns used by the rewindability spec
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp) const override
 	{
 		// return an empty set

@@ -88,7 +88,7 @@ CLogicalDifferenceAll::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDifferenceAll::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -109,7 +109,7 @@ CLogicalDifferenceAll::PopCopyWithRemappedColumns(
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalDifferenceAll::DeriveKeyCollection(CMemoryPool *,		// mp,
 										   CExpressionHandle &	//exprhdl
 ) const
@@ -126,7 +126,7 @@ CLogicalDifferenceAll::DeriveKeyCollection(CMemoryPool *,		// mp,
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									IStatisticsArray *	// not used
 ) const
@@ -139,26 +139,26 @@ CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::Ref<CColRefSet> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
-	CExpression *pexprScCond =
+	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, m_pdrgpdrgpcrInput);
 
 	// compute the statistics for LASJ
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	CStatsPredJoinArray *join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is an LASJ
 		);
-	IStatistics *LASJ_stats =
+	gpos::Ref<IStatistics> LASJ_stats =
 		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
 									  true /* DoIgnoreLASJHistComputation*/
 		);

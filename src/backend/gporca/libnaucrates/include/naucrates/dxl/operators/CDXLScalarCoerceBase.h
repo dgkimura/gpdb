@@ -39,7 +39,7 @@ class CDXLScalarCoerceBase : public CDXLScalar
 {
 private:
 	// catalog MDId of the result type
-	IMDId *m_result_type_mdid;
+	gpos::Ref<IMDId> m_result_type_mdid;
 
 	// output type modifier
 	INT m_type_modifier;
@@ -54,13 +54,14 @@ public:
 	CDXLScalarCoerceBase(const CDXLScalarCoerceBase &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						 EdxlCoercionForm dxl_coerce_format, INT location);
+	CDXLScalarCoerceBase(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						 INT type_modifier, EdxlCoercionForm dxl_coerce_format,
+						 INT location);
 
 	~CDXLScalarCoerceBase() override;
 
 	// return result type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetResultTypeMdId() const
 	{
 		return m_result_type_mdid;
@@ -93,13 +94,13 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 };
 }  // namespace gpdxl
 

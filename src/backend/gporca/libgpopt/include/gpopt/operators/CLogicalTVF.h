@@ -30,10 +30,10 @@ class CLogicalTVF : public CLogical
 {
 private:
 	// function mdid
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CWStringConst *m_pstr;
@@ -56,11 +56,13 @@ public:
 	// ctors
 	explicit CLogicalTVF(CMemoryPool *mp);
 
-	CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc);
+	CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
+				CColumnDescriptorArray *pdrgpcoldesc);
 
-	CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc,
+	CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
+				CColumnDescriptorArray *pdrgpcoldesc,
 				CColRefArray *pdrgpcrOutput);
 
 	// dtor
@@ -81,14 +83,14 @@ public:
 	}
 
 	// function mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid;
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid;
@@ -122,23 +124,23 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -147,7 +149,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  //exprhdl
 	) const override
@@ -157,7 +159,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *DeriveFunctionProperties(
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -169,11 +171,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		return nullptr;
@@ -194,21 +196,22 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalTVF *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalTVF>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalTVF == pop->Eopid());
 
-		return dynamic_cast<CLogicalTVF *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalTVF> >(pop);
 	}
 
 

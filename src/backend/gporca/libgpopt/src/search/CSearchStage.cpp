@@ -96,7 +96,7 @@ CSearchStage::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 void
-CSearchStage::SetBestExpr(CExpression *pexpr)
+CSearchStage::SetBestExpr(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT_IMP(nullptr != pexpr, pexpr->Pop()->FPhysical());
 

@@ -39,7 +39,7 @@ class CMDIdColStats : public IMDId
 {
 private:
 	// mdid of base relation
-	CMDIdGPDB *m_rel_mdid;
+	gpos::Ref<CMDIdGPDB> m_rel_mdid;
 
 	// position of the attribute in the base relation
 	ULONG m_attr_pos;
@@ -57,7 +57,7 @@ public:
 	CMDIdColStats(const CMDIdColStats &) = delete;
 
 	// ctor
-	CMDIdColStats(CMDIdGPDB *rel_mdid, ULONG attno);
+	CMDIdColStats(gpos::Ref<CMDIdGPDB> rel_mdid, ULONG attno);
 
 	// dtor
 	~CMDIdColStats() override;
@@ -79,11 +79,11 @@ public:
 	}
 
 	// accessors
-	IMDId *GetRelMdId() const;
+	gpos::Ref<IMDId> GetRelMdId() const;
 	ULONG Position() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -108,19 +108,20 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdColStats *
-	CastMdid(const IMDId *mdid)
+	static const gpos::Ref<CMDIdColStats>
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidColStats == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdColStats *>(mdid);
+		return dynamic_cast<const gpos::Ref<CMDIdColStats> >(mdid);
 	}
 
 	// make a copy in the given memory pool
-	IMDId *
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
+		gpos::Ref<CMDIdGPDB> mdid_rel =
+			CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
 		return GPOS_NEW(mp) CMDIdColStats(mdid_rel, m_attr_pos);
 	}
 };

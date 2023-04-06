@@ -37,24 +37,24 @@ private:
 				 CleanupNULL<CColRef>>;
 
 	// helper to transform function
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr,
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres, gpos::Ref<CExpression> pexpr,
 				   BOOL fEnforceCorrelatedApply) const override;
 
 	// collect subqueries that exclusively use outer/inner child
-	static void CollectSubqueries(CMemoryPool *mp, CExpression *pexpr,
+	static void CollectSubqueries(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								  CColRefSetArray *pdrgpcrs,
 								  CExpressionArrays *pdrgpdrgpexprSubqs);
 
 	// replace subqueries with scalar identifier based on given map
-	static CExpression *PexprReplaceSubqueries(CMemoryPool *mp,
-											   CExpression *pexprScalar,
-											   ExprToColRefMap *phmexprcr);
+	static gpos::Ref<CExpression> PexprReplaceSubqueries(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
+		ExprToColRefMap *phmexprcr);
 
 	// push down subquery below join
-	static CExpression *PexprSubqueryPushDown(CMemoryPool *mp,
-											  CExpression *pexpr,
-											  BOOL fEnforceCorrelatedApply);
+	static gpos::Ref<CExpression> PexprSubqueryPushDown(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		BOOL fEnforceCorrelatedApply);
 
 public:
 	CXformSubqJoin2Apply(const CXformSubqJoin2Apply &) = delete;
@@ -63,7 +63,7 @@ public:
 	explicit CXformSubqJoin2Apply(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformSubqJoin2Apply(CExpression *pexprPattern)
+	explicit CXformSubqJoin2Apply(gpos::Ref<CExpression> pexprPattern)
 		: CXformSubqueryUnnest(pexprPattern)
 	{
 	}

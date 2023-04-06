@@ -30,10 +30,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
-									 IMDId *first_col_type_mdid,
+									 gpos::Ref<IMDId> first_col_type_mdid,
 									 CDXLColRefArray *dxl_colref_array,
 									 EdxlSubPlanType dxl_subplan_type,
-									 CDXLNode *dxlnode_test_expr,
+									 gpos::Ref<CDXLNode> dxlnode_test_expr,
 									 BOOL outer_param)
 	: CDXLScalar(mp),
 	  m_first_col_type_mdid(first_col_type_mdid),
@@ -85,7 +85,7 @@ CDXLScalarSubPlan::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarSubPlan::GetFirstColTypeMdId() const
 {
 	return m_first_col_type_mdid;
@@ -153,7 +153,7 @@ CDXLScalarSubPlan::GetSubplanTypeStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *dxlnode) const
+								  const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -193,7 +193,8 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 									 ulid);
 
 		const CMDName *mdname = (*m_dxl_colref_array)[ul]->MdName();
-		const IMDId *mdid_type = (*m_dxl_colref_array)[ul]->MdidType();
+		const gpos::Ref<IMDId> mdid_type =
+			(*m_dxl_colref_array)[ul]->MdidType();
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenColName), mdname->GetMDName());
 		mdid_type->Serialize(xml_serializer,
@@ -228,14 +229,14 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSubPlan::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlSubPlanIndexSentinel == dxlnode->Arity());
 
 	// assert child plan is a physical plan and is valid
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
 	GPOS_ASSERT(nullptr != child_dxlnode);
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

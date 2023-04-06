@@ -33,7 +33,7 @@ class CQueryToDXLResult
 {
 private:
 	// DXL representing the Query
-	CDXLNode *m_query_dxl;
+	gpos::Ref<CDXLNode> m_query_dxl;
 
 	// array of DXL nodes that represent the query output
 	CDXLNodeArray *m_query_output;
@@ -43,14 +43,14 @@ private:
 
 public:
 	// ctor
-	CQueryToDXLResult(CDXLNode *query, CDXLNodeArray *query_output,
+	CQueryToDXLResult(gpos::Ref<CDXLNode> query, CDXLNodeArray *query_output,
 					  CDXLNodeArray *cte_producers);
 
 	// dtor
 	~CQueryToDXLResult();
 
 	// return the DXL representation of the query
-	const CDXLNode *CreateDXLNode() const;
+	const gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// return the array of output columns
 	const CDXLNodeArray *GetOutputColumnsDXLArray() const;

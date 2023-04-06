@@ -55,7 +55,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	const IMDColumn *PartColAt(ULONG  // pos
+	const gpos::Ref<IMDColumn> PartColAt(ULONG	// pos
 	) const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition columns");
@@ -100,14 +100,15 @@ public:
 	}
 
 	// part constraint
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	MDPartConstraint() const override
 	{
 		return nullptr;
 	}
 
 	// CTAS storage options
-	virtual CDXLCtasStorageOptions *GetDxlCtasStorageOption() const = 0;
+	virtual gpos::Ref<CDXLCtasStorageOptions> GetDxlCtasStorageOption()
+		const = 0;
 };
 }  // namespace gpmd
 

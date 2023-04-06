@@ -82,9 +82,10 @@ CParseHandlerMDRequest::StartElement(const XMLCh *const,  // element_uri,
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
 		// parse mdid
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenValue,
-			EdxltokenMdid);
+		gpos::Ref<IMDId> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenValue, EdxltokenMdid);
 		m_mdid_array->Append(mdid);
 
 		return;

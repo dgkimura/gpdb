@@ -60,30 +60,32 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalRightOuterHashJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalRightOuterHashJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalRightOuterHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalRightOuterHashJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalRightOuterHashJoin> >(pop);
 	}
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required distribution of the n-th child
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulOptReq) override;
+	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 gpos::Ref<CReqdPropPlan> prppInput,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulOptReq) override;
 
-	CPartitionPropagationSpec *PppsRequired(
+	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
+		gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 };	// class CPhysicalRightOuterHashJoin

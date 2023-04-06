@@ -29,7 +29,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::CMDPartConstraintGPDB(
 	CMemoryPool *mp, ULongPtrArray *level_with_default_part_array,
-	BOOL is_unbounded, CDXLNode *dxlnode)
+	BOOL is_unbounded, gpos::Ref<CDXLNode> dxlnode)
 	: m_mp(mp),
 	  m_level_with_default_part_array(level_with_default_part_array),
 	  m_is_unbounded(is_unbounded),
@@ -60,7 +60,7 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //		Scalar expression of the check constraint
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
 											 CMDAccessor *md_accessor,
 											 CColRefArray *colref_array) const

@@ -97,7 +97,7 @@ CMDAccessorTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -106,20 +106,20 @@ CMDAccessorTest::EresUnittest_Basic()
 					 CTestUtils::GetCostModel(mp));
 
 	// lookup different objects
-	CMDIdGPDB *pmdidObject1 = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> pmdidObject1 = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /* OID */,
 				  1 /* major version */, 1 /* minor version */);
-	CMDIdGPDB *pmdidObject2 = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> pmdidObject2 = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /* OID */,
 				  12 /* version */, 1 /* minor version */);
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel1 =
+	const gpos::Ref<IMDRelation> pimdrel1 =
 #endif
 		mda.RetrieveRel(pmdidObject1);
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel2 =
+	const gpos::Ref<IMDRelation> pimdrel2 =
 #endif
 		mda.RetrieveRel(pmdidObject2);
 
@@ -128,44 +128,44 @@ CMDAccessorTest::EresUnittest_Basic()
 
 	// access an object again
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel3 =
+	const gpos::Ref<IMDRelation> pimdrel3 =
 #endif
 		mda.RetrieveRel(pmdidObject1);
 
 	GPOS_ASSERT(pimdrel1 == pimdrel3);
 
 	// access GPDB types, operators and aggregates
-	CMDIdGPDB *mdid_type =
+	gpos::Ref<CMDIdGPDB> mdid_type =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4, 1, 0);
-	CMDIdGPDB *mdid_op =
+	gpos::Ref<CMDIdGPDB> mdid_op =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_OP_INT4_LT, 1, 0);
-	CMDIdGPDB *agg_mdid =
+	gpos::Ref<CMDIdGPDB> agg_mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_AGG_AVG, 1, 0);
 
 #ifdef GPOS_DEBUG
-	const IMDType *pimdtype =
+	const gpos::Ref<IMDType> pimdtype =
 #endif
 		mda.RetrieveType(mdid_type);
 
-	const IMDScalarOp *md_scalar_op GPOS_ASSERTS_ONLY =
+	const gpos::Ref<IMDScalarOp> md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(mdid_op);
 
 	GPOS_ASSERT(IMDType::EcmptL == md_scalar_op->ParseCmpType());
 
 #ifdef GPOS_DEBUG
-	const IMDAggregate *pmdagg =
+	const gpos::Ref<IMDAggregate> pmdagg =
 #endif
 		mda.RetrieveAgg(agg_mdid);
 
 
 	// access types by type info
 #ifdef GPOS_DEBUG
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 #endif
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDTypeBool *pmdtypebool =
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
 #endif
 		mda.PtMDType<IMDTypeBool>(CTestUtils::m_sysidDefault);
 
@@ -224,7 +224,7 @@ CMDAccessorTest::EresUnittest_Datum()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -233,23 +233,23 @@ CMDAccessorTest::EresUnittest_Datum()
 					 CTestUtils::GetCostModel(mp));
 
 	// create an INT4 datum
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	IDatumInt4 *pdatumInt4 =
+	gpos::Ref<IDatumInt4> pdatumInt4 =
 		pmdtypeint4->CreateInt4Datum(mp, 5, false /* is_null */);
 	GPOS_ASSERT(5 == pdatumInt4->Value());
 
 	// create a BOOL datum
-	const IMDTypeBool *pmdtypebool =
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
 		mda.PtMDType<IMDTypeBool>(CTestUtils::m_sysidDefault);
-	IDatumBool *pdatumBool =
+	gpos::Ref<IDatumBool> pdatumBool =
 		pmdtypebool->CreateBoolDatum(mp, false, false /* is_null */);
 	GPOS_ASSERT(false == pdatumBool->GetValue());
 
 	// create an OID datum
-	const IMDTypeOid *pmdtypeoid =
+	const gpos::Ref<IMDTypeOid> pmdtypeoid =
 		mda.PtMDType<IMDTypeOid>(CTestUtils::m_sysidDefault);
-	IDatumOid *pdatumOid =
+	gpos::Ref<IDatumOid> pdatumOid =
 		pmdtypeoid->CreateOidDatum(mp, 20, false /* is_null */);
 	GPOS_ASSERT(20 == pdatumOid->OidValue());
 
@@ -298,7 +298,7 @@ CMDAccessorTest::EresUnittest_DatumGeneric()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -324,26 +324,26 @@ CMDAccessorTest::EresUnittest_Navigate()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// lookup a function in the MD cache
-	CMDIdGPDB *mdid_func = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid_func = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidGeneral, GPDB_FUNC_TIMEOFDAY /* OID */,
 				  1 /* major version */, 0 /* minor version */);
 
-	const IMDFunction *pmdfunc = mda.RetrieveFunc(mdid_func);
+	const gpos::Ref<IMDFunction> pmdfunc = mda.RetrieveFunc(mdid_func);
 
 	// lookup function return type
-	IMDId *pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
-	const IMDType *pimdtype = mda.RetrieveType(pmdidFuncReturnType);
+	gpos::Ref<IMDId> pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
+	const gpos::Ref<IMDType> pimdtype = mda.RetrieveType(pmdidFuncReturnType);
 
 	// lookup equality operator for function return type
-	IMDId *pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
+	gpos::Ref<IMDId> pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
 
-	const IMDScalarOp *md_scalar_op GPOS_ASSERTS_ONLY =
+	const gpos::Ref<IMDScalarOp> md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(pmdidEqOp);
 
 #ifdef GPOS_DEBUG
@@ -394,7 +394,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 #endif	// GPOS_DEBUG
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -403,16 +403,16 @@ CMDAccessorTest::EresUnittest_Indexes()
 					 CTestUtils::GetCostModel(mp));
 
 	// lookup a relation in the MD cache
-	CMDIdGPDB *rel_mdid =
+	gpos::Ref<CMDIdGPDB> rel_mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID,
 							   1 /* major */, 1 /* minor version */);
 
-	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid);
+	const gpos::Ref<IMDRelation> pmdrel = mda.RetrieveRel(rel_mdid);
 
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
-	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);
-	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
+	gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(0);
+	const gpos::Ref<IMDIndex> pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	ULONG ulKeys = pmdindex->Keys();
 
@@ -430,7 +430,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 		ULONG ulKeyColumn = pmdindex->KeyAt(ul);
 
 #ifdef GPOS_DEBUG
-		const IMDColumn *pmdcol =
+		const gpos::Ref<IMDColumn> pmdcol =
 #endif	// GPOS_DEBUG
 			pmdrel->GetMdCol(ulKeyColumn);
 
@@ -465,7 +465,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 #endif	// GPOS_DEBUG
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -475,11 +475,11 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// lookup a relation in the MD cache
-	CMDIdGPDB *rel_mdid =
+	gpos::Ref<CMDIdGPDB> rel_mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID21,
 							   1 /* major */, 1 /* minor version */);
 
-	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid);
+	const gpos::Ref<IMDRelation> pmdrel = mda.RetrieveRel(rel_mdid);
 	GPOS_ASSERT(0 < pmdrel->CheckConstraintCount());
 
 	// create the array of column reference for the table columns
@@ -488,16 +488,16 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	const ULONG num_cols = pmdrel->ColumnCount() - pmdrel->SystemColumnsCount();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
-		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
-		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
-		CColRef *colref =
+		const gpos::Ref<IMDColumn> pmdcol = pmdrel->GetMdCol(ul);
+		const gpos::Ref<IMDType> pmdtype = mda.RetrieveType(pmdcol->MdidType());
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		colref_array->Append(colref);
 	}
 
 	// get one of its check constraint
-	IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
-	const IMDCheckConstraint *pmdCheckConstraint =
+	gpos::Ref<IMDId> pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
+	const gpos::Ref<IMDCheckConstraint> pmdCheckConstraint =
 		mda.RetrieveCheckConstraints(pmdidCheckConstraint);
 
 #ifdef GPOS_DEBUG
@@ -508,7 +508,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 #endif	// GPOS_DEBUG
 
 	// extract and then print the check constraint expression
-	CExpression *pexpr =
+	gpos::Ref<CExpression> pexpr =
 		pmdCheckConstraint->GetCheckConstraintExpr(mp, &mda, colref_array);
 
 #ifdef GPOS_DEBUG
@@ -541,7 +541,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	CAutoTrace at(mp);
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -549,15 +549,15 @@ CMDAccessorTest::EresUnittest_Cast()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtypeInt =
+	const gpos::Ref<IMDType> pmdtypeInt =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeOid =
+	const gpos::Ref<IMDType> pmdtypeOid =
 		mda.PtMDType<IMDTypeOid>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeBigInt =
+	const gpos::Ref<IMDType> pmdtypeBigInt =
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2BigInt =
+	const gpos::Ref<IMDCast> pmdcastInt2BigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeBigInt->MDId());
 
@@ -567,7 +567,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(pmdcastInt2BigInt->MdidDest()->Equals(pmdtypeBigInt->MDId()));
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2Oid =
+	const gpos::Ref<IMDCast> pmdcastInt2Oid =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeOid->MDId());
 
@@ -575,7 +575,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(!pmdcastInt2Oid->GetCastFuncMdId()->IsValid());
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastOid2Int =
+	const gpos::Ref<IMDCast> pmdcastOid2Int =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeOid->MDId(), pmdtypeInt->MDId());
 
@@ -602,7 +602,7 @@ CMDAccessorTest::EresUnittest_ScCmp()
 	CAutoTrace at(mp);
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -610,13 +610,13 @@ CMDAccessorTest::EresUnittest_ScCmp()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtypeInt =
+	const gpos::Ref<IMDType> pmdtypeInt =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeBigInt =
+	const gpos::Ref<IMDType> pmdtypeBigInt =
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDScCmp *pmdScEqIntBigInt =
+	const gpos::Ref<IMDScCmp> pmdScEqIntBigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdsccmp(pmdtypeInt->MDId(), pmdtypeBigInt->MDId(),
 					 IMDType::EcmptEq);
@@ -644,12 +644,12 @@ CMDAccessorTest::EresUnittest_Negative()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// lookup a non-existing objects
-	CMDIdGPDB *pmdidNonExistingObject = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> pmdidNonExistingObject = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /* OID */,
 				  15 /* version */, 1 /* minor version */);
 
@@ -686,7 +686,7 @@ CMDAccessorTest::PvLookupSingleObj(void *pv)
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	// lookup a cache object
-	CMDIdGPDB *mdid = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /* OID */,
 				  1 /* major version */, 1 /* minor version */);
 
@@ -726,7 +726,7 @@ CMDAccessorTest::PvLookupMultipleObj(void *pv)
 		GPOS_CHECK_ABORT;
 
 		// lookup relation
-		CMDIdGPDB *mdid = GPOS_NEW(pmdtaskparams->m_mp)
+		gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(pmdtaskparams->m_mp)
 			CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID /*OID*/,
 					  1 /*major*/, ul + 1 /*minor*/);
 		(void) md_accessor->RetrieveRel(mdid);
@@ -763,7 +763,7 @@ CMDAccessorTest::PvInitMDAAndLookup(void *pv)
 	// scope for MD accessor
 	{
 		// Setup an MD cache with a file-based provider
-		CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 		pmdp->AddRef();
 		CMDAccessor mda(mp, pcache, CTestUtils::m_sysidDefault, pmdp);
 

@@ -58,10 +58,11 @@ CParseHandlerScalarNullIf::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	IMDId *mdid_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
-		EdxltokenScalarNullIf);
-	IMDId *mdid_return_type =
+	gpos::Ref<IMDId> mdid_op =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
+			EdxltokenScalarNullIf);
+	gpos::Ref<IMDId> mdid_return_type =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
 			EdxltokenScalarNullIf);

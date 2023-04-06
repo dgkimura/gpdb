@@ -62,12 +62,12 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// applicable transformations
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
@@ -86,13 +86,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalLeftOuterCorrelatedApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftOuterCorrelatedApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftOuterCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftOuterCorrelatedApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftOuterCorrelatedApply> >(pop);
 	}
 
 };	// class CLogicalLeftOuterCorrelatedApply

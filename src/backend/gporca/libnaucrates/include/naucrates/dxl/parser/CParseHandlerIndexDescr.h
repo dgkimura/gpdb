@@ -37,7 +37,7 @@ class CParseHandlerIndexDescr : public CParseHandlerBase
 {
 private:
 	// the index descriptor to construct
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::Ref<CDXLIndexDescr> m_dxl_index_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +64,7 @@ public:
 	//dtor
 	~CParseHandlerIndexDescr() override;
 
-	CDXLIndexDescr *GetDXLIndexDescr();
+	gpos::Ref<CDXLIndexDescr> GetDXLIndexDescr();
 };
 }  // namespace gpdxl
 

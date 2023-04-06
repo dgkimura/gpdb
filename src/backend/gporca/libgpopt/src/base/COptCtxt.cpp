@@ -35,8 +35,9 @@ ULONG COptCtxt::m_ulFirstValidPartId = 1;
 //
 //---------------------------------------------------------------------------
 COptCtxt::COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
-				   CMDAccessor *md_accessor, IConstExprEvaluator *pceeval,
-				   COptimizerConfig *optimizer_config)
+				   CMDAccessor *md_accessor,
+				   gpos::Ref<IConstExprEvaluator> pceeval,
+				   gpos::Ref<COptimizerConfig> optimizer_config)
 	: CTaskLocalStorageObject(CTaskLocalStorage::EtlsidxOptCtxt),
 	  m_mp(mp),
 	  m_pcf(col_factory),
@@ -100,10 +101,10 @@ COptCtxt::~COptCtxt()
 //		Factory method for optimizer context
 //
 //---------------------------------------------------------------------------
-COptCtxt *
+gpos::Ref<COptCtxt>
 COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-					   IConstExprEvaluator *pceeval,
-					   COptimizerConfig *optimizer_config)
+					   gpos::Ref<IConstExprEvaluator> pceeval,
+					   gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 
@@ -111,7 +112,7 @@ COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
 	// instead of having it create its own;
 	CColumnFactory *col_factory = GPOS_NEW(mp) CColumnFactory;
 
-	COptCtxt *poctxt = nullptr;
+	gpos::Ref<COptCtxt> poctxt = nullptr;
 	{
 		// safe handling of column factory; since it owns a pool that would be
 		// leaked if below allocation fails
@@ -157,7 +158,7 @@ COptCtxt::FAllEnforcersEnabled()
 void
 COptCtxt::AddPartForScanId(ULONG scanid, ULONG index)
 {
-	CBitSet *parts = m_scanid_to_part_map->Find(&scanid);
+	gpos::Ref<CBitSet> parts = m_scanid_to_part_map->Find(&scanid);
 	if (nullptr == parts)
 	{
 		parts = GPOS_NEW(m_mp) CBitSet(m_mp);

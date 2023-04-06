@@ -34,7 +34,7 @@ class CParseHandlerPartitionSelector : public CParseHandlerPhysicalOp
 {
 private:
 	// table id
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// number of partitioning levels
 	ULONG m_selector_id;

@@ -84,7 +84,7 @@ const BYTE CScalarBooleanTest::m_rgBoolEvalMap[][3] = {
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBooleanTest::Matches(COperator *pop) const
+CScalarBooleanTest::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -103,7 +103,7 @@ CScalarBooleanTest::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarBooleanTest::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

@@ -93,34 +93,34 @@ private:
 
 	// add column as a new equivalence class, if it is not already in one of the
 	// existing equivalence classes
-	static void AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
+	static void AddColumnToEquivClasses(CMemoryPool *mp,
+										const gpos::Ref<CColRef> colref,
 										CColRefSetArray *pdrgpcrs);
 
 	// create constraint from scalar comparison
-	static CConstraint *PcnstrFromScalarCmp(CMemoryPool *mp, CExpression *pexpr,
-											CColRefSetArray **ppdrgpcrs,
-											BOOL infer_nulls_as = false);
+	static gpos::Ref<CConstraint> PcnstrFromScalarCmp(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create constraint from scalar boolean expression
-	static CConstraint *PcnstrFromScalarBoolOp(CMemoryPool *mp,
-											   CExpression *pexpr,
-											   CColRefSetArray **ppdrgpcrs,
-											   BOOL infer_nulls_as = false);
+	static gpos::Ref<CConstraint> PcnstrFromScalarBoolOp(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create conjunction/disjunction from array of constraints
-	static CConstraint *PcnstrConjDisj(CMemoryPool *mp,
-									   CConstraintArray *pdrgpcnstr,
-									   BOOL fConj);
+	static gpos::Ref<CConstraint> PcnstrConjDisj(CMemoryPool *mp,
+												 CConstraintArray *pdrgpcnstr,
+												 BOOL fConj);
 
 protected:
 	// memory pool -- used for local computations
 	CMemoryPool *m_mp;
 
 	// columns used in this constraint
-	CColRefSet *m_pcrsUsed;
+	gpos::Ref<CColRefSet> m_pcrsUsed;
 
 	// equivalent scalar expression
-	CExpression *m_pexprScalar;
+	gpos::Ref<CExpression> m_pexprScalar;
 
 	// print
 	IOstream &PrintConjunctionDisjunction(IOstream &os,
@@ -128,9 +128,8 @@ protected:
 
 	// construct a conjunction or disjunction scalar expression from an
 	// array of constraints
-	static CExpression *PexprScalarConjDisj(CMemoryPool *mp,
-											CConstraintArray *pdrgpcnstr,
-											BOOL fConj);
+	static gpos::Ref<CExpression> PexprScalarConjDisj(
+		CMemoryPool *mp, CConstraintArray *pdrgpcnstr, BOOL fConj);
 
 	// flatten an array of constraints to be used as constraint children
 	static CConstraintArray *PdrgpcnstrFlatten(CMemoryPool *mp,
@@ -144,28 +143,28 @@ protected:
 
 	// mapping between columns and arrays of constraints
 	static ColRefToConstraintArrayMap *Phmcolconstr(
-		CMemoryPool *mp, CColRefSet *pcrs, CConstraintArray *pdrgpcnstr);
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
+		CConstraintArray *pdrgpcnstr);
 
 	// return a copy of the conjunction/disjunction constraint for a different column
-	static CConstraint *PcnstrConjDisjRemapForColumn(
-		CMemoryPool *mp, CColRef *colref, CConstraintArray *pdrgpcnstr,
-		BOOL fConj);
+	static gpos::Ref<CConstraint> PcnstrConjDisjRemapForColumn(
+		CMemoryPool *mp, gpos::Ref<CColRef> colref,
+		CConstraintArray *pdrgpcnstr, BOOL fConj);
 
 	// create constraint from scalar array comparison expression originally generated for
 	// "scalar op ANY/ALL (array)" construct
-	static CConstraint *PcnstrFromScalarArrayCmp(CMemoryPool *mp,
-												 CExpression *pexpr,
-												 CColRef *colref,
-												 BOOL infer_nulls_as = false);
+	static gpos::Ref<CConstraint> PcnstrFromScalarArrayCmp(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRef> colref, BOOL infer_nulls_as = false);
 
-	static CColRefSet *PcrsFromConstraints(CMemoryPool *mp,
-										   CConstraintArray *pdrgpcnstr);
+	static gpos::Ref<CColRefSet> PcrsFromConstraints(
+		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
 
 public:
 	CConstraint(const CConstraint &) = delete;
 
 	// ctor
-	explicit CConstraint(CMemoryPool *mp, CColRefSet *pcrsUsed);
+	explicit CConstraint(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsUsed);
 
 	// dtor
 	~CConstraint() override;
@@ -184,23 +183,23 @@ public:
 	}
 
 	// does the current constraint contain the given one
-	virtual BOOL Contains(CConstraint *pcnstr);
+	virtual BOOL Contains(gpos::Ref<CConstraint> pcnstr);
 
 	// equality function
-	virtual BOOL Equals(CConstraint *pcnstr);
+	virtual BOOL Equals(gpos::Ref<CConstraint> pcnstr);
 
 	// columns in this constraint
-	virtual CColRefSet *
+	virtual gpos::Ref<CColRefSet>
 	PcrsUsed() const
 	{
 		return m_pcrsUsed;
 	}
 
 	// scalar expression
-	virtual CExpression *PexprScalar(CMemoryPool *mp) = 0;
+	virtual gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp) = 0;
 
 	// check if there is a constraint on the given column
-	virtual BOOL FConstraint(const CColRef *colref) const = 0;
+	virtual BOOL FConstraint(const gpos::Ref<CColRef> colref) const = 0;
 
 	virtual BOOL
 	FConstraintOnSegmentId() const
@@ -208,66 +207,66 @@ public:
 		return false;
 	}
 
-	virtual CConstraint *
+	virtual gpos::Ref<CConstraint>
 	GetConstraintOnSegmentId() const
 	{
 		return nullptr;
 	}
 
 	// return a copy of the constraint with remapped columns
-	virtual CConstraint *PcnstrCopyWithRemappedColumns(
+	virtual gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
 
 	// return constraint on a given column
-	virtual CConstraint *
-	Pcnstr(CMemoryPool *,	//mp,
-		   const CColRef *	//colref
+	virtual gpos::Ref<CConstraint>
+	Pcnstr(CMemoryPool *,			 //mp,
+		   const gpos::Ref<CColRef>	 //colref
 	)
 	{
 		return nullptr;
 	}
 
 	// return constraint on a given set of columns
-	virtual CConstraint *
-	Pcnstr(CMemoryPool *,  //mp,
-		   CColRefSet *	   //pcrs
+	virtual gpos::Ref<CConstraint>
+	Pcnstr(CMemoryPool *,		  //mp,
+		   gpos::Ref<CColRefSet>  //pcrs
 	)
 	{
 		return nullptr;
 	}
 
 	// return a clone of the constraint for a different column
-	virtual CConstraint *PcnstrRemapForColumn(CMemoryPool *mp,
-											  CColRef *colref) const = 0;
+	virtual gpos::Ref<CConstraint> PcnstrRemapForColumn(
+		CMemoryPool *mp, gpos::Ref<CColRef> colref) const = 0;
 
 	// create constraint from scalar expression and pass back any discovered
 	// equivalence classes
-	static CConstraint *PcnstrFromScalarExpr(CMemoryPool *mp,
-											 CExpression *pexpr,
-											 CColRefSetArray **ppdrgpcrs,
-											 BOOL infer_nulls_as = false);
+	static gpos::Ref<CConstraint> PcnstrFromScalarExpr(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create constraint from EXISTS/ANY scalar subquery
-	static CConstraint *PcnstrFromExistsAnySubquery(
-		CMemoryPool *mp, CExpression *pexpr, CColRefSetArray **ppdrgpcrs);
+	static gpos::Ref<CConstraint> PcnstrFromExistsAnySubquery(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray **ppdrgpcrs);
 
 	// create conjunction from array of constraints
-	static CConstraint *PcnstrConjunction(CMemoryPool *mp,
-										  CConstraintArray *pdrgpcnstr);
+	static gpos::Ref<CConstraint> PcnstrConjunction(
+		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
 
 	// create disjunction from array of constraints
-	static CConstraint *PcnstrDisjunction(CMemoryPool *mp,
-										  CConstraintArray *pdrgpcnstr);
+	static gpos::Ref<CConstraint> PcnstrDisjunction(
+		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
 
 	// merge equivalence classes coming from children of a bool op
 	static CColRefSetArray *PdrgpcrsMergeFromBoolOp(
-		CMemoryPool *mp, CExpression *pexpr, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray *pdrgpcrsFst, CColRefSetArray *pdrgpcrsSnd);
 
 	// subset of the given constraints, which reference the given column
 	static CConstraintArray *PdrgpcnstrOnColumn(CMemoryPool *mp,
 												CConstraintArray *pdrgpcnstr,
-												CColRef *colref,
+												gpos::Ref<CColRef> colref,
 												BOOL fExclusive);
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 
@@ -275,7 +274,7 @@ public:
 
 // shorthand for printing, pointer.
 inline IOstream &
-operator<<(IOstream &os, const CConstraint *cnstr)
+operator<<(IOstream &os, const gpos::Ref<CConstraint> cnstr)
 {
 	return cnstr->OsPrint(os);
 }

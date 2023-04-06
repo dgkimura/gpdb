@@ -243,7 +243,7 @@ public:
 	// get rte from m_rtable_entries_list by given index
 	RangeTblEntry *GetRTEByIndex(Index index);
 
-	Index GetRTEIndexByTableDescr(const CDXLTableDescr *table_descr,
+	Index GetRTEIndexByTableDescr(const gpos::Ref<CDXLTableDescr> table_descr,
 								  BOOL *is_rte_exists);
 };
 

@@ -62,11 +62,12 @@ private:
 	// pair of DXL CTE producer and target list of the original CTE query
 	struct SCTEProducerInfo
 	{
-		const CDXLNode *m_cte_producer;
+		const gpos::Ref<CDXLNode> m_cte_producer;
 		List *m_target_list;
 
 		// ctor
-		SCTEProducerInfo(const CDXLNode *cte_producer, List *target_list)
+		SCTEProducerInfo(const gpos::Ref<CDXLNode> cte_producer,
+						 List *target_list)
 			: m_cte_producer(cte_producer), m_target_list(target_list)
 		{
 		}
@@ -85,7 +86,7 @@ private:
 public:
 	// ctor: single CTE
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, CommonTableExpr *cte,
-				  CDXLNode *cte_producer);
+				  gpos::Ref<CDXLNode> cte_producer);
 
 	// ctor: multiple CTEs
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
@@ -105,14 +106,14 @@ public:
 	}
 
 	// lookup CTE producer by its name
-	const CDXLNode *GetCTEProducer(const CHAR *cte_str) const;
+	const gpos::Ref<CDXLNode> GetCTEProducer(const CHAR *cte_str) const;
 
 	// lookup CTE producer target list by its name
 	List *GetCTEProducerTargetList(const CHAR *cte_str) const;
 
 	// add a new CTE producer for this level
 	void AddCTEProducer(CMemoryPool *mp, CommonTableExpr *cte,
-						const CDXLNode *cte_producer);
+						const gpos::Ref<CDXLNode> cte_producer);
 };
 
 // hash maps mapping ULONG -> CCTEListEntry

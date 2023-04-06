@@ -56,8 +56,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::Ref<CXformContext>, gpos::Ref<CXformResult>,
+				   gpos::Ref<CExpression>) const override;
 
 };	// class CXformImplementLimit
 

@@ -66,7 +66,7 @@ CParseHandlerScalarSwitch::StartElement(const XMLCh *const element_uri,
 			EdxltokenScalarSwitch);
 
 		// construct node
-		CDXLScalarSwitch *dxl_op =
+		gpos::Ref<CDXLScalarSwitch> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarSwitch(m_mp, m_mdid_type);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}

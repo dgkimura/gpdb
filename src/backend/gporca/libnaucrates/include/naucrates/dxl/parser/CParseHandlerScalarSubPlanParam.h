@@ -36,7 +36,7 @@ class CParseHandlerScalarSubPlanParam : public CParseHandlerScalarOp
 {
 private:
 	// column reference
-	CDXLColRef *m_dxl_colref;
+	gpos::Ref<CDXLColRef> m_dxl_colref;
 
 	// process the start of an element
 	void StartElement(
@@ -65,14 +65,14 @@ public:
 	~CParseHandlerScalarSubPlanParam() override;
 
 	// return column reference
-	CDXLColRef *
+	gpos::Ref<CDXLColRef>
 	MakeDXLColRef(void) const
 	{
 		return m_dxl_colref;
 	}
 
 	// return param type
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId(void) const
 	{
 		return m_dxl_colref->MdidType();

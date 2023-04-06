@@ -52,26 +52,27 @@ private:
 	static const DOUBLE m_dOuterInnerRatioThreshold;
 
 	// check the stats ratio to decide whether to apply the xform or not
-	static BOOL FApplyXformUsingStatsInfo(const IStatistics *outer_stats,
-										  const IStatistics *inner_side_stats);
+	static BOOL FApplyXformUsingStatsInfo(
+		const gpos::Ref<IStatistics> outer_stats,
+		const gpos::Ref<IStatistics> inner_side_stats);
 
 	// check if the inner expression is of a type which should be considered by this xform
-	static BOOL FValidInnerExpr(CExpression *pexprInner);
+	static BOOL FValidInnerExpr(gpos::Ref<CExpression> pexprInner);
 
 	// construct a left anti semi join with the CTE consumer (ulCTEJoinId) as outer
 	// and a group by as inner
-	static CExpression *PexprLeftAntiSemiJoinWithInnerGroupBy(
+	static gpos::Ref<CExpression> PexprLeftAntiSemiJoinWithInnerGroupBy(
 		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
-		CColRefArray *pdrgpcrOuterCopy, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
+		CColRefArray *pdrgpcrOuterCopy, gpos::Ref<CColRefSet> pcrsScalar,
+		gpos::Ref<CColRefSet> pcrsInner, CColRefArray *pdrgpcrJoinOutput,
 		ULONG ulCTEJoinId, ULONG ulCTEOuterId);
 
 	// return a project over a left anti semi join that appends nulls for all
 	// columns in the original inner child
-	static CExpression *PexprProjectOverLeftAntiSemiJoin(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId,
+	static gpos::Ref<CExpression> PexprProjectOverLeftAntiSemiJoin(
+		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
+		CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId,
 		CColRefArray **ppdrgpcrProjectOutput);
 
 public:
@@ -109,8 +110,9 @@ public:
 	}
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 	// return true if xform should be applied only once
 	BOOL IsApplyOnce() override;

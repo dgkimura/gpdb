@@ -38,9 +38,9 @@ CDatumOidGPDB::CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null)
 	: m_mdid(nullptr), m_val(oid_val), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = dynamic_cast<const CMDTypeOidGPDB *>(
-					  md_accessor->PtMDType<IMDTypeOid>(sysid))
-					  ->MDId();
+	gpos::Ref<IMDId> mdid = dynamic_cast<const gpos::Ref<CMDTypeOidGPDB> >(
+								md_accessor->PtMDType<IMDTypeOid>(sysid))
+								->MDId();
 	mdid->AddRef();
 
 	m_mdid = mdid;
@@ -60,7 +60,7 @@ CDatumOidGPDB::CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumOidGPDB::CDatumOidGPDB(IMDId *mdid, OID oid_val, BOOL is_null)
+CDatumOidGPDB::CDatumOidGPDB(gpos::Ref<IMDId> mdid, OID oid_val, BOOL is_null)
 	: m_mdid(mdid), m_val(oid_val), m_is_null(is_null)
 {
 	GPOS_ASSERT(nullptr != m_mdid);
@@ -136,7 +136,7 @@ CDatumOidGPDB::Size() const
 //		Accessor of type information
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDatumOidGPDB::MDId() const
 {
 	return m_mdid;
@@ -190,15 +190,15 @@ CDatumOidGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumOidGPDB::Matches(const IDatum *datum) const
+CDatumOidGPDB::Matches(const gpos::Ref<IDatum> datum) const
 {
 	if (!datum->MDId()->Equals(m_mdid))
 	{
 		return false;
 	}
 
-	const CDatumOidGPDB *datum_cast =
-		dynamic_cast<const CDatumOidGPDB *>(datum);
+	const gpos::Ref<CDatumOidGPDB> datum_cast =
+		dynamic_cast<const gpos::Ref<CDatumOidGPDB> >(datum);
 
 	if (!datum_cast->IsNull() && !IsNull())
 	{
@@ -221,7 +221,7 @@ CDatumOidGPDB::Matches(const IDatum *datum) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CDatumOidGPDB::MakeCopy(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();

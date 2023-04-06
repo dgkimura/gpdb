@@ -39,7 +39,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// range of all xforms
-	CXform *m_rgpxf[CXform::ExfSentinel];
+	gpos::Ref<CXform> m_rgpxf[CXform::ExfSentinel];
 
 	// name -> xform map
 	XformNameToXformMap *m_phmszxform;
@@ -60,7 +60,7 @@ private:
 	explicit CXformFactory(CMemoryPool *mp);
 
 	// actual adding of xform
-	void Add(CXform *pxform);
+	void Add(gpos::Ref<CXform> pxform);
 
 	// skip unused xforms that have been removed, preserving
 	// xform ids of the remaining ones
@@ -80,10 +80,10 @@ public:
 	void Instantiate();
 
 	// accessor by xform id
-	CXform *Pxf(CXform::EXformId exfid) const;
+	gpos::Ref<CXform> Pxf(CXform::EXformId exfid) const;
 
 	// accessor by xform name
-	CXform *Pxf(const CHAR *szXformName) const;
+	gpos::Ref<CXform> Pxf(const CHAR *szXformName) const;
 
 	// accessor of exploration xforms
 	CXformSet *

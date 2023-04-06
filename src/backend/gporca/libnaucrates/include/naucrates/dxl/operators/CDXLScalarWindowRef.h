@@ -43,10 +43,10 @@ class CDXLScalarWindowRef : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -67,8 +67,8 @@ public:
 	CDXLScalarWindowRef(const CDXLScalarWindowRef &) = delete;
 
 	// ctor
-	CDXLScalarWindowRef(CMemoryPool *mp, IMDId *pmdidWinfunc,
-						IMDId *mdid_return_type, BOOL is_distinct,
+	CDXLScalarWindowRef(CMemoryPool *mp, gpos::Ref<IMDId> pmdidWinfunc,
+						gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct,
 						BOOL is_star_arg, BOOL is_simple_agg,
 						EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition);
 
@@ -82,14 +82,14 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// catalog id of the function
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid;
 	}
 
 	// return type of the function
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid;
@@ -140,16 +140,16 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarWindowRef *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarWindowRef>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarWindowRef == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarWindowRef *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarWindowRef> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -158,7 +158,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

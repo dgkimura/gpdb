@@ -44,7 +44,7 @@ public:
 
 private:
 	// id of the scalar comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of scalar comparison operator
 	CMDName *m_scalar_op_mdname;
@@ -56,14 +56,15 @@ public:
 	CDXLScalarSubqueryQuantified(CDXLScalarSubqueryQuantified &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryQuantified(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CDXLScalarSubqueryQuantified(CMemoryPool *mp,
+								 gpos::Ref<IMDId> scalar_op_mdid,
 								 CMDName *mdname, ULONG colid);
 
 	// dtor
 	~CDXLScalarSubqueryQuantified() override;
 
 	// scalar operator id
-	IMDId *
+	gpos::Ref<IMDId>
 	GetScalarOpMdId() const
 	{
 		return m_scalar_op_mdid;
@@ -84,17 +85,18 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						const gpos::Ref<CDXLNode>) const override;
 
 	// conversion function
-	static CDXLScalarSubqueryQuantified *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarSubqueryQuantified>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryAll == dxl_op->GetDXLOperator() ||
 					EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSubqueryQuantified *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarSubqueryQuantified> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -108,7 +110,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

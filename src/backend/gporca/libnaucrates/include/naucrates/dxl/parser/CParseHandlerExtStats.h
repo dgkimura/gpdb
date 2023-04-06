@@ -42,7 +42,7 @@ private:
 		const XMLCh *const element_qname		// element's qname
 		) override;
 
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	CMDName *m_mdname;
 

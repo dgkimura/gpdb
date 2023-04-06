@@ -39,13 +39,13 @@ private:
 	CColRefArray *m_pdrgpcrInsert;
 
 	// ctid column
-	CColRef *m_pcrCtid;
+	gpos::Ref<CColRef> m_pcrCtid;
 
 	// segmentId column
-	CColRef *m_pcrSegmentId;
+	gpos::Ref<CColRef> m_pcrSegmentId;
 
 	// action column
-	CColRef *m_pcrAction;
+	gpos::Ref<CColRef> m_pcrAction;
 
 public:
 	CLogicalSplit(const CLogicalSplit &) = delete;
@@ -55,8 +55,9 @@ public:
 
 	// ctor
 	CLogicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
-				  CColRefArray *pdrgpcrInsert, CColRef *pcrCtid,
-				  CColRef *pcrSegmentId, CColRef *pcrAction);
+				  CColRefArray *pdrgpcrInsert, gpos::Ref<CColRef> pcrCtid,
+				  gpos::Ref<CColRef> pcrSegmentId,
+				  gpos::Ref<CColRef> pcrAction);
 
 	// dtor
 	~CLogicalSplit() override;
@@ -90,21 +91,21 @@ public:
 	}
 
 	// ctid column
-	CColRef *
+	gpos::Ref<CColRef>
 	PcrCtid() const
 	{
 		return m_pcrCtid;
 	}
 
 	// segmentId column
-	CColRef *
+	gpos::Ref<CColRef>
 	PcrSegmentId() const
 	{
 		return m_pcrSegmentId;
 	}
 
 	// action column
-	CColRef *
+	gpos::Ref<CColRef>
 	PcrAction() const
 	{
 		return m_pcrAction;
@@ -114,7 +115,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -124,21 +125,21 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 // mp
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -150,7 +151,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -158,9 +159,9 @@ public:
 	}
 
 	// compute required stats columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-			 ULONG child_index) const override
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index) const override
 	{
 		return PcrsReqdChildStats(mp, exprhdl, pcrsInput,
 								  exprhdl.DeriveUsedColumns(1), child_index);
@@ -174,12 +175,13 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -193,13 +195,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSplit *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalSplit>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSplit == pop->Eopid());
 
-		return dynamic_cast<CLogicalSplit *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalSplit> >(pop);
 	}
 
 	// debug print

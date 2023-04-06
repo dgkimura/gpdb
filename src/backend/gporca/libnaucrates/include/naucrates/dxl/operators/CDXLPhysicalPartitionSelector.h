@@ -44,7 +44,7 @@ class CDXLPhysicalPartitionSelector : public CDXLPhysical
 {
 private:
 	// table id
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// selector id
 	ULONG m_selector_id;
@@ -58,7 +58,7 @@ public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;
 
 	// ctor
-	CDXLPhysicalPartitionSelector(CMemoryPool *mp, IMDId *mdid_rel,
+	CDXLPhysicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel,
 								  ULONG selector_id, ULONG scan_id,
 								  ULongPtrArray *parts);
 
@@ -72,7 +72,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// table id
-	IMDId *
+	gpos::Ref<IMDId>
 	GetRelMdId() const
 	{
 		return m_rel_mdid;
@@ -100,23 +100,24 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalPartitionSelector *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalPartitionSelector>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalPartitionSelector ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalPartitionSelector *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalPartitionSelector> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

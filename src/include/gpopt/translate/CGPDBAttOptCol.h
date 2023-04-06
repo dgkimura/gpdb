@@ -37,16 +37,17 @@ class CGPDBAttOptCol : public CRefCount<CGPDBAttOptCol>
 {
 private:
 	// gpdb att info
-	CGPDBAttInfo *m_gpdb_att_info;
+	gpos::Ref<CGPDBAttInfo> m_gpdb_att_info;
 
 	// optimizer col info
-	COptColInfo *m_opt_col_info;
+	gpos::Ref<COptColInfo> m_opt_col_info;
 
 public:
 	CGPDBAttOptCol(const CGPDBAttOptCol &) = delete;
 
 	// ctor
-	CGPDBAttOptCol(CGPDBAttInfo *gpdb_att_info, COptColInfo *opt_col_info)
+	CGPDBAttOptCol(gpos::Ref<CGPDBAttInfo> gpdb_att_info,
+				   gpos::Ref<COptColInfo> opt_col_info)
 		: m_gpdb_att_info(gpdb_att_info), m_opt_col_info(opt_col_info)
 	{
 		GPOS_ASSERT(nullptr != m_gpdb_att_info);
@@ -61,14 +62,14 @@ public:
 	}
 
 	// accessor
-	const CGPDBAttInfo *
+	const gpos::Ref<CGPDBAttInfo>
 	GetGPDBAttInfo() const
 	{
 		return m_gpdb_att_info;
 	}
 
 	// accessor
-	const COptColInfo *
+	const gpos::Ref<COptColInfo>
 	GetOptColInfo() const
 	{
 		return m_opt_col_info;

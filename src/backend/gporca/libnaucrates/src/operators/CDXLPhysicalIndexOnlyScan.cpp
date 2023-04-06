@@ -27,8 +27,9 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr,
-	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr,
+	EdxlIndexScanDirection idx_scan_direction)
 	: CDXLPhysicalIndexScan(mp, table_descr, dxl_index_descr,
 							idx_scan_direction)
 {

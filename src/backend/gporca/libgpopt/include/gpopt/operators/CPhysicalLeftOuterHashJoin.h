@@ -29,9 +29,9 @@ class CPhysicalLeftOuterHashJoin : public CPhysicalHashJoin
 {
 private:
 	// helper for deriving hash join distribution from hashed children
-	CDistributionSpec *PdsDeriveFromHashedChildren(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedChildren(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 public:
 	CPhysicalLeftOuterHashJoin(const CPhysicalLeftOuterHashJoin &) = delete;
@@ -61,17 +61,17 @@ public:
 	}
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CDistributionSpec> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CPhysicalLeftOuterHashJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalLeftOuterHashJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalLeftOuterHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftOuterHashJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalLeftOuterHashJoin> >(pop);
 	}
 
 

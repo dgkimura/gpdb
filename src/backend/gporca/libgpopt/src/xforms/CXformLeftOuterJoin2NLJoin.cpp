@@ -68,9 +68,9 @@ CXformLeftOuterJoin2NLJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftOuterJoin2NLJoin::Transform(CXformContext *pxfctxt,
-									  CXformResult *pxfres,
-									  CExpression *pexpr) const
+CXformLeftOuterJoin2NLJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+									  gpos::Ref<CXformResult> pxfres,
+									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

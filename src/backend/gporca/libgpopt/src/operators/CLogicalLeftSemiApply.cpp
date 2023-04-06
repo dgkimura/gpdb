@@ -66,7 +66,7 @@ CLogicalLeftSemiApply::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalLeftSemiApply::DeriveOutputColumns(CMemoryPool *,  // mp
 										   CExpressionHandle &exprhdl)
 {
@@ -84,7 +84,7 @@ CLogicalLeftSemiApply::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalLeftSemiApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

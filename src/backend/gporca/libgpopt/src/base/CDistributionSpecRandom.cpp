@@ -43,7 +43,8 @@ CDistributionSpecRandom::CDistributionSpecRandom()
 	}
 }
 
-CDistributionSpecRandom::CDistributionSpecRandom(CColRef *gp_segment_id_)
+CDistributionSpecRandom::CDistributionSpecRandom(
+	gpos::Ref<CColRef> gp_segment_id_)
 	: m_gp_segment_id(gp_segment_id_)
 {
 	if (COptCtxt::PoctxtFromTLS()->FDMLQuery())
@@ -63,7 +64,7 @@ CDistributionSpecRandom::CDistributionSpecRandom(CColRef *gp_segment_id_)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRandom::Matches(const CDistributionSpec *pds) const
+CDistributionSpecRandom::Matches(const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (pds->Edt() == CDistributionSpec::EdtRouted)
 	{
@@ -71,8 +72,8 @@ CDistributionSpecRandom::Matches(const CDistributionSpec *pds) const
 		// If both gp_segment_ids are null, then it does not match
 		// If one gp_segment_id is null and the other is not, it doesn't match
 		// If both gp_segment_ids are not null, they match iff they are equal
-		const CDistributionSpecRouted *pdsRouted =
-			static_cast<const CDistributionSpecRouted *>(pds);
+		const gpos::Ref<CDistributionSpecRouted> pdsRouted =
+			static_cast<const gpos::Ref<CDistributionSpecRouted> >(pds);
 		GPOS_ASSERT(pdsRouted != nullptr);
 
 		const BOOL localNull = m_gp_segment_id == nullptr;
@@ -89,8 +90,8 @@ CDistributionSpecRandom::Matches(const CDistributionSpec *pds) const
 	}
 	else if (pds->Edt() == CDistributionSpec::EdtRandom)
 	{
-		const CDistributionSpecRandom *pdsRandom =
-			static_cast<const CDistributionSpecRandom *>(pds);
+		const gpos::Ref<CDistributionSpecRandom> pdsRandom =
+			static_cast<const gpos::Ref<CDistributionSpecRandom> >(pds);
 
 		return pdsRandom->IsDuplicateSensitive() == m_is_duplicate_sensitive;
 	}
@@ -109,7 +110,8 @@ CDistributionSpecRandom::Matches(const CDistributionSpec *pds) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRandom::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecRandom::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Matches(pds))
 	{
@@ -137,13 +139,13 @@ CDistributionSpecRandom::FSatisfies(const CDistributionSpec *pds) const
 void
 CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *
+										 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG
 										 ,
 										 CExpressionArray *pdrgpexpr,
-										 CExpression *pexpr)
+										 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -187,9 +189,9 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 	//         ->  Result  (cost=0.00..0.00 rows=1 width=1)  (#2)  ==> Motion converted to Result Node
 	//            ->  Values Scan on "Values"  (cost=0.00..0.00 rows=2 width=4) ==> Derives universal spec
 
-	CDistributionSpec *expr_dist_spec =
+	gpos::Ref<CDistributionSpec> expr_dist_spec =
 		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
-	CDistributionSpecRandom *random_dist_spec = nullptr;
+	gpos::Ref<CDistributionSpecRandom> random_dist_spec = nullptr;
 
 	if (CUtils::FDuplicateHazardDistributionSpec(expr_dist_spec))
 	{
@@ -208,7 +210,7 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 
 	// add a distribution enforcer
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRandom(mp, random_dist_spec), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }

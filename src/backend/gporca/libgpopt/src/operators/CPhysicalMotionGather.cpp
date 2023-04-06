@@ -48,7 +48,7 @@ CPhysicalMotionGather::CPhysicalMotionGather(
 //---------------------------------------------------------------------------
 CPhysicalMotionGather::CPhysicalMotionGather(
 	CMemoryPool *mp, CDistributionSpecSingleton::ESegmentType est,
-	COrderSpec *pos)
+	gpos::Ref<COrderSpec> pos)
 	: CPhysicalMotion(mp),
 	  m_pdssSingeton(nullptr),
 	  m_pos(pos),
@@ -86,14 +86,15 @@ CPhysicalMotionGather::~CPhysicalMotionGather()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionGather::Matches(COperator *pop) const
+CPhysicalMotionGather::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalMotionGather *popGather = CPhysicalMotionGather::PopConvert(pop);
+	gpos::Ref<CPhysicalMotionGather> popGather =
+		CPhysicalMotionGather::PopConvert(pop);
 
 	return Est() == popGather->Est() && m_pos->Matches(popGather->Pos());
 }
@@ -106,19 +107,20 @@ CPhysicalMotionGather::Matches(COperator *pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CColRefSet *pcrsRequired, ULONG child_index,
+									gpos::Ref<CColRefSet> pcrsRequired,
+									ULONG child_index,
 									CDrvdPropArray *,  // pdrgpdpCtxt
 									ULONG			   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 
-	CColRefSet *pcrsChildReqd =
+	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
@@ -135,7 +137,7 @@ CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalMotionGather::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										 CColRefSet *pcrsRequired,
+										 gpos::Ref<CColRefSet> pcrsRequired,
 										 ULONG	// ulOptReq
 ) const
 {
@@ -152,7 +154,7 @@ CPhysicalMotionGather::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
-								 const CEnfdOrder *peo) const
+								 const gpos::Ref<CEnfdOrder> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -182,9 +184,9 @@ CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   COrderSpec *,  //posInput,
+								   gpos::Ref<COrderSpec>,  //posInput,
 								   ULONG child_index,
 								   CDrvdPropArray *,  // pdrgpdpCtxt
 								   ULONG			  // ulOptReq
@@ -208,7 +210,7 @@ CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionGather::PosDerive(CMemoryPool *,		  // mp
 								 CExpressionHandle &  // exprhdl
 ) const
@@ -248,13 +250,13 @@ CPhysicalMotionGather::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionGather *
-CPhysicalMotionGather::PopConvert(COperator *pop)
+gpos::Ref<CPhysicalMotionGather>
+CPhysicalMotionGather::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionGather == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionGather *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalMotionGather> >(pop);
 }
 
 // EOF

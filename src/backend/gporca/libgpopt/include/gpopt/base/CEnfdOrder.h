@@ -46,7 +46,7 @@ public:
 
 private:
 	// required sort order
-	COrderSpec *m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// order matching type
 	EOrderMatching m_eom;
@@ -58,7 +58,7 @@ public:
 	CEnfdOrder(const CEnfdOrder &) = delete;
 
 	// ctor
-	CEnfdOrder(COrderSpec *pos, EOrderMatching eom);
+	CEnfdOrder(gpos::Ref<COrderSpec> pos, EOrderMatching eom);
 
 	// dtor
 	~CEnfdOrder() override;
@@ -68,21 +68,22 @@ public:
 
 	// check if the given order specification is compatible with the
 	// order specification of this object for the specified matching type
-	BOOL FCompatible(COrderSpec *pos) const;
+	BOOL FCompatible(gpos::Ref<COrderSpec> pos) const;
 
 	// required order accessor
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	PosRequired() const
 	{
 		return m_pos;
 	}
 
 	// get order enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::Ref<CPhysical> popPhysical,
 							BOOL fOrderReqd) const;
 
 	// property spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_pos;
@@ -97,7 +98,7 @@ public:
 
 	// matching function
 	BOOL
-	Matches(CEnfdOrder *peo)
+	Matches(gpos::Ref<CEnfdOrder> peo)
 	{
 		GPOS_ASSERT(nullptr != peo);
 

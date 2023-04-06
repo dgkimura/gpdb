@@ -17,11 +17,12 @@
 using namespace gpopt;
 
 // return statistics object after union all operation with input statistics object
-CStatistics *
+gpos::Ref<CStatistics>
 CUnionAllStatsProcessor::CreateStatsForUnionAll(
-	CMemoryPool *mp, const CStatistics *stats_first_child,
-	const CStatistics *stats_second_child, ULongPtrArray *output_colids,
-	ULongPtrArray *first_child_colids, ULongPtrArray *second_child_colids)
+	CMemoryPool *mp, const gpos::Ref<CStatistics> stats_first_child,
+	const gpos::Ref<CStatistics> stats_second_child,
+	ULongPtrArray *output_colids, ULongPtrArray *first_child_colids,
+	ULongPtrArray *second_child_colids)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != stats_second_child);
@@ -75,7 +76,8 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 			}
 			else
 			{
-				CColRef *column_ref = col_factory->LookupColRef(output_colid);
+				gpos::Ref<CColRef> column_ref =
+					col_factory->LookupColRef(output_colid);
 				GPOS_ASSERT(nullptr != column_ref);
 
 				CHistogram *dummy_histogram = CHistogram::MakeDefaultHistogram(
@@ -101,7 +103,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	second_child_colids->Release();
 
 	// create an output stats object
-	CStatistics *unionall_stats = GPOS_NEW(mp)
+	gpos::Ref<CStatistics> unionall_stats = GPOS_NEW(mp)
 		CStatistics(mp, histograms_new, column_to_width_map, unionall_rows,
 					is_empty_unionall, 0 /* m_num_predicates */
 		);

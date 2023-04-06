@@ -53,8 +53,9 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, INT return_type_modifier,
+CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type,
+						 INT return_type_modifier,
 						 const CWStringConst *pstrFunc)
 	: CScalar(mp),
 	  m_func_mdid(mdid_func),
@@ -69,7 +70,8 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
 	GPOS_ASSERT(mdid_return_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+	const gpos::Ref<IMDFunction> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
@@ -117,7 +119,7 @@ CScalarFunc::PstrFunc() const
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarFunc::FuncMdId() const
 {
 	return m_func_mdid;
@@ -165,13 +167,13 @@ CScalarFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarFunc::Matches(COperator *pop) const
+CScalarFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CScalarFunc *popScFunc = CScalarFunc::PopConvert(pop);
+	gpos::Ref<CScalarFunc> popScFunc = CScalarFunc::PopConvert(pop);
 
 	// match if func ids are identical
 	return popScFunc->FuncMdId()->Equals(m_func_mdid) &&
@@ -186,7 +188,7 @@ CScalarFunc::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarFunc::MdidType() const
 {
 	return m_return_type_mdid;

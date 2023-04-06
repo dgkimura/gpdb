@@ -56,17 +56,18 @@ CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 //		Copy function
 //
 //---------------------------------------------------------------------------
-CDrvdPropCtxt *
+gpos::Ref<CDrvdPropCtxt>
 CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 {
-	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
+		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
 	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		CDrvdPropPlan *pdpplan =
-			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
+		gpos::Ref<CDrvdPropPlan> pdpplan =
+			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
 		pdpplan->AddRef();
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
@@ -89,7 +90,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
+CDrvdPropCtxtPlan::AddProps(gpos::Ref<CDrvdProp> pdp)
 {
 	if (CDrvdProp::EptPlan != pdp->Ept())
 	{
@@ -97,10 +98,10 @@ CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
 		return;
 	}
 
-	CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan(pdp);
+	gpos::Ref<CDrvdPropPlan> pdpplan = CDrvdPropPlan::Pdpplan(pdp);
 
 	ULONG ulProducerId = gpos::ulong_max;
-	CDrvdPropPlan *pdpplanProducer =
+	gpos::Ref<CDrvdPropPlan> pdpplanProducer =
 		pdpplan->GetCostModel()->PdpplanProducer(&ulProducerId);
 	if (nullptr == pdpplanProducer)
 	{
@@ -133,8 +134,8 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		CDrvdPropPlan *pdpplan =
-			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
+		gpos::Ref<CDrvdPropPlan> pdpplan =
+			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
 
 		os << id << "-->" << *pdpplan << std::endl;
 	}
@@ -151,7 +152,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 //		Return the plan properties of cte producer with given id
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 {
 	GPOS_ASSERT(nullptr != m_phmulpdpCTEs);
@@ -169,7 +170,8 @@ CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId)
+CDrvdPropCtxtPlan::CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan,
+										ULONG ulCTEId)
 {
 	GPOS_ASSERT(nullptr != pdpplan);
 

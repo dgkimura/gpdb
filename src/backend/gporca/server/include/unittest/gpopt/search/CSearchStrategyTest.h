@@ -30,10 +30,10 @@ class CSearchStrategyTest
 {
 private:
 	// type definition for of expression generator
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	// type definition for of optimize function
-	using PfnOptimize = void (*)(CMemoryPool *, CExpression *,
+	using PfnOptimize = void (*)(CMemoryPool *, gpos::Ref<CExpression>,
 								 CSearchStageArray *);
 
 	// generate random search strategy
@@ -44,7 +44,7 @@ private:
 						 CSearchStageArray *search_stage_array,
 						 PfnOptimize pfnOptimize);
 
-	static void BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
+	static void BuildMemo(CMemoryPool *mp, gpos::Ref<CExpression> pexprInput,
 						  CSearchStageArray *search_stage_array);
 
 public:

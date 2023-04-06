@@ -29,7 +29,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(
-	CMemoryPool *mp, CDXLIndexDescr *dxl_index_descr)
+	CMemoryPool *mp, gpos::Ref<CDXLIndexDescr> dxl_index_descr)
 	: CDXLScalar(mp), m_dxl_index_descr(dxl_index_descr)
 {
 	GPOS_ASSERT(nullptr != m_dxl_index_descr);
@@ -71,8 +71,8 @@ CDXLScalarBitmapIndexProbe::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::SerializeToDXL(CXMLSerializer *xml_serializer,
-										   const CDXLNode *dxlnode) const
+CDXLScalarBitmapIndexProbe::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -98,7 +98,7 @@ CDXLScalarBitmapIndexProbe::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBitmapIndexProbe::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 										BOOL validate_children) const
 {
 	// bitmap index probe has 1 child: the index condition list
@@ -106,7 +106,7 @@ CDXLScalarBitmapIndexProbe::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		CDXLNode *pdxlnIndexCondList = (*dxlnode)[0];
+		gpos::Ref<CDXLNode> pdxlnIndexCondList = (*dxlnode)[0];
 		GPOS_ASSERT(EdxlopScalarIndexCondList ==
 					pdxlnIndexCondList->GetOperator()->GetDXLOperator());
 		pdxlnIndexCondList->GetOperator()->AssertValid(pdxlnIndexCondList,

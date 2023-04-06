@@ -45,25 +45,26 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxl_node) const override;
+						const gpos::Ref<CDXLNode> dxl_node) const override;
 
 	// set alias name
 	void SetAliasName(CMDName *);
 
 	// conversion function
-	static CDXLLogicalProject *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLLogicalProject>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalProject == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalProject *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLLogicalProject> >(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

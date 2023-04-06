@@ -16,7 +16,7 @@ public:
 
 	EDistributionType Edt() const override;
 
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	const CHAR *
 	SzId() const override
@@ -25,8 +25,9 @@ public:
 	}
 
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpression> pexpr) override;
 };
 }  // namespace gpopt
 

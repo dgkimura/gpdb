@@ -30,7 +30,7 @@ class CDatumBoolGPDB : public IDatumBool
 {
 private:
 	// type information
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// boolean value
 	BOOL m_value;
@@ -43,13 +43,13 @@ public:
 
 	// ctors
 	CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null = false);
-	CDatumBoolGPDB(IMDId *mdid, BOOL value, BOOL is_null = false);
+	CDatumBoolGPDB(gpos::Ref<IMDId> mdid, BOOL value, BOOL is_null = false);
 
 	// dtor
 	~CDatumBoolGPDB() override;
 
 	// accessor of metadata type mdid
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// accessor of boolean value
 	BOOL GetValue() const override;
@@ -67,10 +67,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *) const override;
+	BOOL Matches(const gpos::Ref<IDatum>) const override;
 
 	// copy datum
-	IDatum *MakeCopy(CMemoryPool *mp) const override;
+	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

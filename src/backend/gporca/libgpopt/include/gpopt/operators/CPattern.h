@@ -50,13 +50,13 @@ public:
 	}
 
 	// create derived properties container
-	CDrvdProp *PdpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -65,23 +65,23 @@ public:
 	virtual BOOL FLeaf() const = 0;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
-	static CPattern *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPattern>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FPattern());
 
-		return dynamic_cast<CPattern *>(pop);
+		return dynamic_cast<gpos::Ref<CPattern> >(pop);
 	}
 
 	// helper to check multi-node pattern
 	static BOOL
-	FMultiNode(COperator *pop)
+	FMultiNode(gpos::Ref<COperator> pop)
 	{
 		return COperator::EopPatternMultiLeaf == pop->Eopid() ||
 			   COperator::EopPatternMultiTree == pop->Eopid();

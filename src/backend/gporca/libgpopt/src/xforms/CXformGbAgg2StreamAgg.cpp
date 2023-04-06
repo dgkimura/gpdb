@@ -48,7 +48,8 @@ CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg(CExpression *pexprPattern)
+CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg(
+	gpos::Ref<CExpression> pexprPattern)
 	: CXformImplementation(pexprPattern)
 {
 }
@@ -65,7 +66,7 @@ CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg(CExpression *pexprPattern)
 CXform::EXformPromise
 CXformGbAgg2StreamAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
 	if (0 == popAgg->Pdrgpcr()->Size() ||
 		!CUtils::FComparisonPossible(popAgg->Pdrgpcr(), IMDType::EcmptL) ||
 		exprhdl.DeriveHasSubquery(1))
@@ -88,20 +89,21 @@ CXformGbAgg2StreamAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2StreamAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformGbAgg2StreamAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
 	// extract components
-	CExpression *pexprRel = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRel = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref children
 	pexprRel->AddRef();
@@ -114,7 +116,7 @@ CXformGbAgg2StreamAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalStreamAgg(
 			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),

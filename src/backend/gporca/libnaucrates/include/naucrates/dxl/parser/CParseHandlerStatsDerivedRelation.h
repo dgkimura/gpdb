@@ -49,7 +49,7 @@ private:
 	ULONG m_relallvisible;
 
 	// relation stats
-	CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
+	gpos::Ref<CDXLStatsDerivedRelation> m_dxl_stats_derived_relation;
 
 	// process the start of an element
 	void StartElement(
@@ -79,7 +79,7 @@ public:
 	~CParseHandlerStatsDerivedRelation() override;
 
 	// the derived relation stats
-	CDXLStatsDerivedRelation *
+	gpos::Ref<CDXLStatsDerivedRelation>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation;

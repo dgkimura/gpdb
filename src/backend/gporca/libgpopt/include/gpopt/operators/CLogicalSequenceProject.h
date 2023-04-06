@@ -32,7 +32,7 @@ class CLogicalSequenceProject : public CLogicalUnary
 {
 private:
 	// partition by keys
-	CDistributionSpec *m_pds;
+	gpos::Ref<CDistributionSpec> m_pds;
 
 	// order specs of child window functions
 	COrderSpecArray *m_pdrgpos;
@@ -56,7 +56,7 @@ public:
 	CLogicalSequenceProject(const CLogicalSequenceProject &) = delete;
 
 	// ctor
-	CLogicalSequenceProject(CMemoryPool *mp, CDistributionSpec *pds,
+	CLogicalSequenceProject(CMemoryPool *mp, gpos::Ref<CDistributionSpec> pds,
 							COrderSpecArray *pdrgpos,
 							CWindowFrameArray *pdrgpwf);
 
@@ -81,7 +81,7 @@ public:
 	}
 
 	// distribution spec
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const
 	{
 		return m_pds;
@@ -116,9 +116,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return true if we can pull projections up past this operator from its given child
 	BOOL FCanPullProjectionsUp(ULONG  //child_index
@@ -132,15 +132,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -148,7 +148,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -167,11 +167,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	ULONG HashValue() const override;
 
@@ -179,20 +180,21 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// remove outer references from Order By/ Partition By clauses, and return a new operator
-	CLogicalSequenceProject *PopRemoveLocalOuterRefs(
+	gpos::Ref<CLogicalSequenceProject> PopRemoveLocalOuterRefs(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// check for outer references in Partition/Order, or window frame edges
-	BOOL FHasLocalReferencesTo(const CColRefSet *outerRefsToCheck) const;
+	BOOL FHasLocalReferencesTo(
+		const gpos::Ref<CColRefSet> outerRefsToCheck) const;
 
 	// conversion function
-	static CLogicalSequenceProject *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalSequenceProject>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequenceProject == pop->Eopid());
 
-		return dynamic_cast<CLogicalSequenceProject *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalSequenceProject> >(pop);
 	}
 
 };	// class CLogicalSequenceProject

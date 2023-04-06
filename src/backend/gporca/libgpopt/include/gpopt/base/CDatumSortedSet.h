@@ -20,7 +20,7 @@ private:
 	BOOL m_fIncludesNull;
 
 public:
-	CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
+	CDatumSortedSet(CMemoryPool *mp, gpos::Ref<CExpression> pexprArray,
 					const IComparator *pcomp);
 
 	BOOL FIncludesNull() const;

@@ -54,7 +54,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -68,20 +68,21 @@ COrderSpecTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
-	CColRef *pcr1 =
+	gpos::Ref<CColRef> pcr1 =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
-	CColRef *pcr2 =
+	gpos::Ref<CColRef> pcr2 =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
-	CColRef *pcr3 =
+	gpos::Ref<CColRef> pcr3 =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 
 
-	COrderSpec *pos1 = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos1 = GPOS_NEW(mp) COrderSpec(mp);
 
-	IMDId *pmdidInt4LT = pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
+	gpos::Ref<IMDId> pmdidInt4LT =
+		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
 
@@ -91,7 +92,7 @@ COrderSpecTest::EresUnittest_Basics()
 	GPOS_ASSERT(pos1->Matches(pos1));
 	GPOS_ASSERT(pos1->FSatisfies(pos1));
 
-	COrderSpec *pos2 = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos2 = GPOS_NEW(mp) COrderSpec(mp);
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
@@ -116,11 +117,11 @@ COrderSpecTest::EresUnittest_Basics()
 	// iterate over the components of the order spec
 	for (ULONG ul = 0; ul < pos1->UlSortColumns(); ul++)
 	{
-		const CColRef *colref GPOS_ASSERTS_ONLY = pos1->Pcr(ul);
+		const gpos::Ref<CColRef> colref GPOS_ASSERTS_ONLY = pos1->Pcr(ul);
 
 		GPOS_ASSERT(nullptr != colref);
 
-		const IMDId *mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
+		const gpos::Ref<IMDId> mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
 
 		GPOS_ASSERT(mdid->IsValid());
 

@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicForeignScan::CDXLPhysicalDynamicForeignScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr, IMdIdArray *part_mdids,
-	ULongPtrArray *selector_ids, OID foreign_server_oid)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	IMdIdArray *part_mdids, ULongPtrArray *selector_ids, OID foreign_server_oid)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_part_mdids(part_mdids),
@@ -95,7 +95,7 @@ CDXLPhysicalDynamicForeignScan::GetOpNameStr() const
 //		Table descriptor for the foreign scan
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+const gpos::Ref<CDXLTableDescr>
 CDXLPhysicalDynamicForeignScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -116,8 +116,8 @@ CDXLPhysicalDynamicForeignScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicForeignScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-											   const CDXLNode *node) const
+CDXLPhysicalDynamicForeignScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -153,7 +153,7 @@ CDXLPhysicalDynamicForeignScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicForeignScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalDynamicForeignScan::AssertValid(const gpos::Ref<CDXLNode> node,
 											BOOL  // validate_children
 ) const
 {

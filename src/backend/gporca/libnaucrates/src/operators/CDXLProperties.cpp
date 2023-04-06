@@ -47,7 +47,8 @@ CDXLProperties::~CDXLProperties()
 //
 //---------------------------------------------------------------------------
 void
-CDXLProperties::SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation)
+CDXLProperties::SetStats(
+	gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation)
 {
 	// allow setting properties only once
 	GPOS_ASSERT(nullptr == m_dxl_stats_derived_relation);
@@ -63,7 +64,7 @@ CDXLProperties::SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation)
 //		Return operator's statistical information
 //
 //---------------------------------------------------------------------------
-const CDXLStatsDerivedRelation *
+const gpos::Ref<CDXLStatsDerivedRelation>
 CDXLProperties::GetDxlStatsDrvdRelation() const
 {
 	return m_dxl_stats_derived_relation;

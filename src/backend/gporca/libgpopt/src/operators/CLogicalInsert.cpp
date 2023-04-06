@@ -42,7 +42,8 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalInsert::CLogicalInsert(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+CLogicalInsert::CLogicalInsert(CMemoryPool *mp,
+							   gpos::Ref<CTableDescriptor> ptabdesc,
 							   CColRefArray *pdrgpcrSource)
 	: CLogical(mp), m_ptabdesc(ptabdesc), m_pdrgpcrSource(pdrgpcrSource)
 
@@ -76,14 +77,14 @@ CLogicalInsert::~CLogicalInsert()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInsert::Matches(COperator *pop) const
+CLogicalInsert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalInsert *popInsert = CLogicalInsert::PopConvert(pop);
+	gpos::Ref<CLogicalInsert> popInsert = CLogicalInsert::PopConvert(pop);
 
 	return m_ptabdesc->MDId()->Equals(popInsert->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrSource->Equals(popInsert->PdrgpcrSource());
@@ -116,7 +117,7 @@ CLogicalInsert::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist)
@@ -136,12 +137,12 @@ CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalInsert::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
 	return pcrsOutput;
 }
@@ -154,7 +155,7 @@ CLogicalInsert::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalInsert::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -201,7 +202,7 @@ CLogicalInsert::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalInsert::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
 							 IStatisticsArray *	 // not used

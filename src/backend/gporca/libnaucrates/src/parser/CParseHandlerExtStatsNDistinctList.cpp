@@ -125,7 +125,8 @@ CParseHandlerExtStatsNDistinctList::EndElement(
 		CParseHandlerExtStatsNDistinct *parse_handler_ext_stats_dep =
 			dynamic_cast<CParseHandlerExtStatsNDistinct *>((*this)[ul]);
 
-		CMDNDistinct *dep = parse_handler_ext_stats_dep->GetNDistinctAt();
+		gpos::Ref<CMDNDistinct> dep =
+			parse_handler_ext_stats_dep->GetNDistinctAt();
 		dep->AddRef();
 
 		m_ndistincts->Append(dep);

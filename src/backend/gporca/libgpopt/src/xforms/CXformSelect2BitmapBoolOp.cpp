@@ -67,15 +67,15 @@ CXformSelect2BitmapBoolOp::Exfp(CExpressionHandle &	 // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2BitmapBoolOp::Transform(CXformContext *pxfctxt,
-									 CXformResult *pxfres,
-									 CExpression *pexpr) const
+CXformSelect2BitmapBoolOp::Transform(gpos::Ref<CXformContext> pxfctxt,
+									 gpos::Ref<CXformResult> pxfres,
+									 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CExpression *pexprResult =
+	gpos::Ref<CExpression> pexprResult =
 		CXformUtils::PexprSelect2BitmapBoolOp(pxfctxt->Pmp(), pexpr);
 
 	if (nullptr != pexprResult)

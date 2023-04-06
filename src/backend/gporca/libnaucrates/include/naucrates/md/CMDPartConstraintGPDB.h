@@ -56,13 +56,13 @@ private:
 	BOOL m_is_unbounded;
 
 	// the DXL representation of the part constraint
-	CDXLNode *m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 public:
 	// ctor
 	CMDPartConstraintGPDB(CMemoryPool *mp,
 						  ULongPtrArray *level_with_default_part_array,
-						  BOOL is_unbounded, CDXLNode *dxlnode);
+						  BOOL is_unbounded, gpos::Ref<CDXLNode> dxlnode);
 
 	// dtor
 	~CMDPartConstraintGPDB() override;
@@ -71,7 +71,7 @@ public:
 	void Serialize(CXMLSerializer *xml_serializer) const override;
 
 	// the scalar expression of the part constraint
-	CExpression *GetPartConstraintExpr(
+	gpos::Ref<CExpression> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CColRefArray *colref_array) const override;
 

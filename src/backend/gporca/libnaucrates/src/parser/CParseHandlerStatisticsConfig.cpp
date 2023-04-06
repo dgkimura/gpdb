@@ -153,7 +153,7 @@ CParseHandlerStatisticsConfig::GetParseHandlerType() const
 //		Returns the statistics configuration
 //
 //---------------------------------------------------------------------------
-CStatisticsConfig *
+gpos::Ref<CStatisticsConfig>
 CParseHandlerStatisticsConfig::GetStatsConf() const
 {
 	return m_stats_conf;

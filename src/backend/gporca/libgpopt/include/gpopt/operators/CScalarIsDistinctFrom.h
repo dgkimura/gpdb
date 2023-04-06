@@ -35,7 +35,7 @@ public:
 	CScalarIsDistinctFrom(const CScalarIsDistinctFrom &) = delete;
 
 	// ctor
-	CScalarIsDistinctFrom(CMemoryPool *mp, IMDId *mdid_op,
+	CScalarIsDistinctFrom(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 						  const CWStringConst *pstrOp)
 		: CScalarCmp(mp, mdid_op, pstrOp, IMDType::EcmptIDF)
 	{
@@ -62,13 +62,14 @@ public:
 		return "CScalarIsDistinctFrom";
 	}
 
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// conversion function
-	static CScalarIsDistinctFrom *PopConvert(COperator *pop);
+	static gpos::Ref<CScalarIsDistinctFrom> PopConvert(
+		gpos::Ref<COperator> pop);
 
 	// get commuted scalar IDF operator
-	CScalarCmp *PopCommutedOp(CMemoryPool *mp) override;
+	gpos::Ref<CScalarCmp> PopCommutedOp(CMemoryPool *mp) override;
 
 };	// class CScalarIsDistinctFrom
 

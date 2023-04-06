@@ -68,9 +68,10 @@ CParseHandlerColStats::StartElement(const XMLCh *const element_uri,
 		GPOS_ASSERT(nullptr == m_mdid);
 
 		// parse mdid and name
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenColumnStats);
+		gpos::Ref<IMDId> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenColumnStats);
 		m_mdid = CMDIdColStats::CastMdid(mdid);
 
 		// parse column name
@@ -189,7 +190,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		CParseHandlerColStatsBucket *parse_handler_col_stats_bucket =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[ul]);
 
-		CDXLBucket *dxl_bucket =
+		gpos::Ref<CDXLBucket> dxl_bucket =
 			parse_handler_col_stats_bucket->GetDXLBucketAt();
 		dxl_bucket->AddRef();
 

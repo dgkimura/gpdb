@@ -53,7 +53,7 @@ CDXLWindowKey::~CDXLWindowKey()
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowKey::SetWindowFrame(CDXLWindowFrame *window_frame)
+CDXLWindowKey::SetWindowFrame(gpos::Ref<CDXLWindowFrame> window_frame)
 {
 	// allow setting window frame only once
 	GPOS_ASSERT(nullptr == m_window_frame_dxl);
@@ -69,7 +69,7 @@ CDXLWindowKey::SetWindowFrame(CDXLWindowFrame *window_frame)
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowKey::SetSortColList(CDXLNode *sort_col_list_dxlnode)
+CDXLWindowKey::SetSortColList(gpos::Ref<CDXLNode> sort_col_list_dxlnode)
 {
 	// allow setting window frame only once
 	GPOS_ASSERT(nullptr == m_sort_col_list_dxlnode);

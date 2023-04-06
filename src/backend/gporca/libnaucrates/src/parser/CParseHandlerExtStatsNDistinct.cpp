@@ -47,7 +47,7 @@ CParseHandlerExtStatsNDistinct::~CParseHandlerExtStatsNDistinct()
 //		The ndistinct constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDNDistinct *
+gpos::Ref<CMDNDistinct>
 CParseHandlerExtStatsNDistinct::GetNDistinctAt() const
 {
 	return m_ndistinct_md;

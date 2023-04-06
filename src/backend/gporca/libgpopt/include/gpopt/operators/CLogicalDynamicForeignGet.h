@@ -37,8 +37,8 @@ public:
 	explicit CLogicalDynamicForeignGet(CMemoryPool *mp);
 
 	CLogicalDynamicForeignGet(CMemoryPool *mp, const CName *pnameAlias,
-							  CTableDescriptor *ptabdesc, ULONG ulPartIndex,
-							  CColRefArray *pdrgpcrOutput,
+							  gpos::Ref<CTableDescriptor> ptabdesc,
+							  ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
 							  CColRef2dArray *pdrgpdrgpcrPart,
 							  IMdIdArray *partition_mdids,
 							  OID foreign_server_oid, BOOL is_master_only);
@@ -59,12 +59,12 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	OID
 	GetForeignServerOid() const
@@ -82,11 +82,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp,
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalDynamicForeignGet has no children");
@@ -102,8 +102,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -124,13 +125,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDynamicForeignGet *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalDynamicForeignGet>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicForeignGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalDynamicForeignGet *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalDynamicForeignGet> >(pop);
 	}
 
 };	// class CLogicalDynamicForeignGet

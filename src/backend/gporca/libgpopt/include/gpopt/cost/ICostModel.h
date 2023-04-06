@@ -70,11 +70,11 @@ public:
 	{
 	private:
 		// stats of the root
-		IStatistics *m_pstats;
+		gpos::Ref<IStatistics> m_pstats;
 
 	public:
 		// ctor
-		CCostingStats(IStatistics *stats) : m_pstats(stats)
+		CCostingStats(gpos::Ref<IStatistics> stats) : m_pstats(stats)
 		{
 			GPOS_ASSERT(nullptr != stats);
 		}
@@ -94,13 +94,13 @@ public:
 
 		// look up the number of distinct values of a particular column
 		CDouble
-		GetNDVs(const CColRef *colref)
+		GetNDVs(const gpos::Ref<CColRef> colref)
 		{
 			return m_pstats->GetNDVs(colref);
 		}
 
 		// root stats getter
-		IStatistics *
+		gpos::Ref<IStatistics>
 		Pstats()
 		{
 			return m_pstats;
@@ -122,7 +122,7 @@ public:
 		ULONG m_ulChildren;
 
 		// stats of the root
-		CCostingStats *m_pcstats;
+		gpos::Ref<CCostingStats> m_pcstats;
 
 		// row estimate of root
 		DOUBLE m_rows;
@@ -146,11 +146,12 @@ public:
 		DOUBLE *m_pdCostChildren;
 
 		// stats of the children
-		CCostingStats **m_pdrgstatsChildren;
+		gpos::Ref<CCostingStats> *m_pdrgstatsChildren;
 
 	public:
 		// ctor
-		SCostingInfo(CMemoryPool *mp, ULONG ulChildren, CCostingStats *pcstats)
+		SCostingInfo(CMemoryPool *mp, ULONG ulChildren,
+					 gpos::Ref<CCostingStats> pcstats)
 			: m_ulChildren(ulChildren),
 			  m_pcstats(pcstats),
 			  m_rows(0),
@@ -170,7 +171,7 @@ public:
 				m_pdRebindsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdCostChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdrgstatsChildren =
-					GPOS_NEW_ARRAY(mp, CCostingStats *, ulChildren);
+					GPOS_NEW_ARRAY(mp, gpos::Ref<CCostingStats>, ulChildren);
 
 				for (ULONG ul = 0; ul < m_ulChildren; ul++)
 				{
@@ -321,20 +322,20 @@ public:
 
 		// child stats setter
 		void
-		SetChildStats(ULONG ulPos, CCostingStats *child_stats)
+		SetChildStats(ULONG ulPos, gpos::Ref<CCostingStats> child_stats)
 		{
 			m_pdrgstatsChildren[ulPos] = child_stats;
 		}
 
 		// return additional cost statistics
-		CCostingStats *
+		gpos::Ref<CCostingStats>
 		Pcstats() const
 		{
 			return m_pcstats;
 		}
 
 		// return additional child statistics
-		CCostingStats *
+		gpos::Ref<CCostingStats>
 		Pcstats(ULONG child_index) const
 		{
 			return m_pdrgstatsChildren[child_index];
@@ -349,7 +350,7 @@ public:
 	virtual CDouble DRowsPerHost(CDouble dRowsTotal) const = 0;
 
 	// return cost model parameters
-	virtual ICostModelParams *GetCostModelParams() const = 0;
+	virtual gpos::Ref<ICostModelParams> GetCostModelParams() const = 0;
 
 	// main driver for cost computation
 	virtual CCost Cost(CExpressionHandle &exprhdl,
@@ -362,7 +363,7 @@ public:
 	void SetParams(ICostModelParamsArray *pdrgpcp) const;
 
 	// create a default cost model instance
-	static ICostModel *PcmDefault(CMemoryPool *mp);
+	static gpos::Ref<ICostModel> PcmDefault(CMemoryPool *mp);
 };
 }  // namespace gpopt
 

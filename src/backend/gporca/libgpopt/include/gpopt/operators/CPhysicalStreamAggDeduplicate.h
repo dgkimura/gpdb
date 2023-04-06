@@ -74,9 +74,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CColRefSet *pcrsRequired, ULONG child_index,
+				 gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
 				 CDrvdPropArray *,	//pdrgpdpCtxt,
 				 ULONG				//ulOptReq
 				 ) override
@@ -86,9 +86,9 @@ public:
 	}
 
 	// compute required sort columns of the n-th child
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				COrderSpec *posRequired, ULONG child_index,
+				gpos::Ref<COrderSpec> posRequired, ULONG child_index,
 				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG			   //ulOptReq
 	) const override
@@ -98,9 +98,9 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired, ULONG child_index,
+				gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
 				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
@@ -116,13 +116,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalStreamAggDeduplicate *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalStreamAggDeduplicate>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalStreamAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CPhysicalStreamAggDeduplicate *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalStreamAggDeduplicate> >(pop);
 	}
 
 };	// class CPhysicalStreamAggDeduplicate

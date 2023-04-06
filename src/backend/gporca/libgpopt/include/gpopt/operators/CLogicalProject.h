@@ -32,11 +32,12 @@ class CLogicalProject : public CLogicalUnary
 private:
 	// return equivalence class from scalar ident project element
 	static CColRefSetArray *PdrgpcrsEquivClassFromScIdent(
-		CMemoryPool *mp, CExpression *pexprPrEl, CColRefSet *not_null_columns);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
+		gpos::Ref<CColRefSet> not_null_columns);
 
 	// extract constraint from scalar constant project element
 	static void ExtractConstraintFromScConst(CMemoryPool *mp,
-											 CExpression *pexprPrEl,
+											 gpos::Ref<CExpression> pexprPrEl,
 											 CConstraintArray *pdrgpcnstr,
 											 CColRefSetArray *pdrgpcrs);
 
@@ -67,11 +68,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -79,7 +80,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -90,21 +91,22 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalProject *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalProject>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalProject == pop->Eopid());
 
-		return dynamic_cast<CLogicalProject *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalProject> >(pop);
 	}
 
 };	// class CLogicalProject

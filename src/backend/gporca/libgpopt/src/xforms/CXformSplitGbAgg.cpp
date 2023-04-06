@@ -60,7 +60,7 @@ CXformSplitGbAgg::CXformSplitGbAgg(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformSplitGbAgg::CXformSplitGbAgg(CExpression *pexprPattern)
+CXformSplitGbAgg::CXformSplitGbAgg(gpos::Ref<CExpression> pexprPattern)
 	: CXformExploration(pexprPattern)
 {
 }
@@ -102,8 +102,9 @@ CXformSplitGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformSplitGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+							gpos::Ref<CXformResult> pxfres,
+							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -111,11 +112,11 @@ CXformSplitGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	// check if the transformation is applicable
 	if (!FApplicable(pexprProjectList))
@@ -125,8 +126,8 @@ CXformSplitGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 
-	CExpression *pexprProjectListLocal = nullptr;
-	CExpression *pexprProjectListGlobal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListLocal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListGlobal = nullptr;
 
 	(void) PopulateLocalGlobalProjectList(
 		mp, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
@@ -150,14 +151,14 @@ CXformSplitGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpcrMinimal->AddRef();
 	}
 
-	CExpression *local_expr = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> local_expr = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrLocal, pdrgpcrMinimal,
 								   COperator::EgbaggtypeLocal /*egbaggtype*/
 								   ),
 		pexprRelational, pexprProjectListLocal);
 
-	CExpression *pexprGlobal = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprGlobal = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrGlobal, pdrgpcrMinimal,
 								   COperator::EgbaggtypeGlobal /*egbaggtype*/
@@ -177,8 +178,9 @@ CXformSplitGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //---------------------------------------------------------------------------
 void
 CXformSplitGbAgg::PopulateLocalGlobalProjectList(
-	CMemoryPool *mp, CExpression *pexprProjList,
-	CExpression **ppexprProjListLocal, CExpression **ppexprProjListGlobal)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprProjList,
+	gpos::Ref<CExpression> *ppexprProjListLocal,
+	gpos::Ref<CExpression> *ppexprProjListGlobal)
 {
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -191,18 +193,18 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 	const ULONG arity = pexprProjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprProgElem = (*pexprProjList)[ul];
-		CScalarProjectElement *popScPrEl =
+		gpos::Ref<CExpression> pexprProgElem = (*pexprProjList)[ul];
+		gpos::Ref<CScalarProjectElement> popScPrEl =
 			CScalarProjectElement::PopConvert(pexprProgElem->Pop());
 
 		// get the scalar agg func
-		CExpression *pexprAggFunc = (*pexprProgElem)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CExpression> pexprAggFunc = (*pexprProgElem)[0];
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
 		popScAggFunc->MDId()->AddRef();
 		popScAggFunc->GetArgTypes()->AddRef();
-		CScalarAggFunc *popScAggFuncLocal = CUtils::PopAggFunc(
+		gpos::Ref<CScalarAggFunc> popScAggFuncLocal = CUtils::PopAggFunc(
 			mp, popScAggFunc->MDId(),
 			GPOS_NEW(mp)
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
@@ -213,7 +215,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 
 		popScAggFunc->MDId()->AddRef();
 		popScAggFunc->GetArgTypes()->AddRef();
-		CScalarAggFunc *popScAggFuncGlobal = CUtils::PopAggFunc(
+		gpos::Ref<CScalarAggFunc> popScAggFuncGlobal = CUtils::PopAggFunc(
 			mp, popScAggFunc->MDId(),
 			GPOS_NEW(mp)
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
@@ -223,13 +225,13 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 			popScAggFunc->FRepSafe());
 
 		// determine column reference for the new project element
-		const IMDAggregate *pmdagg =
+		const gpos::Ref<IMDAggregate> pmdagg =
 			md_accessor->RetrieveAgg(popScAggFunc->MDId());
-		const IMDType *pmdtype =
+		const gpos::Ref<IMDType> pmdtype =
 			md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
-		CColRef *pcrLocal =
+		gpos::Ref<CColRef> pcrLocal =
 			col_factory->PcrCreate(pmdtype, default_type_modifier);
-		CColRef *pcrGlobal = popScPrEl->Pcr();
+		gpos::Ref<CColRef> pcrGlobal = popScPrEl->Pcr();
 
 		// create a new local aggregate function
 		// create array of arguments for the aggregate function
@@ -238,7 +240,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 		pdrgpexprAgg->AddRef();
 		CExpressionArray *pdrgpexprLocal = pdrgpexprAgg;
 
-		CExpression *pexprAggFuncLocal =
+		gpos::Ref<CExpression> pexprAggFuncLocal =
 			GPOS_NEW(mp) CExpression(mp, popScAggFuncLocal, pdrgpexprLocal);
 
 		// create a new global aggregate function adding the column reference of the
@@ -248,8 +250,9 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 		CExpressionArray *pdrgpexprGlobal = GPOS_NEW(mp) CExpressionArray(mp);
 		pdrgpexprGlobal->Append(CUtils::PexprScalarIdent(mp, pcrLocal));
 
-		CScalarValuesList *l = GPOS_NEW(mp) CScalarValuesList(mp);
-		CExpression *globall = GPOS_NEW(mp) CExpression(mp, l, pdrgpexprGlobal);
+		gpos::Ref<CScalarValuesList> l = GPOS_NEW(mp) CScalarValuesList(mp);
+		gpos::Ref<CExpression> globall =
+			GPOS_NEW(mp) CExpression(mp, l, pdrgpexprGlobal);
 		fullargs->Append(globall);
 
 		fullargs->Append(GPOS_NEW(mp)
@@ -264,15 +267,16 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 							 CExpression(mp, GPOS_NEW(mp) CScalarValuesList(mp),
 										 GPOS_NEW(mp) CExpressionArray(mp)));
 
-		CExpression *pexprAggFuncGlobal =
+		gpos::Ref<CExpression> pexprAggFuncGlobal =
 			GPOS_NEW(mp) CExpression(mp, popScAggFuncGlobal, fullargs);
 
 		// create new project elements for the aggregate functions
-		CExpression *pexprProjElemLocal =
+		gpos::Ref<CExpression> pexprProjElemLocal =
 			CUtils::PexprScalarProjectElement(mp, pcrLocal, pexprAggFuncLocal);
 
-		CExpression *pexprProjElemGlobal = CUtils::PexprScalarProjectElement(
-			mp, pcrGlobal, pexprAggFuncGlobal);
+		gpos::Ref<CExpression> pexprProjElemGlobal =
+			CUtils::PexprScalarProjectElement(mp, pcrGlobal,
+											  pexprAggFuncGlobal);
 
 		pdrgpexprProjElemLocal->Append(pexprProjElemLocal);
 		pdrgpexprProjElemGlobal->Append(pexprProjElemGlobal);
@@ -296,18 +300,18 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformSplitGbAgg::FApplicable(CExpression *pexpr)
+CXformSplitGbAgg::FApplicable(gpos::Ref<CExpression> pexpr)
 {
 	const ULONG arity = pexpr->Arity();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrEl = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprPrEl = (*pexpr)[ul];
 
 		// get the scalar child of the project element
-		CExpression *pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct() ||

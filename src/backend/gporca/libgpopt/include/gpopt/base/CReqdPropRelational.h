@@ -37,7 +37,7 @@ class CReqdPropRelational : public CReqdProp
 {
 private:
 	// required stat columns
-	CColRefSet *m_pcrsStat{nullptr};
+	gpos::Ref<CColRefSet> m_pcrsStat{nullptr};
 
 public:
 	CReqdPropRelational(const CReqdPropRelational &) = delete;
@@ -46,7 +46,7 @@ public:
 	CReqdPropRelational();
 
 	// ctor
-	explicit CReqdPropRelational(CColRefSet *pcrs);
+	explicit CReqdPropRelational(gpos::Ref<CColRefSet> pcrs);
 
 	// dtor
 	~CReqdPropRelational() override;
@@ -60,7 +60,7 @@ public:
 	}
 
 	// stat columns accessor
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsStat() const
 	{
 		return m_pcrsStat;
@@ -68,18 +68,19 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CReqdProp *prpInput, ULONG child_index,
+				 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// return difference from given properties
-	CReqdPropRelational *PrprelDifference(CMemoryPool *mp,
-										  CReqdPropRelational *prprel);
+	gpos::Ref<CReqdPropRelational> PrprelDifference(
+		CMemoryPool *mp, gpos::Ref<CReqdPropRelational> prprel);
 
 	// return true if property container is empty
 	BOOL IsEmpty() const;
 
 	// shorthand for conversion
-	static CReqdPropRelational *GetReqdRelationalProps(CReqdProp *prp);
+	static gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
+		gpos::Ref<CReqdProp> prp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

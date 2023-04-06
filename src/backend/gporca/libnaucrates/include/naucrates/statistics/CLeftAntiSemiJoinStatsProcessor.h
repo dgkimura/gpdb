@@ -23,7 +23,8 @@ public:
 	// helper for LAS-joining histograms
 	static void JoinHistogramsLASJ(
 		const CHistogram *histogram1, const CHistogram *histogram2,
-		CStatsPredJoin *join_stats, CDouble num_rows1, CDouble num_rows2,
+		gpos::Ref<CStatsPredJoin> join_stats, CDouble num_rows1,
+		CDouble num_rows2,
 		CHistogram **result_hist1,	// output: histogram 1 after join
 		CHistogram **result_hist2,	// output: histogram 2 after join
 		CDouble *scale_factor,		// output: scale factor based on the join
@@ -31,9 +32,9 @@ public:
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);
 	// left anti semi join with another stats structure
-	static CStatistics *CalcLASJoinStatsStatic(
-		CMemoryPool *mp, const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+	static gpos::Ref<CStatistics> CalcLASJoinStatsStatic(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
+		const gpos::Ref<IStatistics> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always

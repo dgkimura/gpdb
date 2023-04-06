@@ -58,13 +58,13 @@ class CDXLScalarAggref : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_agg_func_mdid;
+	gpos::Ref<IMDId> m_agg_func_mdid;
 
 	// resolved return type refers to a non-ambiguous type that was resolved during query
 	// parsing if the actual return type of Agg is ambiguous (e.g., AnyElement in GPDB)
 	// if resolved return type is NULL, then we can get Agg return type by looking up MD cache
 	// using Agg MDId
-	IMDId *m_resolved_rettype_mdid;
+	gpos::Ref<IMDId> m_resolved_rettype_mdid;
 
 	// Denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -80,9 +80,10 @@ public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
 
 	// ctor/dtor
-	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
-					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 EdxlAggrefKind aggkind, ULongPtrArray *argtypes);
+	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
+					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
+					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
+					 ULongPtrArray *argtypes);
 
 	~CDXLScalarAggref() override;
 
@@ -91,9 +92,9 @@ public:
 
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *GetDXLAggFuncMDid() const;
+	gpos::Ref<IMDId> GetDXLAggFuncMDid() const;
 
-	IMDId *GetDXLResolvedRetTypeMDid() const;
+	gpos::Ref<IMDId> GetDXLResolvedRetTypeMDid() const;
 
 	const CWStringConst *GetDXLStrAggStage() const;
 
@@ -117,20 +118,21 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	void SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *dxlnode, ULONG index,
+									   const gpos::Ref<CDXLNode> dxlnode,
+									   ULONG index,
 									   const CHAR *attr_name) const;
 
 	// conversion function
-	static CDXLScalarAggref *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarAggref>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarAggref == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarAggref *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarAggref> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -139,7 +141,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

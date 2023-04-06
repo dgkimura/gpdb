@@ -55,7 +55,7 @@ CXformEagerAgg::CXformEagerAgg(CMemoryPool *mp)
 }
 
 // ctor
-CXformEagerAgg::CXformEagerAgg(CExpression *exprPattern)
+CXformEagerAgg::CXformEagerAgg(gpos::Ref<CExpression> exprPattern)
 	: CXformExploration(exprPattern)
 {
 }
@@ -76,8 +76,9 @@ CXformEagerAgg::Exfp(CExpressionHandle &exprhdl) const
 
 // actual transformation
 void
-CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						  CExpression *agg_expr) const
+CXformEagerAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+						  gpos::Ref<CXformResult> pxfres,
+						  gpos::Ref<CExpression> agg_expr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, agg_expr));
@@ -90,11 +91,11 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *join_expr = (*agg_expr)[0];
-	CExpression *join_outer_child_expr = (*join_expr)[0];
-	CExpression *join_inner_child_expr = (*join_expr)[1];
-	CExpression *join_condition_expr = (*join_expr)[2];
-	CExpression *agg_proj_list_expr = (*agg_expr)[1];
+	gpos::Ref<CExpression> join_expr = (*agg_expr)[0];
+	gpos::Ref<CExpression> join_outer_child_expr = (*join_expr)[0];
+	gpos::Ref<CExpression> join_inner_child_expr = (*join_expr)[1];
+	gpos::Ref<CExpression> join_condition_expr = (*join_expr)[2];
+	gpos::Ref<CExpression> agg_proj_list_expr = (*agg_expr)[1];
 
 	//	'push_down_gb_crs' represents the column references that are used for
 	//	grouping in the pushed-down aggregate. This is the union of the original
@@ -109,19 +110,20 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	//			t2
 	//		WHERE t1.j1 = t2.j2
 	//		GROUP BY t1.g1;
-	CColRefSet *push_down_gb_cols = GPOS_NEW(mp)
+	gpos::Ref<CColRefSet> push_down_gb_cols = GPOS_NEW(mp)
 		CColRefSet(mp, *(join_condition_expr->DeriveUsedColumns()));
-	CColRefSet *grouping_cols =
+	gpos::Ref<CColRefSet> grouping_cols =
 		(CLogicalGbAgg::PopConvert(agg_expr->Pop()))->PcrsLocalUsed();
 	push_down_gb_cols->Union(grouping_cols);
 
 	/* only keep columns from outer child in the new grouping col set */
-	CColRefSet *outer_child_cols = join_outer_child_expr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_child_cols =
+		join_outer_child_expr->DeriveOutputColumns();
 	push_down_gb_cols->Intersection(outer_child_cols);
 
 	/* create new project lists for the two new Gb aggregates */
-	CExpression *lower_expr_proj_list = nullptr;
-	CExpression *upper_expr_proj_list = nullptr;
+	gpos::Ref<CExpression> lower_expr_proj_list = nullptr;
+	gpos::Ref<CExpression> upper_expr_proj_list = nullptr;
 	(void) PopulateLowerUpperProjectList(
 		mp, agg_proj_list_expr, &lower_expr_proj_list, &upper_expr_proj_list);
 
@@ -130,24 +132,24 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	// lower expression as a local aggregate
 	CColRefArray *push_down_gb_col_array = push_down_gb_cols->Pdrgpcr(mp);
 	join_outer_child_expr->AddRef();
-	CExpression *lower_agg_expr = GPOS_NEW(mp)
+	gpos::Ref<CExpression> lower_agg_expr = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalGbAgg(mp, push_down_gb_col_array,
 											   COperator::EgbaggtypeLocal),
 					join_outer_child_expr, lower_expr_proj_list);
 
 	// join expression
-	COperator *join_op = join_expr->Pop();
+	gpos::Ref<COperator> join_op = join_expr->Pop();
 	join_op->AddRef();
 	join_inner_child_expr->AddRef();
 	join_condition_expr->AddRef();
-	CExpression *new_join_expr =
+	gpos::Ref<CExpression> new_join_expr =
 		GPOS_NEW(mp) CExpression(mp, join_op, lower_agg_expr,
 								 join_inner_child_expr, join_condition_expr);
 
 	// upper expression as a global aggregate
 	CColRefArray *grouping_col_array = grouping_cols->Pdrgpcr(mp);
-	CExpression *upper_agg_expr = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> upper_agg_expr = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CLogicalGbAgg(mp, grouping_col_array, COperator::EgbaggtypeGlobal),
@@ -160,9 +162,9 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 // Only following aggregates are supported:
 // 	min, max, sum, count, avg
 BOOL
-CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
+CXformEagerAgg::CanPushAggBelowJoin(gpos::Ref<CExpression> scalar_agg_func_expr)
 {
-	CScalarAggFunc *scalar_agg_func =
+	gpos::Ref<CScalarAggFunc> scalar_agg_func =
 		CScalarAggFunc::PopConvert(scalar_agg_func_expr->Pop());
 	if ((*scalar_agg_func_expr)[0]->Arity() != 1)
 	{
@@ -176,14 +178,15 @@ CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
 		return false;
 	}
 
-	COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
+	gpos::Ref<COptCtxt> poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
-	IMDId *agg_mdid =
+	gpos::Ref<IMDId> agg_mdid =
 		scalar_agg_func->MDId();  // oid of the original aggregate function
-	CExpression *agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
-	IMDId *agg_child_mdid =
+	gpos::Ref<CExpression> agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
+	gpos::Ref<IMDId> agg_child_mdid =
 		CScalar::PopConvert(agg_child_expr->Pop())->MdidType();
-	const IMDType *agg_child_type = md_accessor->RetrieveType(agg_child_mdid);
+	const gpos::Ref<IMDType> agg_child_type =
+		md_accessor->RetrieveType(agg_child_mdid);
 	// if agg_mdid is not one of the supported aggregates (min, max, sum, count, avg)
 	// then don't push it down
 	if (!(agg_mdid->Equals(
@@ -210,16 +213,17 @@ CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
 //		- Single expression input in the agg
 //		- Input expression only part of outer child
 BOOL
-CXformEagerAgg::CanApplyTransform(CExpression *gb_agg_expr)
+CXformEagerAgg::CanApplyTransform(gpos::Ref<CExpression> gb_agg_expr)
 {
-	CExpression *join_expr = (*gb_agg_expr)[0];
-	CExpression *agg_proj_list_expr = (*gb_agg_expr)[1];
-	CExpression *join_outer_child_expr = (*join_expr)[0];
+	gpos::Ref<CExpression> join_expr = (*gb_agg_expr)[0];
+	gpos::Ref<CExpression> agg_proj_list_expr = (*gb_agg_expr)[1];
+	gpos::Ref<CExpression> join_outer_child_expr = (*join_expr)[0];
 
 	// currently only supporting aggregate column references from outer child
-	CColRefSet *join_outer_child_cols =
+	gpos::Ref<CColRefSet> join_outer_child_cols =
 		join_outer_child_expr->DeriveOutputColumns();
-	CColRefSet *agg_proj_list_cols = agg_proj_list_expr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> agg_proj_list_cols =
+		agg_proj_list_expr->DeriveUsedColumns();
 	if (!join_outer_child_cols->ContainsAll(agg_proj_list_cols))
 	{
 		// all columns used by the Gb aggregate should only be present in outer
@@ -235,7 +239,8 @@ CXformEagerAgg::CanApplyTransform(CExpression *gb_agg_expr)
 	}
 	for (ULONG agg_index = 0; agg_index < num_aggregates; agg_index++)
 	{
-		CExpression *scalar_agg_proj_expr = (*agg_proj_list_expr)[agg_index];
+		gpos::Ref<CExpression> scalar_agg_proj_expr =
+			(*agg_proj_list_expr)[agg_index];
 		if (!CanPushAggBelowJoin((*scalar_agg_proj_expr)[0]))
 		{
 			// No aggregate is pushed below join if an unsupported aggregate is
@@ -253,8 +258,10 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 	CMemoryPool *mp,  // memory pool
 	CExpression
 		*orig_proj_list,  // project list of the original global aggregate
-	CExpression **lower_proj_list,	// project list of the new lower aggregate
-	CExpression **upper_proj_list	// project list of the new upper aggregate
+	gpos::Ref<CExpression>
+		*lower_proj_list,  // project list of the new lower aggregate
+	gpos::Ref<CExpression>
+		*upper_proj_list  // project list of the new upper aggregate
 )
 {
 	// build an array of project elements for the new lower and upper aggregates
@@ -265,16 +272,16 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 	// loop over each project element
 	for (ULONG ul = 0; ul < num_proj_elements; ul++)
 	{
-		CExpression *orig_proj_elem_expr = (*orig_proj_list)[ul];
-		CScalarProjectElement *orig_proj_elem =
+		gpos::Ref<CExpression> orig_proj_elem_expr = (*orig_proj_list)[ul];
+		gpos::Ref<CScalarProjectElement> orig_proj_elem =
 			CScalarProjectElement::PopConvert(orig_proj_elem_expr->Pop());
 
-		CExpression *orig_agg_expr = (*orig_proj_elem_expr)[0];
-		CScalarAggFunc *orig_agg_func =
+		gpos::Ref<CExpression> orig_agg_expr = (*orig_proj_elem_expr)[0];
+		gpos::Ref<CScalarAggFunc> orig_agg_func =
 			CScalarAggFunc::PopConvert(orig_agg_expr->Pop());
-		IMDId *orig_agg_mdid = orig_agg_func->MDId();
+		gpos::Ref<IMDId> orig_agg_mdid = orig_agg_func->MDId();
 		// min and max
-		CExpression *lower_proj_elem_expr = nullptr;
+		gpos::Ref<CExpression> lower_proj_elem_expr = nullptr;
 		PopulateLowerProjectElement(
 			mp, orig_agg_mdid,
 			GPOS_NEW(mp)
@@ -283,7 +290,7 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 			&lower_proj_elem_expr);
 		lower_proj_elem_array->Append(lower_proj_elem_expr);
 
-		CExpression *upper_proj_elem_expr = nullptr;
+		gpos::Ref<CExpression> upper_proj_elem_expr = nullptr;
 		PopulateUpperProjectElement(
 			mp, orig_agg_mdid,
 			GPOS_NEW(mp)
@@ -307,10 +314,10 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 // splitting and pushing down a single aggregate.
 void
 CXformEagerAgg::PopulateLowerProjectElement(
-	CMemoryPool *mp,  // memory pool
-	IMDId *agg_mdid,  // original global aggregate function
+	CMemoryPool *mp,			// memory pool
+	gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
 	CWStringConst *agg_name, CExpressionArray *agg_arg_array, BOOL is_distinct,
-	CExpression **
+	gpos::Ref<CExpression> *
 		lower_proj_elem_expr  // output project element of the new lower aggregate
 )
 {
@@ -318,23 +325,23 @@ CXformEagerAgg::PopulateLowerProjectElement(
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	agg_mdid->AddRef();
-	CScalarAggFunc *lower_agg_func = CUtils::PopAggFunc(
+	gpos::Ref<CScalarAggFunc> lower_agg_func = CUtils::PopAggFunc(
 		mp, agg_mdid, agg_name, is_distinct, EaggfuncstageLocal, true, nullptr,
 		EaggfunckindNormal, GPOS_NEW(mp) ULongPtrArray(mp), false);
 	// add the arguments for the lower aggregate function, which is
 	// going to be the same as the original aggregate function
 	agg_arg_array->AddRef();
-	CExpression *lower_agg_expr =
+	gpos::Ref<CExpression> lower_agg_expr =
 		GPOS_NEW(mp) CExpression(mp, lower_agg_func, agg_arg_array);
 
 	/* 2. create new aggregate function for the upper aggregate operator */
 	// determine the return type of the lower aggregate function
-	IMDId *lower_agg_ret_mdid =
+	gpos::Ref<IMDId> lower_agg_ret_mdid =
 		md_accessor->RetrieveAgg(agg_mdid)->GetIntermediateResultTypeMdid();
-	const IMDType *lower_agg_ret_type =
+	const gpos::Ref<IMDType> lower_agg_ret_type =
 		md_accessor->RetrieveType(lower_agg_ret_mdid);
 	// create a column reference for the new created aggregate function
-	CColRef *lower_colref =
+	gpos::Ref<CColRef> lower_colref =
 		col_factory->PcrCreate(lower_agg_ret_type, default_type_modifier);
 	// create new project element for the aggregate function
 	*lower_proj_elem_expr =
@@ -345,17 +352,17 @@ CXformEagerAgg::PopulateLowerProjectElement(
 // corresponding to a single aggregate.
 void
 CXformEagerAgg::PopulateUpperProjectElement(
-	CMemoryPool *mp,  // memory pool
-	IMDId *agg_mdid,  // original global aggregate function
-	CWStringConst *agg_name, CColRef *lower_colref, CColRef *output_colref,
-	BOOL is_distinct,
-	CExpression **
+	CMemoryPool *mp,			// memory pool
+	gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
+	CWStringConst *agg_name, gpos::Ref<CColRef> lower_colref,
+	gpos::Ref<CColRef> output_colref, BOOL is_distinct,
+	gpos::Ref<CExpression> *
 		upper_proj_elem_expr  // output project element of the new lower aggregate
 )
 {
 	// create a new operator
 	agg_mdid->AddRef();
-	CScalarAggFunc *upper_agg_func = CUtils::PopAggFunc(
+	gpos::Ref<CScalarAggFunc> upper_agg_func = CUtils::PopAggFunc(
 		mp, agg_mdid, agg_name, is_distinct, EaggfuncstageGlobal, true, nullptr,
 		EaggfunckindNormal, GPOS_NEW(mp) ULongPtrArray(mp), false);
 
@@ -377,7 +384,7 @@ CXformEagerAgg::PopulateUpperProjectElement(
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarValuesList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp)));
 
-	CExpression *upper_agg_expr =
+	gpos::Ref<CExpression> upper_agg_expr =
 		GPOS_NEW(mp) CExpression(mp, upper_agg_func, upper_agg_arg_array);
 
 

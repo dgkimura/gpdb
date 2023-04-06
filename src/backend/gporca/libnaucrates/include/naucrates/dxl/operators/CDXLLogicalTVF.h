@@ -34,10 +34,10 @@ class CDXLLogicalTVF : public CDXLLogical
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CMDName *m_mdname;
@@ -49,8 +49,9 @@ public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;
 
 	// ctor/dtor
-	CDXLLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				   CMDName *mdname, CDXLColDescrArray *pdrgdxlcd);
+	CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				   gpos::Ref<IMDId> mdid_return_type, CMDName *mdname,
+				   CDXLColDescrArray *pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 
@@ -68,14 +69,14 @@ public:
 	}
 
 	// get function id
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid;
 	}
 
 	// get return type
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid;
@@ -92,29 +93,30 @@ public:
 	}
 
 	// get the column descriptor at the given position
-	const CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
+	const gpos::Ref<CDXLColDescr> GetColumnDescrAt(ULONG ul) const;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLLogicalTVF *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLLogicalTVF>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalTVF == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalTVF *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLLogicalTVF> >(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

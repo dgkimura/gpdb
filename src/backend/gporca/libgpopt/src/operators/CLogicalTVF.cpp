@@ -53,8 +53,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
 						 CColumnDescriptorArray *pdrgpcoldesc)
 	: CLogical(mp),
 	  m_func_mdid(mdid_func),
@@ -73,7 +73,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (mdid_func->IsValid())
 	{
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		const gpos::Ref<IMDFunction> pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid);
 
 		m_efs = pmdfunc->GetFuncStability();
 		m_returns_set = pmdfunc->ReturnsSet();
@@ -93,8 +94,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
 						 CColumnDescriptorArray *pdrgpcoldesc,
 						 CColRefArray *pdrgpcrOutput)
 	: CLogical(mp),
@@ -111,7 +112,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+	const gpos::Ref<IMDFunction> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
@@ -167,14 +169,14 @@ CLogicalTVF::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalTVF::Matches(COperator *pop) const
+CLogicalTVF::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pop);
+	gpos::Ref<CLogicalTVF> popTVF = CLogicalTVF::PopConvert(pop);
 
 	return m_func_mdid->Equals(popTVF->FuncMdId()) &&
 		   m_return_type_mdid->Equals(popTVF->ReturnTypeMdId()) &&
@@ -190,7 +192,7 @@ CLogicalTVF::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										UlongToColRefMap *colref_mapping,
 										BOOL must_exist)
@@ -224,12 +226,12 @@ CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalTVF::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -243,7 +245,7 @@ CLogicalTVF::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive function properties
 //
 //---------------------------------------------------------------------------
-CFunctionProp *
+gpos::Ref<CFunctionProp>
 CLogicalTVF::DeriveFunctionProperties(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
@@ -316,7 +318,7 @@ CLogicalTVF::DeriveMaxCard(CMemoryPool *,		// mp
 //
 //---------------------------------------------------------------------------
 
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalTVF::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  IStatisticsArray *  // stats_ctxt
 ) const

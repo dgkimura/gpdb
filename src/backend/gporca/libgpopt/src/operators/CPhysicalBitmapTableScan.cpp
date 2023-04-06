@@ -32,11 +32,9 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(CMemoryPool *mp,
-												   CTableDescriptor *ptabdesc,
-												   ULONG ulOriginOpId,
-												   const CName *pnameTableAlias,
-												   CColRefArray *pdrgpcrOutput)
+CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameTableAlias, CColRefArray *pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameTableAlias, ptabdesc, pdrgpcrOutput),
 	  m_ulOriginOpId(ulOriginOpId)
 {
@@ -73,7 +71,7 @@ CPhysicalBitmapTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalBitmapTableScan::Matches(COperator *pop) const
+CPhysicalBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }

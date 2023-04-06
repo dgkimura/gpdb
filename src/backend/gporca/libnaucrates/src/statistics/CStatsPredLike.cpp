@@ -25,8 +25,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredLike::CStatsPredLike(ULONG colid, CExpression *expr_left,
-							   CExpression *expr_right,
+CStatsPredLike::CStatsPredLike(ULONG colid, gpos::Ref<CExpression> expr_left,
+							   gpos::Ref<CExpression> expr_right,
 							   CDouble default_scale_factor)
 	: CStatsPred(colid),
 	  m_expr_left(expr_left),

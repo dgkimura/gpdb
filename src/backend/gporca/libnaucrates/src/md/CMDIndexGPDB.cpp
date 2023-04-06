@@ -31,9 +31,10 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   BOOL is_clustered, BOOL is_partitioned,
-						   EmdindexType index_type, IMDId *mdid_item_type,
+CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, BOOL is_clustered,
+						   BOOL is_partitioned, EmdindexType index_type,
+						   gpos::Ref<IMDId> mdid_item_type,
 						   ULongPtrArray *index_key_cols_array,
 						   ULongPtrArray *included_cols_array,
 						   IMdIdArray *mdid_opfamilies_array,
@@ -98,7 +99,7 @@ CMDIndexGPDB::~CMDIndexGPDB()
 //		Returns the metadata id of this index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIndexGPDB::MDId() const
 {
 	return m_mdid;
@@ -382,7 +383,7 @@ CMDIndexGPDB::DebugPrint(IOstream &os) const
 //		Type of items returned by the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 {
 	return m_mdid_item_type;
@@ -398,14 +399,15 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(const gpos::Ref<IMDScalarOp> md_scalar_op,
+						   ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());
 
 	// check if the index opfamily for the key at the given position is one of
 	// the families the scalar comparison belongs to
-	const IMDId *mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos];
+	const gpos::Ref<IMDId> mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos];
 
 	const ULONG opfamilies_count = md_scalar_op->OpfamiliesCount();
 

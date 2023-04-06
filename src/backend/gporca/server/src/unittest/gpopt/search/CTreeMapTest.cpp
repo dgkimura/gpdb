@@ -131,7 +131,7 @@ CTreeMapTest::CNode::~CNode()
 //		Constructor function for result tree
 //
 //---------------------------------------------------------------------------
-CTreeMapTest::CNode *
+gpos::Ref<CTreeMapTest::CNode>
 CTreeMapTest::Pnd(CMemoryPool *mp, ULONG *pul, CNodeArray *pdrgpnd,
 				  BOOL *fTestTrue)
 {
@@ -310,7 +310,7 @@ CTreeMapTest::EresUnittest_Unrank()
 	{
 		oss << "=== tree rank: " << ulRank << " ===" << std::endl;
 		BOOL fFlag = true;
-		CNode *pnd = ptmap->PrUnrank(mp, &fFlag, ulRank);
+		gpos::Ref<CNode> pnd = ptmap->PrUnrank(mp, &fFlag, ulRank);
 
 		pnd->Release();
 	}
@@ -339,14 +339,14 @@ CTreeMapTest::EresUnittest_Memo()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	CEngine *peng = nullptr;
-	CExpression *pexpr = nullptr;
+	gpos::Ref<CExpression> pexpr = nullptr;
 	CQueryContext *pqc = nullptr;
-	CExpression *pexprPlan = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
 	{
 		// install opt context in TLS
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -385,9 +385,9 @@ CTreeMapTest::EresUnittest_Memo()
 
 			for (ULONG ulRank = 0; ulRank < ullCount; ulRank++)
 			{
-				CDrvdPropCtxtPlan *pdpctxtplan =
+				gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 					GPOS_NEW(mp) CDrvdPropCtxtPlan(mp, false /*fUpdateCTEMap*/);
-				CExpression *pexprAlt = nullptr;
+				gpos::Ref<CExpression> pexprAlt = nullptr;
 				GPOS_TRY
 				{
 					pexprAlt =

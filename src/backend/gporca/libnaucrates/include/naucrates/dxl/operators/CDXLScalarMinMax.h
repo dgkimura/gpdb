@@ -43,7 +43,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	EdxlMinMaxType m_min_max_type;
@@ -52,7 +52,7 @@ public:
 	CDXLScalarMinMax(const CDXLScalarMinMax &) = delete;
 
 	// ctor
-	CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					 EdxlMinMaxType min_max_type);
 
 	//dtor
@@ -62,7 +62,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return type
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MdidType() const
 	{
 		return m_mdid_type;
@@ -80,7 +80,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -88,18 +88,18 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarMinMax *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarMinMax>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarMinMax == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarMinMax *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarMinMax> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

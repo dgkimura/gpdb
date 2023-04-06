@@ -67,7 +67,7 @@ CParseHandlerRoutedMotion::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	m_dxl_op = (CDXLPhysicalRoutedDistributeMotion *)
+	m_dxl_op = (gpos::Ref<CDXLPhysicalRoutedDistributeMotion>)
 		CDXLOperatorFactory::MakeDXLRoutedMotion(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 

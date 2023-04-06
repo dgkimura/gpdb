@@ -36,7 +36,7 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicScan::CPhysicalDynamicScan(
-	CMemoryPool *mp, CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameAlias, ULONG scan_id, CColRefArray *pdrgpcrOutput,
 	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
 	ColRefToUlongMapArray *root_col_mapping_per_part)
@@ -52,12 +52,12 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 	GPOS_ASSERT(0 < pdrgpdrgpcrParts->Size());
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *root_rel = mda->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> root_rel = mda->RetrieveRel(ptabdesc->MDId());
 	IMdIdArray *all_partition_mdids = root_rel->ChildPartitionMdids();
 	ULONG part_ptr = 0;
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ul++)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
+		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
 		while (part_mdid != (*all_partition_mdids)[part_ptr])
 		{
 			part_ptr++;
@@ -139,14 +139,14 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 //		conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalDynamicScan *
-CPhysicalDynamicScan::PopConvert(COperator *pop)
+gpos::Ref<CPhysicalDynamicScan>
+CPhysicalDynamicScan::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop) &&
 				CPhysicalScan::PopConvert(pop)->FDynamicScan());
 
-	return dynamic_cast<CPhysicalDynamicScan *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalDynamicScan> >(pop);
 }
 
 

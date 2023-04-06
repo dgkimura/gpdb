@@ -62,7 +62,7 @@ CParseHandlerPlan::~CParseHandlerPlan()
 //		Root of constructed DXL plan
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerPlan::CreateDXLNode()
 {
 	return m_dxl_node;
@@ -186,7 +186,7 @@ CParseHandlerPlan::EndElement(const XMLCh *const,  // element_uri,
 	{
 		CParseHandlerDirectDispatchInfo *direct_dispatch_info_parse_handler =
 			dynamic_cast<CParseHandlerDirectDispatchInfo *>((*this)[1]);
-		CDXLDirectDispatchInfo *dxl_direct_dispatch_info =
+		gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info =
 			direct_dispatch_info_parse_handler->GetDXLDirectDispatchInfo();
 		GPOS_ASSERT(nullptr != dxl_direct_dispatch_info);
 

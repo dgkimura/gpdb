@@ -29,7 +29,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLColDescr::CDXLColDescr(CMDName *md_name, ULONG column_id, INT attr_no,
-						   IMDId *column_mdid_type, INT type_modifier,
+						   gpos::Ref<IMDId> column_mdid_type, INT type_modifier,
 						   BOOL is_dropped, ULONG width)
 	: m_md_name(md_name),
 	  m_column_id(column_id),
@@ -106,7 +106,7 @@ CDXLColDescr::AttrNum() const
 //		Returns the type id for this column
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLColDescr::MdidType() const
 {
 	return m_column_mdid_type;

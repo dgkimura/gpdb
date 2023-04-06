@@ -43,7 +43,7 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp) : m_pdrgpcrs(nullptr)
 //		ctor
 //
 //---------------------------------------------------------------------------
-CKeyCollection::CKeyCollection(CMemoryPool *mp, CColRefSet *pcrs)
+CKeyCollection::CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs)
 	: m_pdrgpcrs(nullptr)
 {
 	GPOS_ASSERT(nullptr != pcrs && 0 < pcrs->Size());
@@ -71,7 +71,7 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp, CColRefArray *colref_array)
 
 	m_pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 	Add(pcrs);
 
@@ -103,7 +103,7 @@ CKeyCollection::~CKeyCollection()
 //
 //---------------------------------------------------------------------------
 void
-CKeyCollection::Add(CColRefSet *pcrs)
+CKeyCollection::Add(gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(!FKey(pcrs) && "no duplicates allowed");
 
@@ -120,7 +120,7 @@ CKeyCollection::Add(CColRefSet *pcrs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CKeyCollection::FKey(const CColRefSet *pcrs,
+CKeyCollection::FKey(const gpos::Ref<CColRefSet> pcrs,
 					 BOOL fExactMatch  // true: match keys exactly,
 									   //  false: match keys by inclusion
 ) const
@@ -162,7 +162,7 @@ CKeyCollection::FKey(const CColRefSet *pcrs,
 BOOL
 CKeyCollection::FKey(CMemoryPool *mp, const CColRefArray *colref_array) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 
 	BOOL fKey = FKey(pcrs);
@@ -185,13 +185,13 @@ CKeyCollection::PdrgpcrTrim(CMemoryPool *mp,
 							const CColRefArray *colref_array) const
 {
 	CColRefArray *pdrgpcrTrim = nullptr;
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 
 	const ULONG ulSets = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulSets; ul++)
 	{
-		CColRefSet *pcrsKey = (*m_pdrgpcrs)[ul];
+		gpos::Ref<CColRefSet> pcrsKey = (*m_pdrgpcrs)[ul];
 		if (pcrs->ContainsAll(pcrsKey))
 		{
 			pdrgpcrTrim = pcrsKey->Pdrgpcr(mp);
@@ -284,7 +284,7 @@ CKeyCollection::PdrgpcrKey(CMemoryPool *mp, ULONG ulIndex) const
 //		Extract key at given position
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CKeyCollection::PcrsKey(CMemoryPool *mp, ULONG ulIndex) const
 {
 	if (0 == m_pdrgpcrs->Size())
@@ -294,7 +294,7 @@ CKeyCollection::PcrsKey(CMemoryPool *mp, ULONG ulIndex) const
 
 	GPOS_ASSERT(nullptr != (*m_pdrgpcrs)[ulIndex]);
 
-	CColRefSet *pcrsKey = (*m_pdrgpcrs)[ulIndex];
+	gpos::Ref<CColRefSet> pcrsKey = (*m_pdrgpcrs)[ulIndex];
 	return GPOS_NEW(mp) CColRefSet(mp, *pcrsKey);
 }
 

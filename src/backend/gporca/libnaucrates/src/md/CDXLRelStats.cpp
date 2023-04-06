@@ -30,7 +30,8 @@ using namespace gpmd;
 //		Constructs a metadata relation
 //
 //---------------------------------------------------------------------------
-CDXLRelStats::CDXLRelStats(CMemoryPool *mp, CMDIdRelStats *rel_stats_mdid,
+CDXLRelStats::CDXLRelStats(CMemoryPool *mp,
+						   gpos::Ref<CMDIdRelStats> rel_stats_mdid,
 						   CMDName *mdname, CDouble rows, BOOL is_empty,
 						   ULONG relpages, ULONG relallvisible)
 	: m_mp(mp),
@@ -69,7 +70,7 @@ CDXLRelStats::~CDXLRelStats()
 //		Returns the metadata id of this relation stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLRelStats::MDId() const
 {
 	return m_rel_stats_mdid;
@@ -191,10 +192,10 @@ CDXLRelStats::DebugPrint(IOstream &os) const
 //		Dummy relation stats
 //
 //---------------------------------------------------------------------------
-CDXLRelStats *
-CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
+gpos::Ref<CDXLRelStats>
+CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
-	CMDIdRelStats *rel_stats_mdid = CMDIdRelStats::CastMdid(mdid);
+	gpos::Ref<CMDIdRelStats> rel_stats_mdid = CMDIdRelStats::CastMdid(mdid);
 	CAutoP<CWStringDynamic> str;
 	str = GPOS_NEW(mp) CWStringDynamic(mp, rel_stats_mdid->GetBuffer());
 	CAutoP<CMDName> mdname;

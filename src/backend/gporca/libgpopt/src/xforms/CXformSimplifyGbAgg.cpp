@@ -59,7 +59,7 @@ CXformSimplifyGbAgg::CXformSimplifyGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
 
 	GPOS_ASSERT(COperator::EgbaggtypeGlobal == popAgg->Egbaggtype());
 
@@ -82,12 +82,12 @@ CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
-								CXformResult *pxfres)
+CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+								gpos::Ref<CXformResult> pxfres)
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	if (0 < pexprProjectList->Arity())
 	{
@@ -95,7 +95,7 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 		return false;
 	}
 
-	CKeyCollection *pkc = pexprRelational->DeriveKeyCollection();
+	gpos::Ref<CKeyCollection> pkc = pexprRelational->DeriveKeyCollection();
 	if (nullptr == pkc)
 	{
 		// relational child does not have key
@@ -107,10 +107,10 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 	for (ULONG ul = 0; !fDrop && ul < ulKeys; ul++)
 	{
 		CColRefArray *pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrKey);
+		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrKey);
 		pdrgpcrKey->Release();
 
-		CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsGrpCols->Include(popAgg->Pdrgpcr());
 		BOOL fGrpColsHasKey = pcrsGrpCols->ContainsAll(pcrs);
 
@@ -120,7 +120,7 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 		{
 			// Gb operator can be dropped
 			pexprRelational->AddRef();
-			CExpression *pexprResult = CUtils::PexprLogicalSelect(
+			gpos::Ref<CExpression> pexprResult = CUtils::PexprLogicalSelect(
 				mp, pexprRelational,
 				CPredicateUtils::PexprConjunction(mp, nullptr));
 			pxfres->Add(pexprResult);
@@ -141,8 +141,9 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformSimplifyGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+							   gpos::Ref<CXformResult> pxfres,
+							   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -158,17 +159,17 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// extract components
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
-	CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrpCols->Include(colref_array);
 
-	CColRefSet *pcrsCovered =
+	gpos::Ref<CColRefSet> pcrsCovered =
 		GPOS_NEW(mp) CColRefSet(mp);  // set of grouping columns covered by FD's
-	CColRefSet *pcrsMinimal = GPOS_NEW(mp)
+	gpos::Ref<CColRefSet> pcrsMinimal = GPOS_NEW(mp)
 		CColRefSet(mp);	 // a set of minimal grouping columns based on FD's
 	CFunctionalDependencyArray *pdrgpfd = pexpr->DeriveFunctionalDependencies();
 
@@ -176,7 +177,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG size = (pdrgpfd == nullptr) ? 0 : pdrgpfd->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CFunctionalDependency *pfd = (*pdrgpfd)[ul];
+		gpos::Ref<CFunctionalDependency> pfd = (*pdrgpfd)[ul];
 		if (pfd->FIncluded(pcrsGrpCols))
 		{
 			pcrsCovered->Include(pfd->PcrsDetermined());
@@ -198,7 +199,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	// create a new Agg with minimal grouping columns
 	colref_array->AddRef();
 
-	CLogicalGbAgg *popAggNew = GPOS_NEW(mp) CLogicalGbAgg(
+	gpos::Ref<CLogicalGbAgg> popAggNew = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, colref_array, pcrsMinimal->Pdrgpcr(mp), popAgg->Egbaggtype());
 	pcrsMinimal->Release();
 	GPOS_ASSERT(!popAgg->Matches(popAggNew) &&
@@ -206,7 +207,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 	pexprProjectList->AddRef();
-	CExpression *pexprResult = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprResult = GPOS_NEW(mp)
 		CExpression(mp, popAggNew, pexprRelational, pexprProjectList);
 	pxfres->Add(pexprResult);
 }

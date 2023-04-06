@@ -32,7 +32,7 @@ class CLogicalDynamicGet : public CLogicalDynamicGetBase
 {
 protected:
 	// Disjunction of selected child partition's constraints after static pruning
-	CConstraint *m_partition_cnstrs_disj{nullptr};
+	gpos::Ref<CConstraint> m_partition_cnstrs_disj{nullptr};
 
 	// Has done static pruning
 	BOOL m_static_pruned{false};
@@ -47,14 +47,14 @@ public:
 	explicit CLogicalDynamicGet(CMemoryPool *mp);
 
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
-					   CTableDescriptor *ptabdesc, ULONG ulPartIndex,
+					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
 					   CColRefArray *pdrgpcrOutput,
 					   CColRef2dArray *pdrgpdrgpcrPart,
 					   IMdIdArray *partition_mdids,
-					   CConstraint *partition_cnstrs_disj, BOOL static_pruned,
-					   IMdIdArray *foreign_server_mdids);
+					   gpos::Ref<CConstraint> partition_cnstrs_disj,
+					   BOOL static_pruned, IMdIdArray *foreign_server_mdids);
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
-					   CTableDescriptor *ptabdesc, ULONG ulPartIndex,
+					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
 					   IMdIdArray *partition_mdids,
 					   IMdIdArray *foreign_server_mdids);
 
@@ -76,7 +76,7 @@ public:
 	}
 
 	// return disjunctive constraint of selected partitions
-	CConstraint *
+	gpos::Ref<CConstraint>
 	GetPartitionConstraintsDisj() const
 	{
 		return m_partition_cnstrs_disj;
@@ -93,7 +93,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -110,9 +110,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -129,7 +129,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -147,11 +147,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp,
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 //pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalDynamicGet has no children");
@@ -170,12 +170,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// derive stats from base table using filters on partition and/or index columns
-	IStatistics *PstatsDeriveFilter(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CExpression *pexprFilter) const;
+	gpos::Ref<IStatistics> PstatsDeriveFilter(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CExpression> pexprFilter) const;
 
 	// stat promise
 	EStatPromise
@@ -189,13 +191,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDynamicGet *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalDynamicGet>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalDynamicGet *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalDynamicGet> >(pop);
 	}
 
 	// debug print

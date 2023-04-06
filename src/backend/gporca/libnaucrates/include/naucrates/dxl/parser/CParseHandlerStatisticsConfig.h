@@ -34,7 +34,7 @@ class CParseHandlerStatisticsConfig : public CParseHandlerBase
 {
 private:
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::Ref<CStatisticsConfig> m_stats_conf;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CStatisticsConfig *GetStatsConf() const;
+	gpos::Ref<CStatisticsConfig> GetStatsConf() const;
 };
 }  // namespace gpdxl
 

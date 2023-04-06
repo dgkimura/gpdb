@@ -78,7 +78,7 @@ public:
 	};
 
 	// md id of cache object
-	virtual IMDId *MDId() const = 0;
+	virtual gpos::Ref<IMDId> MDId() const = 0;
 
 	// cache object name
 	virtual CMDName Mdname() const = 0;
@@ -97,7 +97,7 @@ public:
 	// element with the given name
 	virtual void SerializeMDIdAsElem(gpdxl::CXMLSerializer *xml_serializer,
 									 const CWStringConst *element_name,
-									 const IMDId *mdid) const;
+									 const gpos::Ref<IMDId> mdid) const;
 
 #ifdef GPOS_DEBUG
 	virtual void DebugPrint(IOstream &os) const = 0;

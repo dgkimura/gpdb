@@ -41,28 +41,28 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// operator id
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// operator name
 	CMDName *m_mdname;
 
 	// type of left operand
-	IMDId *m_mdid_type_left;
+	gpos::Ref<IMDId> m_mdid_type_left;
 
 	// type of right operand
-	IMDId *m_mdid_type_right;
+	gpos::Ref<IMDId> m_mdid_type_right;
 
 	// type of result operand
-	IMDId *m_mdid_type_result;
+	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// id of function which implements the operator
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// id of commute operator
-	IMDId *m_mdid_commute_opr;
+	gpos::Ref<IMDId> m_mdid_commute_opr;
 
 	// id of inverse operator
-	IMDId *m_mdid_inverse_opr;
+	gpos::Ref<IMDId> m_mdid_inverse_opr;
 
 	// comparison type for comparison operators
 	IMDType::ECmpType m_comparision_type;
@@ -74,10 +74,10 @@ private:
 	IMdIdArray *m_mdid_opfamilies_array;
 
 	// compatible hash op family
-	IMDId *m_mdid_hash_opfamily;
+	gpos::Ref<IMDId> m_mdid_hash_opfamily;
 
 	// compatible legacy hash op family using legacy (cdbhash) opclass
-	IMDId *m_mdid_legacy_hash_opfamily;
+	gpos::Ref<IMDId> m_mdid_legacy_hash_opfamily;
 
 	// does operator preserve the NDV of its input(s)
 	// (used for cardinality estimation)
@@ -87,14 +87,15 @@ public:
 	CMDScalarOpGPDB(const CMDScalarOpGPDB &) = delete;
 
 	// ctor/dtor
-	CMDScalarOpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					IMDId *mdid_type_left, IMDId *mdid_type_right,
-					IMDId *result_type_mdid, IMDId *mdid_func,
-					IMDId *mdid_commute_opr, IMDId *m_mdid_inverse_opr,
-					IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-					IMdIdArray *mdid_opfamilies_array,
-					IMDId *m_mdid_hash_opfamily,
-					IMDId *mdid_legacy_hash_opfamily, BOOL is_ndv_preserving);
+	CMDScalarOpGPDB(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+		gpos::Ref<IMDId> mdid_type_left, gpos::Ref<IMDId> mdid_type_right,
+		gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> mdid_func,
+		gpos::Ref<IMDId> mdid_commute_opr, gpos::Ref<IMDId> m_mdid_inverse_opr,
+		IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
+		IMdIdArray *mdid_opfamilies_array,
+		gpos::Ref<IMDId> m_mdid_hash_opfamily,
+		gpos::Ref<IMDId> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving);
 
 	~CMDScalarOpGPDB() override;
 
@@ -106,28 +107,28 @@ public:
 	}
 
 	// operator id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// operator name
 	CMDName Mdname() const override;
 
 	// left operand type id
-	IMDId *GetLeftMdid() const override;
+	gpos::Ref<IMDId> GetLeftMdid() const override;
 
 	// right operand type id
-	IMDId *GetRightMdid() const override;
+	gpos::Ref<IMDId> GetRightMdid() const override;
 
 	// resulttype id
-	IMDId *GetResultTypeMdid() const override;
+	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// implementer function id
-	IMDId *FuncMdId() const override;
+	gpos::Ref<IMDId> FuncMdId() const override;
 
 	// commutor id
-	IMDId *GetCommuteOpMdid() const override;
+	gpos::Ref<IMDId> GetCommuteOpMdid() const override;
 
 	// inverse operator id
-	IMDId *GetInverseOpMdid() const override;
+	gpos::Ref<IMDId> GetInverseOpMdid() const override;
 
 	// is this an equality operator
 	BOOL IsEqualityOp() const override;
@@ -150,10 +151,10 @@ public:
 	ULONG OpfamiliesCount() const override;
 
 	// operator class at given position
-	IMDId *OpfamilyMdidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> OpfamilyMdidAt(ULONG pos) const override;
 
 	// compatible hash opfamily
-	IMDId *HashOpfamilyMdid() const override;
+	gpos::Ref<IMDId> HashOpfamilyMdid() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

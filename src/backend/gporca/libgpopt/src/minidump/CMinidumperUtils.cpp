@@ -68,17 +68,17 @@ CMinidumperUtils::PdxlmdLoad(CMemoryPool *mp, const CHAR *file_name)
 	CParseHandlerDXL *parse_handler_dxl = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, file_name, nullptr /*xsd_file_path*/);
 
-	CBitSet *pbs = parse_handler_dxl->Pbs();
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<CBitSet> pbs = parse_handler_dxl->Pbs();
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		parse_handler_dxl->GetOptimizerConfig();
-	CDXLNode *query = parse_handler_dxl->GetQueryDXLRoot();
+	gpos::Ref<CDXLNode> query = parse_handler_dxl->GetQueryDXLRoot();
 	CDXLNodeArray *query_output_dxlnode_array =
 		parse_handler_dxl->GetOutputColumnsDXLArray();
 	CDXLNodeArray *cte_producers = parse_handler_dxl->GetCTEProducerDXLArray();
 	IMDCacheObjectArray *mdcache_obj_array =
 		parse_handler_dxl->GetMdIdCachedObjArray();
 	CSystemIdArray *pdrgpsysid = parse_handler_dxl->GetSysidPtrArray();
-	CDXLNode *pdxlnPlan = parse_handler_dxl->PdxlnPlan();
+	gpos::Ref<CDXLNode> pdxlnPlan = parse_handler_dxl->PdxlnPlan();
 	ULLONG plan_id = parse_handler_dxl->GetPlanId();
 	ULLONG plan_space_size = parse_handler_dxl->GetPlanSpaceSize();
 
@@ -221,12 +221,11 @@ CMinidumperUtils::Finalize(CMiniDumperDXL *pmdmp, BOOL fSerializeErrCtx)
 //		Load and execute the minidump in the given file
 //
 //---------------------------------------------------------------------------
-CDXLNode *
-CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
-									   ULONG ulSegments, ULONG ulSessionId,
-									   ULONG ulCmdId,
-									   COptimizerConfig *optimizer_config,
-									   IConstExprEvaluator *pceeval)
+gpos::Ref<CDXLNode>
+CMinidumperUtils::PdxlnExecuteMinidump(
+	CMemoryPool *mp, const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId,
+	ULONG ulCmdId, gpos::Ref<COptimizerConfig> optimizer_config,
+	gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 	GPOS_ASSERT(nullptr != optimizer_config);
@@ -237,7 +236,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
 	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 	GPOS_CHECK_ABORT;
 
-	CDXLNode *pdxlnPlan =
+	gpos::Ref<CDXLNode> pdxlnPlan =
 		PdxlnExecuteMinidump(mp, pdxlmd, file_name, ulSegments, ulSessionId,
 							 ulCmdId, optimizer_config, pceeval);
 
@@ -256,12 +255,12 @@ CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
 //		Execute the given minidump
 //
 //---------------------------------------------------------------------------
-CDXLNode *
-CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, CDXLMinidump *pdxlmd,
-									   const CHAR *file_name, ULONG ulSegments,
-									   ULONG ulSessionId, ULONG ulCmdId,
-									   COptimizerConfig *optimizer_config,
-									   IConstExprEvaluator *pceeval)
+gpos::Ref<CDXLNode>
+CMinidumperUtils::PdxlnExecuteMinidump(
+	CMemoryPool *mp, CDXLMinidump *pdxlmd, const CHAR *file_name,
+	ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
+	gpos::Ref<COptimizerConfig> optimizer_config,
+	gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 
@@ -270,7 +269,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, CDXLMinidump *pdxlmd,
 
 	CMetadataAccessorFactory factory(mp, pdxlmd, file_name);
 
-	CDXLNode *result = CMinidumperUtils::PdxlnExecuteMinidump(
+	gpos::Ref<CDXLNode> result = CMinidumperUtils::PdxlnExecuteMinidump(
 		mp, factory.Pmda(), pdxlmd, file_name, ulSegments, ulSessionId, ulCmdId,
 		optimizer_config, pceeval);
 
@@ -286,11 +285,12 @@ CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, CDXLMinidump *pdxlmd,
 //		Execute the given minidump using the given MD accessor
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLMinidump *pdxlmd,
 	const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
-	COptimizerConfig *optimizer_config, IConstExprEvaluator *pceeval)
+	gpos::Ref<COptimizerConfig> optimizer_config,
+	gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != pdxlmd->GetQueryDXLRoot() &&
@@ -302,14 +302,14 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 				"No metadata found in Minidump");
 	GPOS_ASSERT(nullptr != optimizer_config);
 
-	CDXLNode *pdxlnPlan = nullptr;
+	gpos::Ref<CDXLNode> pdxlnPlan = nullptr;
 	CAutoTimer at("Minidump", true /*fPrint*/);
 
 	GPOS_CHECK_ABORT;
 
 	// set trace flags
-	CBitSet *pbsEnabled = nullptr;
-	CBitSet *pbsDisabled = nullptr;
+	gpos::Ref<CBitSet> pbsEnabled = nullptr;
+	gpos::Ref<CBitSet> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	if (nullptr == pceeval)

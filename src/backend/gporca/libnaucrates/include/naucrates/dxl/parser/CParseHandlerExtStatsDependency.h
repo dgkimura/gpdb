@@ -37,7 +37,7 @@ private:
 	INT m_to_attno;
 
 	// dependency object
-	CMDDependency *m_dependency;
+	gpos::Ref<CMDDependency> m_dependency;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	~CParseHandlerExtStatsDependency() override;
 
 	// returns the constructed bucket
-	CMDDependency *GetDependencyAt() const;
+	gpos::Ref<CMDDependency> GetDependencyAt() const;
 };
 }  // namespace gpdxl
 

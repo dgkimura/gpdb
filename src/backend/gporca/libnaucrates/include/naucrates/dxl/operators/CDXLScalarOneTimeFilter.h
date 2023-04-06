@@ -41,17 +41,18 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarOneTimeFilter *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarOneTimeFilter>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarOneTimeFilter *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarOneTimeFilter> >(dxl_op);
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						const gpos::Ref<CDXLNode>) const override;
 
 	// does the operator return a boolean result
 	BOOL

@@ -38,10 +38,10 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -56,12 +56,12 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *colref =
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 		pcrs->Include(colref);
 
@@ -70,12 +70,12 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 
 	GPOS_ASSERT(pcrs->Size() == num_cols);
 
-	CColRefSet *pcrsTwo = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
+	gpos::Ref<CColRefSet> pcrsTwo = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 	GPOS_ASSERT(pcrsTwo->Size() == num_cols);
 
-	CColRefSet *pcrsThree = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsThree = GPOS_NEW(mp) CColRefSet(mp);
 	GPOS_ASSERT(pcrsThree->Size() == 0);
-	CColRef *pcrThree =
+	gpos::Ref<CColRef> pcrThree =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 	pcrsThree->Include(pcrThree);
 	GPOS_ASSERT(pcrsThree->Size() == 1);
@@ -110,10 +110,10 @@ CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -128,12 +128,12 @@ CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *colref =
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 		pcrs->Include(colref);
 

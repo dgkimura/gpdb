@@ -122,7 +122,7 @@ CParseHandlerLogicalInsert::EndElement(const XMLCh *const,	// element_uri,
 	GPOS_ASSERT(nullptr != pphTabDesc->GetDXLTableDescr());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	CDXLTableDescr *table_descr = pphTabDesc->GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> table_descr = pphTabDesc->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(

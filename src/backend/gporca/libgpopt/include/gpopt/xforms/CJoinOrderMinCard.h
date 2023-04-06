@@ -34,7 +34,7 @@ class CJoinOrderMinCard : public CJoinOrder
 {
 private:
 	// result component
-	SComponent *m_pcompResult;
+	gpos::Ref<SComponent> m_pcompResult;
 
 public:
 	// ctor
@@ -45,7 +45,7 @@ public:
 	~CJoinOrderMinCard() override;
 
 	// main handler
-	virtual CExpression *PexprExpand();
+	virtual gpos::Ref<CExpression> PexprExpand();
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;

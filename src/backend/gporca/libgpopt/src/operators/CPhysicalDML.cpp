@@ -35,10 +35,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
-						   CTableDescriptor *ptabdesc,
-						   CColRefArray *pdrgpcrSource, CBitSet *pbsModified,
-						   CColRef *pcrAction, CColRef *pcrCtid,
-						   CColRef *pcrSegmentId, BOOL fSplit)
+						   gpos::Ref<CTableDescriptor> ptabdesc,
+						   CColRefArray *pdrgpcrSource,
+						   gpos::Ref<CBitSet> pbsModified,
+						   gpos::Ref<CColRef> pcrAction,
+						   gpos::Ref<CColRef> pcrCtid,
+						   gpos::Ref<CColRef> pcrSegmentId, BOOL fSplit)
 	: CPhysical(mp),
 	  m_edmlop(edmlop),
 	  m_ptabdesc(ptabdesc),
@@ -117,10 +119,10 @@ CPhysicalDML::~CPhysicalDML()
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalDML::PosRequired(CMemoryPool *,		// mp
-						  CExpressionHandle &,	// exprhdl
-						  COrderSpec *,			// posRequired
+gpos::Ref<COrderSpec>
+CPhysicalDML::PosRequired(CMemoryPool *,		  // mp
+						  CExpressionHandle &,	  // exprhdl
+						  gpos::Ref<COrderSpec>,  // posRequired
 						  ULONG
 #ifdef GPOS_DEBUG
 							  child_index
@@ -143,7 +145,7 @@ CPhysicalDML::PosRequired(CMemoryPool *,		// mp
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalDML::PosDerive(CMemoryPool *mp,
 						CExpressionHandle &	 // exprhdl
 ) const
@@ -161,13 +163,14 @@ CPhysicalDML::PosDerive(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl, const CEnfdOrder *peo) const
+CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl,
+						const gpos::Ref<CEnfdOrder> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// get the order delivered by the DML node
-	COrderSpec *pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
+	gpos::Ref<COrderSpec> pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
 	if (peo->FCompatible(pos))
 	{
 		return CEnfdProp::EpetUnnecessary;
@@ -186,10 +189,10 @@ CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl, const CEnfdOrder *peo) const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 						   CExpressionHandle &,	 // exprhdl,
-						   CColRefSet *pcrsRequired,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -203,7 +206,8 @@ CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 		0 == child_index &&
 		"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
+	gpos::Ref<CColRefSet> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
 	return pcrs;
@@ -217,10 +221,10 @@ CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalDML::PdsRequired(CMemoryPool *mp,
-						  CExpressionHandle &,	// exprhdl,
-						  CDistributionSpec *,	// pdsInput,
+						  CExpressionHandle &,			 // exprhdl,
+						  gpos::Ref<CDistributionSpec>,	 // pdsInput,
 						  ULONG
 #ifdef GPOS_DEBUG
 							  child_index
@@ -258,9 +262,10 @@ CPhysicalDML::PdsRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CRewindabilitySpec *prsRequired, ULONG child_index,
+						  gpos::Ref<CRewindabilitySpec> prsRequired,
+						  ULONG child_index,
 						  CDrvdPropArray *,	 // pdrgpdpCtxt
 						  ULONG				 // ulOptReq
 ) const
@@ -278,10 +283,10 @@ CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *pcter,
+						   gpos::Ref<CCTEReq> pcter,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -305,7 +310,7 @@ CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalDML::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {
@@ -320,7 +325,7 @@ CPhysicalDML::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalDML::PdsDerive(CMemoryPool *,	//mp,
 						CExpressionHandle &exprhdl) const
 {
@@ -335,7 +340,7 @@ CPhysicalDML::PdsDerive(CMemoryPool *,	//mp,
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalDML::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -378,11 +383,11 @@ CPhysicalDML::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDML::Matches(COperator *pop) const
+CPhysicalDML::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalDML *popDML = CPhysicalDML::PopConvert(pop);
+		gpos::Ref<CPhysicalDML> popDML = CPhysicalDML::PopConvert(pop);
 
 		return m_pcrAction == popDML->PcrAction() &&
 			   m_pcrCtid == popDML->PcrCtid() &&
@@ -405,8 +410,8 @@ CPhysicalDML::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalDML::EpetRewindability(CExpressionHandle &,		// exprhdl,
-								const CEnfdRewindability *	// per
+CPhysicalDML::EpetRewindability(CExpressionHandle &,				 // exprhdl,
+								const gpos::Ref<CEnfdRewindability>	 // per
 ) const
 {
 	return CEnfdProp::EpetProhibited;
@@ -439,10 +444,11 @@ CPhysicalDML::EpetRewindability(CExpressionHandle &,		// exprhdl,
 //		tuples deleted before the new ones are inserted.
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
+gpos::Ref<COrderSpec>
+CPhysicalDML::PosComputeRequired(CMemoryPool *mp,
+								 gpos::Ref<CTableDescriptor> ptabdesc)
 {
-	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 
 	const CBitSetArray *pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
 	if (1 < pdrgpbsKeys->Size() && CLogicalDML::EdmlUpdate == m_edmlop)
@@ -453,7 +459,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 		BOOL fNeedsSort = false;
 		for (ULONG ul = 0; ul < ulKeySets; ul++)
 		{
-			CBitSet *pbs = (*pdrgpbsKeys)[ul];
+			gpos::Ref<CBitSet> pbs = (*pdrgpbsKeys)[ul];
 			if (!pbs->IsDisjoint(m_pbsModified))
 			{
 				fNeedsSort = true;
@@ -463,7 +469,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 
 		if (fNeedsSort)
 		{
-			IMDId *mdid =
+			gpos::Ref<IMDId> mdid =
 				m_pcrAction->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 			mdid->AddRef();
 			pos->Append(mdid, m_pcrAction, COrderSpec::EntAuto);

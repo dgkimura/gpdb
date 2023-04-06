@@ -33,7 +33,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalTableScan::CPhysicalTableScan(CMemoryPool *mp, const CName *pnameAlias,
-									   CTableDescriptor *ptabdesc,
+									   gpos::Ref<CTableDescriptor> ptabdesc,
 									   CColRefArray *pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
@@ -68,14 +68,15 @@ CPhysicalTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTableScan::Matches(COperator *pop) const
+CPhysicalTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalTableScan *popTableScan = CPhysicalTableScan::PopConvert(pop);
+	gpos::Ref<CPhysicalTableScan> popTableScan =
+		CPhysicalTableScan::PopConvert(pop);
 	return m_ptabdesc->MDId()->Equals(popTableScan->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popTableScan->PdrgpcrOutput());
 }

@@ -58,8 +58,8 @@ CParseHandlerScalarIfStmt::StartElement(const XMLCh *const,	 // element_uri,
 								 element_local_name))
 	{
 		// parse and create scalar if statment
-		CDXLScalarIfStmt *dxl_op =
-			(CDXLScalarIfStmt *) CDXLOperatorFactory::MakeDXLIfStmt(
+		gpos::Ref<CDXLScalarIfStmt> dxl_op =
+			(gpos::Ref<CDXLScalarIfStmt>) CDXLOperatorFactory::MakeDXLIfStmt(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 		// construct node

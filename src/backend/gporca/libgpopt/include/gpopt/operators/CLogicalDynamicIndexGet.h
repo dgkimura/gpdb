@@ -37,13 +37,13 @@ class CLogicalDynamicIndexGet : public CLogicalDynamicGetBase
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
 
 	// order spec
-	COrderSpec *m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 public:
 	CLogicalDynamicIndexGet(const CLogicalDynamicIndexGet &) = delete;
@@ -51,10 +51,10 @@ public:
 	// ctors
 	explicit CLogicalDynamicIndexGet(CMemoryPool *mp);
 
-	CLogicalDynamicIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
-							CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-							const CName *pnameAlias, ULONG ulPartIndex,
-							CColRefArray *pdrgpcrOutput,
+	CLogicalDynamicIndexGet(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
+							gpos::Ref<CTableDescriptor> ptabdesc,
+							ULONG ulOriginOpId, const CName *pnameAlias,
+							ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
 							CColRef2dArray *pdrgpdrgpcrPart,
 							IMdIdArray *partition_mdids);
 
@@ -97,14 +97,14 @@ public:
 	}
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
 	}
 
 	// order spec
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	Pos() const
 	{
 		return m_pos;
@@ -114,30 +114,30 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   //mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 //mp
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 //pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalDynamicIndexGet has no children");
@@ -145,8 +145,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -166,13 +167,13 @@ public:
 	// conversion function
 	//-------------------------------------------------------------------------------------
 
-	static CLogicalDynamicIndexGet *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalDynamicIndexGet>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicIndexGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalDynamicIndexGet *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalDynamicIndexGet> >(pop);
 	}
 
 

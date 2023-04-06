@@ -68,7 +68,7 @@ CLogicalInnerCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInnerCorrelatedApply::Matches(COperator *pop) const
+CLogicalInnerCorrelatedApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -87,7 +87,7 @@ CLogicalInnerCorrelatedApply::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalInnerCorrelatedApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

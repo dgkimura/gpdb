@@ -51,9 +51,9 @@ CXformImplementSequenceProject::CXformImplementSequenceProject(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
-										  CXformResult *pxfres,
-										  CExpression *pexpr) const
+CXformImplementSequenceProject::Transform(gpos::Ref<CXformContext> pxfctxt,
+										  gpos::Ref<CXformResult> pxfres,
+										  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -62,17 +62,17 @@ CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref all children
 	pexprRelational->AddRef();
 	pexprScalar->AddRef();
 
 	// extract members of logical sequence project operator
-	CLogicalSequenceProject *popLogicalSequenceProject =
+	gpos::Ref<CLogicalSequenceProject> popLogicalSequenceProject =
 		CLogicalSequenceProject::PopConvert(pexpr->Pop());
-	CDistributionSpec *pds = popLogicalSequenceProject->Pds();
+	gpos::Ref<CDistributionSpec> pds = popLogicalSequenceProject->Pds();
 	COrderSpecArray *pdrgpos = popLogicalSequenceProject->Pdrgpos();
 	CWindowFrameArray *pdrgpwf = popLogicalSequenceProject->Pdrgpwf();
 	pds->AddRef();
@@ -80,7 +80,7 @@ CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
 	pdrgpwf->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprSequenceProject = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprSequenceProject = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalSequenceProject(mp, pds, pdrgpos, pdrgpwf),
 		pexprRelational, pexprScalar);
 

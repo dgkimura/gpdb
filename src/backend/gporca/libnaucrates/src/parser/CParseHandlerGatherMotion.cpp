@@ -67,8 +67,8 @@ CParseHandlerGatherMotion::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create Gather motion operator
-	m_dxl_op =
-		(CDXLPhysicalGatherMotion *) CDXLOperatorFactory::MakeDXLGatherMotion(
+	m_dxl_op = (gpos::Ref<CDXLPhysicalGatherMotion>)
+		CDXLOperatorFactory::MakeDXLGatherMotion(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 	// create and activate the parse handler for the children nodes in reverse

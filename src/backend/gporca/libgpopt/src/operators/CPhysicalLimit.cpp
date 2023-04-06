@@ -31,8 +31,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalLimit::CPhysicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
-							   BOOL fHasCount, BOOL fTopLimitUnderDML)
+CPhysicalLimit::CPhysicalLimit(CMemoryPool *mp, gpos::Ref<COrderSpec> pos,
+							   BOOL fGlobal, BOOL fHasCount,
+							   BOOL fTopLimitUnderDML)
 	: CPhysical(mp),
 	  m_pos(pos),
 	  m_fGlobal(fGlobal),
@@ -71,11 +72,11 @@ CPhysicalLimit::~CPhysicalLimit()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalLimit::Matches(COperator *pop) const
+CPhysicalLimit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalLimit *popLimit = CPhysicalLimit::PopConvert(pop);
+		gpos::Ref<CPhysicalLimit> popLimit = CPhysicalLimit::PopConvert(pop);
 
 		if (popLimit->FGlobal() == m_fGlobal &&
 			popLimit->FHasCount() == m_fHasCount)
@@ -97,19 +98,20 @@ CPhysicalLimit::Matches(COperator *pop) const
 //		Columns required by Limit's relational child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalLimit::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 
-	CColRefSet *pcrsChildReqd =
+	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
@@ -125,10 +127,10 @@ CPhysicalLimit::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalLimit::PosRequired(CMemoryPool *,		  // mp
-							CExpressionHandle &,  // exprhdl
-							COrderSpec *,		  // posInput
+gpos::Ref<COrderSpec>
+CPhysicalLimit::PosRequired(CMemoryPool *,			// mp
+							CExpressionHandle &,	// exprhdl
+							gpos::Ref<COrderSpec>,	// posInput
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index
@@ -148,10 +150,10 @@ CPhysicalLimit::PosRequired(CMemoryPool *,		  // mp
 	return m_pos;
 }
 
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
-							CDistributionSpec *, ULONG, CDrvdPropArray *,
-							ULONG) const
+							gpos::Ref<CDistributionSpec>, ULONG,
+							CDrvdPropArray *, ULONG) const
 {
 	// FIXME: this method will (and should) _never_ be called
 	// sweep through all 38 overrides of PdsRequired and switch to Ped()
@@ -161,16 +163,17 @@ CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
 	return nullptr;
 }
 
-CEnfdDistribution *
+gpos::Ref<CEnfdDistribution>
 CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					CReqdPropPlan *prppInput, ULONG child_index,
+					gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 					CDrvdPropArray *,  // pdrgpdpCtxt
 					ULONG			   // ulDistrReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsInput =
+		prppInput->Ped()->PdsRequired();
 
 	if (FGlobal())
 	{
@@ -182,7 +185,7 @@ CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CEnfdDistribution::EdmSatisfy);
 		}
 
-		CExpression *pexprOffset = exprhdl.PexprScalarExactChild(
+		gpos::Ref<CExpression> pexprOffset = exprhdl.PexprScalarExactChild(
 			1 /*child_index*/, true /*error_on_null_return*/);
 		if (!m_fHasCount && CUtils::FScalarConstIntZero(pexprOffset))
 		{
@@ -241,9 +244,10 @@ CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalLimit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CRewindabilitySpec *prsRequired, ULONG child_index,
+							gpos::Ref<CRewindabilitySpec> prsRequired,
+							ULONG child_index,
 							CDrvdPropArray *,  // pdrgpdpCtxt
 							ULONG			   // ulOptReq
 ) const
@@ -274,10 +278,10 @@ CPhysicalLimit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 							 CExpressionHandle &,  //exprhdl,
-							 CCTEReq *pcter,
+							 gpos::Ref<CCTEReq> pcter,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -301,7 +305,7 @@ CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalLimit::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::Ref<CColRefSet> pcrsRequired,
 								  ULONG	 // ulOptReq
 ) const
 {
@@ -317,7 +321,7 @@ CPhysicalLimit::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalLimit::PosDerive(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 ) const
@@ -336,10 +340,10 @@ CPhysicalLimit::PosDerive(CMemoryPool *,	   // mp
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLimit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter = exprhdl.Pdpplan(0)->Pds();
 
 	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt())
 	{
@@ -369,7 +373,7 @@ CPhysicalLimit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalLimit::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -386,7 +390,7 @@ CPhysicalLimit::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalLimit::EpetOrder(CExpressionHandle &,	// exprhdl
-						  const CEnfdOrder *peo) const
+						  const gpos::Ref<CEnfdOrder> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -412,12 +416,13 @@ CPhysicalLimit::EpetOrder(CExpressionHandle &,	// exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalLimit::EpetDistribution(CExpressionHandle &exprhdl,
-								 const CEnfdDistribution *ped) const
+								 const gpos::Ref<CEnfdDistribution> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the limit node
-	CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
 
 	if (ped->FCompatible(pds))
 	{
@@ -444,8 +449,8 @@ CPhysicalLimit::EpetDistribution(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalLimit::EpetRewindability(CExpressionHandle &,		  // exprhdl
-								  const CEnfdRewindability *  // per
+CPhysicalLimit::EpetRewindability(CExpressionHandle &,	// exprhdl
+								  const gpos::Ref<CEnfdRewindability>  // per
 ) const
 {
 	// rewindability is preserved on operator's output

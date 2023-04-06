@@ -87,7 +87,7 @@ CLogicalUnionAll::DeriveMaxCard(CMemoryPool *,	// mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalUnionAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											 UlongToColRefMap *colref_mapping,
 											 BOOL must_exist)
@@ -108,7 +108,7 @@ CLogicalUnionAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalUnionAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 									  CExpressionHandle &  // exprhdl
 ) const
@@ -142,7 +142,7 @@ CLogicalUnionAll::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics based on union all semantics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl)
 {
@@ -156,18 +156,19 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrInput);
 
-	IStatistics *result_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> result_stats = exprhdl.Pstats(0);
 	result_stats->AddRef();
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		IStatistics *child_stats = exprhdl.Pstats(ul);
-		CStatistics *stats = CUnionAllStatsProcessor::CreateStatsForUnionAll(
-			mp, dynamic_cast<CStatistics *>(result_stats),
-			dynamic_cast<CStatistics *>(child_stats),
-			CColRef::Pdrgpul(mp, pdrgpcrOutput),
-			CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
-			CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul]));
+		gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(ul);
+		gpos::Ref<CStatistics> stats =
+			CUnionAllStatsProcessor::CreateStatsForUnionAll(
+				mp, dynamic_cast<gpos::Ref<CStatistics> >(result_stats),
+				dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
+				CColRef::Pdrgpul(mp, pdrgpcrOutput),
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul]));
 		result_stats->Release();
 		result_stats = stats;
 	}
@@ -183,7 +184,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 //		Derive statistics based on union all semantics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalUnionAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   IStatisticsArray *  // not used
 ) const

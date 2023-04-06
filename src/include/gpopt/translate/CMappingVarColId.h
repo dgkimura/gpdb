@@ -97,7 +97,7 @@ private:
 	void Insert(ULONG, ULONG, INT, ULONG, CWStringBase *str);
 
 	// helper function to access mapping
-	const CGPDBAttOptCol *GetGPDBAttOptColMapping(
+	const gpos::Ref<CGPDBAttOptCol> GetGPDBAttOptColMapping(
 		ULONG current_query_level, const Var *var,
 		EPlStmtPhysicalOpType plstmt_physical_op_type) const;
 
@@ -124,12 +124,12 @@ public:
 
 	// load up mapping information from an index
 	void LoadIndexColumns(ULONG query_level, ULONG RTE_index,
-						  const gpmd::IMDIndex *index,
-						  const gpdxl::CDXLTableDescr *table_descr);
+						  const gpos::Ref<gpmd::IMDIndex> index,
+						  const gpos::Ref<gpdxl::CDXLTableDescr> table_descr);
 
 	// load up mapping information from table descriptor
 	void LoadTblColumns(ULONG query_level, ULONG RTE_index,
-						const gpdxl::CDXLTableDescr *table_descr);
+						const gpos::Ref<gpdxl::CDXLTableDescr> table_descr);
 
 	// load up column id mapping information from the array of column descriptors
 	void LoadColumns(ULONG query_level, ULONG RTE_index,
@@ -146,7 +146,7 @@ public:
 
 	// load up mapping information from scalar projection list
 	void LoadProjectElements(ULONG query_level, ULONG RTE_index,
-							 const CDXLNode *project_list_dxlnode);
+							 const gpos::Ref<CDXLNode> project_list_dxlnode);
 
 	// load up mapping information from list of column names
 	void Load(ULONG query_level, ULONG RTE_index, CIdGenerator *id_generator,

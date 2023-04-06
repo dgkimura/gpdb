@@ -51,7 +51,7 @@ CMCVTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -72,17 +72,17 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	CMemoryPool *mp = amp.Pmp();
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid);
 
 	// create three integer MCVs
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 5);
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 1);
-	CPoint *point3 = CTestUtils::PpointInt4(mp, 10);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 5);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 1);
+	gpos::Ref<CPoint> point3 = CTestUtils::PpointInt4(mp, 10);
 	IDatumArray *pdrgpdatumMCV = GPOS_NEW(mp) IDatumArray(mp);
-	IDatum *datum1 = point1->GetDatum();
-	IDatum *datum2 = point2->GetDatum();
-	IDatum *datum3 = point3->GetDatum();
+	gpos::Ref<IDatum> datum1 = point1->GetDatum();
+	gpos::Ref<IDatum> datum2 = point2->GetDatum();
+	gpos::Ref<IDatum> datum3 = point3->GetDatum();
 	datum1->AddRef();
 	datum2->AddRef();
 	datum3->AddRef();
@@ -113,7 +113,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1),
 								GPOS_NEW(mp) CDouble(4.0));
 
-	CStatistics *stats =
+	gpos::Ref<CStatistics> stats =
 		GPOS_NEW(mp) CStatistics(mp, col_histogram_mapping, colid_width_mapping,
 								 1000.0 /* rows */, false /* is_empty */
 		);
@@ -195,21 +195,21 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelMCV =
+		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelMCV =
 			(*pdrgpdxlstatsderrelMCV)[0];
 		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolMCV =
 			pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolMCV =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolMCV =
 			(*pdrgpdxlstatsdercolMCV)[0];
 		CBucketArray *pdrgppbucketMCV = CDXLUtils::ParseDXLToBucketsArray(
 			mp, md_accessor, pdxlstatsdercolMCV);
 		CHistogram *phistMCV = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketMCV);
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelHist =
+		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0];
 		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolHist =
 			pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolHist =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolHist =
 			(*pdrgpdxlstatsdercolHist)[0];
 		CBucketArray *pdrgppbucketHist = CDXLUtils::ParseDXLToBucketsArray(
 			mp, md_accessor, pdxlstatsdercolHist);
@@ -236,7 +236,7 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 									GPOS_NEW(mp) CDouble(width));
 
-		CStatistics *stats = GPOS_NEW(mp) CStatistics(
+		gpos::Ref<CStatistics> stats = GPOS_NEW(mp) CStatistics(
 			mp, col_histogram_mapping, colid_width_mapping,
 			pdxlstatsderrelMCV->Rows(), pdxlstatsderrelMCV->IsEmpty());
 

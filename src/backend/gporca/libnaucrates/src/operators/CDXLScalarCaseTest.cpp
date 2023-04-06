@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
+CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -82,7 +83,7 @@ CDXLScalarCaseTest::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarCaseTest::MdidType() const
 {
 	return m_mdid_type;
@@ -98,7 +99,7 @@ CDXLScalarCaseTest::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCaseTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *	 //dxlnode
+								   const gpos::Ref<CDXLNode>  //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -136,7 +137,7 @@ CDXLScalarCaseTest::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCaseTest::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarCaseTest::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL  // validate_children
 ) const
 {

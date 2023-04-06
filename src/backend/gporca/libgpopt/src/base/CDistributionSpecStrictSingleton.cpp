@@ -39,7 +39,7 @@ CDistributionSpecStrictSingleton::CDistributionSpecStrictSingleton(
 //---------------------------------------------------------------------------
 BOOL
 CDistributionSpecStrictSingleton::FSatisfies(
-	const CDistributionSpec *pdss) const
+	const gpos::Ref<CDistributionSpec> pdss) const
 {
 	if (Matches(pdss))
 	{
@@ -61,7 +61,8 @@ CDistributionSpecStrictSingleton::FSatisfies(
 
 	return (
 		(EdtSingleton == pdss->Edt() || EdtStrictSingleton == pdss->Edt()) &&
-		m_est == static_cast<const CDistributionSpecSingleton *>(pdss)->Est());
+		m_est == static_cast<const gpos::Ref<CDistributionSpecSingleton> >(pdss)
+					 ->Est());
 }
 
 

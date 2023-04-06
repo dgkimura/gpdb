@@ -53,7 +53,7 @@ CLogicalCTEAnchor::CLogicalCTEAnchor(CMemoryPool *mp, ULONG id)
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalCTEAnchor::DeriveOutputColumns(CMemoryPool *,  // mp
 									   CExpressionHandle &exprhdl)
 {
@@ -68,7 +68,7 @@ CLogicalCTEAnchor::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalCTEAnchor::DeriveKeyCollection(CMemoryPool *,  // mp
 									   CExpressionHandle &exprhdl) const
 {
@@ -83,17 +83,18 @@ CLogicalCTEAnchor::DeriveKeyCollection(CMemoryPool *,  // mp
 //		Derive part consumer
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CLogicalCTEAnchor::DerivePartitionInfo(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 
-	CExpression *pexprProducer =
+	gpos::Ref<CExpression> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
-	CPartInfo *ppartinfoCTEProducer = pexprProducer->DerivePartitionInfo();
+	gpos::Ref<CPartInfo> ppartinfoCTEProducer =
+		pexprProducer->DerivePartitionInfo();
 
 	return CPartInfo::PpartinfoCombine(mp, ppartinfoChild,
 									   ppartinfoCTEProducer);
@@ -124,14 +125,15 @@ CLogicalCTEAnchor::DeriveMaxCard(CMemoryPool *,	 // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEAnchor::Matches(COperator *pop) const
+CLogicalCTEAnchor::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalCTEAnchor *popCTEAnchor = CLogicalCTEAnchor::PopConvert(pop);
+	gpos::Ref<CLogicalCTEAnchor> popCTEAnchor =
+		CLogicalCTEAnchor::PopConvert(pop);
 
 	return m_id == popCTEAnchor->Id();
 }

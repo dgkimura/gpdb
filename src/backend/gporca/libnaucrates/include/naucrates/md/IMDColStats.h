@@ -61,7 +61,7 @@ public:
 	virtual BOOL IsColStatsMissing() const = 0;
 
 	// get the bucket at the given position
-	virtual const CDXLBucket *GetDXLBucketAt(ULONG ul) const = 0;
+	virtual const gpos::Ref<CDXLBucket> GetDXLBucketAt(ULONG ul) const = 0;
 };
 }  // namespace gpmd
 

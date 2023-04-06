@@ -115,7 +115,8 @@ CParseHandlerLogicalGet::EndElement(const XMLCh *const element_local_name,
 
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	if (EdxltokenLogicalGet == token_type)

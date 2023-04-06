@@ -70,7 +70,7 @@ CTaskLocalStorage::Reset(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CTaskLocalStorage::Store(CTaskLocalStorageObject *obj)
+CTaskLocalStorage::Store(gpos::Ref<CTaskLocalStorageObject> obj)
 {
 	GPOS_ASSERT(nullptr != obj);
 
@@ -94,7 +94,7 @@ CTaskLocalStorage::Store(CTaskLocalStorageObject *obj)
 //		Lookup object in TLS
 //
 //---------------------------------------------------------------------------
-CTaskLocalStorageObject *
+gpos::Ref<CTaskLocalStorageObject>
 CTaskLocalStorage::Get(CTaskLocalStorage::Etlsidx idx)
 {
 	HashTableAccessor HashTableAccessor(m_hash_table, idx);
@@ -111,7 +111,7 @@ CTaskLocalStorage::Get(CTaskLocalStorage::Etlsidx idx)
 //
 //---------------------------------------------------------------------------
 void
-CTaskLocalStorage::Remove(CTaskLocalStorageObject *obj)
+CTaskLocalStorage::Remove(gpos::Ref<CTaskLocalStorageObject> obj)
 {
 	GPOS_ASSERT(nullptr != obj);
 

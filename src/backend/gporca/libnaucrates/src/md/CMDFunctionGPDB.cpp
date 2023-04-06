@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Constructs a metadata func
 //
 //---------------------------------------------------------------------------
-CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-								 IMDId *result_type_mdid,
+CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								 CMDName *mdname,
+								 gpos::Ref<IMDId> result_type_mdid,
 								 IMdIdArray *mdid_array, BOOL ReturnsSet,
 								 EFuncStbl func_stability,
 								 EFuncDataAcc func_data_access, BOOL is_strict,
@@ -105,7 +106,7 @@ CMDFunctionGPDB::InitDXLTokenArrays()
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDFunctionGPDB::MDId() const
 {
 	return m_mdid;
@@ -134,7 +135,7 @@ CMDFunctionGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDFunctionGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -185,7 +186,7 @@ CMDFunctionGPDB::GetOutputArgTypeArrayStr() const
 	const ULONG len = m_mdid_types_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		IMDId *mdid = (*m_mdid_types_array)[ul];
+		gpos::Ref<IMDId> mdid = (*m_mdid_types_array)[ul];
 		if (ul == len - 1)
 		{
 			// last element: do not print a comma

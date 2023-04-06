@@ -51,7 +51,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// derived column stats
-	CDXLStatsDerivedColumn *m_dxl_stats_derived_col;
+	gpos::Ref<CDXLStatsDerivedColumn> m_dxl_stats_derived_col;
 
 	// process the start of an element
 	void StartElement(
@@ -81,7 +81,7 @@ public:
 	~CParseHandlerStatsDerivedColumn() override;
 
 	// derived column stats
-	CDXLStatsDerivedColumn *
+	gpos::Ref<CDXLStatsDerivedColumn>
 	GetDxlStatsDerivedCol() const
 	{
 		return m_dxl_stats_derived_col;

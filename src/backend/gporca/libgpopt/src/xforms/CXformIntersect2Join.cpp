@@ -58,8 +58,9 @@ CXformIntersect2Join::CXformIntersect2Join(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformIntersect2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -71,16 +72,16 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalIntersect *popIntersect =
+	gpos::Ref<CLogicalIntersect> popIntersect =
 		CLogicalIntersect::PopConvert(pexpr->Pop());
 	CColRef2dArray *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
 
 	// construct group by over the left and right expressions
 
-	CExpression *pexprProjList =
+	gpos::Ref<CExpression> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 	pexprProjList->AddRef();
@@ -89,14 +90,15 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	(*pdrgpdrgpcrInput)[0]->AddRef();
 	(*pdrgpdrgpcrInput)[1]->AddRef();
 
-	CExpression *pexprLeftAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprLeftAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, (*pdrgpdrgpcrInput)[0], pexprLeftChild, pexprProjList);
-	CExpression *pexprRightAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprRightAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, (*pdrgpdrgpcrInput)[1], pexprRightChild, pexprProjList);
 
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
+	gpos::Ref<CExpression> pexprScCond =
+		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
-	CExpression *pexprJoin =
+	gpos::Ref<CExpression> pexprJoin =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
 								 pexprLeftAgg, pexprRightAgg, pexprScCond);
 

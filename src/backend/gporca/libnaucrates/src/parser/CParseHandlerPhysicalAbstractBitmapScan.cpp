@@ -161,9 +161,10 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
 	// set table descriptor
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
-	CDXLPhysical *dxl_op = nullptr;
+	gpos::Ref<CDXLPhysical> dxl_op = nullptr;
 
 	if (EdxltokenPhysicalBitmapTableScan == token_type)
 	{

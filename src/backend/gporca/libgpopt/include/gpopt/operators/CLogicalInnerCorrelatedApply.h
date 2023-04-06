@@ -61,12 +61,12 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return true if operator is a correlated apply
 	BOOL
@@ -76,13 +76,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalInnerCorrelatedApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalInnerCorrelatedApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalInnerCorrelatedApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalInnerCorrelatedApply> >(pop);
 	}
 
 };	// class CLogicalInnerCorrelatedApply

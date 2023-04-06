@@ -134,7 +134,8 @@ CParseHandlerRelationExtendedStats::EndElement(
 	{
 		CParseHandlerExtStatsInfo *parse_handler_ext_stats_info =
 			dynamic_cast<CParseHandlerExtStatsInfo *>((*this)[ul]);
-		CMDExtStatsInfo *info = parse_handler_ext_stats_info->GetInfo();
+		gpos::Ref<CMDExtStatsInfo> info =
+			parse_handler_ext_stats_info->GetInfo();
 		info->AddRef();
 
 		extstatsinfo_array->Append(info);

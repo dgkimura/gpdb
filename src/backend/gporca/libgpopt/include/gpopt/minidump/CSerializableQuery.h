@@ -36,7 +36,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// query DXL node;
-	const CDXLNode *m_query_dxl_root;
+	const gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// query output
 	const CDXLNodeArray *m_query_output;
@@ -49,7 +49,7 @@ public:
 	CSerializableQuery(const CSerializableQuery &) = delete;
 
 	// ctor
-	CSerializableQuery(CMemoryPool *mp, const CDXLNode *query,
+	CSerializableQuery(CMemoryPool *mp, const gpos::Ref<CDXLNode> query,
 					   const CDXLNodeArray *query_output_dxlnode_array,
 					   const CDXLNodeArray *cte_producers);
 

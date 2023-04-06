@@ -58,7 +58,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -68,7 +68,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -78,19 +78,19 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static CScalarNullTest *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarNullTest>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarNullTest == pop->Eopid());
 
-		return dynamic_cast<CScalarNullTest *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarNullTest> >(pop);
 	}
 
 };	// class CScalarNullTest

@@ -62,7 +62,8 @@ public:
 	EXformPromise
 	Exfp(CExpressionHandle &exprhdl) const override
 	{
-		CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+		gpos::Ref<CLogicalGbAgg> popGbAgg =
+			CLogicalGbAgg::PopConvert(exprhdl.Pop());
 		if (popGbAgg->FGlobal())
 		{
 			return ExfpHigh;
@@ -73,37 +74,40 @@ public:
 
 	// actual transform
 	void
-	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-			  CExpression *pexpr) const override
+	Transform(gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+			  gpos::Ref<CExpression> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		COptimizerConfig *optconfig =
+		gpos::Ref<COptimizerConfig> optconfig =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
-		CExpression *pexprSetOp = (*pexpr)[0];
+		gpos::Ref<CExpression> pexprSetOp = (*pexpr)[0];
 		if (pexprSetOp->Arity() >
 			optconfig->GetHint()->UlPushGroupByBelowSetopThreshold())
 		{
 			// bail-out if set op has many children
 			return;
 		}
-		CExpression *pexprPrjList = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprPrjList = (*pexpr)[1];
 		if (0 < pexprPrjList->Arity())
 		{
 			// bail-out if group-by has any aggregate functions
 			return;
 		}
 
-		CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-		CLogicalSetOp *popSetOp = CLogicalSetOp::PopConvert(pexprSetOp->Pop());
+		gpos::Ref<CLogicalGbAgg> popGbAgg =
+			CLogicalGbAgg::PopConvert(pexpr->Pop());
+		gpos::Ref<CLogicalSetOp> popSetOp =
+			CLogicalSetOp::PopConvert(pexprSetOp->Pop());
 
 		CColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
 		CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
-		CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
+		gpos::Ref<CColRefSet> pcrsOutput =
+			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
 		CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
 		CExpressionArray *pdrgpexprNewChildren =
 			GPOS_NEW(mp) CExpressionArray(mp);
@@ -114,9 +118,10 @@ public:
 
 		for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 		{
-			CExpression *pexprChild = (*pexprSetOp)[ulChild];
+			gpos::Ref<CExpression> pexprChild = (*pexprSetOp)[ulChild];
 			CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
-			CColRefSet *pcrsChild = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
+			gpos::Ref<CColRefSet> pcrsChild =
+				GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 
 			CColRefArray *pdrgpcrChildGb = nullptr;
 			if (!pcrsChild->Equals(pcrsOutput))
@@ -140,10 +145,11 @@ public:
 
 			// if child of setop is already an Agg with the same grouping columns
 			// that we want to use, there is no need to add another agg on top of it
-			COperator *popChild = pexprChild->Pop();
+			gpos::Ref<COperator> popChild = pexprChild->Pop();
 			if (COperator::EopLogicalGbAgg == popChild->Eopid())
 			{
-				CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(popChild);
+				gpos::Ref<CLogicalGbAgg> popGbAgg =
+					CLogicalGbAgg::PopConvert(popChild);
 				if (CColRef::Equals(popGbAgg->Pdrgpcr(), pdrgpcrChildGb))
 				{
 					pdrgpexprNewChildren->Append(pexprChild);
@@ -155,8 +161,9 @@ public:
 
 			fNewChild = true;
 			pexprPrjList->AddRef();
-			CExpression *pexprChildGb = CUtils::PexprLogicalGbAggGlobal(
-				mp, pdrgpcrChildGb, pexprChild, pexprPrjList);
+			gpos::Ref<CExpression> pexprChildGb =
+				CUtils::PexprLogicalGbAggGlobal(mp, pdrgpcrChildGb, pexprChild,
+												pexprPrjList);
 			pdrgpexprNewChildren->Append(pexprChildGb);
 
 			pdrgpcrChildGb->AddRef();
@@ -178,12 +185,12 @@ public:
 		pdrgpcrGb->AddRef();
 		TSetOp *popSetOpNew =
 			GPOS_NEW(mp) TSetOp(mp, pdrgpcrGb, pdrgpdrgpcrNewInput);
-		CExpression *pexprNewSetOp =
+		gpos::Ref<CExpression> pexprNewSetOp =
 			GPOS_NEW(mp) CExpression(mp, popSetOpNew, pdrgpexprNewChildren);
 
 		popGbAgg->AddRef();
 		pexprPrjList->AddRef();
-		CExpression *pexprResult =
+		gpos::Ref<CExpression> pexprResult =
 			GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprNewSetOp, pexprPrjList);
 
 		pxfres->Add(pexprResult);

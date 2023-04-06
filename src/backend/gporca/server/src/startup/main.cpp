@@ -330,7 +330,8 @@ PvExec(void *pv)
 		CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 		GPOS_CHECK_ABORT;
 
-		COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+		gpos::Ref<COptimizerConfig> optimizer_config =
+			pdxlmd->GetOptimizerConfig();
 
 		if (nullptr == optimizer_config)
 		{
@@ -348,7 +349,7 @@ PvExec(void *pv)
 
 		ULONG ulSegments = CTestUtils::UlSegments(optimizer_config);
 
-		CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
+		gpos::Ref<CDXLNode> pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
 			mp, file_name, ulSegments, 1 /*ulSessionId*/, 1 /*ulCmdId*/,
 			optimizer_config, nullptr /*pceeval*/
 		);

@@ -42,10 +42,10 @@ public:
 	IBucket() = default;
 
 	// lower point
-	virtual CPoint *GetLowerBound() const = 0;
+	virtual gpos::Ref<CPoint> GetLowerBound() const = 0;
 
 	// upper point
-	virtual CPoint *GetUpperBound() const = 0;
+	virtual gpos::Ref<CPoint> GetUpperBound() const = 0;
 
 	// is bucket singleton?
 	BOOL

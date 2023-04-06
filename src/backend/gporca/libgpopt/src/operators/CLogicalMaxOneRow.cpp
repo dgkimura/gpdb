@@ -50,13 +50,14 @@ CLogicalMaxOneRow::Esp(CExpressionHandle &exprhdl) const
 //		Promise level for stat derivation
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CColRefSet *pcrsInput, ULONG child_index) const
+							gpos::Ref<CColRefSet> pcrsInput,
+							ULONG child_index) const
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Union(pcrsInput);
 
 	// intersect with the output columns of relational child
@@ -90,13 +91,13 @@ CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalMaxOneRow::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								IStatisticsArray *	// stats_ctxt
 ) const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly
-	IStatistics *stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 	return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 }
 

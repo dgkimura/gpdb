@@ -60,10 +60,10 @@ CPhysicalHashAgg::~CPhysicalHashAgg() = default;
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
-							  CExpressionHandle &,	// exprhdl
-							  COrderSpec *,			// posRequired
+							  CExpressionHandle &,	  // exprhdl
+							  gpos::Ref<COrderSpec>,  // posRequired
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -88,7 +88,7 @@ CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalHashAgg::PosDerive(CMemoryPool *mp,
 							CExpressionHandle &	 // exprhdl
 ) const
@@ -108,7 +108,7 @@ CPhysicalHashAgg::PosDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalHashAgg::EpetOrder(CExpressionHandle &,  // exprhdl
-							const CEnfdOrder *
+							const gpos::Ref<CEnfdOrder>
 #ifdef GPOS_DEBUG
 								peo
 #endif	// GPOS_DEBUG

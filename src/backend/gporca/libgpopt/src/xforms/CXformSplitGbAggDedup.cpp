@@ -56,8 +56,9 @@ CXformSplitGbAggDedup::CXformSplitGbAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -65,12 +66,12 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAggDeduplicate *popAggDedup =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAggDedup =
 		CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	// check if the transformation is applicable
 	if (!FApplicable(pexprProjectList))
@@ -80,8 +81,8 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 
-	CExpression *pexprProjectListLocal = nullptr;
-	CExpression *pexprProjectListGlobal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListLocal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListGlobal = nullptr;
 
 	(void) PopulateLocalGlobalProjectList(
 		mp, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
@@ -103,14 +104,14 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpcrKeys->AddRef();
 	pdrgpcrKeys->AddRef();
 
-	CExpression *local_expr = GPOS_NEW(mp)
+	gpos::Ref<CExpression> local_expr = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 						mp, colref_array, pdrgpcrMinimal,
 						COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
 					pexprRelational, pexprProjectListLocal);
 
-	CExpression *pexprGlobal = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprGlobal = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, colref_array, pdrgpcrMinimal,

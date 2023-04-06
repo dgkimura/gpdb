@@ -92,7 +92,7 @@ CParseHandlerWindowOids::GetParseHandlerType() const
 	return EdxlphWindowOids;
 }
 
-CWindowOids *
+gpos::Ref<CWindowOids>
 CParseHandlerWindowOids::GetWindowOids() const
 {
 	return m_window_oids;

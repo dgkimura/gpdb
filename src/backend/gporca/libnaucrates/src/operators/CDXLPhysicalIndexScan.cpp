@@ -28,8 +28,9 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr,
-	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr,
+	EdxlIndexScanDirection idx_scan_direction)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_dxl_index_descr(dxl_index_descr),
@@ -89,7 +90,7 @@ CDXLPhysicalIndexScan::GetOpNameStr() const
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
-const CDXLIndexDescr *
+const gpos::Ref<CDXLIndexDescr>
 CDXLPhysicalIndexScan::GetDXLIndexDescr() const
 {
 	return m_dxl_index_descr;
@@ -117,7 +118,7 @@ CDXLPhysicalIndexScan::GetIndexScanDir() const
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+const gpos::Ref<CDXLTableDescr>
 CDXLPhysicalIndexScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -133,7 +134,7 @@ CDXLPhysicalIndexScan::GetDXLTableDescr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *node) const
+									  const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -175,7 +176,7 @@ CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalIndexScan::AssertValid(const gpos::Ref<CDXLNode> node,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -194,7 +195,7 @@ CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *index_cond_dxlnode = (*node)[EdxlisIndexCondition];
+	gpos::Ref<CDXLNode> index_cond_dxlnode = (*node)[EdxlisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

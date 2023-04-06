@@ -90,19 +90,19 @@ public:
 		return EmdtType;
 	}
 
-	virtual IMDId *GetDistrOpfamilyMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetDistrOpfamilyMdid() const = 0;
 
 	// md id of cache object
-	IMDId *MDId() const override = 0;
+	gpos::Ref<IMDId> MDId() const override = 0;
 
 	// id of specified specified comparison operator type
-	virtual IMDId *GetMdidForCmpType(ECmpType cmp_type) const = 0;
+	virtual gpos::Ref<IMDId> GetMdidForCmpType(ECmpType cmp_type) const = 0;
 
 	// id of specified specified aggregate type
-	virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
+	virtual gpos::Ref<IMDId> GetMdidForAggType(EAggType agg_type) const = 0;
 
 	// id of comparison operator for type used in btree lookups
-	virtual const IMDId *CmpOpMdid() const = 0;
+	virtual const gpos::Ref<IMDId> CmpOpMdid() const = 0;
 
 	// id of hash operator for type
 	virtual BOOL IsHashable() const = 0;
@@ -114,18 +114,18 @@ public:
 	virtual BOOL IsRedistributable() const = 0;
 
 	// id of the array type for the type
-	virtual IMDId *GetArrayTypeMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetArrayTypeMdid() const = 0;
 
 	// type id
 	virtual ETypeInfo GetDatumType() const = 0;
 
 	// transformation function for datums
-	virtual IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const = 0;
+	virtual gpos::Ref<IDatum> GetDatumForDXLConstVal(
+		const gpos::Ref<CDXLScalarConstValue> dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
-	virtual IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-										const CDXLDatum *dxl_datum) const = 0;
+	virtual gpos::Ref<IDatum> GetDatumForDXLDatum(
+		CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const = 0;
 
 	// is type fixed length
 	virtual BOOL IsFixedLength() const = 0;
@@ -140,7 +140,7 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	virtual IMDId *GetBaseRelMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetBaseRelMdid() const = 0;
 
 	// type length
 	virtual ULONG Length() const = 0;
@@ -149,17 +149,18 @@ public:
 	virtual BOOL IsPassedByValue() const = 0;
 
 	// return the null constant for this type
-	virtual IDatum *DatumNull() const = 0;
+	virtual gpos::Ref<IDatum> DatumNull() const = 0;
 
 	// generate the DXL scalar constant from IDatum
-	virtual CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-												  IDatum *datum) const = 0;
+	virtual gpos::Ref<CDXLScalarConstValue> GetDXLOpScConst(
+		CMemoryPool *mp, gpos::Ref<IDatum> datum) const = 0;
 
 	// generate the DXL datum from IDatum
-	virtual CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const = 0;
+	virtual gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
+											 gpos::Ref<IDatum> datum) const = 0;
 
 	// generate the DXL datum representing null value
-	virtual CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CDXLDatum> GetDXLDatumNull(CMemoryPool *mp) const = 0;
 
 	// is type an ambiguous one? e.g., AnyElement in GPDB
 	virtual BOOL
@@ -172,12 +173,12 @@ public:
 	static const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
 
 	// return true if we can perform statistical comparison between datums of these two types; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IMDType *mdtype_second);
+	static BOOL StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
+								   const gpos::Ref<IMDType> mdtype_second);
 
 	// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IDatum *datum_second);
+	static BOOL StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
+								   const gpos::Ref<IDatum> datum_second);
 };
 }  // namespace gpmd
 

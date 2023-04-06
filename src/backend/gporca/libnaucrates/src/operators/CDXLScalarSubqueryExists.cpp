@@ -80,8 +80,8 @@ CDXLScalarSubqueryExists::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryExists::SerializeToDXL(CXMLSerializer *xml_serializer,
-										 const CDXLNode *dxlnode) const
+CDXLScalarSubqueryExists::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -101,12 +101,12 @@ CDXLScalarSubqueryExists::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryExists::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSubqueryExists::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -48,7 +48,7 @@ using namespace gpmd;
 
 // check if the expression is a negated boolean scalar identifier
 BOOL
-CPredicateUtils::FNegatedBooleanScalarIdent(CExpression *pexprPred)
+CPredicateUtils::FNegatedBooleanScalarIdent(gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 
@@ -62,13 +62,14 @@ CPredicateUtils::FNegatedBooleanScalarIdent(CExpression *pexprPred)
 
 // check if the expression is a boolean scalar identifier
 BOOL
-CPredicateUtils::FBooleanScalarIdent(CExpression *pexprPred)
+CPredicateUtils::FBooleanScalarIdent(gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 
 	if (COperator::EopScalarIdent == pexprPred->Pop()->Eopid())
 	{
-		CScalarIdent *popScIdent = CScalarIdent::PopConvert(pexprPred->Pop());
+		gpos::Ref<CScalarIdent> popScIdent =
+			CScalarIdent::PopConvert(pexprPred->Pop());
 		if (IMDType::EtiBool ==
 			popScIdent->Pcr()->RetrieveType()->GetDatumType())
 		{
@@ -81,14 +82,14 @@ CPredicateUtils::FBooleanScalarIdent(CExpression *pexprPred)
 
 // is the given expression an equality comparison
 BOOL
-CPredicateUtils::IsEqualityOp(CExpression *pexpr)
+CPredicateUtils::IsEqualityOp(gpos::Ref<CExpression> pexpr)
 {
 	return FComparison(pexpr, IMDType::EcmptEq);
 }
 
 // is the given expression a comparison
 BOOL
-CPredicateUtils::FComparison(CExpression *pexpr)
+CPredicateUtils::FComparison(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -97,18 +98,19 @@ CPredicateUtils::FComparison(CExpression *pexpr)
 
 // is the given expression a comparison of the given type
 BOOL
-CPredicateUtils::FComparison(CExpression *pexpr, IMDType::ECmpType cmp_type)
+CPredicateUtils::FComparison(gpos::Ref<CExpression> pexpr,
+							 IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	if (COperator::EopScalarCmp != pop->Eopid())
 	{
 		return false;
 	}
 
-	CScalarCmp *popScCmp = CScalarCmp::PopConvert(pop);
+	gpos::Ref<CScalarCmp> popScCmp = CScalarCmp::PopConvert(pop);
 	GPOS_ASSERT(nullptr != popScCmp);
 
 	return cmp_type == popScCmp->ParseCmpType();
@@ -120,7 +122,7 @@ CPredicateUtils::FComparison(CExpression *pexpr, IMDType::ECmpType cmp_type)
 // constant comparisons.
 BOOL
 CPredicateUtils::FComparison(
-	CExpression *pexpr, CColRef *colref,
+	gpos::Ref<CExpression> pexpr, gpos::Ref<CColRef> colref,
 	CColRefSet
 		*pcrsAllowedRefs  // other column references allowed in the comparison
 )
@@ -132,8 +134,8 @@ CPredicateUtils::FComparison(
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	if (CUtils::FScalarIdent(pexprLeft, colref) ||
 		CScalarIdent::FCastedScId(pexprLeft, colref) ||
@@ -154,10 +156,10 @@ CPredicateUtils::FComparison(
 
 BOOL
 CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
-	CExpression *pexpr,
+	gpos::Ref<CExpression> pexpr,
 	CColRefSet
 		*pcrsOuterRefs,	 // other column references allowed in the comparison
-	CColRef **localColRef)
+	gpos::Ref<CColRef> *localColRef)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -167,13 +169,13 @@ CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	BOOL leftIsACol = CUtils::FScalarIdentIgnoreCast(pexprLeft);
 	BOOL rightIsACol = CUtils::FScalarIdentIgnoreCast(pexprRight);
-	CColRefSet *pcrsUsedLeft = pexprLeft->DeriveUsedColumns();
-	CColRefSet *pcrsUsedRight = pexprRight->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedLeft = pexprLeft->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedRight = pexprRight->DeriveUsedColumns();
 
 	// allow any expressions of the form
 	//  col = expr(outer refs)
@@ -211,8 +213,8 @@ CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 // columns. If pcrsAllowedRefs is NULL, then check whether the expression has
 // no column references and no volatile functions
 BOOL
-CPredicateUtils::FValidRefsOnly(CExpression *pexprScalar,
-								CColRefSet *pcrsAllowedRefs)
+CPredicateUtils::FValidRefsOnly(gpos::Ref<CExpression> pexprScalar,
+								gpos::Ref<CColRefSet> pcrsAllowedRefs)
 {
 	if (nullptr != pcrsAllowedRefs)
 	{
@@ -229,7 +231,7 @@ CPredicateUtils::FValidRefsOnly(CExpression *pexprScalar,
 // is the given expression a conjunction of equality comparisons
 BOOL
 CPredicateUtils::FConjunctionOfEqComparisons(CMemoryPool *mp,
-											 CExpression *pexpr)
+											 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -256,7 +258,7 @@ CPredicateUtils::FConjunctionOfEqComparisons(CMemoryPool *mp,
 
 // does the given expression have any NOT children?
 BOOL
-CPredicateUtils::FHasNegatedChild(CExpression *pexpr)
+CPredicateUtils::FHasNegatedChild(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -274,7 +276,7 @@ CPredicateUtils::FHasNegatedChild(CExpression *pexpr)
 
 // recursively collect conjuncts
 void
-CPredicateUtils::CollectConjuncts(CExpression *pexpr,
+CPredicateUtils::CollectConjuncts(gpos::Ref<CExpression> pexpr,
 								  CExpressionArray *pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -296,7 +298,7 @@ CPredicateUtils::CollectConjuncts(CExpression *pexpr,
 
 // recursively collect disjuncts
 void
-CPredicateUtils::CollectDisjuncts(CExpression *pexpr,
+CPredicateUtils::CollectDisjuncts(gpos::Ref<CExpression> pexpr,
 								  CExpressionArray *pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -318,7 +320,8 @@ CPredicateUtils::CollectDisjuncts(CExpression *pexpr,
 
 // extract conjuncts from a predicate
 CExpressionArray *
-CPredicateUtils::PdrgpexprConjuncts(CMemoryPool *mp, CExpression *pexpr)
+CPredicateUtils::PdrgpexprConjuncts(CMemoryPool *mp,
+									gpos::Ref<CExpression> pexpr)
 {
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CollectConjuncts(pexpr, pdrgpexpr);
@@ -328,7 +331,8 @@ CPredicateUtils::PdrgpexprConjuncts(CMemoryPool *mp, CExpression *pexpr)
 
 // extract disjuncts from a predicate
 CExpressionArray *
-CPredicateUtils::PdrgpexprDisjuncts(CMemoryPool *mp, CExpression *pexpr)
+CPredicateUtils::PdrgpexprDisjuncts(CMemoryPool *mp,
+									gpos::Ref<CExpression> pexpr)
 {
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CollectDisjuncts(pexpr, pdrgpexpr);
@@ -349,10 +353,10 @@ CPredicateUtils::PdrgpexprExpandDisjuncts(CMemoryPool *mp,
 	const ULONG size = pdrgpexprDisjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CExpression *pexpr = (*pdrgpexprDisjuncts)[ul];
+		gpos::Ref<CExpression> pexpr = (*pdrgpexprDisjuncts)[ul];
 		if (COperator::EopScalarArrayCmp == pexpr->Pop()->Eopid())
 		{
-			CExpression *pexprExpanded =
+			gpos::Ref<CExpression> pexprExpanded =
 				CScalarArrayCmp::PexprExpand(mp, pexpr);
 			if (FOr(pexprExpanded))
 			{
@@ -408,10 +412,10 @@ CPredicateUtils::PdrgpexprExpandConjuncts(CMemoryPool *mp,
 	const ULONG size = pdrgpexprConjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CExpression *pexpr = (*pdrgpexprConjuncts)[ul];
+		gpos::Ref<CExpression> pexpr = (*pdrgpexprConjuncts)[ul];
 		if (COperator::EopScalarArrayCmp == pexpr->Pop()->Eopid())
 		{
-			CExpression *pexprExpanded =
+			gpos::Ref<CExpression> pexprExpanded =
 				CScalarArrayCmp::PexprExpand(mp, pexpr);
 			if (FAnd(pexprExpanded))
 			{
@@ -456,7 +460,7 @@ CPredicateUtils::PdrgpexprExpandConjuncts(CMemoryPool *mp,
 
 // check if a conjunct/disjunct can be skipped
 BOOL
-CPredicateUtils::FSkippable(CExpression *pexpr, BOOL fConjunction)
+CPredicateUtils::FSkippable(gpos::Ref<CExpression> pexpr, BOOL fConjunction)
 {
 	return ((fConjunction && CUtils::FScalarConstTrue(pexpr)) ||
 			(!fConjunction && CUtils::FScalarConstFalse(pexpr)));
@@ -465,7 +469,7 @@ CPredicateUtils::FSkippable(CExpression *pexpr, BOOL fConjunction)
 // check if a conjunction/disjunction can be reduced to a constant
 // True/False based on the given conjunct/disjunct
 BOOL
-CPredicateUtils::FReducible(CExpression *pexpr, BOOL fConjunction)
+CPredicateUtils::FReducible(gpos::Ref<CExpression> pexpr, BOOL fConjunction)
 {
 	return ((fConjunction && CUtils::FScalarConstFalse(pexpr)) ||
 			(!fConjunction && CUtils::FScalarConstTrue(pexpr)));
@@ -506,12 +510,12 @@ CPredicateUtils::EcmptReverse(IMDType::ECmpType cmp_type)
 
 // is the condition a LIKE predicate
 BOOL
-CPredicateUtils::FLikePredicate(IMDId *mdid)
+CPredicateUtils::FLikePredicate(gpos::Ref<IMDId> mdid)
 {
 	GPOS_ASSERT(nullptr != mdid);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op = md_accessor->RetrieveScOp(mdid);
 
 	const CWStringConst *str_opname = md_scalar_op->Mdname().GetMDName();
 
@@ -528,38 +532,38 @@ CPredicateUtils::FLikePredicate(IMDId *mdid)
 
 // is the condition a LIKE predicate
 BOOL
-CPredicateUtils::FLikePredicate(CExpression *pexpr)
+CPredicateUtils::FLikePredicate(gpos::Ref<CExpression> pexpr)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarCmp != pop->Eopid())
 	{
 		return false;
 	}
 
-	CScalarCmp *popScCmp = CScalarCmp::PopConvert(pop);
-	IMDId *mdid = popScCmp->MdIdOp();
+	gpos::Ref<CScalarCmp> popScCmp = CScalarCmp::PopConvert(pop);
+	gpos::Ref<IMDId> mdid = popScCmp->MdIdOp();
 
 	return FLikePredicate(mdid);
 }
 
 // extract the components of a LIKE predicate
 void
-CPredicateUtils::ExtractLikePredComponents(CExpression *pexprPred,
-										   CExpression **ppexprScIdent,
-										   CExpression **ppexprConst)
+CPredicateUtils::ExtractLikePredComponents(
+	gpos::Ref<CExpression> pexprPred, gpos::Ref<CExpression> *ppexprScIdent,
+	gpos::Ref<CExpression> *ppexprConst)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(2 == pexprPred->Arity());
 	GPOS_ASSERT(FLikePredicate(pexprPred));
 
-	CExpression *pexprLeft = (*pexprPred)[0];
-	CExpression *pexprRight = (*pexprPred)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprPred)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprPred)[1];
 
 	*ppexprScIdent = nullptr;
 	*ppexprConst = nullptr;
 
-	CExpression *pexprLeftNoCast = pexprLeft;
-	CExpression *pexprRightNoCast = pexprRight;
+	gpos::Ref<CExpression> pexprLeftNoCast = pexprLeft;
+	gpos::Ref<CExpression> pexprRightNoCast = pexprRight;
 
 	if (COperator::EopScalarCast == pexprLeft->Pop()->Eopid())
 	{
@@ -592,9 +596,10 @@ CPredicateUtils::ExtractLikePredComponents(CExpression *pexprPred,
 
 // extract components in a comparison expression on the given key
 void
-CPredicateUtils::ExtractComponents(CExpression *pexprScCmp, CColRef *pcrKey,
-								   CExpression **ppexprKey,
-								   CExpression **ppexprOther,
+CPredicateUtils::ExtractComponents(gpos::Ref<CExpression> pexprScCmp,
+								   gpos::Ref<CColRef> pcrKey,
+								   gpos::Ref<CExpression> *ppexprKey,
+								   gpos::Ref<CExpression> *ppexprOther,
 								   IMDType::ECmpType *pecmpt)
 {
 	GPOS_ASSERT(nullptr != pexprScCmp);
@@ -604,8 +609,8 @@ CPredicateUtils::ExtractComponents(CExpression *pexprScCmp, CColRef *pcrKey,
 	*ppexprKey = nullptr;
 	*ppexprOther = nullptr;
 
-	CExpression *pexprLeft = (*pexprScCmp)[0];
-	CExpression *pexprRight = (*pexprScCmp)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprScCmp)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprScCmp)[1];
 
 	IMDType::ECmpType cmp_type =
 		CScalarCmp::PopConvert(pexprScCmp->Pop())->ParseCmpType();
@@ -631,8 +636,9 @@ CPredicateUtils::ExtractComponents(CExpression *pexprScCmp, CColRef *pcrKey,
 
 // Expression is a comparison with a simple identifer on at least one side
 BOOL
-CPredicateUtils::FIdentCompare(CExpression *pexpr, IMDType::ECmpType pecmpt,
-							   CColRef *colref)
+CPredicateUtils::FIdentCompare(gpos::Ref<CExpression> pexpr,
+							   IMDType::ECmpType pecmpt,
+							   gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -642,8 +648,8 @@ CPredicateUtils::FIdentCompare(CExpression *pexpr, IMDType::ECmpType pecmpt,
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	if (CUtils::FScalarIdent(pexprLeft, colref) ||
 		CCastUtils::FBinaryCoercibleCastedScId(pexprLeft, colref))
@@ -660,7 +666,7 @@ CPredicateUtils::FIdentCompare(CExpression *pexpr, IMDType::ECmpType pecmpt,
 }
 
 // create conjunction/disjunction from array of components; Takes ownership over the given array of expressions
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 							   BOOL fConjunction)
 {
@@ -679,7 +685,7 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CExpression *pexpr = (*pdrgpexpr)[ul];
+		gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ul];
 
 		if (FSkippable(pexpr, fConjunction))
 		{
@@ -703,7 +709,7 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 	SafeRelease(pdrgpexpr);
 
 	// assemble result
-	CExpression *pexprResult = nullptr;
+	gpos::Ref<CExpression> pexprResult = nullptr;
 	if (nullptr != pdrgpexprFinal && (0 < pdrgpexprFinal->Size()))
 	{
 		if (1 == pdrgpexprFinal->Size())
@@ -725,23 +731,24 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 }
 
 // create conjunction from array of components;
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprConjunction(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 {
 	return PexprConjDisj(mp, pdrgpexpr, true /*fConjunction*/);
 }
 
 // create disjunction from array of components;
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprDisjunction(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 {
 	return PexprConjDisj(mp, pdrgpexpr, false /*fConjunction*/);
 }
 
 // create a conjunction/disjunction of two components; Does *not* take ownership over given expressions
-CExpression *
-CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpression *pexprOne,
-							   CExpression *pexprTwo, BOOL fConjunction)
+gpos::Ref<CExpression>
+CPredicateUtils::PexprConjDisj(CMemoryPool *mp, gpos::Ref<CExpression> pexprOne,
+							   gpos::Ref<CExpression> pexprTwo,
+							   BOOL fConjunction)
 {
 	GPOS_ASSERT(nullptr != pexprOne);
 	GPOS_ASSERT(nullptr != pexprTwo);
@@ -777,17 +784,19 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpression *pexprOne,
 }
 
 // create a conjunction of two components;
-CExpression *
-CPredicateUtils::PexprConjunction(CMemoryPool *mp, CExpression *pexprOne,
-								  CExpression *pexprTwo)
+gpos::Ref<CExpression>
+CPredicateUtils::PexprConjunction(CMemoryPool *mp,
+								  gpos::Ref<CExpression> pexprOne,
+								  gpos::Ref<CExpression> pexprTwo)
 {
 	return PexprConjDisj(mp, pexprOne, pexprTwo, true /*fConjunction*/);
 }
 
 // create a disjunction of two components;
-CExpression *
-CPredicateUtils::PexprDisjunction(CMemoryPool *mp, CExpression *pexprOne,
-								  CExpression *pexprTwo)
+gpos::Ref<CExpression>
+CPredicateUtils::PexprDisjunction(CMemoryPool *mp,
+								  gpos::Ref<CExpression> pexprOne,
+								  gpos::Ref<CExpression> pexprTwo)
 {
 	return PexprConjDisj(mp, pexprOne, pexprTwo, false /*fConjunction*/);
 }
@@ -801,7 +810,7 @@ CPredicateUtils::PdrgpexprPlainEqualities(CMemoryPool *mp,
 	const ULONG arity = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprCurr = (*pdrgpexpr)[ul];
+		gpos::Ref<CExpression> pexprCurr = (*pdrgpexpr)[ul];
 
 		if (FPlainEquality(pexprCurr))
 		{
@@ -814,12 +823,12 @@ CPredicateUtils::PdrgpexprPlainEqualities(CMemoryPool *mp,
 
 // is an expression an equality over scalar identifiers
 BOOL
-CPredicateUtils::FPlainEquality(CExpression *pexpr)
+CPredicateUtils::FPlainEquality(gpos::Ref<CExpression> pexpr)
 {
 	if (IsEqualityOp(pexpr))
 	{
-		CExpression *pexprLeft = (*pexpr)[0];
-		CExpression *pexprRight = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 		// check if the scalar condition is over scalar idents
 		if (COperator::EopScalarIdent == pexprLeft->Pop()->Eopid() &&
@@ -833,18 +842,19 @@ CPredicateUtils::FPlainEquality(CExpression *pexpr)
 
 // is an expression a self comparison on some column
 BOOL
-CPredicateUtils::FSelfComparison(CExpression *pexpr, IMDType::ECmpType *pecmpt)
+CPredicateUtils::FSelfComparison(gpos::Ref<CExpression> pexpr,
+								 IMDType::ECmpType *pecmpt)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != pecmpt);
 
 	*pecmpt = IMDType::EcmptOther;
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (CUtils::FScalarCmp(pexpr))
 	{
 		*pecmpt = CScalarCmp::PopConvert(pop)->ParseCmpType();
-		COperator *popLeft = (*pexpr)[0]->Pop();
-		COperator *popRight = (*pexpr)[1]->Pop();
+		gpos::Ref<COperator> popLeft = (*pexpr)[0]->Pop();
+		gpos::Ref<COperator> popRight = (*pexpr)[1]->Pop();
 
 		// return true if comparison is over the same column, and that column
 		// is not nullable
@@ -856,8 +866,8 @@ CPredicateUtils::FSelfComparison(CExpression *pexpr, IMDType::ECmpType *pecmpt)
 			return false;
 		}
 
-		CColRef *colref =
-			const_cast<CColRef *>(CScalarIdent::PopConvert(popLeft)->Pcr());
+		gpos::Ref<CColRef> colref = const_cast<gpos::Ref<CColRef> >(
+			CScalarIdent::PopConvert(popLeft)->Pcr());
 
 		return CColRef::EcrtTable == colref->Ecrt() &&
 			   !CColRefTable::PcrConvert(colref)->IsNullable();
@@ -867,14 +877,14 @@ CPredicateUtils::FSelfComparison(CExpression *pexpr, IMDType::ECmpType *pecmpt)
 }
 
 // eliminate self comparison and replace it with True or False if possible
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprEliminateSelfComparison(CMemoryPool *mp,
-											  CExpression *pexpr)
+											  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
 
 	pexpr->AddRef();
-	CExpression *pexprNew = pexpr;
+	gpos::Ref<CExpression> pexprNew = pexpr;
 	IMDType::ECmpType cmp_type = IMDType::EcmptOther;
 	if (FSelfComparison(pexpr, &cmp_type))
 	{
@@ -905,21 +915,21 @@ CPredicateUtils::PexprEliminateSelfComparison(CMemoryPool *mp,
 
 // is the given expression in the form (col1 Is NOT DISTINCT FROM col2)
 BOOL
-CPredicateUtils::FINDFScalarIdents(CExpression *pexpr)
+CPredicateUtils::FINDFScalarIdents(gpos::Ref<CExpression> pexpr)
 {
 	if (!FNot(pexpr))
 	{
 		return false;
 	}
 
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	if (COperator::EopScalarIsDistinctFrom != pexprChild->Pop()->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprOuter = (*pexprChild)[0];
-	CExpression *pexprInner = (*pexprChild)[1];
+	gpos::Ref<CExpression> pexprOuter = (*pexprChild)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexprChild)[1];
 
 	return (COperator::EopScalarIdent == pexprOuter->Pop()->Eopid() &&
 			COperator::EopScalarIdent == pexprInner->Pop()->Eopid());
@@ -927,15 +937,15 @@ CPredicateUtils::FINDFScalarIdents(CExpression *pexpr)
 
 // is the given expression in the form (col1 Is DISTINCT FROM col2)
 BOOL
-CPredicateUtils::FIDFScalarIdents(CExpression *pexpr)
+CPredicateUtils::FIDFScalarIdents(gpos::Ref<CExpression> pexpr)
 {
 	if (COperator::EopScalarIsDistinctFrom != pexpr->Pop()->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 
 	return (COperator::EopScalarIdent == pexprOuter->Pop()->Eopid() &&
 			COperator::EopScalarIdent == pexprInner->Pop()->Eopid());
@@ -943,7 +953,7 @@ CPredicateUtils::FIDFScalarIdents(CExpression *pexpr)
 
 // is the given expression in the form 'expr IS DISTINCT FROM false)'
 BOOL
-CPredicateUtils::FIDFFalse(CExpression *pexpr)
+CPredicateUtils::FIDFFalse(gpos::Ref<CExpression> pexpr)
 {
 	if (COperator::EopScalarIsDistinctFrom != pexpr->Pop()->Eopid())
 	{
@@ -956,20 +966,20 @@ CPredicateUtils::FIDFFalse(CExpression *pexpr)
 
 // is the given expression in the form (expr IS DISTINCT FROM expr)
 BOOL
-CPredicateUtils::FIDF(CExpression *pexpr)
+CPredicateUtils::FIDF(gpos::Ref<CExpression> pexpr)
 {
 	return (COperator::EopScalarIsDistinctFrom == pexpr->Pop()->Eopid());
 }
 
 // is the given expression in the form (expr Is NOT DISTINCT FROM expr)
 BOOL
-CPredicateUtils::FINDF(CExpression *pexpr)
+CPredicateUtils::FINDF(gpos::Ref<CExpression> pexpr)
 {
 	return (FNot(pexpr) && FIDF((*pexpr)[0]));
 }
 
 // generate a conjunction of INDF expressions between corresponding columns in the given arrays
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprINDFConjunction(CMemoryPool *mp,
 									  CColRefArray *pdrgpcrFirst,
 									  CColRefArray *pdrgpcrSecond)
@@ -992,28 +1002,28 @@ CPredicateUtils::PexprINDFConjunction(CMemoryPool *mp,
 
 // is the given expression a comparison between a scalar ident and a constant
 BOOL
-CPredicateUtils::FCompareIdentToConst(CExpression *pexpr)
+CPredicateUtils::FCompareIdentToConst(gpos::Ref<CExpression> pexpr)
 {
-	CExpression *pexprIdent;
-	CExpression *pexprConst;
+	gpos::Ref<CExpression> pexprIdent;
+	gpos::Ref<CExpression> pexprConst;
 
 	return FCompareIdentToConst(pexpr, pexprIdent, pexprConst);
 }
 
 BOOL
-CPredicateUtils::FCompareIdentToConst(CExpression *pexpr,
-									  CExpression *&pexprIdent,
-									  CExpression *&pexprConst)
+CPredicateUtils::FCompareIdentToConst(gpos::Ref<CExpression> pexpr,
+									  gpos::Ref<CExpression> &pexprIdent,
+									  gpos::Ref<CExpression> &pexprConst)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	if (COperator::EopScalarCmp != pop->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	// if left side scalar ident then right side must be a const
 	if ((CUtils::FScalarIdent(pexprLeft) ||
@@ -1042,17 +1052,17 @@ CPredicateUtils::FCompareIdentToConst(CExpression *pexpr,
 
 // is the given expression of the form (col IS DISTINCT FROM const)
 BOOL
-CPredicateUtils::FIdentIDFConst(CExpression *pexpr)
+CPredicateUtils::FIdentIDFConst(gpos::Ref<CExpression> pexpr)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	if (COperator::EopScalarIsDistinctFrom != pop->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	// left side must be scalar ident
 	if (COperator::EopScalarIdent != pexprLeft->Pop()->Eopid())
@@ -1071,14 +1081,14 @@ CPredicateUtils::FIdentIDFConst(CExpression *pexpr)
 
 // is the given expression of the form (col = col)
 BOOL
-CPredicateUtils::FEqIdentsOfSameType(CExpression *pexpr)
+CPredicateUtils::FEqIdentsOfSameType(gpos::Ref<CExpression> pexpr)
 {
 	if (!CPredicateUtils::IsEqualityOp(pexpr))
 	{
 		return false;
 	}
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	// left side must be scalar ident
 	if (COperator::EopScalarIdent != pexprLeft->Pop()->Eopid())
@@ -1092,8 +1102,10 @@ CPredicateUtils::FEqIdentsOfSameType(CExpression *pexpr)
 		return false;
 	}
 
-	CScalarIdent *left_ident = CScalarIdent::PopConvert(pexprLeft->Pop());
-	CScalarIdent *right_ident = CScalarIdent::PopConvert(pexprRight->Pop());
+	gpos::Ref<CScalarIdent> left_ident =
+		CScalarIdent::PopConvert(pexprLeft->Pop());
+	gpos::Ref<CScalarIdent> right_ident =
+		CScalarIdent::PopConvert(pexprRight->Pop());
 	if (!left_ident->MdidType()->Equals(right_ident->MdidType()))
 	{
 		return false;
@@ -1106,7 +1118,7 @@ CPredicateUtils::FEqIdentsOfSameType(CExpression *pexpr)
 // is the given expression is of the form (col IS DISTINCT FROM const)
 // ignoring cast on either sides
 BOOL
-CPredicateUtils::FIdentIDFConstIgnoreCast(CExpression *pexpr)
+CPredicateUtils::FIdentIDFConstIgnoreCast(gpos::Ref<CExpression> pexpr)
 {
 	return FIdentCompareConstIgnoreCast(pexpr,
 										COperator::EopScalarIsDistinctFrom);
@@ -1114,18 +1126,18 @@ CPredicateUtils::FIdentIDFConstIgnoreCast(CExpression *pexpr)
 
 // is the given expression of the form (col cmp constant) ignoring casting on either sides
 BOOL
-CPredicateUtils::FIdentCompareConstIgnoreCast(CExpression *pexpr,
+CPredicateUtils::FIdentCompareConstIgnoreCast(gpos::Ref<CExpression> pexpr,
 											  COperator::EOperatorId op_id)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	if (op_id != pop->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	// col <op> const
 	if (COperator::EopScalarIdent == pexprLeft->Pop()->Eopid() &&
@@ -1160,17 +1172,17 @@ CPredicateUtils::FIdentCompareConstIgnoreCast(CExpression *pexpr,
 
 // is the given expression a comparison between a const and a const
 BOOL
-CPredicateUtils::FCompareConstToConstIgnoreCast(CExpression *pexpr)
+CPredicateUtils::FCompareConstToConstIgnoreCast(gpos::Ref<CExpression> pexpr)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	if (COperator::EopScalarCmp != pop->Eopid())
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	// left side must be scalar const
 
@@ -1193,22 +1205,24 @@ CPredicateUtils::FCompareConstToConstIgnoreCast(CExpression *pexpr)
 // is the given expression an array comparison between scalar ident
 // and a const array or a constant
 BOOL
-CPredicateUtils::FArrayCompareIdentToConstIgnoreCast(CExpression *pexpr)
+CPredicateUtils::FArrayCompareIdentToConstIgnoreCast(
+	gpos::Ref<CExpression> pexpr)
 {
 	if (!CUtils::FScalarArrayCmp(pexpr))
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	if (CUtils::FScalarIdentIgnoreCast(pexprLeft))
 	{
 		if ((CUtils::FScalarArray(pexprRight) ||
 			 CUtils::FScalarArrayCoerce(pexprRight)))
 		{
-			CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+			gpos::Ref<CExpression> pexprArray =
+				CUtils::PexprScalarArrayChild(pexpr);
 			return CUtils::FScalarConstArray(pexprArray);
 		}
 		return CUtils::FScalarConst(pexprRight) ||
@@ -1220,7 +1234,7 @@ CPredicateUtils::FArrayCompareIdentToConstIgnoreCast(CExpression *pexpr)
 
 // is the given expression of the form NOT (col IS DISTINCT FROM const) ignoring cast on either sides
 BOOL
-CPredicateUtils::FIdentINDFConstIgnoreCast(CExpression *pexpr)
+CPredicateUtils::FIdentINDFConstIgnoreCast(gpos::Ref<CExpression> pexpr)
 {
 	if (!FNot(pexpr))
 	{
@@ -1237,7 +1251,7 @@ CPredicateUtils::FIdentINDFConstIgnoreCast(CExpression *pexpr)
 // |  +--CScalarIdent
 // +--CScalarConstArray:
 BOOL
-CPredicateUtils::FCompareCastIdentToConstArray(CExpression *pexpr)
+CPredicateUtils::FCompareCastIdentToConstArray(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1245,7 +1259,8 @@ CPredicateUtils::FCompareCastIdentToConstArray(CExpression *pexpr)
 		(CCastUtils::FBinaryCoercibleCast((*pexpr)[0]) &&
 		 CUtils::FScalarIdent((*(*pexpr)[0])[0])))
 	{
-		CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+		gpos::Ref<CExpression> pexprArray =
+			CUtils::PexprScalarArrayChild(pexpr);
 		return CUtils::FScalarConstArray(pexprArray);
 	}
 
@@ -1255,7 +1270,7 @@ CPredicateUtils::FCompareCastIdentToConstArray(CExpression *pexpr)
 // is the given expression a comparison between a scalar ident and an array with constants or ScalarIdents
 BOOL
 CPredicateUtils::FCompareScalarIdentToConstAndScalarIdentArray(
-	CExpression *pexpr)
+	gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1265,13 +1280,13 @@ CPredicateUtils::FCompareScalarIdentToConstAndScalarIdentArray(
 		return false;
 	}
 
-	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+	gpos::Ref<CExpression> pexprArray = CUtils::PexprScalarArrayChild(pexpr);
 	return CUtils::FScalarConstAndScalarIdentArray(pexprArray);
 }
 
 // is the given expression a comparison between a scalar ident and a constant array
 BOOL
-CPredicateUtils::FCompareIdentToConstArray(CExpression *pexpr)
+CPredicateUtils::FCompareIdentToConstArray(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1281,14 +1296,15 @@ CPredicateUtils::FCompareIdentToConstArray(CExpression *pexpr)
 		return false;
 	}
 
-	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+	gpos::Ref<CExpression> pexprArray = CUtils::PexprScalarArrayChild(pexpr);
 	return CUtils::FScalarConstArray(pexprArray);
 }
 
-CExpression *
-CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp, CExpression *expr,
-										 CColRef *pcrPartKey,
-										 CColRefSet *pcrsAllowedRefs,
+gpos::Ref<CExpression>
+CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp,
+										 gpos::Ref<CExpression> expr,
+										 gpos::Ref<CColRef> pcrPartKey,
+										 gpos::Ref<CColRefSet> pcrsAllowedRefs,
 										 BOOL allow_not_equals_preds)
 {
 	GPOS_ASSERT(nullptr != expr);
@@ -1299,15 +1315,15 @@ CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp, CExpression *expr,
 		return nullptr;
 	}
 
-	CScalarCmp *sc_cmp = CScalarCmp::PopConvert(expr->Pop());
+	gpos::Ref<CScalarCmp> sc_cmp = CScalarCmp::PopConvert(expr->Pop());
 
 	if (!allow_not_equals_preds && sc_cmp->ParseCmpType() == IMDType::EcmptNEq)
 	{
 		return nullptr;
 	}
 
-	CExpression *expr_left = (*expr)[0];
-	CExpression *expr_right = (*expr)[1];
+	gpos::Ref<CExpression> expr_left = (*expr)[0];
+	gpos::Ref<CExpression> expr_right = (*expr)[1];
 
 	if ((CUtils::FScalarIdent(expr_left, pcrPartKey) ||
 		 CCastUtils::FBinaryCoercibleCastedScId(expr_left, pcrPartKey)) &&
@@ -1321,10 +1337,10 @@ CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp, CExpression *expr,
 		 CCastUtils::FBinaryCoercibleCastedScId(expr_right, pcrPartKey)) &&
 		FValidRefsOnly(expr_left, pcrsAllowedRefs))
 	{
-		COperator *commuted_op = sc_cmp->PopCommutedOp(mp);
+		gpos::Ref<COperator> commuted_op = sc_cmp->PopCommutedOp(mp);
 		expr_left->AddRef();
 		expr_right->AddRef();
-		CExpression *swapped_expr =
+		gpos::Ref<CExpression> swapped_expr =
 			GPOS_NEW(mp) CExpression(mp, commuted_op, expr_right, expr_left);
 		return swapped_expr;
 	}
@@ -1337,11 +1353,13 @@ CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp, CExpression *expr,
 // are those that compare the partition key to expressions involving only
 // the allowed columns. If the allowed columns set is NULL, then we only want
 // constant comparisons.
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprPartPruningPredicate(
-	CMemoryPool *mp, const CExpressionArray *pdrgpexpr, CColRef *pcrPartKey,
-	CExpression *pexprCol,	// predicate on pcrPartKey obtained from pcnstr
-	CColRefSet *pcrsAllowedRefs, BOOL allow_not_equals_preds)
+	CMemoryPool *mp, const CExpressionArray *pdrgpexpr,
+	gpos::Ref<CColRef> pcrPartKey,
+	gpos::Ref<CExpression>
+		pexprCol,  // predicate on pcrPartKey obtained from pcnstr
+	gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allow_not_equals_preds)
 {
 	GPOS_ASSERT(nullptr != pcrsAllowedRefs);
 	CExpressionArray *pdrgpexprResult = GPOS_NEW(mp) CExpressionArray(mp);
@@ -1353,9 +1371,9 @@ CPredicateUtils::PexprPartPruningPredicate(
 
 	for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 	{
-		CExpression *pexpr = (*pdrgpexpr)[ul];
+		gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ul];
 
-		CExpression *canonical_expr = ValidatePartPruningExpr(
+		gpos::Ref<CExpression> canonical_expr = ValidatePartPruningExpr(
 			mp, pexpr, pcrPartKey, pcrsAllowedRefs, allow_not_equals_preds);
 
 		if (nullptr != canonical_expr)
@@ -1376,7 +1394,8 @@ CPredicateUtils::PexprPartPruningPredicate(
 		 ExprsContainsOnlyStrictComparisons(pdrgpexprResult)))
 	{
 #ifdef GPOS_DEBUG
-		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(mp, pdrgpexprResult);
+		gpos::Ref<CColRefSet> pcrsUsed =
+			CUtils::PcrsExtractColumns(mp, pdrgpexprResult);
 		GPOS_ASSERT_IMP(pdrgpexprResult->Size() > 0,
 						pcrsUsed->FMember(pcrPartKey));
 		SafeRelease(pcrsUsed);
@@ -1405,7 +1424,7 @@ CPredicateUtils::PexprPartPruningPredicate(
 CExpressionArray *
 CPredicateUtils::PdrgpexprAppendConjunctsDedup(CMemoryPool *mp,
 											   CExpressionArray *pdrgpexpr,
-											   CExpression *pexpr)
+											   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 
@@ -1427,7 +1446,8 @@ CPredicateUtils::PdrgpexprAppendConjunctsDedup(CMemoryPool *mp,
 // check if the given expression is a boolean expression on the
 // given column, e.g. if its of the form "ScalarIdent(colref)" or "Not(ScalarIdent(colref))"
 BOOL
-CPredicateUtils::FBoolPredicateOnColumn(CExpression *pexpr, CColRef *colref)
+CPredicateUtils::FBoolPredicateOnColumn(gpos::Ref<CExpression> pexpr,
+										gpos::Ref<CColRef> colref)
 {
 	BOOL fBoolean =
 		(IMDType::EtiBool == colref->RetrieveType()->GetDatumType());
@@ -1445,12 +1465,13 @@ CPredicateUtils::FBoolPredicateOnColumn(CExpression *pexpr, CColRef *colref)
 // check if the given expression is a null check on the given column
 // i.e. "is null" or "is not null"
 BOOL
-CPredicateUtils::FNullCheckOnColumn(CExpression *pexpr, CColRef *colref)
+CPredicateUtils::FNullCheckOnColumn(gpos::Ref<CExpression> pexpr,
+									gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
 
-	CExpression *pexprIsNull = pexpr;
+	gpos::Ref<CExpression> pexprIsNull = pexpr;
 	if (FNot(pexpr))
 	{
 		pexprIsNull = (*pexpr)[0];
@@ -1458,7 +1479,7 @@ CPredicateUtils::FNullCheckOnColumn(CExpression *pexpr, CColRef *colref)
 
 	if (CUtils::FScalarNullTest(pexprIsNull))
 	{
-		CExpression *pexprChild = (*pexprIsNull)[0];
+		gpos::Ref<CExpression> pexprChild = (*pexprIsNull)[0];
 		return (CUtils::FScalarIdent(pexprChild, colref) ||
 				CCastUtils::FBinaryCoercibleCastedScId(pexprChild, colref));
 	}
@@ -1468,7 +1489,8 @@ CPredicateUtils::FNullCheckOnColumn(CExpression *pexpr, CColRef *colref)
 
 // check if the given expression of the form "col is not null"
 BOOL
-CPredicateUtils::FNotNullCheckOnColumn(CExpression *pexpr, CColRef *colref)
+CPredicateUtils::FNotNullCheckOnColumn(gpos::Ref<CExpression> pexpr,
+									   gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -1485,8 +1507,8 @@ CPredicateUtils::FNotNullCheckOnColumn(CExpression *pexpr, CColRef *colref)
 // check if the given expression is a scalar array cmp expression on the
 // given column
 BOOL
-CPredicateUtils::FScArrayCmpOnColumn(CExpression *pexpr, CColRef *colref,
-									 BOOL fConstOnly)
+CPredicateUtils::FScArrayCmpOnColumn(gpos::Ref<CExpression> pexpr,
+									 gpos::Ref<CColRef> colref, BOOL fConstOnly)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1495,8 +1517,8 @@ CPredicateUtils::FScArrayCmpOnColumn(CExpression *pexpr, CColRef *colref,
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	if (!CUtils::FScalarIdent(pexprLeft, colref) ||
 		!CUtils::FScalarArray(pexprRight))
@@ -1509,7 +1531,7 @@ CPredicateUtils::FScArrayCmpOnColumn(CExpression *pexpr, CColRef *colref,
 	BOOL fSupported = true;
 	for (ULONG ul = 0; ul < ulArrayElems && fSupported; ul++)
 	{
-		CExpression *pexprArrayElem = (*pexprRight)[ul];
+		gpos::Ref<CExpression> pexprArrayElem = (*pexprRight)[ul];
 		if (fConstOnly && !CUtils::FScalarConst(pexprArrayElem))
 		{
 			fSupported = false;
@@ -1524,11 +1546,11 @@ CPredicateUtils::FScArrayCmpOnColumn(CExpression *pexpr, CColRef *colref,
 // are those that compare the partition keys to expressions involving only
 // the allowed columns. If the allowed columns set is NULL, then we only want
 // constant filters.
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprExtractPredicatesOnPartKeys(
-	CMemoryPool *mp, CExpression *pexprScalar,
-	CColRef2dArray *pdrgpdrgpcrPartKeys, CColRefSet *pcrsAllowedRefs,
-	BOOL fUseConstraints, const IMDRelation *pmdrel)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
+	CColRef2dArray *pdrgpdrgpcrPartKeys, gpos::Ref<CColRefSet> pcrsAllowedRefs,
+	BOOL fUseConstraints, const gpos::Ref<IMDRelation> pmdrel)
 {
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrPartKeys);
 	if (GPOS_FTRACE(EopttraceDisablePartSelection))
@@ -1538,7 +1560,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 
 	CExpressionArray *pdrgpexprConjuncts = PdrgpexprConjuncts(mp, pexprScalar);
 	CColRefSetArray *pdrgpcrsChild = nullptr;
-	CConstraint *pcnstr = nullptr;
+	gpos::Ref<CConstraint> pcnstr = nullptr;
 	if (pexprScalar->DeriveHasScalarArrayCmp() &&
 		!GPOS_FTRACE(EopttraceArrayConstraints))
 	{
@@ -1548,7 +1570,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 		CExpressionArray *pdrgpexprExpandedConjuncts =
 			PdrgpexprExpandConjuncts(mp, pdrgpexprConjuncts);
 		pdrgpexprConjuncts->Release();
-		CExpression *pexprExpandedScalar =
+		gpos::Ref<CExpression> pexprExpandedScalar =
 			PexprConjunction(mp, pdrgpexprExpandedConjuncts);
 
 		// this will no longer contain array statements
@@ -1585,7 +1607,8 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
-		CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcrPartKeys, ul);
+		gpos::Ref<CColRef> colref =
+			CUtils::PcrExtractPartKey(pdrgpdrgpcrPartKeys, ul);
 		// extract part type for this level
 		BOOL isKnownToBeListPartitioned = false;
 		if (pmdrel != nullptr)
@@ -1598,11 +1621,11 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 				(IMDRelation::ErelpartitionList == szPartType);
 		}
 
-		CExpression *pexprCol =
+		gpos::Ref<CExpression> pexprCol =
 			PexprPredicateCol(mp, pcnstr, colref, fUseConstraints);
 
 		// look for a filter on the part key
-		CExpression *pexprCmp = PexprPartPruningPredicate(
+		gpos::Ref<CExpression> pexprCmp = PexprPartPruningPredicate(
 			mp, pdrgpexprConjuncts, colref, pexprCol, pcrsAllowedRefs,
 			isKnownToBeListPartitioned /* allowNotEqualPreds */);
 		SafeRelease(pexprCol);
@@ -1634,17 +1657,19 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 }
 
 // extract the constraint on the given column and return the corresponding scalar expression
-CExpression *
-CPredicateUtils::PexprPredicateCol(CMemoryPool *mp, CConstraint *pcnstr,
-								   CColRef *colref, BOOL fUseConstraints)
+gpos::Ref<CExpression>
+CPredicateUtils::PexprPredicateCol(CMemoryPool *mp,
+								   gpos::Ref<CConstraint> pcnstr,
+								   gpos::Ref<CColRef> colref,
+								   BOOL fUseConstraints)
 {
 	if (nullptr == pcnstr || !fUseConstraints)
 	{
 		return nullptr;
 	}
 
-	CExpression *pexprCol = nullptr;
-	CConstraint *pcnstrCol = pcnstr->Pcnstr(mp, colref);
+	gpos::Ref<CExpression> pexprCol = nullptr;
+	gpos::Ref<CConstraint> pcnstrCol = pcnstr->Pcnstr(mp, colref);
 	if (nullptr != pcnstrCol && !pcnstrCol->IsConstraintUnbounded())
 	{
 		pexprCol = pcnstrCol->PexprScalar(mp);
@@ -1658,15 +1683,15 @@ CPredicateUtils::PexprPredicateCol(CMemoryPool *mp, CConstraint *pcnstr,
 
 // checks if comparison is between two columns, or a column and a const
 BOOL
-CPredicateUtils::FCompareColToConstOrCol(CExpression *pexprScalar)
+CPredicateUtils::FCompareColToConstOrCol(gpos::Ref<CExpression> pexprScalar)
 {
 	if (!CUtils::FScalarCmp(pexprScalar))
 	{
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexprScalar)[0];
-	CExpression *pexprRight = (*pexprScalar)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprScalar)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprScalar)[1];
 
 	BOOL fColLeft = CUtils::FScalarIdent(pexprLeft);
 	BOOL fColRight = CUtils::FScalarIdent(pexprRight);
@@ -1679,9 +1704,10 @@ CPredicateUtils::FCompareColToConstOrCol(CExpression *pexprScalar)
 
 // checks if the given constraint specifies a constant column
 BOOL
-CPredicateUtils::FConstColumn(CConstraint *pcnstr, const CColRef *
+CPredicateUtils::FConstColumn(gpos::Ref<CConstraint> pcnstr,
+							  const gpos::Ref<CColRef>
 #ifdef GPOS_DEBUG
-													   colref
+								  colref
 #endif	// GPOS_DEBUG
 )
 {
@@ -1693,8 +1719,8 @@ CPredicateUtils::FConstColumn(CConstraint *pcnstr, const CColRef *
 
 	GPOS_ASSERT(pcnstr->FConstraint(colref));
 
-	CConstraintInterval *pcnstrInterval =
-		dynamic_cast<CConstraintInterval *>(pcnstr);
+	gpos::Ref<CConstraintInterval> pcnstrInterval =
+		dynamic_cast<gpos::Ref<CConstraintInterval> >(pcnstr);
 	CRangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 	if (1 < pdrgprng->Size())
 	{
@@ -1708,15 +1734,15 @@ CPredicateUtils::FConstColumn(CConstraint *pcnstr, const CColRef *
 
 	GPOS_ASSERT(1 == pdrgprng->Size());
 
-	const CRange *prng = (*pdrgprng)[0];
+	const gpos::Ref<CRange> prng = (*pdrgprng)[0];
 
 	return prng->FPoint() && !pcnstrInterval->FIncludesNull();
 }
 
 // checks if the given constraint specifies a set of constants for a column
 BOOL
-CPredicateUtils::FColumnDisjunctionOfConst(CConstraint *pcnstr,
-										   const CColRef *colref)
+CPredicateUtils::FColumnDisjunctionOfConst(gpos::Ref<CConstraint> pcnstr,
+										   const gpos::Ref<CColRef> colref)
 {
 	if (FConstColumn(pcnstr, colref))
 	{
@@ -1733,17 +1759,17 @@ CPredicateUtils::FColumnDisjunctionOfConst(CConstraint *pcnstr,
 
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstr->Ect());
 
-	CConstraintInterval *pcnstrInterval =
-		dynamic_cast<CConstraintInterval *>(pcnstr);
+	gpos::Ref<CConstraintInterval> pcnstrInterval =
+		dynamic_cast<gpos::Ref<CConstraintInterval> >(pcnstr);
 	return FColumnDisjunctionOfConst(pcnstrInterval, colref);
 }
 
 // checks if the given constraint specifies a set of constants for a column
 BOOL
-CPredicateUtils::FColumnDisjunctionOfConst(CConstraintInterval *pcnstrInterval,
-										   const CColRef *
+CPredicateUtils::FColumnDisjunctionOfConst(
+	gpos::Ref<CConstraintInterval> pcnstrInterval, const gpos::Ref<CColRef>
 #ifdef GPOS_DEBUG
-											   colref
+													   colref
 #endif
 )
 {
@@ -1762,7 +1788,7 @@ CPredicateUtils::FColumnDisjunctionOfConst(CConstraintInterval *pcnstrInterval,
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
-		CRange *prng = (*pdrgprng)[ul];
+		gpos::Ref<CRange> prng = (*pdrgprng)[ul];
 		if (!prng->FPoint())
 		{
 			return false;
@@ -1773,20 +1799,20 @@ CPredicateUtils::FColumnDisjunctionOfConst(CConstraintInterval *pcnstrInterval,
 }
 
 // helper to create index lookup comparison predicate with index key on left side
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
-										   CExpression *pexprScalar,
-										   const IMDIndex *pmdindex,
+										   gpos::Ref<CExpression> pexprScalar,
+										   const gpos::Ref<IMDIndex> pmdindex,
 										   CColRefArray *pdrgpcrIndex,
-										   CColRefSet *outer_refs)
+										   gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	CExpression *pexprLeft = (*pexprScalar)[0];
-	CExpression *pexprRight = (*pexprScalar)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprScalar)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprScalar)[1];
 
-	CColRefSet *pcrsIndex = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrIndex);
+	gpos::Ref<CColRefSet> pcrsIndex = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrIndex);
 
 	if ((CUtils::FScalarIdent(pexprLeft) &&
 		 pcrsIndex->FMember(
@@ -1796,7 +1822,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 			 CScalarIdent::PopConvert((*pexprLeft)[0]->Pop())->Pcr())))
 	{
 		// left expression is a scalar identifier or casted scalar identifier on an index key
-		CColRefSet *pcrsUsedRight = pexprRight->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsedRight = pexprRight->DeriveUsedColumns();
 		BOOL fSuccess = true;
 
 		if (0 < pcrsUsedRight->Size())
@@ -1808,7 +1834,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 			}
 			else if (nullptr != outer_refs)
 			{
-				CColRefSet *pcrsOuterRefsRight =
+				gpos::Ref<CColRefSet> pcrsOuterRefsRight =
 					GPOS_NEW(mp) CColRefSet(mp, *pcrsUsedRight);
 				pcrsOuterRefsRight->Difference(pcrsIndex);
 				fSuccess = outer_refs->ContainsAll(pcrsOuterRefsRight);
@@ -1833,31 +1859,32 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 }
 
 // helper to create index lookup comparison predicate with index key on right side
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
-											CExpression *pexprScalar,
-											const IMDIndex *pmdindex,
+											gpos::Ref<CExpression> pexprScalar,
+											const gpos::Ref<IMDIndex> pmdindex,
 											CColRefArray *pdrgpcrIndex,
-											CColRefSet *outer_refs)
+											gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	CExpression *pexprLeft = (*pexprScalar)[0];
-	CExpression *pexprRight = (*pexprScalar)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprScalar)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprScalar)[1];
 	if (CUtils::FScalarCmp(pexprScalar))
 	{
-		CScalarCmp *popScCmp = CScalarCmp::PopConvert(pexprScalar->Pop());
-		CScalarCmp *popScCmpCommute = popScCmp->PopCommutedOp(mp);
+		gpos::Ref<CScalarCmp> popScCmp =
+			CScalarCmp::PopConvert(pexprScalar->Pop());
+		gpos::Ref<CScalarCmp> popScCmpCommute = popScCmp->PopCommutedOp(mp);
 
 		if (popScCmpCommute)
 		{
 			// build new comparison after switching arguments and using commutative comparison operator
 			pexprRight->AddRef();
 			pexprLeft->AddRef();
-			CExpression *pexprCommuted = GPOS_NEW(mp)
+			gpos::Ref<CExpression> pexprCommuted = GPOS_NEW(mp)
 				CExpression(mp, popScCmpCommute, pexprRight, pexprLeft);
-			CExpression *pexprIndexCond =
+			gpos::Ref<CExpression> pexprIndexCond =
 				PexprIndexLookupKeyOnLeft(mp, md_accessor, pexprCommuted,
 										  pmdindex, pdrgpcrIndex, outer_refs);
 			pexprCommuted->Release();
@@ -1877,12 +1904,12 @@ CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 //	[expr CMP index-key]
 // where expr is a scalar expression that is free of index keys and
 // may have outer references (in the case of index nested loops)
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  CExpression *pexprScalar,
-								  const IMDIndex *pmdindex,
+								  gpos::Ref<CExpression> pexprScalar,
+								  const gpos::Ref<IMDIndex> pmdindex,
 								  CColRefArray *pdrgpcrIndex,
-								  CColRefSet *outer_refs,
+								  gpos::Ref<CColRefSet> outer_refs,
 								  BOOL allowArrayCmpForBTreeIndexes)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -1922,15 +1949,17 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 		return nullptr;
 	}
 
-	CExpression *pexprIndexLookupKeyOnLeft = PexprIndexLookupKeyOnLeft(
-		mp, md_accessor, pexprScalar, pmdindex, pdrgpcrIndex, outer_refs);
+	gpos::Ref<CExpression> pexprIndexLookupKeyOnLeft =
+		PexprIndexLookupKeyOnLeft(mp, md_accessor, pexprScalar, pmdindex,
+								  pdrgpcrIndex, outer_refs);
 	if (nullptr != pexprIndexLookupKeyOnLeft)
 	{
 		return pexprIndexLookupKeyOnLeft;
 	}
 
-	CExpression *pexprIndexLookupKeyOnRight = PexprIndexLookupKeyOnRight(
-		mp, md_accessor, pexprScalar, pmdindex, pdrgpcrIndex, outer_refs);
+	gpos::Ref<CExpression> pexprIndexLookupKeyOnRight =
+		PexprIndexLookupKeyOnRight(mp, md_accessor, pexprScalar, pmdindex,
+								   pdrgpcrIndex, outer_refs);
 	if (nullptr != pexprIndexLookupKeyOnRight)
 	{
 		return pexprIndexLookupKeyOnRight;
@@ -1943,24 +1972,24 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 void
 CPredicateUtils::ExtractIndexPredicates(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprPredicate, const IMDIndex *pmdindex,
+	CExpressionArray *pdrgpexprPredicate, const gpos::Ref<IMDIndex> pmdindex,
 	CColRefArray *pdrgpcrIndex, CExpressionArray *pdrgpexprIndex,
 	CExpressionArray *pdrgpexprResidual,
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 		pcrsAcceptedOuterRefs,	// outer refs that are acceptable in an index predicate
 	BOOL allowArrayCmpForBTreeIndexes)
 {
 	const ULONG length = pdrgpexprPredicate->Size();
 
-	CColRefSet *pcrsIndex = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrIndex);
+	gpos::Ref<CColRefSet> pcrsIndex = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrIndex);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CExpression *pexprCond = (*pdrgpexprPredicate)[ul];
+		gpos::Ref<CExpression> pexprCond = (*pdrgpexprPredicate)[ul];
 
 		pexprCond->AddRef();
 
-		CColRefSet *pcrsUsed =
+		gpos::Ref<CColRefSet> pcrsUsed =
 			GPOS_NEW(mp) CColRefSet(mp, *pexprCond->DeriveUsedColumns());
 		if (nullptr != pcrsAcceptedOuterRefs)
 		{
@@ -1992,7 +2021,7 @@ CPredicateUtils::ExtractIndexPredicates(
 				 CUtils::FScalarIdentBoolType((*pexprCond)[0]))
 		{
 			// expression is of the form "not(col) for a column identifier of boolean type: convert to "col = false"
-			CExpression *pexprScId = (*pexprCond)[0];
+			gpos::Ref<CExpression> pexprScId = (*pexprCond)[0];
 			pexprCond->Release();
 			pexprScId->AddRef();
 			pexprCond = CUtils::PexprScalarEqCmp(
@@ -2003,7 +2032,7 @@ CPredicateUtils::ExtractIndexPredicates(
 		else
 		{
 			// attempt building index lookup predicate
-			CExpression *pexprLookupPred = PexprIndexLookup(
+			gpos::Ref<CExpression> pexprLookupPred = PexprIndexLookup(
 				mp, md_accessor, pexprCond, pmdindex, pdrgpcrIndex,
 				pcrsAcceptedOuterRefs, allowArrayCmpForBTreeIndexes);
 			if (nullptr != pexprLookupPred)
@@ -2027,17 +2056,18 @@ CPredicateUtils::ExtractIndexPredicates(
 // split given scalar expression into two conjunctions; without outer
 // references and with outer references
 void
-CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp, CExpression *pexprScalar,
-								   CColRefSet *outer_refs,
-								   CExpression **ppexprLocal,
-								   CExpression **ppexprOuterRef)
+CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprScalar,
+								   gpos::Ref<CColRefSet> outer_refs,
+								   gpos::Ref<CExpression> *ppexprLocal,
+								   gpos::Ref<CExpression> *ppexprOuterRef)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 	GPOS_ASSERT(nullptr != outer_refs);
 	GPOS_ASSERT(nullptr != ppexprLocal);
 	GPOS_ASSERT(nullptr != ppexprOuterRef);
 
-	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
 	if (pcrsUsed->IsDisjoint(outer_refs))
 	{
 		// if used columns are disjoint from outer references, return input expression
@@ -2056,8 +2086,8 @@ CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp, CExpression *pexprScalar,
 
 		for (ULONG c = 0; c < pexprScalar->Arity(); c++)
 		{
-			CExpression *childLocalExpr = nullptr;
-			CExpression *childOuterRefExpr = nullptr;
+			gpos::Ref<CExpression> childLocalExpr = nullptr;
+			gpos::Ref<CExpression> childOuterRefExpr = nullptr;
 
 			SeparateOuterRefs(mp, (*pexprScalar)[c], outer_refs,
 							  &childLocalExpr, &childOuterRefExpr);
@@ -2085,8 +2115,8 @@ CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp, CExpression *pexprScalar,
 	const ULONG size = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CExpression *pexprPred = (*pdrgpexpr)[ul];
-		CColRefSet *pcrsPredUsed = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
+		gpos::Ref<CColRefSet> pcrsPredUsed = pexprPred->DeriveUsedColumns();
 		pexprPred->AddRef();
 		if (0 == pcrsPredUsed->Size() || outer_refs->IsDisjoint(pcrsPredUsed))
 		{
@@ -2105,13 +2135,15 @@ CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp, CExpression *pexprScalar,
 
 // convert predicates of the form (a Cmp b) into (a InvCmp b);
 // where InvCmp is the inverse comparison (e.g., '=' --> '<>')
-CExpression *
-CPredicateUtils::PexprInverseComparison(CMemoryPool *mp, CExpression *pexprCmp)
+gpos::Ref<CExpression>
+CPredicateUtils::PexprInverseComparison(CMemoryPool *mp,
+										gpos::Ref<CExpression> pexprCmp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid_op = CScalarCmp::PopConvert(pexprCmp->Pop())->MdIdOp();
-	IMDId *pmdidInverseOp =
+	gpos::Ref<IMDId> mdid_op =
+		CScalarCmp::PopConvert(pexprCmp->Pop())->MdIdOp();
+	gpos::Ref<IMDId> pmdidInverseOp =
 		md_accessor->RetrieveScOp(mdid_op)->GetInverseOpMdid();
 	const CWStringConst *pstrFirst =
 		md_accessor->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
@@ -2127,9 +2159,9 @@ CPredicateUtils::PexprInverseComparison(CMemoryPool *mp, CExpression *pexprCmp)
 
 // convert predicates of the form (true = (a Cmp b)) into (a Cmp b);
 // do this operation recursively on deep expression tree
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprPruneSuperfluosEquality(CMemoryPool *mp,
-											  CExpression *pexpr)
+											  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
@@ -2160,9 +2192,9 @@ CPredicateUtils::PexprPruneSuperfluosEquality(CMemoryPool *mp,
 
 			if (fConstFalseLeftChild)
 			{
-				CExpression *pexprInverse =
+				gpos::Ref<CExpression> pexprInverse =
 					PexprInverseComparison(mp, (*pexpr)[1]);
-				CExpression *pexprPruned =
+				gpos::Ref<CExpression> pexprPruned =
 					PexprPruneSuperfluosEquality(mp, pexprInverse);
 				pexprInverse->Release();
 				return pexprPruned;
@@ -2178,9 +2210,9 @@ CPredicateUtils::PexprPruneSuperfluosEquality(CMemoryPool *mp,
 
 			if (fConstFalseRightChild)
 			{
-				CExpression *pexprInverse =
+				gpos::Ref<CExpression> pexprInverse =
 					PexprInverseComparison(mp, (*pexpr)[0]);
-				CExpression *pexprPruned =
+				gpos::Ref<CExpression> pexprPruned =
 					PexprPruneSuperfluosEquality(mp, pexprInverse);
 				pexprInverse->Release();
 
@@ -2194,19 +2226,19 @@ CPredicateUtils::PexprPruneSuperfluosEquality(CMemoryPool *mp,
 	const ULONG ulChildren = pexpr->Arity();
 	for (ULONG ul = 0; ul < ulChildren; ul++)
 	{
-		CExpression *pexprChild =
+		gpos::Ref<CExpression> pexprChild =
 			PexprPruneSuperfluosEquality(mp, (*pexpr)[ul]);
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	pop->AddRef();
 	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 }
 
 // determine if we should test predicate implication for statistics computation
 BOOL
-CPredicateUtils::FCheckPredicateImplication(CExpression *pexprPred)
+CPredicateUtils::FCheckPredicateImplication(gpos::Ref<CExpression> pexprPred)
 {
 	// currently restrict testing implication to only equality of column references on scalar
 	// ident and binary coercible casted idents
@@ -2214,8 +2246,8 @@ CPredicateUtils::FCheckPredicateImplication(CExpression *pexprPred)
 		IMDType::EcmptEq ==
 			CScalarCmp::PopConvert(pexprPred->Pop())->ParseCmpType())
 	{
-		CExpression *pexprLeft = (*pexprPred)[0];
-		CExpression *pexprRight = (*pexprPred)[1];
+		gpos::Ref<CExpression> pexprLeft = (*pexprPred)[0];
+		gpos::Ref<CExpression> pexprRight = (*pexprPred)[1];
 		return ((COperator::EopScalarIdent == pexprLeft->Pop()->Eopid() ||
 				 CCastUtils::FBinaryCoercibleCastedScId(pexprLeft)) &&
 				(COperator::EopScalarIdent == pexprRight->Pop()->Eopid() ||
@@ -2227,17 +2259,17 @@ CPredicateUtils::FCheckPredicateImplication(CExpression *pexprPred)
 // Given a predicate and a list of equivalence classes, return true if that predicate is
 // implied by given equivalence classes
 BOOL
-CPredicateUtils::FImpliedPredicate(CExpression *pexprPred,
+CPredicateUtils::FImpliedPredicate(gpos::Ref<CExpression> pexprPred,
 								   CColRefSetArray *pdrgpcrsEquivClasses)
 {
 	GPOS_ASSERT(pexprPred->Pop()->FScalar());
 	GPOS_ASSERT(FCheckPredicateImplication(pexprPred));
 
-	CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
 	const ULONG size = pdrgpcrsEquivClasses->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrsEquivClasses)[ul];
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrsEquivClasses)[ul];
 		if (pcrs->ContainsAll(pcrsUsed))
 		{
 			// predicate is implied by given equivalence classes
@@ -2255,9 +2287,9 @@ CPredicateUtils::FImpliedPredicate(CExpression *pexprPred,
 // for example, in the expression ((a=b) AND (a=c)), if a child
 // equivalence class is {b,c}, then we remove the conjunct (a=c)
 // since it can be implied from {b,c}, {a,b}
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
-											 CExpression *pexprScalar,
+											 gpos::Ref<CExpression> pexprScalar,
 											 CExpressionHandle &exprhdl)
 {
 	if (COperator::EopScalarNAryJoinPredList == pexprScalar->Pop()->Eopid())
@@ -2288,7 +2320,7 @@ CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
 	CExpressionArray *pdrgpexprNewConjuncts = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CExpression *pexprConj = (*pdrgpexprConjuncts)[ul];
+		gpos::Ref<CExpression> pexprConj = (*pdrgpexprConjuncts)[ul];
 		if (FCheckPredicateImplication(pexprConj) &&
 			FImpliedPredicate(pexprConj, pdrgpcrs))
 		{
@@ -2298,7 +2330,7 @@ CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
 
 		// add predicate to current equivalence classes
 		CColRefSetArray *pdrgpcrsConj = nullptr;
-		CConstraint *pcnstr =
+		gpos::Ref<CConstraint> pcnstr =
 			CConstraint::PcnstrFromScalarExpr(mp, pexprConj, &pdrgpcrsConj);
 		SafeRelease(pcnstr);
 		if (nullptr != pdrgpcrsConj)
@@ -2326,25 +2358,26 @@ CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
 // child columns are not visible above (anti)semi-join
 BOOL
 CPredicateUtils::FValidSemiJoinCorrelations(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	CExpressionArray *pdrgpexprCorrelations)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, CExpressionArray *pdrgpexprCorrelations)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
-	CColRefSet *pcrsOuterOuput = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsInnerOuput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOuterOuput = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOuput = pexprInner->DeriveOutputColumns();
 
 	// collect output columns of both children
-	CColRefSet *pcrsChildren = GPOS_NEW(mp) CColRefSet(mp, *pcrsOuterOuput);
+	gpos::Ref<CColRefSet> pcrsChildren =
+		GPOS_NEW(mp) CColRefSet(mp, *pcrsOuterOuput);
 	pcrsChildren->Union(pcrsInnerOuput);
 
 	const ULONG ulCorrs = pdrgpexprCorrelations->Size();
 	BOOL fValid = true;
 	for (ULONG ul = 0; fValid && ul < ulCorrs; ul++)
 	{
-		CExpression *pexprPred = (*pdrgpexprCorrelations)[ul];
-		CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CExpression> pexprPred = (*pdrgpexprCorrelations)[ul];
+		gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
 		if (0 < pcrsUsed->Size() && !pcrsChildren->ContainsAll(pcrsUsed) &&
 			!pcrsUsed->IsDisjoint(pcrsInnerOuput))
 		{
@@ -2361,8 +2394,8 @@ CPredicateUtils::FValidSemiJoinCorrelations(
 // equality that use columns from the given column set
 BOOL
 CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
-										  CExpression *pexprScalar,
-										  CColRefSet *pcrs)
+										  gpos::Ref<CExpression> pexprScalar,
+										  gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 	GPOS_ASSERT(pexprScalar->Pop()->FScalar());
@@ -2376,8 +2409,8 @@ CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
 	for (ULONG ul = 0; fSuccess && ul < size; ul++)
 	{
 		// join predicate must be an equality of scalar idents and uses columns from given set
-		CExpression *pexprConj = (*pdrgpexpr)[ul];
-		CColRefSet *pcrsUsed = pexprConj->DeriveUsedColumns();
+		gpos::Ref<CExpression> pexprConj = (*pdrgpexpr)[ul];
+		gpos::Ref<CColRefSet> pcrsUsed = pexprConj->DeriveUsedColumns();
 		fSuccess = IsEqualityOp(pexprConj) &&
 				   CUtils::FScalarIdent((*pexprConj)[0]) &&
 				   CUtils::FScalarIdent((*pexprConj)[1]) &&
@@ -2389,15 +2422,15 @@ CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
 }
 
 // for all columns in the given expression and are members of the given column set, replace columns with NULLs
-CExpression *
+gpos::Ref<CExpression>
 CPredicateUtils::PexprReplaceColsWithNulls(CMemoryPool *mp,
-										   CExpression *pexprScalar,
-										   CColRefSet *pcrs)
+										   gpos::Ref<CExpression> pexprScalar,
+										   gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	COperator *pop = pexprScalar->Pop();
+	gpos::Ref<COperator> pop = pexprScalar->Pop();
 	GPOS_ASSERT(pop->FScalar());
 
 	if (CUtils::FSubquery(pop))
@@ -2420,7 +2453,7 @@ CPredicateUtils::PexprReplaceColsWithNulls(CMemoryPool *mp,
 	const ULONG ulChildren = pexprScalar->Arity();
 	for (ULONG ul = 0; ul < ulChildren; ul++)
 	{
-		CExpression *pexprChild =
+		gpos::Ref<CExpression> pexprChild =
 			PexprReplaceColsWithNulls(mp, (*pexprScalar)[ul], pcrs);
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -2433,8 +2466,9 @@ CPredicateUtils::PexprReplaceColsWithNulls(CMemoryPool *mp,
 // all columns in the given set that are included in the expression
 // are set to NULL
 BOOL
-CPredicateUtils::FNullRejecting(CMemoryPool *mp, CExpression *pexprScalar,
-								CColRefSet *pcrs)
+CPredicateUtils::FNullRejecting(CMemoryPool *mp,
+								gpos::Ref<CExpression> pexprScalar,
+								gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -2451,7 +2485,7 @@ CPredicateUtils::FNullRejecting(CMemoryPool *mp, CExpression *pexprScalar,
 	}
 
 	// create another expression copy where we replace columns included in the set with NULL values
-	CExpression *pexprColsReplacedWithNulls =
+	gpos::Ref<CExpression> pexprColsReplacedWithNulls =
 		PexprReplaceColsWithNulls(mp, pexprScalar, pcrs);
 
 	// evaluate the resulting expression
@@ -2468,7 +2502,7 @@ CPredicateUtils::FNullRejecting(CMemoryPool *mp, CExpression *pexprScalar,
 
 // returns true iff the given expression is a Not operator whose child is an identifier
 BOOL
-CPredicateUtils::FNotIdent(CExpression *pexpr)
+CPredicateUtils::FNotIdent(gpos::Ref<CExpression> pexpr)
 {
 	return FNot(pexpr) &&
 		   COperator::EopScalarIdent == (*pexpr)[0]->Pop()->Eopid();
@@ -2477,7 +2511,7 @@ CPredicateUtils::FNotIdent(CExpression *pexpr)
 // returns true iff all predicates in the given array are compatible with the given index.
 BOOL
 CPredicateUtils::FCompatiblePredicates(CExpressionArray *pdrgpexprPred,
-									   const IMDIndex *pmdindex,
+									   const gpos::Ref<IMDIndex> pmdindex,
 									   CColRefArray *pdrgpcrIndex,
 									   CMDAccessor *md_accessor)
 {
@@ -2499,23 +2533,24 @@ CPredicateUtils::FCompatiblePredicates(CExpressionArray *pdrgpexprPred,
 
 // returns true iff the given predicate 'pexprPred' is compatible with the given index 'pmdindex'.
 BOOL
-CPredicateUtils::FCompatibleIndexPredicate(CExpression *pexprPred,
-										   const IMDIndex *pmdindex,
+CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
+										   const gpos::Ref<IMDIndex> pmdindex,
 										   CColRefArray *pdrgpcrIndex,
 										   CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
 
-	const IMDScalarOp *pmdobjScCmp = nullptr;
+	const gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
-		CScalarCmp *popScCmp = CScalarCmp::PopConvert(pexprPred->Pop());
+		gpos::Ref<CScalarCmp> popScCmp =
+			CScalarCmp::PopConvert(pexprPred->Pop());
 		pmdobjScCmp = md_accessor->RetrieveScOp(popScCmp->MdIdOp());
 	}
 	else if (COperator::EopScalarArrayCmp == pexprPred->Pop()->Eopid())
 	{
-		CScalarArrayCmp *popScArrCmp =
+		gpos::Ref<CScalarArrayCmp> popScArrCmp =
 			CScalarArrayCmp::PopConvert(pexprPred->Pop());
 		pmdobjScCmp = md_accessor->RetrieveScOp(popScArrCmp->MdIdOp());
 	}
@@ -2524,11 +2559,11 @@ CPredicateUtils::FCompatibleIndexPredicate(CExpression *pexprPred,
 		return false;
 	}
 
-	CExpression *pexprLeft = (*pexprPred)[0];
-	CColRefSet *pcrsUsed = pexprLeft->DeriveUsedColumns();
+	gpos::Ref<CExpression> pexprLeft = (*pexprPred)[0];
+	gpos::Ref<CColRefSet> pcrsUsed = pexprLeft->DeriveUsedColumns();
 	GPOS_ASSERT(1 == pcrsUsed->Size());
 
-	CColRef *pcrIndexKey = pcrsUsed->PcrFirst();
+	gpos::Ref<CColRef> pcrIndexKey = pcrsUsed->PcrFirst();
 	ULONG ulKeyPos = pdrgpcrIndex->IndexOf(pcrIndexKey);
 	GPOS_ASSERT(gpos::ulong_max != ulKeyPos);
 
@@ -2544,7 +2579,8 @@ CPredicateUtils::FContainsVolatileFunction(CExpressionArray *pdrgpexprPred)
 	const ULONG ulNumPreds = pdrgpexprPred->Size();
 	for (ULONG ul = 0; ul < ulNumPreds; ul++)
 	{
-		CExpression *pexpr = (CExpression *) (*pdrgpexprPred)[ul];
+		gpos::Ref<CExpression> pexpr =
+			(gpos::Ref<CExpression>) (*pdrgpexprPred)[ul];
 
 		if (FContainsVolatileFunction(pexpr))
 		{
@@ -2557,17 +2593,18 @@ CPredicateUtils::FContainsVolatileFunction(CExpressionArray *pdrgpexprPred)
 
 // check if the expression contains a volatile function like random().
 BOOL
-CPredicateUtils::FContainsVolatileFunction(CExpression *pexpr)
+CPredicateUtils::FContainsVolatileFunction(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 
-	COperator *popCurrent = pexpr->Pop();
+	gpos::Ref<COperator> popCurrent = pexpr->Pop();
 	GPOS_ASSERT(nullptr != popCurrent);
 
 	if (COperator::EopScalarFunc == popCurrent->Eopid())
 	{
-		CScalarFunc *pCurrentFunction = CScalarFunc::PopConvert(popCurrent);
+		gpos::Ref<CScalarFunc> pCurrentFunction =
+			CScalarFunc::PopConvert(popCurrent);
 		return IMDFunction::EfsVolatile ==
 			   pCurrentFunction->EfsGetFunctionStability();
 	}
@@ -2589,8 +2626,9 @@ CPredicateUtils::FContainsVolatileFunction(CExpression *pexpr)
 
 // check if the expensive CNF conversion is beneficial in finding predicate for hash join
 BOOL
-CPredicateUtils::FConvertToCNF(CExpression *pexprOuter, CExpression *pexprInner,
-							   CExpression *pexprScalar)
+CPredicateUtils::FConvertToCNF(gpos::Ref<CExpression> pexprOuter,
+							   gpos::Ref<CExpression> pexprInner,
+							   gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
@@ -2645,7 +2683,7 @@ CPredicateUtils::FConvertToCNF(CExpression *pexprOuter, CExpression *pexprInner,
 // set the input columns of the new n-ary union/unionall operator
 void
 CPredicateUtils::CollectGrandChildrenUnionUnionAll(
-	CMemoryPool *mp, CExpression *pexpr, ULONG child_index,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, ULONG child_index,
 	CExpressionArray *pdrgpexprResult, CColRef2dArray *pdrgdrgpcrResult)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -2656,11 +2694,12 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 		CPredicateUtils::FCollapsibleChildUnionUnionAll(pexpr, child_index));
 
 
-	CExpression *pexprChild = (*pexpr)[child_index];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[child_index];
 	GPOS_ASSERT(nullptr != pexprChild);
 
-	CLogicalSetOp *pop = CLogicalSetOp::PopConvert(pexpr->Pop());
-	CLogicalSetOp *popChild = CLogicalSetOp::PopConvert(pexprChild->Pop());
+	gpos::Ref<CLogicalSetOp> pop = CLogicalSetOp::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalSetOp> popChild =
+		CLogicalSetOp::PopConvert(pexprChild->Pop());
 
 	// the parent setop's expected input columns and the child setop's output columns
 	// may have different size or order or both. We need to ensure that the new
@@ -2676,7 +2715,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ulColIdx = 0; ulColIdx < num_cols; ulColIdx++)
 	{
-		const CColRef *colref = (*pdrgpcrInputExpected)[ulColIdx];
+		const gpos::Ref<CColRef> colref = (*pdrgpcrInputExpected)[ulColIdx];
 		ULONG ulPos = pdrgpcrOuputChild->IndexOf(colref);
 		GPOS_ASSERT(gpos::ulong_max != ulPos);
 		pdrgpul->Append(GPOS_NEW(mp) ULONG(ulPos));
@@ -2689,7 +2728,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 	for (ULONG ul = 0; ul < ulArityChild; ul++)
 	{
 		// collect the grand child expression
-		CExpression *pexprGrandchild = (*pexprChild)[ul];
+		gpos::Ref<CExpression> pexprGrandchild = (*pexprChild)[ul];
 		GPOS_ASSERT(pexprGrandchild->Pop()->FLogical());
 
 		pexprGrandchild->AddRef();
@@ -2701,7 +2740,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 		for (ULONG ulColIdx = 0; ulColIdx < num_cols; ulColIdx++)
 		{
 			ULONG ulPos = *(*pdrgpul)[ulColIdx];
-			CColRef *colref = (*pdrgpcrOld)[ulPos];
+			gpos::Ref<CColRef> colref = (*pdrgpcrOld)[ulPos];
 			pdrgpcrNew->Append(colref);
 		}
 
@@ -2713,7 +2752,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 
 // check if we can collapse the nth child of the given union / union all operator
 BOOL
-CPredicateUtils::FCollapsibleChildUnionUnionAll(CExpression *pexpr,
+CPredicateUtils::FCollapsibleChildUnionUnionAll(gpos::Ref<CExpression> pexpr,
 												ULONG child_index)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -2723,7 +2762,7 @@ CPredicateUtils::FCollapsibleChildUnionUnionAll(CExpression *pexpr,
 		return false;
 	}
 
-	CExpression *pexprChild = (*pexpr)[child_index];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[child_index];
 	GPOS_ASSERT(nullptr != pexprChild);
 
 	// we can only collapse when the parent and child operator are of the same kind
@@ -2754,7 +2793,7 @@ CPredicateUtils::FCollapsibleChildUnionUnionAll(CExpression *pexpr,
 //		+--CScalarConstArray
 BOOL
 CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
-	CExpression *pexpr, CColRefSet *outer_refs)
+	gpos::Ref<CExpression> pexpr, gpos::Ref<CColRefSet> outer_refs)
 {
 	if (CPredicateUtils::FAnd(pexpr))
 	{
@@ -2787,9 +2826,9 @@ CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
 }
 
 BOOL
-CPredicateUtils::FBuiltInComparisonIsVeryStrict(IMDId *mdid)
+CPredicateUtils::FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid)
 {
-	const CMDIdGPDB *const pmdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	const gpos::Ref<CMDIdGPDB> const pmdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	GPOS_ASSERT(nullptr != pmdidGPDB);
 
@@ -2838,7 +2877,7 @@ CPredicateUtils::FBuiltInComparisonIsVeryStrict(IMDId *mdid)
 
 BOOL
 CPredicateUtils::ExprContainsOnlyStrictComparisons(CMemoryPool *mp,
-												   CExpression *expr)
+												   gpos::Ref<CExpression> expr)
 {
 	CExpressionArray *conjuncts = PdrgpexprConjuncts(mp, expr);
 	BOOL result = ExprsContainsOnlyStrictComparisons(conjuncts);
@@ -2854,10 +2893,11 @@ CPredicateUtils::ExprsContainsOnlyStrictComparisons(CExpressionArray *conjuncts)
 	BOOL result = true;
 	for (ULONG ul = 0; ul < conjuncts->Size(); ++ul)
 	{
-		CExpression *conjunct = (*conjuncts)[ul];
+		gpos::Ref<CExpression> conjunct = (*conjuncts)[ul];
 		if (FComparison(conjunct))
 		{
-			CScalarCmp *pscalarCmp = CScalarCmp::PopConvert(conjunct->Pop());
+			gpos::Ref<CScalarCmp> pscalarCmp =
+				CScalarCmp::PopConvert(conjunct->Pop());
 			if (!CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(
 					mda, pscalarCmp->MdIdOp()))
 			{

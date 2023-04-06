@@ -201,15 +201,17 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(mp);
+			gpos::Ref<ICostModel> pcm = CTestUtils::GetCostModel(mp);
 
-			COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, filename,
-				optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
-				1 /*ulSessionId*/, 1,	  /*ulCmdId*/
-				optimizer_config, nullptr /*pceeval*/
-			);
+			gpos::Ref<COptimizerConfig> optimizer_config =
+				pdxlmd->GetOptimizerConfig();
+			gpos::Ref<CDXLNode> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, filename,
+					optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
+					1 /*ulSessionId*/, 1,	  /*ulCmdId*/
+					optimizer_config, nullptr /*pceeval*/
+				);
 
 
 			GPOS_CHECK_ABORT;
@@ -296,19 +298,21 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 	{
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(mp);
+			gpos::Ref<ICostModel> pcm = CTestUtils::GetCostModel(mp);
 
-			COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig(
-				CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
-				CStatisticsConfig::PstatsconfDefault(mp),
-				CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
-				CWindowOids::GetWindowOids(mp));
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, rgszNegativeIndexApplyFileNames[ul],
-				GPOPT_TEST_SEGMENTS /*ulSegments*/, 1 /*ulSessionId*/,
-				1,						  /*ulCmdId*/
-				optimizer_config, nullptr /*pceeval*/
-			);
+			gpos::Ref<COptimizerConfig> optimizer_config =
+				GPOS_NEW(mp) COptimizerConfig(
+					CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+					CStatisticsConfig::PstatsconfDefault(mp),
+					CCTEConfig::PcteconfDefault(mp), pcm,
+					CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
+			gpos::Ref<CDXLNode> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, rgszNegativeIndexApplyFileNames[ul],
+					GPOPT_TEST_SEGMENTS /*ulSegments*/, 1 /*ulSessionId*/,
+					1,						  /*ulCmdId*/
+					optimizer_config, nullptr /*pceeval*/
+				);
 			GPOS_CHECK_ABORT;
 			optimizer_config->Release();
 			pdxlnPlan->Release();
@@ -350,11 +354,12 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop)
+CICGTest::FDXLOpSatisfiesPredicate(gpos::Ref<CDXLNode> pdxl,
+								   FnDXLOpPredicate fdop)
 {
 	using namespace gpdxl;
 
-	CDXLOperator *dxl_op = pdxl->GetOperator();
+	gpos::Ref<CDXLOperator> dxl_op = pdxl->GetOperator();
 	if (!fdop(dxl_op))
 	{
 		return false;
@@ -381,7 +386,7 @@ CICGTest::FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop)
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FIsNotIndexJoin(CDXLOperator *dxl_op)
+CICGTest::FIsNotIndexJoin(gpos::Ref<CDXLOperator> dxl_op)
 {
 	if (EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator())
 	{
@@ -403,7 +408,7 @@ CICGTest::FIsNotIndexJoin(CDXLOperator *dxl_op)
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FHasNoIndexJoin(CDXLNode *pdxl)
+CICGTest::FHasNoIndexJoin(gpos::Ref<CDXLNode> pdxl)
 {
 	return FDXLOpSatisfiesPredicate(pdxl, FIsNotIndexJoin);
 }

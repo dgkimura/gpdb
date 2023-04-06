@@ -38,8 +38,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 void
 CSubqueryTestUtils::GenerateGetExpressions(CMemoryPool *mp,
-										   CExpression **ppexprOuter,
-										   CExpression **ppexprInner)
+										   gpos::Ref<CExpression> *ppexprOuter,
+										   gpos::Ref<CExpression> *ppexprInner)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != ppexprOuter);
@@ -47,17 +47,17 @@ CSubqueryTestUtils::GenerateGetExpressions(CMemoryPool *mp,
 
 	// outer expression
 	CWStringConst strNameR(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdidR =
+	gpos::Ref<CMDIdGPDB> pmdidR =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID1, 1, 1);
-	CTableDescriptor *ptabdescR = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescR = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidR, CName(&strNameR));
 	*ppexprOuter = CTestUtils::PexprLogicalGet(mp, ptabdescR, &strNameR);
 
 	// inner expression
 	CWStringConst strNameS(GPOS_WSZ_LIT("Rel2"));
-	CMDIdGPDB *pmdidS =
+	gpos::Ref<CMDIdGPDB> pmdidS =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID2, 1, 1);
-	CTableDescriptor *ptabdescS = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescS = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidS, CName(&strNameS));
 	*ppexprInner = CTestUtils::PexprLogicalGet(mp, ptabdescS, &strNameS);
 }
@@ -71,23 +71,23 @@ CSubqueryTestUtils::GenerateGetExpressions(CMemoryPool *mp,
 //		Generate randomized join expression with a subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprJoinWithAggSubquery(CMemoryPool *mp, BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprLeft = nullptr;
-	CExpression *pexprRight = nullptr;
+	gpos::Ref<CExpression> pexprLeft = nullptr;
+	gpos::Ref<CExpression> pexprRight = nullptr;
 	GenerateGetExpressions(mp, &pexprLeft, &pexprRight);
 
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSelectWithAggSubquery(mp, pexprLeft, pexprInner, fCorrelated);
 
 	(*pexprSelect)[0]->AddRef();
 	(*pexprSelect)[1]->AddRef();
 
-	CExpression *pexpr = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexpr = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), (*pexprSelect)[0],
 					pexprRight, (*pexprSelect)[1]);
 
@@ -104,25 +104,24 @@ CSubqueryTestUtils::PexprJoinWithAggSubquery(CMemoryPool *mp, BOOL fCorrelated)
 //		Generate a Select expression with a subquery equality predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
-CSubqueryTestUtils::PexprSelectWithAggSubquery(CMemoryPool *mp,
-											   CExpression *pexprOuter,
-											   CExpression *pexprInner,
-											   BOOL fCorrelated)
+gpos::Ref<CExpression>
+CSubqueryTestUtils::PexprSelectWithAggSubquery(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
 	// get any column
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
 
 	// generate agg subquery
-	CExpression *pexprSubq =
+	gpos::Ref<CExpression> pexprSubq =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// generate equality predicate
-	CExpression *pexprPredicate =
+	gpos::Ref<CExpression> pexprPredicate =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pexprSubq);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPredicate);
@@ -138,22 +137,23 @@ CSubqueryTestUtils::PexprSelectWithAggSubquery(CMemoryPool *mp,
 //		involving constant
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAggSubqueryConstComparison(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	BOOL fCorrelated)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
 	// generate agg subquery
-	CExpression *pexprSubq =
+	gpos::Ref<CExpression> pexprSubq =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
-	CExpression *pexprConst = CUtils::PexprScalarConstInt8(mp, 0 /*val*/);
+	gpos::Ref<CExpression> pexprConst =
+		CUtils::PexprScalarConstInt8(mp, 0 /*val*/);
 
 	// generate equality predicate
-	CExpression *pexprPredicate =
+	gpos::Ref<CExpression> pexprPredicate =
 		CUtils::PexprScalarEqCmp(mp, pexprConst, pexprSubq);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPredicate);
@@ -168,11 +168,10 @@ CSubqueryTestUtils::PexprSelectWithAggSubqueryConstComparison(
 //		Generate a Project expression with a subquery equality predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
-CSubqueryTestUtils::PexprProjectWithAggSubquery(CMemoryPool *mp,
-												CExpression *pexprOuter,
-												CExpression *pexprInner,
-												BOOL fCorrelated)
+gpos::Ref<CExpression>
+CSubqueryTestUtils::PexprProjectWithAggSubquery(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
@@ -181,20 +180,21 @@ CSubqueryTestUtils::PexprProjectWithAggSubquery(CMemoryPool *mp,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate agg subquery
-	CExpression *pexprSubq =
+	gpos::Ref<CExpression> pexprSubq =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// generate a computed column
-	CScalarSubquery *popSubquery =
+	gpos::Ref<CScalarSubquery> popSubquery =
 		CScalarSubquery::PopConvert(pexprSubq->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(popSubquery->MdidType());
-	CColRef *pcrComputed =
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(popSubquery->MdidType());
+	gpos::Ref<CColRef> pcrComputed =
 		col_factory->PcrCreate(pmdtype, popSubquery->TypeModifier());
 
 	// generate a scalar project list
-	CExpression *pexprPrjElem =
+	gpos::Ref<CExpression> pexprPrjElem =
 		CUtils::PexprScalarProjectElement(mp, pcrComputed, pexprSubq);
-	CExpression *pexprPrjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprPrjElem);
 
 	return CUtils::PexprLogicalProject(mp, pexprOuter, pexprPrjList,
@@ -210,14 +210,14 @@ CSubqueryTestUtils::PexprProjectWithAggSubquery(CMemoryPool *mp,
 //		Generate randomized Select expression with a subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAggSubquery(CMemoryPool *mp,
 											   BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprSelectWithAggSubquery(mp, pexprOuter, pexprInner, fCorrelated);
@@ -232,14 +232,14 @@ CSubqueryTestUtils::PexprSelectWithAggSubquery(CMemoryPool *mp,
 //		involving constant
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAggSubqueryConstComparison(CMemoryPool *mp,
 															  BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprSelectWithAggSubqueryConstComparison(mp, pexprOuter, pexprInner,
@@ -256,14 +256,14 @@ CSubqueryTestUtils::PexprSelectWithAggSubqueryConstComparison(CMemoryPool *mp,
 //		element
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithAggSubquery(CMemoryPool *mp,
 												BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprProjectWithAggSubquery(mp, pexprOuter, pexprInner, fCorrelated);
@@ -278,29 +278,30 @@ CSubqueryTestUtils::PexprProjectWithAggSubquery(CMemoryPool *mp,
 //		Generate a random select expression with a subquery over join predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAggSubqueryOverJoin(CMemoryPool *mp,
 													   BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
 	// generate a pair of get expressions
-	CExpression *pexprR = nullptr;
-	CExpression *pexprS = nullptr;
+	gpos::Ref<CExpression> pexprR = nullptr;
+	gpos::Ref<CExpression> pexprS = nullptr;
 	GenerateGetExpressions(mp, &pexprR, &pexprS);
 
 	// generate outer expression
 	CWStringConst strNameT(GPOS_WSZ_LIT("Rel3"));
 
-	CMDIdGPDB *pmdidT =
+	gpos::Ref<CMDIdGPDB> pmdidT =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID3, 1, 1);
-	CTableDescriptor *ptabdescT = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescT = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidT, CName(&strNameT));
-	CExpression *pexprT = CTestUtils::PexprLogicalGet(mp, ptabdescT, &strNameT);
-	CColRef *pcrInner = pexprR->DeriveOutputColumns()->PcrAny();
-	CColRef *pcrOuter = pexprT->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprT =
+		CTestUtils::PexprLogicalGet(mp, ptabdescT, &strNameT);
+	gpos::Ref<CColRef> pcrInner = pexprR->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrOuter = pexprT->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprPred = nullptr;
+	gpos::Ref<CExpression> pexprPred = nullptr;
 	if (fCorrelated)
 	{
 		// generate correlation predicate
@@ -316,15 +317,16 @@ CSubqueryTestUtils::PexprSelectWithAggSubqueryOverJoin(CMemoryPool *mp,
 	pdrgpexpr->Append(pexprR);
 	pdrgpexpr->Append(pexprS);
 	pdrgpexpr->Append(pexprPred);
-	CExpression *pexprJoin = CTestUtils::PexprLogicalNAryJoin(mp, pdrgpexpr);
+	gpos::Ref<CExpression> pexprJoin =
+		CTestUtils::PexprLogicalNAryJoin(mp, pdrgpexpr);
 
-	CExpression *pexprSubq = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprSubq = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarSubquery(mp, pcrInner, false /*fGeneratedByExist*/,
 									 false /*fGeneratedByQuantified*/),
 		pexprJoin);
 
-	CExpression *pexprPredOuter =
+	gpos::Ref<CExpression> pexprPredOuter =
 		CUtils::PexprScalarEqCmp(mp, pcrOuter, pexprSubq);
 	return CUtils::PexprLogicalSelect(mp, pexprT, pexprPredOuter);
 }
@@ -337,7 +339,7 @@ CSubqueryTestUtils::PexprSelectWithAggSubqueryOverJoin(CMemoryPool *mp,
 //		Generate randomized Select expression with Any subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAnySubquery(CMemoryPool *mp,
 											   BOOL fCorrelated)
 {
@@ -355,7 +357,7 @@ CSubqueryTestUtils::PexprSelectWithAnySubquery(CMemoryPool *mp,
 //		over window operation
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAnySubqueryOverWindow(CMemoryPool *mp,
 														 BOOL fCorrelated)
 {
@@ -374,7 +376,7 @@ CSubqueryTestUtils::PexprSelectWithAnySubqueryOverWindow(CMemoryPool *mp,
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryQuantifiedOverWindow(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -382,9 +384,9 @@ CSubqueryTestUtils::PexprSelectWithSubqueryQuantifiedOverWindow(
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny == op_id ||
 				COperator::EopScalarSubqueryAll == op_id);
 
-	CExpression *pexprOuter = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprInner = CTestUtils::PexprOneWindowFunction(mp);
-	CExpression *pexprSubqueryQuantified =
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprOneWindowFunction(mp);
+	gpos::Ref<CExpression> pexprSubqueryQuantified =
 		PexprSubqueryQuantified(mp, op_id, pexprOuter, pexprInner, fCorrelated);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprSubqueryQuantified);
@@ -399,7 +401,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryQuantifiedOverWindow(
 //		Generate randomized Select expression with All subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAllSubquery(CMemoryPool *mp,
 											   BOOL fCorrelated)
 {
@@ -417,7 +419,7 @@ CSubqueryTestUtils::PexprSelectWithAllSubquery(CMemoryPool *mp,
 //		over window operation
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAllSubqueryOverWindow(CMemoryPool *mp,
 														 BOOL fCorrelated)
 {
@@ -435,7 +437,7 @@ CSubqueryTestUtils::PexprSelectWithAllSubqueryOverWindow(CMemoryPool *mp,
 //		expression is a GbAgg
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAnyAggSubquery(CMemoryPool *mp,
 												  BOOL fCorrelated)
 {
@@ -453,7 +455,7 @@ CSubqueryTestUtils::PexprSelectWithAnyAggSubquery(CMemoryPool *mp,
 //		expression is a GbAgg
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithAllAggSubquery(CMemoryPool *mp,
 												  BOOL fCorrelated)
 {
@@ -470,12 +472,12 @@ CSubqueryTestUtils::PexprSelectWithAllAggSubquery(CMemoryPool *mp,
 //		Generate randomized Project expression with Any subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithAnySubquery(CMemoryPool *mp,
 												BOOL fCorrelated)
 {
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprProjectWithSubqueryQuantified(mp, pexprOuter, pexprInner,
@@ -492,12 +494,12 @@ CSubqueryTestUtils::PexprProjectWithAnySubquery(CMemoryPool *mp,
 //		Generate randomized Project expression with All subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithAllSubquery(CMemoryPool *mp,
 												BOOL fCorrelated)
 {
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprProjectWithSubqueryQuantified(mp, pexprOuter, pexprInner,
@@ -515,17 +517,17 @@ CSubqueryTestUtils::PexprProjectWithAllSubquery(CMemoryPool *mp,
 //		and filter contexts
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueriesInDifferentContexts(CMemoryPool *mp,
 													   BOOL fCorrelated)
 {
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSelectWithAggSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	return PexprProjectWithSubqueryQuantified(mp, pexprSelect, pexprGet,
 											  COperator::EopScalarSubqueryAny,
 											  fCorrelated);
@@ -541,20 +543,21 @@ CSubqueryTestUtils::PexprSubqueriesInDifferentContexts(CMemoryPool *mp,
 //		test context
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueriesInNullTestContext(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	// generate agg subquery
-	CExpression *pexprSubq =
+	gpos::Ref<CExpression> pexprSubq =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// generate Is Not Null predicate
-	CExpression *pexprPredicate = CUtils::PexprIsNotNull(mp, pexprSubq);
+	gpos::Ref<CExpression> pexprPredicate =
+		CUtils::PexprIsNotNull(mp, pexprSubq);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPredicate);
 }
@@ -568,7 +571,7 @@ CSubqueryTestUtils::PexprSubqueriesInNullTestContext(CMemoryPool *mp,
 //		Generate randomized Select expression with Exists subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithExistsSubquery(CMemoryPool *mp,
 												  BOOL fCorrelated)
 {
@@ -584,7 +587,7 @@ CSubqueryTestUtils::PexprSelectWithExistsSubquery(CMemoryPool *mp,
 //		Generate randomized Select expression with Not Exists subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNotExistsSubquery(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
@@ -602,14 +605,14 @@ CSubqueryTestUtils::PexprSelectWithNotExistsSubquery(CMemoryPool *mp,
 //		an OR tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryDisjuncts(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprSelectWithSubqueryBoolOp(mp, pexprOuter, pexprInner,
@@ -626,7 +629,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryDisjuncts(CMemoryPool *mp,
 //		subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithTrimmableExists(CMemoryPool *mp,
 												   BOOL fCorrelated)
 {
@@ -643,7 +646,7 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExists(CMemoryPool *mp,
 //		subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithTrimmableNotExists(CMemoryPool *mp,
 													  BOOL fCorrelated)
 {
@@ -660,7 +663,7 @@ CSubqueryTestUtils::PexprSelectWithTrimmableNotExists(CMemoryPool *mp,
 //		Generate randomized Project expression with Exists subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithExistsSubquery(CMemoryPool *mp,
 												   BOOL fCorrelated)
 {
@@ -677,7 +680,7 @@ CSubqueryTestUtils::PexprProjectWithExistsSubquery(CMemoryPool *mp,
 //		Generate randomized Project expression with Not Exists subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithNotExistsSubquery(CMemoryPool *mp,
 													  BOOL fCorrelated)
 {
@@ -695,24 +698,24 @@ CSubqueryTestUtils::PexprProjectWithNotExistsSubquery(CMemoryPool *mp,
 //		involving subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNestedCmpSubquery(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
-	CExpression *pexprSelectWithSubquery =
+	gpos::Ref<CExpression> pexprSelectWithSubquery =
 		PexprSelectWithAggSubquery(mp, fCorrelated);
 
-	CExpression *pexprLogical = (*pexprSelectWithSubquery)[0];
-	CExpression *pexprSubqueryPred = (*pexprSelectWithSubquery)[1];
+	gpos::Ref<CExpression> pexprLogical = (*pexprSelectWithSubquery)[0];
+	gpos::Ref<CExpression> pexprSubqueryPred = (*pexprSelectWithSubquery)[1];
 
 	// generate a parent equality predicate
 	pexprSubqueryPred->AddRef();
-	CExpression *pexprPredicate1 = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprPredicate1 = CUtils::PexprScalarEqCmp(
 		mp, CUtils::PexprScalarConstBool(mp, true /*value*/),
 		pexprSubqueryPred);
 
 	// add another nesting level
-	CExpression *pexprPredicate = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprPredicate = CUtils::PexprScalarEqCmp(
 		mp, CUtils::PexprScalarConstBool(mp, true /*value*/), pexprPredicate1);
 
 	pexprLogical->AddRef();
@@ -730,34 +733,35 @@ CSubqueryTestUtils::PexprSelectWithNestedCmpSubquery(CMemoryPool *mp,
 //		two subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithCmpSubqueries(CMemoryPool *mp,
 												 BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	// generate a scalar subquery
-	CExpression *pexprScalarSubquery1 =
+	gpos::Ref<CExpression> pexprScalarSubquery1 =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// generate get expression
 	CWStringConst strNameT(GPOS_WSZ_LIT("Rel3"));
 
-	CMDIdGPDB *pmdidT =
+	gpos::Ref<CMDIdGPDB> pmdidT =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID3, 1, 1);
-	CTableDescriptor *ptabdescT = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescT = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidT, CName(&strNameT));
-	CExpression *pexprT = CTestUtils::PexprLogicalGet(mp, ptabdescT, &strNameT);
+	gpos::Ref<CExpression> pexprT =
+		CTestUtils::PexprLogicalGet(mp, ptabdescT, &strNameT);
 
 	// generate another scalar subquery
-	CExpression *pexprScalarSubquery2 =
+	gpos::Ref<CExpression> pexprScalarSubquery2 =
 		PexprSubqueryAgg(mp, pexprOuter, pexprT, fCorrelated);
 
 	// generate equality predicate between both subqueries
-	CExpression *pexprPredicate = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprPredicate = CUtils::PexprScalarEqCmp(
 		mp, pexprScalarSubquery1, pexprScalarSubquery2);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPredicate);
@@ -771,23 +775,25 @@ CSubqueryTestUtils::PexprSelectWithCmpSubqueries(CMemoryPool *mp,
 //		Generate randomized Select expression with nested subquery predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNestedSubquery(CMemoryPool *mp,
 												  BOOL fCorrelated)
 {
-	CExpression *pexprInner = PexprSelectWithAggSubquery(mp, fCorrelated);
-	CColRef *pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprInner =
+		PexprSelectWithAggSubquery(mp, fCorrelated);
+	gpos::Ref<CColRef> pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprOuter = CTestUtils::PexprLogicalGet(mp);
-	CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CColRef> pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprSubq = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprSubq = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarSubquery(mp, pcrInner, false /*fGeneratedByExist*/,
 									 false /*fGeneratedByQuantified*/),
 		pexprInner);
 
-	CExpression *pexprPred = CUtils::PexprScalarEqCmp(mp, pcrOuter, pexprSubq);
+	gpos::Ref<CExpression> pexprPred =
+		CUtils::PexprScalarEqCmp(mp, pcrOuter, pexprSubq);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPred);
 }
@@ -801,7 +807,7 @@ CSubqueryTestUtils::PexprSelectWithNestedSubquery(CMemoryPool *mp,
 //		Generate a random select expression with nested quantified subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNestedQuantifiedSubqueries(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -810,33 +816,33 @@ CSubqueryTestUtils::PexprSelectWithNestedQuantifiedSubqueries(
 
 	CWStringConst strName1(GPOS_WSZ_LIT("Rel1"));
 	CWStringConst strAlias1(GPOS_WSZ_LIT("Rel1Alias"));
-	CExpression *pexprOuter1 = CTestUtils::PexprLogicalGetNullable(
+	gpos::Ref<CExpression> pexprOuter1 = CTestUtils::PexprLogicalGetNullable(
 		mp, GPOPT_TEST_REL_OID1, &strName1, &strAlias1);
 
 	CWStringConst strName2(GPOS_WSZ_LIT("Rel2"));
 	CWStringConst strAlias2(GPOS_WSZ_LIT("Rel2Alias"));
-	CExpression *pexprOuter2 = CTestUtils::PexprLogicalGetNullable(
+	gpos::Ref<CExpression> pexprOuter2 = CTestUtils::PexprLogicalGetNullable(
 		mp, GPOPT_TEST_REL_OID2, &strName2, &strAlias2);
 
 	CWStringConst strName3(GPOS_WSZ_LIT("Rel3"));
 	CWStringConst strAlias3(GPOS_WSZ_LIT("Rel3Alias"));
-	CExpression *pexprOuter3 = CTestUtils::PexprLogicalGetNullable(
+	gpos::Ref<CExpression> pexprOuter3 = CTestUtils::PexprLogicalGetNullable(
 		mp, GPOPT_TEST_REL_OID3, &strName3, &strAlias3);
 
 	CWStringConst strName4(GPOS_WSZ_LIT("Rel4"));
 	CWStringConst strAlias4(GPOS_WSZ_LIT("Rel4Alias"));
-	CExpression *pexprInner = CTestUtils::PexprLogicalGetNullable(
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGetNullable(
 		mp, GPOPT_TEST_REL_OID4, &strName4, &strAlias4);
 
-	CExpression *pexprSubqueryQuantified1 = PexprSubqueryQuantified(
+	gpos::Ref<CExpression> pexprSubqueryQuantified1 = PexprSubqueryQuantified(
 		mp, op_id, pexprOuter3, pexprInner, fCorrelated);
-	CExpression *pexprSelect1 =
+	gpos::Ref<CExpression> pexprSelect1 =
 		CUtils::PexprLogicalSelect(mp, pexprOuter3, pexprSubqueryQuantified1);
-	CExpression *pexprSubqueryQuantified2 = PexprSubqueryQuantified(
+	gpos::Ref<CExpression> pexprSubqueryQuantified2 = PexprSubqueryQuantified(
 		mp, op_id, pexprOuter2, pexprSelect1, fCorrelated);
-	CExpression *pexprSelect2 =
+	gpos::Ref<CExpression> pexprSelect2 =
 		CUtils::PexprLogicalSelect(mp, pexprOuter2, pexprSubqueryQuantified2);
-	CExpression *pexprSubqueryQuantified3 = PexprSubqueryQuantified(
+	gpos::Ref<CExpression> pexprSubqueryQuantified3 = PexprSubqueryQuantified(
 		mp, op_id, pexprOuter1, pexprSelect2, fCorrelated);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter1,
@@ -852,7 +858,7 @@ CSubqueryTestUtils::PexprSelectWithNestedQuantifiedSubqueries(
 //		Generate a random select expression with nested Any subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNestedAnySubqueries(CMemoryPool *mp,
 													   BOOL fCorrelated)
 {
@@ -869,7 +875,7 @@ CSubqueryTestUtils::PexprSelectWithNestedAnySubqueries(CMemoryPool *mp,
 //		Generate a random select expression with nested All subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithNestedAllSubqueries(CMemoryPool *mp,
 													   BOOL fCorrelated)
 {
@@ -887,22 +893,25 @@ CSubqueryTestUtils::PexprSelectWithNestedAllSubqueries(CMemoryPool *mp,
 //		Generate randomized select expression with 2-levels correlated subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWith2LevelsCorrSubquery(CMemoryPool *mp,
 													   BOOL fCorrelated)
 {
-	CExpression *pexpr = PexprSelectWithNestedSubquery(mp, fCorrelated);
+	gpos::Ref<CExpression> pexpr =
+		PexprSelectWithNestedSubquery(mp, fCorrelated);
 	if (fCorrelated)
 	{
 		// add a 2-level correlation
-		CExpression *pexprOuterSubq = (*(*pexpr)[1])[1];
-		CExpression *pexprInnerSubq = (*(*(*pexprOuterSubq)[0])[1])[1];
-		CExpression *pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
+		gpos::Ref<CExpression> pexprOuterSubq = (*(*pexpr)[1])[1];
+		gpos::Ref<CExpression> pexprInnerSubq =
+			(*(*(*pexprOuterSubq)[0])[1])[1];
+		gpos::Ref<CExpression> pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
 		CExpressionArray *pdrgpexpr = (*pexprInnerSelect)[1]->PdrgPexpr();
 
-		CColRef *pcrOuter = pexpr->DeriveOutputColumns()->PcrAny();
-		CColRef *pcrInner = pexprInnerSelect->DeriveOutputColumns()->PcrAny();
-		CExpression *pexprPred =
+		gpos::Ref<CColRef> pcrOuter = pexpr->DeriveOutputColumns()->PcrAny();
+		gpos::Ref<CColRef> pcrInner =
+			pexprInnerSelect->DeriveOutputColumns()->PcrAny();
+		gpos::Ref<CExpression> pexprPred =
 			CUtils::PexprScalarEqCmp(mp, pcrOuter, pcrInner);
 		pdrgpexpr->Append(pexprPred);
 	}
@@ -919,14 +928,14 @@ CSubqueryTestUtils::PexprSelectWith2LevelsCorrSubquery(CMemoryPool *mp,
 //		an AND tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryConjuncts(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprSelectWithSubqueryBoolOp(
@@ -942,14 +951,14 @@ CSubqueryTestUtils::PexprSelectWithSubqueryConjuncts(CMemoryPool *mp,
 //		Generate randomized project expression with multiple subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 											   BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	return PexprProjectWithSubqueries(mp, pexprOuter, pexprInner, fCorrelated);
@@ -969,9 +978,10 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 //			WHERE inner_column = 5 [AND outer_column = inner_column]
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubquery(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -980,21 +990,22 @@ CSubqueryTestUtils::PexprSubquery(
 	GPOS_ASSERT(nullptr != pexprInner);
 
 	// get a random column from inner expression
-	CColRef *pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
 
 	// generate a non-correlated predicate to be added to inner expression
-	CExpression *pexprNonCorrelated = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprNonCorrelated = CUtils::PexprScalarEqCmp(
 		mp, pcrInner, CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
 	// predicate for the inner expression
-	CExpression *pexprPred = nullptr;
+	gpos::Ref<CExpression> pexprPred = nullptr;
 	if (fCorrelated)
 	{
 		// get a random column from outer expression
-		CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
+		gpos::Ref<CColRef> pcrOuter =
+			pexprOuter->DeriveOutputColumns()->PcrAny();
 
 		// generate correlated predicate
-		CExpression *pexprCorrelated =
+		gpos::Ref<CExpression> pexprCorrelated =
 			CUtils::PexprScalarEqCmp(mp, pcrOuter, pcrInner);
 
 		// generate AND expression of correlated and non-correlated predicates
@@ -1022,10 +1033,10 @@ CSubqueryTestUtils::PexprSubquery(
 //		Generate a quantified subquery expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryQuantified(
-	CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-	CExpression *pexprInner,
+	CMemoryPool *mp, COperator::EOperatorId op_id,
+	gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1035,16 +1046,16 @@ CSubqueryTestUtils::PexprSubqueryQuantified(
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
-	const CColRef *pcrInner = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
 	pcrs = pexprOuter->DeriveOutputColumns();
-	const CColRef *pcrOuter = pcrs->PcrAny();
+	const gpos::Ref<CColRef> pcrOuter = pcrs->PcrAny();
 
 	// return a quantified subquery expression
 	if (COperator::EopScalarSubqueryAny == op_id)
@@ -1078,7 +1089,7 @@ CSubqueryTestUtils::PexprSubqueryQuantified(
 //		Generate an expression with undecorrelatable quantified subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableSubquery(CMemoryPool *mp,
 												  COperator::EOperatorId op_id,
 												  BOOL fCorrelated)
@@ -1089,17 +1100,17 @@ CSubqueryTestUtils::PexprUndecorrelatableSubquery(CMemoryPool *mp,
 				COperator::EopScalarSubqueryNotExists == op_id);
 
 	CWStringConst strNameR(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdidR =
+	gpos::Ref<CMDIdGPDB> pmdidR =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID1,
 							   1 /*version_major*/, 1 /*version_minor*/);
-	CTableDescriptor *ptabdescR =
+	gpos::Ref<CTableDescriptor> ptabdescR =
 		CTestUtils::PtabdescPlain(mp, 3 /*num_cols*/, pmdidR, CName(&strNameR));
-	CExpression *pexprOuter =
+	gpos::Ref<CExpression> pexprOuter =
 		CTestUtils::PexprLogicalGet(mp, ptabdescR, &strNameR);
 
 	// generate quantified subquery predicate
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubquery = nullptr;
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSubquery = nullptr;
 	switch (op_id)
 	{
 		case COperator::EopScalarSubqueryAny:
@@ -1119,8 +1130,8 @@ CSubqueryTestUtils::PexprUndecorrelatableSubquery(CMemoryPool *mp,
 	}
 
 	// generate a regular predicate
-	CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprPred = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CColRef> pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprPred = CUtils::PexprScalarEqCmp(
 		mp, pcrOuter, CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
 	// generate OR expression of  predicates
@@ -1141,7 +1152,7 @@ CSubqueryTestUtils::PexprUndecorrelatableSubquery(CMemoryPool *mp,
 //		Generate an expression with undecorrelatable ANY subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableAnySubquery(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
@@ -1158,7 +1169,7 @@ CSubqueryTestUtils::PexprUndecorrelatableAnySubquery(CMemoryPool *mp,
 //		Generate an expression with undecorrelatable ALL subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableAllSubquery(CMemoryPool *mp,
 													 BOOL fCorrelated)
 {
@@ -1175,7 +1186,7 @@ CSubqueryTestUtils::PexprUndecorrelatableAllSubquery(CMemoryPool *mp,
 //		Generate an expression with undecorrelatable Exists subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableExistsSubquery(CMemoryPool *mp,
 														BOOL fCorrelated)
 {
@@ -1191,7 +1202,7 @@ CSubqueryTestUtils::PexprUndecorrelatableExistsSubquery(CMemoryPool *mp,
 //		Generate an expression with undecorrelatable Not Exists subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableNotExistsSubquery(CMemoryPool *mp,
 														   BOOL fCorrelated)
 {
@@ -1208,27 +1219,27 @@ CSubqueryTestUtils::PexprUndecorrelatableNotExistsSubquery(CMemoryPool *mp,
 //		Generate an expression with undecorrelatable Scalar subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprUndecorrelatableScalarSubquery(CMemoryPool *mp,
 														BOOL fCorrelated)
 {
-	CExpression *pexprOuter = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// get a random column from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
-	CColRef *pcrInner = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
-	CExpression *pexprSubquery = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprSubquery = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarSubquery(mp, pcrInner, false /*fGeneratedByExist*/,
 									 false /*fGeneratedByQuantified*/),
 		pexprSelect);
 
-	CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprPred =
+	gpos::Ref<CColRef> pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprPred =
 		CUtils::PexprScalarEqCmp(mp, pcrOuter, pexprSubquery);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPred);
@@ -1243,10 +1254,10 @@ CSubqueryTestUtils::PexprUndecorrelatableScalarSubquery(CMemoryPool *mp,
 //		Generate an EXISTS/NOT EXISTS subquery expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryExistential(
-	CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-	CExpression *pexprInner,
+	CMemoryPool *mp, COperator::EOperatorId op_id,
+	gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1257,7 +1268,7 @@ CSubqueryTestUtils::PexprSubqueryExistential(
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// return a quantified subquery expression
@@ -1284,9 +1295,10 @@ CSubqueryTestUtils::PexprSubqueryExistential(
 //			FROM inner_expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryAgg(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1295,27 +1307,28 @@ CSubqueryTestUtils::PexprSubqueryAgg(
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// get a random column from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
-	CColRef *pcrInner = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
 	// generate a SUM expression
-	CExpression *pexprProjElem = CTestUtils::PexprPrjElemWithSum(mp, pcrInner);
-	CColRef *pcrComputed =
+	gpos::Ref<CExpression> pexprProjElem =
+		CTestUtils::PexprPrjElemWithSum(mp, pcrInner);
+	gpos::Ref<CColRef> pcrComputed =
 		CScalarProjectElement::PopConvert(pexprProjElem->Pop())->Pcr();
 
 	// add SUM expression to a project list
-	CExpression *pexprProjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprProjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprProjElem);
 
 	// generate empty grouping columns list
 	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	// generate a group by on top of select expression
-	CExpression *pexprLogicalGbAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprLogicalGbAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, colref_array, pexprSelect, pexprProjList);
 
 	// return a subquery expression on top of group by
@@ -1336,10 +1349,11 @@ CSubqueryTestUtils::PexprSubqueryAgg(
 //		subqueries
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	BOOL fCorrelated, CScalarBoolOp::EBoolOperator eboolop)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, BOOL fCorrelated,
+	CScalarBoolOp::EBoolOperator eboolop)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
@@ -1348,29 +1362,29 @@ CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
 				CScalarBoolOp::EboolopOr == eboolop);
 
 	// get any two columns
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
 
 	// generate agg subquery
-	CExpression *pexprAggSubquery =
+	gpos::Ref<CExpression> pexprAggSubquery =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// generate equality predicate involving a subquery
-	CExpression *pexprPred1 =
+	gpos::Ref<CExpression> pexprPred1 =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pexprAggSubquery);
 
 	// generate a regular predicate
-	CExpression *pexprPred2 = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprPred2 = CUtils::PexprScalarEqCmp(
 		mp, pcrLeft, CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
 	// generate ALL subquery
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubqueryAll = PexprSubqueryQuantified(
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSubqueryAll = PexprSubqueryQuantified(
 		mp, COperator::EopScalarSubqueryAll, pexprOuter, pexprGet, fCorrelated);
 
 	// generate EXISTS subquery
-	CExpression *pexprGet2 = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubqueryExists =
+	gpos::Ref<CExpression> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSubqueryExists =
 		PexprSubqueryExistential(mp, COperator::EopScalarSubqueryExists,
 								 pexprOuter, pexprGet2, fCorrelated);
 
@@ -1381,7 +1395,8 @@ CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
 	pdrgpexpr->Append(pexprSubqueryExists);
 	pdrgpexpr->Append(pexprSubqueryAll);
 
-	CExpression *pexprPred = CUtils::PexprScalarBoolOp(mp, eboolop, pdrgpexpr);
+	gpos::Ref<CExpression> pexprPred =
+		CUtils::PexprScalarBoolOp(mp, eboolop, pdrgpexpr);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprPred);
 }
@@ -1395,11 +1410,10 @@ CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
 //		Generate a Project expression with multiple subqueries in project list
 //
 //---------------------------------------------------------------------------
-CExpression *
-CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
-											   CExpression *pexprOuter,
-											   CExpression *pexprInner,
-											   BOOL fCorrelated)
+gpos::Ref<CExpression>
+CSubqueryTestUtils::PexprProjectWithSubqueries(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
@@ -1410,16 +1424,17 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 	// generate an array of project elements holding subquery expressions
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
-	CColRef *pcrComputed = nullptr;
-	CExpression *pexprPrjElem = nullptr;
-	CExpression *pexprGet = nullptr;
+	gpos::Ref<CColRef> pcrComputed = nullptr;
+	gpos::Ref<CExpression> pexprPrjElem = nullptr;
+	gpos::Ref<CExpression> pexprGet = nullptr;
 
-	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
+		md_accessor->PtMDType<IMDTypeBool>();
 
 	// generate agg subquery
-	CExpression *pexprAggSubquery =
+	gpos::Ref<CExpression> pexprAggSubquery =
 		PexprSubqueryAgg(mp, pexprOuter, pexprInner, fCorrelated);
-	const CColRef *colref =
+	const gpos::Ref<CColRef> colref =
 		CScalarSubquery::PopConvert(pexprAggSubquery->Pop())->Pcr();
 	pcrComputed =
 		col_factory->PcrCreate(colref->RetrieveType(), colref->TypeModifier());
@@ -1429,7 +1444,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 
 	// generate ALL subquery
 	pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubqueryAll = PexprSubqueryQuantified(
+	gpos::Ref<CExpression> pexprSubqueryAll = PexprSubqueryQuantified(
 		mp, COperator::EopScalarSubqueryAll, pexprOuter, pexprGet, fCorrelated);
 	pcrComputed = col_factory->PcrCreate(pmdtypebool, default_type_modifier);
 	pexprPrjElem =
@@ -1438,7 +1453,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 
 	// generate existential subquery
 	pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubqueryExists =
+	gpos::Ref<CExpression> pexprSubqueryExists =
 		PexprSubqueryExistential(mp, COperator::EopScalarSubqueryExists,
 								 pexprOuter, pexprGet, fCorrelated);
 	pcrComputed = col_factory->PcrCreate(pmdtypebool, default_type_modifier);
@@ -1446,7 +1461,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 		CUtils::PexprScalarProjectElement(mp, pcrComputed, pexprSubqueryExists);
 	pdrgpexpr->Append(pexprPrjElem);
 
-	CExpression *pexprPrjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pdrgpexpr);
 
 	return CUtils::PexprLogicalProject(mp, pexprOuter, pexprPrjList,
@@ -1464,7 +1479,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryQuantified(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -1472,10 +1487,10 @@ CSubqueryTestUtils::PexprSelectWithSubqueryQuantified(
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny == op_id ||
 				COperator::EopScalarSubqueryAll == op_id);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
-	CExpression *pexprSubqueryQuantified =
+	gpos::Ref<CExpression> pexprSubqueryQuantified =
 		PexprSubqueryQuantified(mp, op_id, pexprOuter, pexprInner, fCorrelated);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprSubqueryQuantified);
@@ -1492,7 +1507,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryQuantified(
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithQuantifiedAggSubquery(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -1500,16 +1515,16 @@ CSubqueryTestUtils::PexprSelectWithQuantifiedAggSubquery(
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny == op_id ||
 				COperator::EopScalarSubqueryAll == op_id);
 
-	CExpression *pexprOuter = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprSubq = PexprSubqueryAgg(
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprSubq = PexprSubqueryAgg(
 		mp, pexprOuter, CTestUtils::PexprLogicalGet(mp), fCorrelated);
-	CExpression *pexprGb = (*pexprSubq)[0];
+	gpos::Ref<CExpression> pexprGb = (*pexprSubq)[0];
 	pexprGb->AddRef();
 	pexprSubq->Release();
 
-	CColRef *pcrInner = pexprGb->DeriveOutputColumns()->PcrAny();
-	CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprSubqueryQuantified = nullptr;
+	gpos::Ref<CColRef> pcrInner = pexprGb->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprSubqueryQuantified = nullptr;
 	if (COperator::EopScalarSubqueryAny == op_id)
 	{
 		const CWStringConst *str =
@@ -1544,31 +1559,34 @@ CSubqueryTestUtils::PexprSelectWithQuantifiedAggSubquery(
 //		Generate a randomized Project expression with a quantified subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithSubqueryQuantified(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	COperator::EOperatorId op_id, BOOL fCorrelated)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner, COperator::EOperatorId op_id,
+	BOOL fCorrelated)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny == op_id ||
 				COperator::EopScalarSubqueryAll == op_id);
 
-	CExpression *pexprSubqueryQuantified =
+	gpos::Ref<CExpression> pexprSubqueryQuantified =
 		PexprSubqueryQuantified(mp, op_id, pexprOuter, pexprInner, fCorrelated);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate a computed column
-	CScalarSubqueryQuantified *pop =
+	gpos::Ref<CScalarSubqueryQuantified> pop =
 		CScalarSubqueryQuantified::PopConvert(pexprSubqueryQuantified->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());
-	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(pop->MdidType());
+	gpos::Ref<CColRef> pcrComputed =
+		col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 
 	// generate a scalar project list
-	CExpression *pexprPrjElem = CUtils::PexprScalarProjectElement(
+	gpos::Ref<CExpression> pexprPrjElem = CUtils::PexprScalarProjectElement(
 		mp, pcrComputed, pexprSubqueryQuantified);
-	CExpression *pexprPrjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprPrjElem);
 
 	return CUtils::PexprLogicalProject(mp, pexprOuter, pexprPrjList,
@@ -1586,7 +1604,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueryQuantified(
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithSubqueryExistential(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -1594,10 +1612,10 @@ CSubqueryTestUtils::PexprSelectWithSubqueryExistential(
 	GPOS_ASSERT(COperator::EopScalarSubqueryExists == op_id ||
 				COperator::EopScalarSubqueryNotExists == op_id);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
-	CExpression *pexprSubqueryExistential = PexprSubqueryExistential(
+	gpos::Ref<CExpression> pexprSubqueryExistential = PexprSubqueryExistential(
 		mp, op_id, pexprOuter, pexprInner, fCorrelated);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprSubqueryExistential);
@@ -1614,7 +1632,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryExistential(
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery(
 	CMemoryPool *mp, COperator::EOperatorId op_id,
 	BOOL  // fCorrelated
@@ -1624,18 +1642,19 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery(
 	GPOS_ASSERT(COperator::EopScalarSubqueryExists == op_id ||
 				COperator::EopScalarSubqueryNotExists == op_id);
 
-	CExpression *pexprOuter = CTestUtils::PexprLogicalGet(mp);
-	CExpression *pexprInner = CTestUtils::PexprLogicalGbAggWithSum(mp);
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner =
+		CTestUtils::PexprLogicalGbAggWithSum(mp);
 
 	// remove grouping columns
 	(*pexprInner)[0]->AddRef();
 	(*pexprInner)[1]->AddRef();
-	CExpression *pexprGbAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprGbAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, GPOS_NEW(mp) CColRefArray(mp), (*pexprInner)[0], (*pexprInner)[1]);
 	pexprInner->Release();
 
 	// create existential subquery
-	CExpression *pexprSubqueryExistential = nullptr;
+	gpos::Ref<CExpression> pexprSubqueryExistential = nullptr;
 	if (COperator::EopScalarSubqueryExists == op_id)
 	{
 		pexprSubqueryExistential = GPOS_NEW(mp) CExpression(
@@ -1648,11 +1667,11 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery(
 	}
 
 	// generate a regular predicate
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
-	CExpression *pexprEqPred = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CExpression> pexprEqPred = CUtils::PexprScalarEqCmp(
 		mp, pcrs->PcrAny(), CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
-	CExpression *pexprConjunction = CPredicateUtils::PexprConjunction(
+	gpos::Ref<CExpression> pexprConjunction = CPredicateUtils::PexprConjunction(
 		mp, pexprSubqueryExistential, pexprEqPred);
 	pexprEqPred->Release();
 	pexprSubqueryExistential->Release();
@@ -1671,7 +1690,7 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery(
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprProjectWithSubqueryExistential(
 	CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated)
 {
@@ -1679,25 +1698,27 @@ CSubqueryTestUtils::PexprProjectWithSubqueryExistential(
 	GPOS_ASSERT(COperator::EopScalarSubqueryExists == op_id ||
 				COperator::EopScalarSubqueryNotExists == op_id);
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
-	CExpression *pexprSubqueryExistential = PexprSubqueryExistential(
+	gpos::Ref<CExpression> pexprSubqueryExistential = PexprSubqueryExistential(
 		mp, op_id, pexprOuter, pexprInner, fCorrelated);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate a computed column
-	CScalarSubqueryExistential *pop =
+	gpos::Ref<CScalarSubqueryExistential> pop =
 		CScalarSubqueryExistential::PopConvert(pexprSubqueryExistential->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());
-	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(pop->MdidType());
+	gpos::Ref<CColRef> pcrComputed =
+		col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 
 	// generate a scalar project list
-	CExpression *pexprPrjElem = CUtils::PexprScalarProjectElement(
+	gpos::Ref<CExpression> pexprPrjElem = CUtils::PexprScalarProjectElement(
 		mp, pcrComputed, pexprSubqueryExistential);
-	CExpression *pexprPrjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprPrjElem);
 
 	return CUtils::PexprLogicalProject(mp, pexprOuter, pexprPrjList,
@@ -1714,7 +1735,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueryExistential(
 //		table get
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryWithConstTableGet(CMemoryPool *mp,
 												   COperator::EOperatorId op_id)
 {
@@ -1723,27 +1744,27 @@ CSubqueryTestUtils::PexprSubqueryWithConstTableGet(CMemoryPool *mp,
 				COperator::EopScalarSubqueryAll == op_id);
 
 	CWStringConst strNameR(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdidR =
+	gpos::Ref<CMDIdGPDB> pmdidR =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID1, 1, 1);
-	CTableDescriptor *ptabdescR = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescR = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidR, CName(&strNameR));
 
-	CExpression *pexprOuter =
+	gpos::Ref<CExpression> pexprOuter =
 		CTestUtils::PexprLogicalGet(mp, ptabdescR, &strNameR);
-	CExpression *pexprConstTableGet =
+	gpos::Ref<CExpression> pexprConstTableGet =
 		CTestUtils::PexprConstTableGet(mp, 3 /* ulElements */);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
-	const CColRef *pcrInner = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
 	pcrs = pexprOuter->DeriveOutputColumns();
-	const CColRef *pcrOuter = pcrs->PcrAny();
+	const gpos::Ref<CColRef> pcrOuter = pcrs->PcrAny();
 
 	const CWStringConst *str = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("="));
 
-	CExpression *pexprSubquery = nullptr;
+	gpos::Ref<CExpression> pexprSubquery = nullptr;
 	if (COperator::EopScalarSubqueryAny == op_id)
 	{
 		// construct ANY subquery expression
@@ -1780,38 +1801,38 @@ CSubqueryTestUtils::PexprSubqueryWithConstTableGet(CMemoryPool *mp,
 //		const table get
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryWithDisjunction(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
 	CWStringConst strNameR(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdidR =
+	gpos::Ref<CMDIdGPDB> pmdidR =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID1, 1, 1);
-	CTableDescriptor *ptabdescR = CTestUtils::PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdescR = CTestUtils::PtabdescCreate(
 		mp, 3 /*num_cols*/, pmdidR, CName(&strNameR));
 
-	CExpression *pexprOuter =
+	gpos::Ref<CExpression> pexprOuter =
 		CTestUtils::PexprLogicalGet(mp, ptabdescR, &strNameR);
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
 	for (int i = 0; i < 2; i++)
 	{
-		CExpression *pexprConstTableGet =
+		gpos::Ref<CExpression> pexprConstTableGet =
 			CTestUtils::PexprConstTableGet(mp, 3 /* ulElements */);
 		// get random columns from inner expression
-		CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
-		const CColRef *pcrInner = pcrs->PcrAny();
+		gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
+		const gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
 		// get random columns from outer expression
 		pcrs = pexprOuter->DeriveOutputColumns();
-		const CColRef *pcrOuter = pcrs->PcrAny();
+		const gpos::Ref<CColRef> pcrOuter = pcrs->PcrAny();
 
 		const CWStringConst *str =
 			GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("="));
 
-		CExpression *pexprSubquery = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CExpression> pexprSubquery = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) gpopt::CScalarSubqueryAny(
 				mp,
@@ -1824,7 +1845,7 @@ CSubqueryTestUtils::PexprSubqueryWithDisjunction(CMemoryPool *mp)
 
 
 	// generate a disjunction of the subquery with itself
-	CExpression *pexprBoolOp =
+	gpos::Ref<CExpression> pexprBoolOp =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopOr, pdrgpexpr);
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuter, pexprBoolOp);

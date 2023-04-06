@@ -29,7 +29,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(ULONG colid,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 CPoint *point)
+								 gpos::Ref<CPoint> point)
 	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
 {
 	GPOS_ASSERT(nullptr != point);
@@ -43,9 +43,10 @@ CStatsPredPoint::CStatsPredPoint(ULONG colid,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
+CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp,
+								 const gpos::Ref<CColRef> colref,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 IDatum *datum)
+								 gpos::Ref<IDatum> datum)
 	: CStatsPred(gpos::ulong_max),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_pred_point(nullptr)
@@ -54,7 +55,7 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 	GPOS_ASSERT(nullptr != datum);
 
 	m_colid = colref->Id();
-	IDatum *padded_datum = PreprocessDatum(mp, colref, datum);
+	gpos::Ref<IDatum> padded_datum = PreprocessDatum(mp, colref, datum);
 
 	m_pred_point = GPOS_NEW(mp) CPoint(padded_datum);
 }
@@ -65,9 +66,10 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 //	@doc:
 //		Add padding to datums when needed
 //---------------------------------------------------------------------------
-IDatum *
-CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
-								 IDatum *datum)
+gpos::Ref<IDatum>
+CStatsPredPoint::PreprocessDatum(CMemoryPool *mp,
+								 const gpos::Ref<CColRef> colref,
+								 gpos::Ref<IDatum> datum)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != datum);
@@ -80,8 +82,8 @@ CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
 		return datum;
 	}
 
-	const CColRefTable *colref_table =
-		CColRefTable::PcrConvert(const_cast<CColRef *>(colref));
+	const gpos::Ref<CColRefTable> colref_table =
+		CColRefTable::PcrConvert(const_cast<gpos::Ref<CColRef> >(colref));
 
 	return datum->MakePaddedDatum(mp, colref_table->Width());
 }

@@ -70,7 +70,7 @@ CMDProviderGeneric::~CMDProviderGeneric()
 //		return the mdid of a requested type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDProviderGeneric::MDId(IMDType::ETypeInfo type_info) const
 {
 	GPOS_ASSERT(IMDType::EtiGeneric > type_info);

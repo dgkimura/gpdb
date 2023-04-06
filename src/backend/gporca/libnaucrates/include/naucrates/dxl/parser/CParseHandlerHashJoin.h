@@ -35,7 +35,7 @@ class CParseHandlerHashJoin : public CParseHandlerPhysicalOp
 {
 private:
 	// the hash join operator
-	CDXLPhysicalHashJoin *m_dxl_op;
+	gpos::Ref<CDXLPhysicalHashJoin> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

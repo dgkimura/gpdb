@@ -16,10 +16,11 @@
 using namespace gpopt;
 
 // return statistics object after performing LSJ operation
-CStatistics *
+gpos::Ref<CStatistics>
 CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
-	CMemoryPool *mp, const IStatistics *outer_stats_input,
-	const IStatistics *inner_stats_input, CStatsPredJoinArray *join_preds_stats)
+	CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
+	const gpos::Ref<IStatistics> inner_stats_input,
+	CStatsPredJoinArray *join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != inner_stats_input);
@@ -40,19 +41,21 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 
 	// dummy agg columns required for group by derivation
 	ULongPtrArray *aggs = GPOS_NEW(mp) ULongPtrArray(mp);
-	IStatistics *inner_stats = CGroupByStatsProcessor::CalcGroupByStats(
-		mp, dynamic_cast<const CStatistics *>(inner_stats_input), inner_colids,
-		aggs,
-		nullptr	 // keys: no keys, use all grouping cols
-	);
+	gpos::Ref<IStatistics> inner_stats =
+		CGroupByStatsProcessor::CalcGroupByStats(
+			mp, dynamic_cast<const gpos::Ref<CStatistics> >(inner_stats_input),
+			inner_colids, aggs,
+			nullptr	 // keys: no keys, use all grouping cols
+		);
 
-	const CStatistics *outer_stats =
-		dynamic_cast<const CStatistics *>(outer_stats_input);
-	CStatistics *semi_join_stats = CJoinStatsProcessor::SetResultingJoinStats(
-		mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats,
-		join_preds_stats, IStatistics::EsjtLeftSemiJoin /* esjt */,
-		true /* DoIgnoreLASJHistComputation */
-	);
+	const gpos::Ref<CStatistics> outer_stats =
+		dynamic_cast<const gpos::Ref<CStatistics> >(outer_stats_input);
+	gpos::Ref<CStatistics> semi_join_stats =
+		CJoinStatsProcessor::SetResultingJoinStats(
+			mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats,
+			join_preds_stats, IStatistics::EsjtLeftSemiJoin /* esjt */,
+			true /* DoIgnoreLASJHistComputation */
+		);
 
 	// clean up
 	inner_colids->Release();

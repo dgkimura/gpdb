@@ -213,15 +213,15 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	CParseHandlerTableDescr *table_descr_parse_handler =
 		dynamic_cast<CParseHandlerTableDescr *>((*this)[6]);
 
-	CDXLTableDescr *dxl_table_descr =
+	gpos::Ref<CDXLTableDescr> dxl_table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
 	dxl_table_descr->AddRef();
 
-	CDXLIndexDescr *dxl_index_descr =
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
 	dxl_index_descr->AddRef();
 
-	CDXLPhysical *dxl_op = nullptr;
+	gpos::Ref<CDXLPhysical> dxl_op = nullptr;
 	if (EdxltokenPhysicalIndexOnlyScan == token_type)
 	{
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexOnlyScan(

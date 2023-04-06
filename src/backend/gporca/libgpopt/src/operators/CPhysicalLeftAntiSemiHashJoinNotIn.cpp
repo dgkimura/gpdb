@@ -44,11 +44,11 @@ CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
-	CDistributionSpec *pdsInput GPOS_UNUSED, ULONG child_index GPOS_UNUSED,
-	CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	gpos::Ref<CDistributionSpec> pdsInput GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 	ULONG ulOptReq
 		GPOS_UNUSED	 // identifies which optimization request should be created
 ) const
@@ -60,10 +60,13 @@ CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	return nullptr;
 }
 
-CEnfdDistribution *
-CPhysicalLeftAntiSemiHashJoinNotIn::Ped(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+gpos::Ref<CEnfdDistribution>
+CPhysicalLeftAntiSemiHashJoinNotIn::Ped(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::Ref<CReqdPropPlan> prppInput,
+										ULONG child_index,
+										CDrvdPropArray *pdrgpdpCtxt,
+										ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());

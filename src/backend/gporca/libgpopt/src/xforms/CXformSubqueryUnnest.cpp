@@ -54,8 +54,9 @@ CXformSubqueryUnnest::Exfp(CExpressionHandle &exprhdl) const
 //		Helper for unnesting subquery under a given context
 //
 //---------------------------------------------------------------------------
-CExpression *
-CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
+gpos::Ref<CExpression>
+CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr,
 										  BOOL fEnforceCorrelatedApply)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -69,14 +70,14 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// we add-ref the logical child since the resulting expression must re-use it
 	pexprOuter->AddRef();
 
-	CExpression *pexprNewOuter = nullptr;
-	CExpression *pexprResidualScalar = nullptr;
+	gpos::Ref<CExpression> pexprNewOuter = nullptr;
+	gpos::Ref<CExpression> pexprResidualScalar = nullptr;
 
 	CSubqueryHandler::ESubqueryCtxt esqctxt = CSubqueryHandler::EsqctxtFilter;
 
@@ -92,11 +93,11 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// create a new alternative using the new logical and scalar expressions
-	CExpression *pexprResult = nullptr;
+	gpos::Ref<CExpression> pexprResult = nullptr;
 	if (COperator::EopScalarProjectList == pexprScalar->Pop()->Eopid())
 	{
-		CLogicalSequenceProject *popSeqPrj = nullptr;
-		CLogicalGbAgg *popGbAgg = nullptr;
+		gpos::Ref<CLogicalSequenceProject> popSeqPrj = nullptr;
+		gpos::Ref<CLogicalGbAgg> popGbAgg = nullptr;
 		COperator::EOperatorId op_id = pexpr->Pop()->Eopid();
 
 		switch (op_id)
@@ -137,11 +138,12 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// normalize resulting expression
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprResult);
+	gpos::Ref<CExpression> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprResult);
 	pexprResult->Release();
 
 	// pull up projections
-	CExpression *pexprPullUpProjections =
+	gpos::Ref<CExpression> pexprPullUpProjections =
 		CNormalizer::PexprPullUpProjections(mp, pexprNormalized);
 	pexprNormalized->Release();
 
@@ -149,13 +151,14 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 }
 
 void
-CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr,
+CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr,
 								BOOL fEnforceCorrelatedApply) const
 {
 	CMemoryPool *pmp = pxfctxt->Pmp();
 
-	CExpression *pexprAvoidCorrelatedApply =
+	gpos::Ref<CExpression> pexprAvoidCorrelatedApply =
 		PexprSubqueryUnnest(pmp, pexpr, fEnforceCorrelatedApply);
 	if (nullptr != pexprAvoidCorrelatedApply)
 	{
@@ -175,8 +178,9 @@ CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //
 //---------------------------------------------------------------------------
 void
-CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

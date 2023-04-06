@@ -54,11 +54,11 @@ private:
 
 	Estattype m_kind;
 
-	CBitSet *m_keys;
+	gpos::Ref<CBitSet> m_keys;
 
 public:
 	CMDExtStatsInfo(CMemoryPool *mp, OID stat_oid, CMDName *stat_name,
-					Estattype kind, CBitSet *keys)
+					Estattype kind, gpos::Ref<CBitSet> keys)
 		: m_mp(mp),
 		  m_stat_oid(stat_oid),
 		  m_stat_name(stat_name),
@@ -91,7 +91,7 @@ public:
 		return m_kind;
 	}
 
-	CBitSet *
+	gpos::Ref<CBitSet>
 	GetStatKeys() const
 	{
 		return m_keys;

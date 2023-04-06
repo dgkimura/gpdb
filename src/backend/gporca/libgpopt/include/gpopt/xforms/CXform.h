@@ -48,7 +48,7 @@ class CXform : public CRefCount<CXform>, public DbgPrintMixin<CXform>
 {
 private:
 	// pattern
-	CExpression *m_pexpr;
+	gpos::Ref<CExpression> m_pexpr;
 
 public:
 	CXform(CXform &) = delete;
@@ -240,7 +240,7 @@ public:
 	};
 
 	// ctor
-	explicit CXform(CExpression *pexpr);
+	explicit CXform(gpos::Ref<CExpression> pexpr);
 
 	// dtor
 	~CXform() override;
@@ -275,11 +275,12 @@ public:
 	}
 
 	// actual transformation
-	virtual void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr) const = 0;
+	virtual void Transform(gpos::Ref<CXformContext> pxfctxt,
+						   gpos::Ref<CXformResult> pxfres,
+						   gpos::Ref<CExpression> pexpr) const = 0;
 
 	// accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprPattern() const
 	{
 		return m_pexpr;
@@ -300,11 +301,11 @@ public:
 #ifdef GPOS_DEBUG
 
 	// verify pattern against given expression
-	BOOL FCheckPattern(CExpression *pexpr) const;
+	BOOL FCheckPattern(gpos::Ref<CExpression> pexpr) const;
 
 	// verify xform promise on the given expression
-	static BOOL FPromising(CMemoryPool *mp, const CXform *pxform,
-						   CExpression *pexpr);
+	static BOOL FPromising(CMemoryPool *mp, const gpos::Ref<CXform> pxform,
+						   gpos::Ref<CExpression> pexpr);
 
 #endif	// GPOS_DEBUG
 
@@ -313,33 +314,33 @@ public:
 
 	// returns a set containing all xforms related to nl join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsNLJoinXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsNLJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms related to index join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsIndexJoinXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsIndexJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms related to bitmap indexes
 	// caller takes ownership of the returned set
-	static CBitSet *PbsBitmapIndexXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsBitmapIndexXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms that generate a plan with a hash join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsHashJoinXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsHashJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use only the join order as available
 	// in the query
-	static CBitSet *PbsJoinOrderInQueryXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsJoinOrderInQueryXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use combination of greedy xforms
 	// for join order
-	static CBitSet *PbsJoinOrderOnGreedyXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsJoinOrderOnGreedyXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use for exhaustive join order
-	static CBitSet *PbsJoinOrderOnExhaustiveXforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsJoinOrderOnExhaustiveXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use for exhaustive2 join order
-	static CBitSet *PbsJoinOrderOnExhaustive2Xforms(CMemoryPool *mp);
+	static gpos::Ref<CBitSet> PbsJoinOrderOnExhaustive2Xforms(CMemoryPool *mp);
 
 	// return true if xform should be applied only once.
 	// for expression of type CPatternTree, in deep trees, the number

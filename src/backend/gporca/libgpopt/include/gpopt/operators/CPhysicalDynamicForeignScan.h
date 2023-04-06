@@ -31,9 +31,10 @@ public:
 
 	// ctor
 	CPhysicalDynamicForeignScan(
-		CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-		ULONG ulOriginOpId, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-		CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+		CMemoryPool *mp, const CName *pnameAlias,
+		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+		CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
+		IMdIdArray *partition_mdids,
 		ColRefToUlongMapArray *root_col_mapping_per_part,
 		OID foreign_server_oid, BOOL is_master_only);
 
@@ -52,13 +53,13 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// statistics derivation during costing
-	IStatistics *PstatsDerive(CMemoryPool *,		// mp
-							  CExpressionHandle &,	// exprhdl
-							  CReqdPropPlan *,		// prpplan
-							  IStatisticsArray *	//stats_ctxt
+	gpos::Ref<IStatistics> PstatsDerive(CMemoryPool *,			   // mp
+										CExpressionHandle &,	   // exprhdl
+										gpos::Ref<CReqdPropPlan>,  // prpplan
+										IStatisticsArray *		   //stats_ctxt
 	) const override;
 
 	OID
@@ -77,7 +78,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive rewindability
-	CRewindabilitySpec *
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -94,23 +95,23 @@ public:
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		const gpos::Ref<CEnfdRewindability> per) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalDynamicForeignScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalDynamicForeignScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicForeignScan == pop->Eopid());
 
-		return reinterpret_cast<CPhysicalDynamicForeignScan *>(pop);
+		return reinterpret_cast<gpos::Ref<CPhysicalDynamicForeignScan> >(pop);
 	}
 
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 };	// class CPhysicalDynamicForeignScan

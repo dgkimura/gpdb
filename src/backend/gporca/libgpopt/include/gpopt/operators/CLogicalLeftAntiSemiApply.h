@@ -73,7 +73,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveOutputColumns(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) override
 	{
@@ -83,7 +83,7 @@ public:
 	}
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -91,7 +91,7 @@ public:
 	}
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -99,7 +99,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -125,18 +125,18 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalLeftAntiSemiApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftAntiSemiApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftAntiSemiApply(pop));
 
-		return dynamic_cast<CLogicalLeftAntiSemiApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftAntiSemiApply> >(pop);
 	}
 
 };	// class CLogicalLeftAntiSemiApply

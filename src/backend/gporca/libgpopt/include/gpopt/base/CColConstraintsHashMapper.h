@@ -16,7 +16,7 @@ class CColConstraintsHashMapper : public IColConstraintsMapper
 public:
 	CColConstraintsHashMapper(CMemoryPool *mp, CConstraintArray *pdrgPcnstr);
 
-	CConstraintArray *PdrgPcnstrLookup(CColRef *colref) override;
+	CConstraintArray *PdrgPcnstrLookup(gpos::Ref<CColRef> colref) override;
 	~CColConstraintsHashMapper() override;
 
 private:

@@ -31,7 +31,7 @@ private:
 	// dependency list values
 	CMDExtStatsInfoArray *m_extinfos;
 
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 	CMDName *m_mdname;
 
 	// process the start of an element

@@ -46,7 +46,7 @@ CXformImplementTVF::CXformImplementTVF(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformImplementTVF::CXformImplementTVF(CExpression *pexpr)
+CXformImplementTVF::CXformImplementTVF(gpos::Ref<CExpression> pexpr)
 	: CXformImplementation(pexpr)
 {
 }
@@ -86,21 +86,22 @@ CXformImplementTVF::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							  CExpression *pexpr) const
+CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
+							  gpos::Ref<CXformResult> pxfres,
+							  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalTVF> popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	IMDId *mdid_func = popTVF->FuncMdId();
+	gpos::Ref<IMDId> mdid_func = popTVF->FuncMdId();
 	mdid_func->AddRef();
 
-	IMDId *mdid_return_type = popTVF->ReturnTypeMdId();
+	gpos::Ref<IMDId> mdid_return_type = popTVF->ReturnTypeMdId();
 	mdid_return_type->AddRef();
 
 	CWStringConst *str =
@@ -110,15 +111,15 @@ CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpcoldesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
 	CExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
 
-	CPhysicalTVF *pphTVF = GPOS_NEW(mp)
+	gpos::Ref<CPhysicalTVF> pphTVF = GPOS_NEW(mp)
 		CPhysicalTVF(mp, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
 
-	CExpression *pexprAlt = nullptr;
+	gpos::Ref<CExpression> pexprAlt = nullptr;
 	// create alternative expression
 	if (nullptr == pdrgpexpr || 0 == pdrgpexpr->Size())
 	{

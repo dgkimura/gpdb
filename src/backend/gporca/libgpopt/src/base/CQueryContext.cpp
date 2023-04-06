@@ -32,8 +32,9 @@ FORCE_GENERATE_DBGSTR(CQueryContext);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
-							 CReqdPropPlan *prpp, CColRefArray *colref_array,
+CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+							 gpos::Ref<CReqdPropPlan> prpp,
+							 CColRefArray *colref_array,
 							 CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
 	: m_prpp(prpp),
 	  m_pdrgpcr(colref_array),
@@ -52,11 +53,13 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 #endif	//GPOS_DEBUG
 
 	// mark unused CTEs
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->MarkUnusedCTEs();
 
-	CColRefSet *pcrsOutputAndOrderingCols = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsOrderSpec = prpp->Peo()->PosRequired()->PcrsUsed(mp);
+	gpos::Ref<CColRefSet> pcrsOutputAndOrderingCols =
+		GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOrderSpec =
+		prpp->Peo()->PosRequired()->PcrsUsed(mp);
 
 	pcrsOutputAndOrderingCols->Include(colref_array);
 	pcrsOutputAndOrderingCols->Include(pcrsOrderSpec);
@@ -109,13 +112,13 @@ CQueryContext::~CQueryContext()
 // 		 Return top level operator in the given expression
 //
 //---------------------------------------------------------------------------
-COperator *
-CQueryContext::PopTop(CExpression *pexpr)
+gpos::Ref<COperator>
+CQueryContext::PopTop(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// skip CTE anchors if any
-	CExpression *pexprCurr = pexpr;
+	gpos::Ref<CExpression> pexprCurr = pexpr;
 	while (COperator::EopLogicalCTEAnchor == pexprCurr->Pop()->Eopid())
 	{
 		pexprCurr = (*pexprCurr)[0];
@@ -143,7 +146,7 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 	const ULONG ulReqdCols = m_pdrgpcr->Size();
 	for (ULONG ul = 0; ul < ulReqdCols; ul++)
 	{
-		CColRef *colref = (*m_pdrgpcr)[ul];
+		gpos::Ref<CColRef> colref = (*m_pdrgpcr)[ul];
 		if (colref->IsSystemCol())
 		{
 			m_pdrgpcrSystemCols->Append(colref);
@@ -162,16 +165,16 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 						   ULongPtrArray *pdrgpulQueryOutputColRefId,
 						   CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr && nullptr != pdrgpulQueryOutputColRefId);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
-	COptCtxt *poptctxt = COptCtxt::PoctxtFromTLS();
+	gpos::Ref<COptCtxt> poptctxt = COptCtxt::PoctxtFromTLS();
 	CColumnFactory *col_factory = poptctxt->Pcf();
 	GPOS_ASSERT(nullptr != col_factory);
 
@@ -182,7 +185,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 		ULONG *pul = (*pdrgpulQueryOutputColRefId)[ul];
 		GPOS_ASSERT(nullptr != pul);
 
-		CColRef *colref = col_factory->LookupColRef(*pul);
+		gpos::Ref<CColRef> colref = col_factory->LookupColRef(*pul);
 		GPOS_ASSERT(nullptr != colref);
 
 		pcrs->Include(colref);
@@ -194,9 +197,9 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// By default no sort order requirement is added, unless the root operator in
 	// the input logical expression is a LIMIT. This is because Orca always
 	// attaches top level Sort to a LIMIT node.
-	COrderSpec *pos = nullptr;
-	CExpression *pexprResult = pexpr;
-	COperator *popTop = PopTop(pexpr);
+	gpos::Ref<COrderSpec> pos = nullptr;
+	gpos::Ref<CExpression> pexprResult = pexpr;
+	gpos::Ref<COperator> popTop = PopTop(pexpr);
 	if (COperator::EopLogicalLimit == popTop->Eopid())
 	{
 		// top level operator is a limit, copy order spec to query context
@@ -209,7 +212,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 		pos = GPOS_NEW(mp) COrderSpec(mp);
 	}
 
-	CDistributionSpec *pds = nullptr;
+	gpos::Ref<CDistributionSpec> pds = nullptr;
 
 	BOOL fDML = CUtils::FLogicalDML(pexpr->Pop());
 	poptctxt->MarkDMLQuery(fDML);
@@ -227,30 +230,31 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// By default, no rewindability requirement needs to be satisfied at the top level
-	CRewindabilitySpec *prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
 
 	// No partition propagation required at the top
-	CPartitionPropagationSpec *ppps =
+	gpos::Ref<CPartitionPropagationSpec> ppps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
 	// Ensure order, distribution and rewindability meet 'satisfy' matching at the top level
-	CEnfdOrder *peo = GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
-	CEnfdDistribution *ped =
+	gpos::Ref<CEnfdOrder> peo =
+		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
+	gpos::Ref<CEnfdDistribution> ped =
 		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
-	CEnfdRewindability *per =
+	gpos::Ref<CEnfdRewindability> per =
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
-	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
+	gpos::Ref<CEnfdPartitionPropagation> pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context
-	CCTEReq *pcter = poptctxt->Pcteinfo()->PcterProducers(mp);
+	gpos::Ref<CCTEReq> pcter = poptctxt->Pcteinfo()->PcterProducers(mp);
 
 	// NB: Partition propagation requirements are not initialized here.  They are
 	// constructed later based on derived relation properties (CPartInfo) by
 	// CReqdPropPlan::InitReqdPartitionPropagation().
 
-	CReqdPropPlan *prpp =
+	gpos::Ref<CReqdPropPlan> prpp =
 		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
 
 	// Finally, create the CQueryContext
@@ -288,18 +292,18 @@ CQueryContext::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 void
 CQueryContext::MapComputedToUsedCols(CColumnFactory *col_factory,
-									 CExpression *pexpr)
+									 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	if (COperator::EopLogicalProject == pexpr->Pop()->Eopid())
 	{
-		CExpression *pexprPrL = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
 		const ULONG arity = pexprPrL->Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprPrEl = (*pexprPrL)[ul];
+			gpos::Ref<CExpression> pexprPrEl = (*pexprPrL)[ul];
 			col_factory->AddComputedToUsedColsMap(pexprPrEl);
 		}
 	}

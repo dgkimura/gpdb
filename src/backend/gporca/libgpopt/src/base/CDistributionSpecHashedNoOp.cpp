@@ -21,7 +21,8 @@ CDistributionSpecHashedNoOp::Edt() const
 }
 
 BOOL
-CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
+CDistributionSpecHashedNoOp::Matches(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	return pds->Edt() == Edt();
 }
@@ -29,14 +30,14 @@ CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
 void
 CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl,
-											 CReqdPropPlan *,
+											 gpos::Ref<CReqdPropPlan>,
 											 CExpressionArray *pdrgpexpr,
-											 CExpression *pexpr)
+											 gpos::Ref<CExpression> pexpr)
 {
-	CDrvdProp *pdp = exprhdl.Pdp();
-	CDistributionSpec *pdsChild = CDrvdPropPlan::Pdpplan(pdp)->Pds();
-	CDistributionSpecHashed *pdsChildHashed =
-		dynamic_cast<CDistributionSpecHashed *>(pdsChild);
+	gpos::Ref<CDrvdProp> pdp = exprhdl.Pdp();
+	gpos::Ref<CDistributionSpec> pdsChild = CDrvdPropPlan::Pdpplan(pdp)->Pds();
+	gpos::Ref<CDistributionSpecHashed> pdsChildHashed =
+		dynamic_cast<gpos::Ref<CDistributionSpecHashed> >(pdsChild);
 
 	if (nullptr == pdsChildHashed)
 	{
@@ -46,10 +47,10 @@ CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 	CExpressionArray *pdrgpexprNoOpRedistributionColumns =
 		pdsChildHashed->Pdrgpexpr();
 	pdrgpexprNoOpRedistributionColumns->AddRef();
-	CDistributionSpecHashedNoOp *pdsNoOp = GPOS_NEW(mp)
+	gpos::Ref<CDistributionSpecHashedNoOp> pdsNoOp = GPOS_NEW(mp)
 		CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionHashDistribute(mp, pdsNoOp), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }

@@ -78,34 +78,35 @@ public:
 	~CColRefSet() override;
 
 	// determine if bit is set
-	BOOL FMember(const CColRef *colref) const;
+	BOOL FMember(const gpos::Ref<CColRef> colref) const;
 
 	// return random member
-	CColRef *PcrAny() const;
+	gpos::Ref<CColRef> PcrAny() const;
 
 	// return first member
-	CColRef *PcrFirst() const;
+	gpos::Ref<CColRef> PcrFirst() const;
 
 	// include column
-	void Include(const CColRef *colref);
+	void Include(const gpos::Ref<CColRef> colref);
 
 	// include column array
 	void Include(const CColRefArray *colref_array);
 
 	// include column set
-	void Include(const CColRefSet *pcrs);
+	void Include(const gpos::Ref<CColRefSet> pcrs);
 
 	// remove column
-	void Exclude(const CColRef *colref);
+	void Exclude(const gpos::Ref<CColRef> colref);
 
 	// remove column array
 	void Exclude(const CColRefArray *colref_array);
 
 	// remove column set
-	void Exclude(const CColRefSet *pcrs);
+	void Exclude(const gpos::Ref<CColRefSet> pcrs);
 
 	// replace column with another column
-	void Replace(const CColRef *pcrOut, const CColRef *pcrIn);
+	void Replace(const gpos::Ref<CColRef> pcrOut,
+				 const gpos::Ref<CColRef> pcrIn);
 
 	// replace column array with another column array
 	void Replace(const CColRefArray *pdrgpcrOut, const CColRefArray *pdrgpcrIn);
@@ -115,7 +116,7 @@ public:
 	BOOL FContained(const CColRefSetArray *pdrgpcrs);
 
 	// check if current colrefset intersects with the given colrefset
-	BOOL FIntersects(const CColRefSet *pcrs);
+	BOOL FIntersects(const gpos::Ref<CColRefSet> pcrs);
 
 	// convert to array
 	CColRefArray *Pdrgpcr(CMemoryPool *mp) const;
@@ -134,7 +135,7 @@ public:
 	void ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const;
 
 	// are the columns in the column reference set covered by the array of column ref sets
-	static BOOL FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs);
+	static BOOL FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs);
 
 };	// class CColRefSet
 

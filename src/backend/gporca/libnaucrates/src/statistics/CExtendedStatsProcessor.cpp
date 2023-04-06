@@ -32,7 +32,7 @@
 using namespace gpopt;
 
 static BOOL
-IsDependencyCapablePredicate(CStatsPred *child_pred GPOS_UNUSED)
+IsDependencyCapablePredicate(gpos::Ref<CStatsPred> child_pred GPOS_UNUSED)
 {
 	return child_pred->GetPredStatsType() == CStatsPred::EsptPoint;
 }
@@ -54,22 +54,22 @@ IsDependencyCapablePredicate(CStatsPred *child_pred GPOS_UNUSED)
  * NB: This function is modified version of choose_best_statistics() in
  *     dependencies.c.
  */
-CMDExtStatsInfo *
+gpos::Ref<CMDExtStatsInfo>
 choose_best_statistics(CMemoryPool *mp,
 					   CMDExtStatsInfoArray *md_statsinfo_array,
-					   CBitSet *attnums,
+					   gpos::Ref<CBitSet> attnums,
 					   CMDExtStatsInfo::Estattype requiredkind)
 {
-	CMDExtStatsInfo *best_match = nullptr;
+	gpos::Ref<CMDExtStatsInfo> best_match = nullptr;
 	int best_num_matched = 2;						  /* goal #1: maximize */
 	int best_match_keys = (STATS_MAX_DIMENSIONS + 1); /* goal #2: minimize */
 
 	for (ULONG i = 0; i < md_statsinfo_array->Size(); i++)
 	{
-		CMDExtStatsInfo *info = (*md_statsinfo_array)[i];
+		gpos::Ref<CMDExtStatsInfo> info = (*md_statsinfo_array)[i];
 		int num_matched;
 		int numkeys;
-		CBitSet *matched;
+		gpos::Ref<CBitSet> matched;
 
 		/* skip statistics that are not of the correct type */
 		if (info->GetStatKind() != requiredkind)
@@ -114,7 +114,7 @@ choose_best_statistics(CMemoryPool *mp,
  *     dependencies.c.
  */
 static bool
-dependency_implies_attribute(CMDDependency *dependency, INT attnum)
+dependency_implies_attribute(gpos::Ref<CMDDependency> dependency, INT attnum)
 {
 	if (attnum == dependency->GetToAttno())
 	{
@@ -133,7 +133,8 @@ dependency_implies_attribute(CMDDependency *dependency, INT attnum)
  *     dependencies.c.
  */
 static bool
-dependency_is_fully_matched(CMDDependency *dependency, CBitSet *attnums)
+dependency_is_fully_matched(gpos::Ref<CMDDependency> dependency,
+							gpos::Ref<CBitSet> attnums)
 {
 	/*
 	 * Check that the dependency actually is fully covered by clauses. We have
@@ -171,11 +172,12 @@ dependency_is_fully_matched(CMDDependency *dependency, CBitSet *attnums)
  * NB: This function is modified version of find_strongest_dependency() in
  *     dependencies.c.
  */
-static CMDDependency *
-find_strongest_dependency(CMDDependencyArray *dependencies, CBitSet *attnums)
+static gpos::Ref<CMDDependency>
+find_strongest_dependency(CMDDependencyArray *dependencies,
+						  gpos::Ref<CBitSet> attnums)
 {
 	ULONG i;
-	CMDDependency *strongest = nullptr;
+	gpos::Ref<CMDDependency> strongest = nullptr;
 
 	/* number of attnums in clauses */
 	ULONG nattnums = attnums->Size();
@@ -187,7 +189,7 @@ find_strongest_dependency(CMDDependencyArray *dependencies, CBitSet *attnums)
 	 */
 	for (i = 0; i < dependencies->Size(); i++)
 	{
-		CMDDependency *dependency = (*dependencies)[i];
+		gpos::Ref<CMDDependency> dependency = (*dependencies)[i];
 
 		/*
 		 * Skip dependencies referencing more attributes than available
@@ -241,9 +243,11 @@ find_strongest_dependency(CMDDependencyArray *dependencies, CBitSet *attnums)
 //---------------------------------------------------------------------------
 void
 CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
-	CDoubleArray *scale_factors, CStatsPredConj *conjunctive_pred_stats,
-	const IMDExtStatsInfo *md_statsinfo, UlongToIntMap *colid_to_attno_mapping,
-	CMemoryPool *mp, UlongToHistogramMap *result_histograms)
+	CDoubleArray *scale_factors,
+	gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
+	const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
+	UlongToIntMap *colid_to_attno_mapping, CMemoryPool *mp,
+	UlongToHistogramMap *result_histograms)
 {
 	GPOS_ASSERT(scale_factors->Size() == 0);
 
@@ -253,10 +257,10 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 	}
 
 	DOUBLE s1 = 1.0;
-	CMDExtStatsInfo *stat;
+	gpos::Ref<CMDExtStatsInfo> stat;
 	CMDDependencyArray *dependencies;
 
-	CBitSet *clauses_attnums = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> clauses_attnums = GPOS_NEW(mp) CBitSet(mp);
 
 	/*
 	 * Pre-process the clauses list to extract the attnums seen in each item.
@@ -271,7 +275,8 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 	 */
 	for (ULONG ul = 0; ul < conjunctive_pred_stats->GetNumPreds(); ul++)
 	{
-		CStatsPred *child_pred = conjunctive_pred_stats->GetPredStats(ul);
+		gpos::Ref<CStatsPred> child_pred =
+			conjunctive_pred_stats->GetPredStats(ul);
 		if (!child_pred->IsAlreadyUsedInScaleFactorEstimation() &&
 			IsDependencyCapablePredicate(child_pred))
 		{
@@ -300,12 +305,13 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 		return;
 	}
 
-	const COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
+	const gpos::Ref<COptCtxt> poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
 
-	CMDIdGPDB *pmdid =
+	gpos::Ref<CMDIdGPDB> pmdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidExtStats, stat->GetStatOid());
-	const IMDExtStats *extstats = md_accessor->RetrieveExtStats(pmdid);
+	const gpos::Ref<IMDExtStats> extstats =
+		md_accessor->RetrieveExtStats(pmdid);
 	pmdid->Release();
 
 	/* load the dependency items stored in the statistics object */
@@ -320,7 +326,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 	while (true)
 	{
 		DOUBLE s2 = 1.0;
-		CMDDependency *dependency;
+		gpos::Ref<CMDDependency> dependency;
 
 		/* the widest/strongest dependency, fully matched by clauses */
 		dependency = find_strongest_dependency(dependencies, clauses_attnums);
@@ -339,7 +345,8 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 		const ULONG filters = conjunctive_pred_stats->GetNumPreds();
 		for (ULONG ul = 0; ul < filters; ul++)
 		{
-			CStatsPred *child_pred = conjunctive_pred_stats->GetPredStats(ul);
+			gpos::Ref<CStatsPred> child_pred =
+				conjunctive_pred_stats->GetPredStats(ul);
 
 			/*
 			 * Skip incompatible clauses, and ones we've already estimated on.
@@ -404,15 +411,15 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 //---------------------------------------------------------------------------
 bool
 CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
-	CMemoryPool *mp, const IMDExtStatsInfo *md_statsinfo,
+	CMemoryPool *mp, const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
 	const UlongToIntMap *colid_to_attno_mapping,
 	ULongPtrArray *&src_grouping_cols, DOUBLE *ndistinct)
 {
 	int nmatches;
 	OID statOid = InvalidOid;
-	const IMDExtStats *stats;
-	CBitSet *attnums = nullptr;
-	CBitSet *matched = nullptr;
+	const gpos::Ref<IMDExtStats> stats;
+	gpos::Ref<CBitSet> attnums = nullptr;
+	gpos::Ref<CBitSet> matched = nullptr;
 
 	/* bail out immediately if the table has no extended statistics */
 	if (!md_statsinfo || !colid_to_attno_mapping)
@@ -441,8 +448,8 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		md_statsinfo->GetExtStatInfoArray();
 	for (ULONG ul = 0; ul < md_statsinfo_array->Size(); ul++)
 	{
-		CMDExtStatsInfo *info = (*md_statsinfo_array)[ul];
-		CBitSet *shared = GPOS_NEW(mp) CBitSet(mp, *attnums);
+		gpos::Ref<CMDExtStatsInfo> info = (*md_statsinfo_array)[ul];
+		gpos::Ref<CBitSet> shared = GPOS_NEW(mp) CBitSet(mp, *attnums);
 		int nshared;
 
 		/* skip statistics of other kinds */
@@ -485,10 +492,11 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 		return false;
 	}
 
-	const COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
+	const gpos::Ref<COptCtxt> poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
 
-	CMDIdGPDB *pmdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidExtStats, statOid);
+	gpos::Ref<CMDIdGPDB> pmdid =
+		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidExtStats, statOid);
 	stats = md_accessor->RetrieveExtStats(pmdid);
 	pmdid->Release();
 
@@ -498,12 +506,12 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 	 */
 	if (stats)
 	{
-		CMDNDistinct *item = nullptr;
+		gpos::Ref<CMDNDistinct> item = nullptr;
 
 		/* Find the specific item that exactly matches the combination */
 		for (ULONG i = 0; i < stats->GetNDistinctList()->Size(); i++)
 		{
-			CMDNDistinct *tmpitem = (*stats->GetNDistinctList())[i];
+			gpos::Ref<CMDNDistinct> tmpitem = (*stats->GetNDistinctList())[i];
 
 			if (tmpitem->GetAttrs()->Equals(matched))
 			{

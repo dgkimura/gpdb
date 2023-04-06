@@ -88,7 +88,8 @@ CBindingTest::EresUnittest_Basic()
 	GPOS_CHECK_ABORT;
 
 	// set up MD providers
-	CMDProviderMemory *pmdp = GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
+	gpos::Ref<CMDProviderMemory> pmdp =
+		GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
 	pmdp->AddRef();
 
 	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
@@ -103,8 +104,8 @@ CBindingTest::EresUnittest_Basic()
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
 
-	CBitSet *pbsEnabled = nullptr;
-	CBitSet *pbsDisabled = nullptr;
+	gpos::Ref<CBitSet> pbsEnabled = nullptr;
+	gpos::Ref<CBitSet> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	// setup opt ctx
@@ -113,7 +114,7 @@ CBindingTest::EresUnittest_Basic()
 
 	// translate DXL Tree -> Expr Tree
 	CTranslatorDXLToExpr *pdxltr = GPOS_NEW(mp) CTranslatorDXLToExpr(mp, &mda);
-	CExpression *pexprTranslated = pdxltr->PexprTranslateQuery(
+	gpos::Ref<CExpression> pexprTranslated = pdxltr->PexprTranslateQuery(
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
@@ -129,7 +130,7 @@ CBindingTest::EresUnittest_Basic()
 	eng.Optimize();
 
 	// extract plan
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();

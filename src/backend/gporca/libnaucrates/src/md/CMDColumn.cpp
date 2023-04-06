@@ -27,9 +27,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, IMDId *mdid_type,
+CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 					 INT type_modifier, BOOL is_nullable, BOOL is_dropped,
-					 CDXLNode *dxl_dafault_value, ULONG length)
+					 gpos::Ref<CDXLNode> dxl_dafault_value, ULONG length)
 	: m_mdname(mdname),
 	  m_attno(attrnum),
 	  m_mdid_type(mdid_type),
@@ -93,7 +93,7 @@ CMDColumn::AttrNum() const
 //		Attribute type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDColumn::MdidType() const
 {
 	return m_mdid_type;

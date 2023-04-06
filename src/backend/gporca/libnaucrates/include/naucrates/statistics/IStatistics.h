@@ -124,7 +124,8 @@ public:
 	virtual CDouble Width(ULongPtrArray *colids) const = 0;
 
 	// what is the width in bytes of set of column references
-	virtual CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const = 0;
+	virtual CDouble Width(CMemoryPool *mp,
+						  gpos::Ref<CColRefSet> colrefs) const = 0;
 
 	// the risk of errors in cardinality estimation
 	virtual ULONG StatsEstimationRisk() const = 0;
@@ -133,60 +134,61 @@ public:
 	virtual void SetStatsEstimationRisk(ULONG risk) = 0;
 
 	// look up the number of distinct values of a particular column
-	virtual CDouble GetNDVs(const CColRef *colref) = 0;
+	virtual CDouble GetNDVs(const gpos::Ref<CColRef> colref) = 0;
 
 	virtual ULONG GetNumberOfPredicates() const = 0;
 
 	// inner join with another stats structure
-	virtual IStatistics *CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	virtual gpos::Ref<IStatistics> CalcInnerJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// LOJ with another stats structure
-	virtual IStatistics *CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	virtual gpos::Ref<IStatistics> CalcLOJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// semi join stats computation
-	virtual IStatistics *CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+	virtual gpos::Ref<IStatistics> CalcLSJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// anti semi join
-	virtual IStatistics *CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	virtual gpos::Ref<IStatistics> CalcLASJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL DoIgnoreLASJHistComputation) const = 0;
 
 	// return required props associated with stats object
-	virtual CReqdPropRelational *GetReqdRelationalProps(
+	virtual gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
 		CMemoryPool *mp) const = 0;
 
 	// append given stats to current object
-	virtual void AppendStats(CMemoryPool *mp, IStatistics *stats) = 0;
+	virtual void AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> stats) = 0;
 
 	// set number of rebinds
 	virtual void SetRebinds(CDouble num_rebinds) = 0;
 
 	// copy stats
-	virtual IStatistics *CopyStats(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) const = 0;
 
 	// return a copy of this stats object scaled by a given factor
-	virtual IStatistics *ScaleStats(CMemoryPool *mp, CDouble factor) const = 0;
+	virtual gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp,
+											  CDouble factor) const = 0;
 
 	// copy stats with remapped column ids
-	virtual IStatistics *CopyStatsWithRemap(CMemoryPool *mp,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist = true) const = 0;
+	virtual gpos::Ref<IStatistics> CopyStatsWithRemap(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist = true) const = 0;
 
 	// return a set of column references we have stats for
-	virtual CColRefSet *GetColRefSet(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp) const = 0;
 
 	// print function
 	virtual IOstream &OsPrint(IOstream &os) const = 0;
 
 	// generate the DXL representation of the statistics object
-	virtual CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
+	virtual gpos::Ref<CDXLStatsDerivedRelation> GetDxlStatsDrvdRelation(
 		CMemoryPool *mp, CMDAccessor *md_accessor) const = 0;
 
 	// is the join type either a left semi join or left anti-semi join

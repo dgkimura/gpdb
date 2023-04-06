@@ -50,16 +50,16 @@ class CDXLNode : public CRefCount<CDXLNode>
 {
 private:
 	// dxl tree operator class
-	CDXLOperator *m_dxl_op;
+	gpos::Ref<CDXLOperator> m_dxl_op;
 
 	// properties of the operator
-	CDXLProperties *m_dxl_properties;
+	gpos::Ref<CDXLProperties> m_dxl_properties;
 
 	// array of children
 	CDXLNodeArray *m_dxl_array;
 
 	// direct dispatch spec
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;
 
 public:
 	CDXLNode(const CDXLNode &) = delete;
@@ -67,24 +67,27 @@ public:
 	// ctors
 
 	explicit CDXLNode(CMemoryPool *mp);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op, CDXLNode *child_dxlnode);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op,
-			 CDXLNode *first_child_dxlnode, CDXLNode *second_child_dxlnode);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op,
-			 CDXLNode *first_child_dxlnode, CDXLNode *second_child_dxlnode,
-			 CDXLNode *third_child_dxlnode);
-	CDXLNode(CDXLOperator *dxl_op, CDXLNodeArray *dxl_array);
+	CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op);
+	CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+			 gpos::Ref<CDXLNode> child_dxlnode);
+	CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+			 gpos::Ref<CDXLNode> first_child_dxlnode,
+			 gpos::Ref<CDXLNode> second_child_dxlnode);
+	CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+			 gpos::Ref<CDXLNode> first_child_dxlnode,
+			 gpos::Ref<CDXLNode> second_child_dxlnode,
+			 gpos::Ref<CDXLNode> third_child_dxlnode);
+	CDXLNode(gpos::Ref<CDXLOperator> dxl_op, CDXLNodeArray *dxl_array);
 
 	// dtor
 	~CDXLNode() override;
 
 	// shorthand to access children
-	inline CDXLNode *
+	inline gpos::Ref<CDXLNode>
 	operator[](ULONG idx) const
 	{
 		GPOS_ASSERT(nullptr != m_dxl_array);
-		CDXLNode *dxl_node = (*m_dxl_array)[idx];
+		gpos::Ref<CDXLNode> dxl_node = (*m_dxl_array)[idx];
 		GPOS_ASSERT(nullptr != dxl_node);
 		return dxl_node;
 	};
@@ -97,14 +100,14 @@ public:
 	}
 
 	// accessor for operator
-	inline CDXLOperator *
+	inline gpos::Ref<CDXLOperator>
 	GetOperator() const
 	{
 		return m_dxl_op;
 	}
 
 	// return properties
-	CDXLProperties *
+	gpos::Ref<CDXLProperties>
 	GetProperties() const
 	{
 		return m_dxl_properties;
@@ -118,30 +121,30 @@ public:
 	}
 
 	// accessor to direct dispatch info
-	CDXLDirectDispatchInfo *
+	gpos::Ref<CDXLDirectDispatchInfo>
 	GetDXLDirectDispatchInfo() const
 	{
 		return m_direct_dispatch_info;
 	}
 
 	// setters
-	void AddChild(CDXLNode *child_dxlnode);
+	void AddChild(gpos::Ref<CDXLNode> child_dxlnode);
 
-	void SetOperator(CDXLOperator *dxl_op);
+	void SetOperator(gpos::Ref<CDXLOperator> dxl_op);
 
 	void SerializeToDXL(CXMLSerializer *) const;
 
 	// replace a given child of this DXL node with the given node
-	void ReplaceChild(ULONG idx, CDXLNode *child_dxlnode);
+	void ReplaceChild(ULONG idx, gpos::Ref<CDXLNode> child_dxlnode);
 
 	void SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const;
 
 	// setter
-	void SetProperties(CDXLProperties *dxl_properties);
+	void SetProperties(gpos::Ref<CDXLProperties> dxl_properties);
 
 	// setter for direct dispatch info
 	void SetDirectDispatchInfo(
-		CDXLDirectDispatchInfo *dxl_direct_dispatch_info);
+		gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info);
 
 	// serialize properties in DXL format
 	void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;

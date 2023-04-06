@@ -57,10 +57,10 @@ private:
 	using JSM = CJobStateMachine<EState, estSentinel, EEvent, eevSentinel>;
 
 	// target group expression
-	CGroupExpression *m_pgexpr;
+	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// xform to apply to group expression
-	CXform *m_xform;
+	gpos::Ref<CXform> m_xform;
 
 	// job state machine
 	JSM m_jsm;
@@ -78,11 +78,12 @@ public:
 	~CJobTransformation() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr, CXform *pxform);
+	void Init(gpos::Ref<CGroupExpression> pgexpr, gpos::Ref<CXform> pxform);
 
 	// schedule a new transformation job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
-							CXform *pxform, CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::Ref<CGroupExpression> pgexpr,
+							gpos::Ref<CXform> pxform, CJob *pjParent);
 
 	// job's main function
 	BOOL FExecute(CSchedulerContext *psc) override;

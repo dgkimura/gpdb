@@ -56,15 +56,15 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void
-	AppendEnforcers(CMemoryPool *,		  // mp
-					CExpressionHandle &,  // exprhdl
-					CReqdPropPlan *,	  // prpp
-					CExpressionArray *,	  // pdrgpexpr
-					CExpression *		  // pexpr
+	AppendEnforcers(CMemoryPool *,			   // mp
+					CExpressionHandle &,	   // exprhdl
+					gpos::Ref<CReqdPropPlan>,  // prpp
+					CExpressionArray *,		   // pdrgpexpr
+					gpos::Ref<CExpression>	   // pexpr
 					) override
 	{
 		GPOS_ASSERT(!"attempt to enforce strict SINGLETON distribution");
@@ -74,13 +74,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecStrictSingleton *
-	PdssConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecStrictSingleton>
+	PdssConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtStrictSingleton == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecStrictSingleton *>(pds);
+		return dynamic_cast<gpos::Ref<CDistributionSpecStrictSingleton> >(pds);
 	}
 
 };	// class CDistributionSpecStrictSingleton

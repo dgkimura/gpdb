@@ -56,7 +56,7 @@ CBitSetTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	ULONG vector_size = 32;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	ULONG cInserts = 10;
 	for (ULONG i = 0; i < cInserts; i += 2)
@@ -73,7 +73,7 @@ CBitSetTest::EresUnittest_Basics()
 	}
 	GPOS_ASSERT(cInserts == pbs->Size());
 
-	CBitSet *pbsCopy = GPOS_NEW(mp) CBitSet(mp, *pbs);
+	gpos::Ref<CBitSet> pbsCopy = GPOS_NEW(mp) CBitSet(mp, *pbs);
 	GPOS_ASSERT(pbsCopy->Equals(pbs));
 
 	// delete old bitset to make sure we're not accidentally
@@ -113,8 +113,8 @@ CBitSetTest::EresUnittest_Removal()
 	CMemoryPool *mp = amp.Pmp();
 
 	ULONG vector_size = 32;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
-	CBitSet *pbsEmpty = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbsEmpty = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	GPOS_ASSERT(pbs->Equals(pbsEmpty));
 	GPOS_ASSERT(pbsEmpty->Equals(pbs));
@@ -163,18 +163,18 @@ CBitSetTest::EresUnittest_SetOps()
 	ULONG vector_size = 32;
 	ULONG cInserts = 10;
 
-	CBitSet *pbs1 = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs1 = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	for (ULONG i = 0; i < cInserts; i += 2)
 	{
 		pbs1->ExchangeSet(i * vector_size);
 	}
 
-	CBitSet *pbs2 = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs2 = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	for (ULONG i = 1; i < cInserts; i += 2)
 	{
 		pbs2->ExchangeSet(i * vector_size);
 	}
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	pbs->Union(pbs1);
 	GPOS_ASSERT(pbs->Equals(pbs1));
@@ -205,8 +205,8 @@ CBitSetTest::EresUnittest_SetOps()
 	pbs->Release();
 
 	// Test that intersection properly deletes links
-	CBitSet *pbs4 = GPOS_NEW(mp) CBitSet(mp, vector_size);
-	CBitSet *pbs5 = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs4 = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs5 = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	pbs4->ExchangeSet(1);
 	pbs5->ExchangeSet(10);
 	pbs5->ExchangeSet(50);
@@ -237,13 +237,13 @@ CBitSetTest::EresUnittest_Performance()
 	CMemoryPool *mp = amp.Pmp();
 
 	ULONG vector_size = 512;
-	CBitSet *pbsBase = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbsBase = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	for (ULONG i = 0; i < vector_size; i++)
 	{
 		(void) pbsBase->ExchangeSet(i);
 	}
 
-	CBitSet *pbsTest = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbsTest = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	for (ULONG j = 0; j < 100000; j++)
 	{
 		ULONG cRandomBits = 16;

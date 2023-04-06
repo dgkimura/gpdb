@@ -112,7 +112,7 @@ const CHAR *CTestUtils::m_szXSDPath =
 const CHAR *CTestUtils::m_szMDFileName = "../data/dxl/metadata/md.xml";
 
 // provider file
-CMDProviderMemory *CTestUtils::m_pmdpf = nullptr;
+gpos::Ref<CMDProviderMemory> CTestUtils::m_pmdpf = nullptr;
 
 // local memory pool
 CMemoryPool *CTestUtils::m_mp = nullptr;
@@ -125,10 +125,10 @@ CMemoryPool *CTestUtils::m_mp = nullptr;
 //		set up a file based provider
 //
 //---------------------------------------------------------------------------
-CMDProviderMemory *
+gpos::Ref<CMDProviderMemory>
 CTestUtils::CTestSetup::PmdpSetupFileBasedProvider()
 {
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	return pmdp;
 }
@@ -203,10 +203,10 @@ CTestUtils::DestroyMDProvider()
 //---------------------------------------------------------------------------
 
 
-CTableDescriptor *
+gpos::Ref<CTableDescriptor>
 CTestUtils::PtabdescPlainWithColNameFormat(
-	CMemoryPool *mp, ULONG num_cols, IMDId *mdid, const WCHAR *wszColNameFormat,
-	const CName &nameTable,
+	CMemoryPool *mp, ULONG num_cols, gpos::Ref<IMDId> mdid,
+	const WCHAR *wszColNameFormat, const CName &nameTable,
 	BOOL is_nullable  // define nullable columns
 )
 {
@@ -214,10 +214,10 @@ CTestUtils::PtabdescPlainWithColNameFormat(
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		md_accessor->PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	CWStringDynamic *str_name = GPOS_NEW(mp) CWStringDynamic(mp);
-	CTableDescriptor *ptabdesc = GPOS_NEW(mp) CTableDescriptor(
+	gpos::Ref<CTableDescriptor> ptabdesc = GPOS_NEW(mp) CTableDescriptor(
 		mp, mdid, nameTable,
 		false,	// convert_hash_to_random
 		IMDRelation::EreldistrRandom, IMDRelation::ErelstorageHeap,
@@ -235,7 +235,7 @@ CTestUtils::PtabdescPlainWithColNameFormat(
 		CWStringConst strName(str_name->GetBuffer());
 		CName nameColumnInt(&strName);
 
-		CColumnDescriptor *pcoldescInt = GPOS_NEW(mp)
+		gpos::Ref<CColumnDescriptor> pcoldescInt = GPOS_NEW(mp)
 			CColumnDescriptor(mp, pmdtypeint4, default_type_modifier,
 							  nameColumnInt, i + 1, is_nullable);
 		ptabdesc->AddColumn(pcoldescInt);
@@ -255,9 +255,9 @@ CTestUtils::PtabdescPlainWithColNameFormat(
 //		Generate a plain table descriptor
 //
 //---------------------------------------------------------------------------
-CTableDescriptor *
-CTestUtils::PtabdescPlain(CMemoryPool *mp, ULONG num_cols, IMDId *mdid,
-						  const CName &nameTable,
+gpos::Ref<CTableDescriptor>
+CTestUtils::PtabdescPlain(CMemoryPool *mp, ULONG num_cols,
+						  gpos::Ref<IMDId> mdid, const CName &nameTable,
 						  BOOL is_nullable	// define nullable columns
 )
 {
@@ -274,11 +274,13 @@ CTestUtils::PtabdescPlain(CMemoryPool *mp, ULONG num_cols, IMDId *mdid,
 //		Generate a table descriptor
 //
 //---------------------------------------------------------------------------
-CTableDescriptor *
-CTestUtils::PtabdescCreate(CMemoryPool *mp, ULONG num_cols, IMDId *mdid,
-						   const CName &nameTable, BOOL fPartitioned)
+gpos::Ref<CTableDescriptor>
+CTestUtils::PtabdescCreate(CMemoryPool *mp, ULONG num_cols,
+						   gpos::Ref<IMDId> mdid, const CName &nameTable,
+						   BOOL fPartitioned)
 {
-	CTableDescriptor *ptabdesc = PtabdescPlain(mp, num_cols, mdid, nameTable);
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescPlain(mp, num_cols, mdid, nameTable);
 
 	if (fPartitioned)
 	{
@@ -286,7 +288,7 @@ CTestUtils::PtabdescCreate(CMemoryPool *mp, ULONG num_cols, IMDId *mdid,
 	}
 
 	// create a keyset containing the first column
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, num_cols);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, num_cols);
 	pbs->ExchangeSet(0);
 	BOOL fSuccess GPOS_ASSERTS_ONLY = ptabdesc->FAddKeySet(pbs);
 	GPOS_ASSERT(fSuccess);
@@ -302,21 +304,22 @@ CTestUtils::PtabdescCreate(CMemoryPool *mp, ULONG num_cols, IMDId *mdid,
 //		Generate a get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalGet(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalGet(CMemoryPool *mp,
+							gpos::Ref<CTableDescriptor> ptabdesc,
 							const CWStringConst *pstrTableAlias)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);
 
-	CLogicalGet *pop = GPOS_NEW(mp) CLogicalGet(
+	gpos::Ref<CLogicalGet> pop = GPOS_NEW(mp) CLogicalGet(
 		mp, GPOS_NEW(mp) CName(mp, CName(pstrTableAlias)), ptabdesc);
 
-	CExpression *result = GPOS_NEW(mp) CExpression(mp, pop);
+	gpos::Ref<CExpression> result = GPOS_NEW(mp) CExpression(mp, pop);
 
 	CColRefArray *arr = pop->PdrgpcrOutput();
 	for (ULONG ul = 0; ul < arr->Size(); ul++)
 	{
-		CColRef *ref = (*arr)[ul];
+		gpos::Ref<CColRef> ref = (*arr)[ul];
 		ref->MarkAsUsed();
 	}
 
@@ -331,14 +334,15 @@ CTestUtils::PexprLogicalGet(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 //		Generate a get expression over table with nullable columns
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGetNullable(CMemoryPool *mp, OID oidTable,
 									const CWStringConst *str_table_name,
 									const CWStringConst *pstrTableAlias)
 {
 	CWStringConst strName(str_table_name->GetBuffer());
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, oidTable, 1, 1);
-	CTableDescriptor *ptabdesc = CTestUtils::PtabdescPlain(
+	gpos::Ref<CMDIdGPDB> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, oidTable, 1, 1);
+	gpos::Ref<CTableDescriptor> ptabdesc = CTestUtils::PtabdescPlain(
 		mp, 3, mdid, CName(&strName), true /*is_nullable*/);
 	CWStringConst strAlias(pstrTableAlias->GetBuffer());
 
@@ -354,11 +358,11 @@ CTestUtils::PexprLogicalGetNullable(CMemoryPool *mp, OID oidTable,
 //		Generate a get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGet(CMemoryPool *mp, CWStringConst *str_table_name,
 							CWStringConst *pstrTableAlias, ULONG ulTableId)
 {
-	CTableDescriptor *ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		PtabdescCreate(mp, GPOPT_TEST_REL_WIDTH,
 					   GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, ulTableId, 1, 1),
 					   CName(str_table_name));
@@ -375,13 +379,14 @@ CTestUtils::PexprLogicalGet(CMemoryPool *mp, CWStringConst *str_table_name,
 //		Generate a randomized get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGet(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("BaseTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = PtabdescCreate(mp, 3, mdid, CName(&strName));
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescCreate(mp, 3, mdid, CName(&strName));
 	CWStringConst strAlias(GPOS_WSZ_LIT("BaseTableAlias"));
 
 	return PexprLogicalGet(mp, ptabdesc, &strAlias);
@@ -395,13 +400,14 @@ CTestUtils::PexprLogicalGet(CMemoryPool *mp)
 //		Generate a randomized foreign get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalForeignGet(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("ExternalTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = PtabdescCreate(mp, 3, mdid, CName(&strName));
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescCreate(mp, 3, mdid, CName(&strName));
 	CWStringConst strAlias(GPOS_WSZ_LIT("ExternalTableAlias"));
 
 	return GPOS_NEW(mp)
@@ -417,14 +423,14 @@ CTestUtils::PexprLogicalForeignGet(CMemoryPool *mp)
 //		Generate a randomized get expression for a partitioned table
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGetPartitioned(CMemoryPool *mp)
 {
 	ULONG ulAttributes = 2;
 	CWStringConst strName(GPOS_WSZ_LIT("PartTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID_PARTITIONED);
-	CTableDescriptor *ptabdesc = PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdesc = PtabdescCreate(
 		mp, ulAttributes, mdid, CName(&strName), true /*fPartitioned*/);
 	CWStringConst strAlias(GPOS_WSZ_LIT("PartTableAlias"));
 
@@ -440,14 +446,14 @@ CTestUtils::PexprLogicalGetPartitioned(CMemoryPool *mp)
 //		with indexes
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalDynamicGetWithIndexes(CMemoryPool *mp)
 {
 	ULONG ulAttributes = 2;
 	CWStringConst strName(GPOS_WSZ_LIT("P1"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(
 		IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID_PARTITIONED_WITH_INDEXES);
-	CTableDescriptor *ptabdesc = PtabdescCreate(
+	gpos::Ref<CTableDescriptor> ptabdesc = PtabdescCreate(
 		mp, ulAttributes, mdid, CName(&strName), true /*fPartitioned*/);
 	CWStringConst strAlias(GPOS_WSZ_LIT("P1Alias"));
 
@@ -470,16 +476,16 @@ CTestUtils::PexprLogicalDynamicGetWithIndexes(CMemoryPool *mp)
 //		Generate a Select expression with a random equality predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr)
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalSelect(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// get any two columns
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
-	CColRef *pcrRight = pcrs->PcrAny();
-	CExpression *pexprPredicate =
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CColRef> pcrRight = pcrs->PcrAny();
+	gpos::Ref<CExpression> pexprPredicate =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 	return CUtils::PexprLogicalSelect(mp, pexpr, pexprPredicate);
@@ -493,11 +499,11 @@ CTestUtils::PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr)
 //		Generate select expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelect(CMemoryPool *mp, CWStringConst *str_table_name,
 							   CWStringConst *pstrTableAlias, ULONG ulTableId)
 {
-	CExpression *pexprGet =
+	gpos::Ref<CExpression> pexprGet =
 		PexprLogicalGet(mp, str_table_name, pstrTableAlias, ulTableId);
 	return PexprLogicalSelect(mp, pexprGet);
 }
@@ -510,7 +516,7 @@ CTestUtils::PexprLogicalSelect(CMemoryPool *mp, CWStringConst *str_table_name,
 //		Generate randomized Select expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelect(CMemoryPool *mp)
 {
 	return PexprLogicalSelect(mp, PexprLogicalGet(mp));
@@ -524,23 +530,25 @@ CTestUtils::PexprLogicalSelect(CMemoryPool *mp)
 //		Generate a select expression with a contradiction
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithContradiction(CMemoryPool *mp)
 {
-	CExpression *pexpr = PexprLogicalSelect(mp, PexprLogicalGet(mp));
+	gpos::Ref<CExpression> pexpr = PexprLogicalSelect(mp, PexprLogicalGet(mp));
 	// get any column
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
-	CColRef *colref = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 
-	CExpression *pexprConstFirst = CUtils::PexprScalarConstInt4(mp, 3 /*val*/);
-	CExpression *pexprPredFirst =
+	gpos::Ref<CExpression> pexprConstFirst =
+		CUtils::PexprScalarConstInt4(mp, 3 /*val*/);
+	gpos::Ref<CExpression> pexprPredFirst =
 		CUtils::PexprScalarEqCmp(mp, colref, pexprConstFirst);
 
-	CExpression *pexprConstSecond = CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
-	CExpression *pexprPredSecond =
+	gpos::Ref<CExpression> pexprConstSecond =
+		CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
+	gpos::Ref<CExpression> pexprPredSecond =
 		CUtils::PexprScalarEqCmp(mp, colref, pexprConstSecond);
 
-	CExpression *pexprPredicate =
+	gpos::Ref<CExpression> pexprPredicate =
 		CPredicateUtils::PexprConjunction(mp, pexprPredFirst, pexprPredSecond);
 	pexprPredFirst->Release();
 	pexprPredSecond->Release();
@@ -556,24 +564,24 @@ CTestUtils::PexprLogicalSelectWithContradiction(CMemoryPool *mp)
 //		Generate a randomized select expression over a partitioned table
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectPartitioned(CMemoryPool *mp)
 {
-	CExpression *pexprGet = PexprLogicalGetPartitioned(mp);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGetPartitioned(mp);
 
 	// extract first partition key
-	CLogicalGet *popGet = CLogicalGet::PopConvert(pexprGet->Pop());
+	gpos::Ref<CLogicalGet> popGet = CLogicalGet::PopConvert(pexprGet->Pop());
 	const CColRef2dArray *pdrgpdrgpcr = popGet->PdrgpdrgpcrPartColumns();
 
 	GPOS_ASSERT(pdrgpdrgpcr != nullptr);
 	GPOS_ASSERT(0 < pdrgpdrgpcr->Size());
 	CColRefArray *colref_array = (*pdrgpdrgpcr)[0];
 	GPOS_ASSERT(1 == colref_array->Size());
-	CColRef *pcrPartKey = (*colref_array)[0];
+	gpos::Ref<CColRef> pcrPartKey = (*colref_array)[0];
 
 	// construct a comparison pk = 5
 	INT val = 5;
-	CExpression *pexprScalar =
+	gpos::Ref<CExpression> pexprScalar =
 		CUtils::PexprScalarEqCmp(mp, CUtils::PexprScalarIdent(mp, pcrPartKey),
 								 CUtils::PexprScalarConstInt4(mp, val));
 
@@ -588,29 +596,29 @@ CTestUtils::PexprLogicalSelectPartitioned(CMemoryPool *mp)
 //		Generate randomized Assert expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalAssert(CMemoryPool *mp)
 {
-	CExpression *pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
 
 	// get any two columns
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
-	CColRef *pcrRight = pcrs->PcrAny();
-	CExpression *pexprPredicate =
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CColRef> pcrRight = pcrs->PcrAny();
+	gpos::Ref<CExpression> pexprPredicate =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 	CWStringConst *pstrErrMsg = CXformUtils::PstrErrorMessage(
 		mp, gpos::CException::ExmaSQL, gpos::CException::ExmiSQLTest,
 		GPOS_WSZ_LIT("Test msg"));
-	CExpression *pexprAssertConstraint = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAssertConstraint = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraint(mp, pstrErrMsg),
 					pexprPredicate);
-	CExpression *pexprAssertPredicate = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAssertPredicate = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraintList(mp),
 					pexprAssertConstraint);
 
-	CLogicalAssert *popAssert = GPOS_NEW(mp) CLogicalAssert(
+	gpos::Ref<CLogicalAssert> popAssert = GPOS_NEW(mp) CLogicalAssert(
 		mp, GPOS_NEW(mp) CException(gpos::CException::ExmaSQL,
 									gpos::CException::ExmiSQLTest));
 
@@ -625,7 +633,7 @@ CTestUtils::PexprLogicalAssert(CMemoryPool *mp)
 //		Generate a 3-way join including a partitioned table
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::Pexpr3WayJoinPartitioned(CMemoryPool *mp)
 {
 	return PexprLogicalJoin<CLogicalInnerJoin>(
@@ -640,7 +648,7 @@ CTestUtils::Pexpr3WayJoinPartitioned(CMemoryPool *mp)
 //		Generate a 4-way join including a partitioned table
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::Pexpr4WayJoinPartitioned(CMemoryPool *mp)
 {
 	return PexprLogicalJoin<CLogicalInnerJoin>(mp, PexprLogicalGet(mp),
@@ -656,13 +664,13 @@ CTestUtils::Pexpr4WayJoinPartitioned(CMemoryPool *mp)
 //		Generate a random select expression with nested AND tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithNestedAnd(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprGet = PexprLogicalGet(mp);
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPred =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopAnd);
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprPred);
@@ -676,13 +684,13 @@ CTestUtils::PexprLogicalSelectWithNestedAnd(CMemoryPool *mp)
 //		Generate a random select expression with nested OR tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithNestedOr(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprGet = PexprLogicalGet(mp);
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPred =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopOr);
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprPred);
@@ -697,13 +705,13 @@ CTestUtils::PexprLogicalSelectWithNestedOr(CMemoryPool *mp)
 //		nested NOT nodes
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithEvenNestedNot(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprGet = PexprLogicalGet(mp);
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPred =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopNot);
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprPred);
@@ -718,22 +726,23 @@ CTestUtils::PexprLogicalSelectWithEvenNestedNot(CMemoryPool *mp)
 //		Generate a scalar expression comparing scalar identifiers
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprScIdentCmpScIdent(CMemoryPool *mp, CExpression *pexprLeft,
-								   CExpression *pexprRight,
+gpos::Ref<CExpression>
+CTestUtils::PexprScIdentCmpScIdent(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprLeft,
+								   gpos::Ref<CExpression> pexprRight,
 								   IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
 	GPOS_ASSERT(cmp_type <= IMDType::EcmptOther);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrsLeft->PcrAny();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrsLeft->PcrAny();
 
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
-	CColRef *pcrRight = pcrsRight->PcrAny();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrRight = pcrsRight->PcrAny();
 
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprPred =
 		CUtils::PexprScalarCmp(mp, pcrLeft, pcrRight, cmp_type);
 
 	return pexprPred;
@@ -748,17 +757,17 @@ CTestUtils::PexprScIdentCmpScIdent(CMemoryPool *mp, CExpression *pexprLeft,
 //		Generate a scalar expression comparing scalar identifier to a constant
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprScIdentCmpConst(CMemoryPool *mp, CExpression *pexpr,
+gpos::Ref<CExpression>
+CTestUtils::PexprScIdentCmpConst(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 IMDType::ECmpType cmp_type, ULONG ulVal)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
-	CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CExpression> pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
 
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprPred =
 		CUtils::PexprScalarCmp(mp, pcrLeft, pexprUl, cmp_type);
 
 	return pexprPred;
@@ -774,12 +783,12 @@ CTestUtils::PexprScIdentCmpConst(CMemoryPool *mp, CExpression *pexpr,
 //		column and a constant
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectCmpToConst(CMemoryPool *mp)
 {
 	// generate a get expression
-	CExpression *pexpr = PexprLogicalGet(mp);
-	CExpression *pexprPred = PexprScIdentCmpConst(
+	gpos::Ref<CExpression> pexpr = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPred = PexprScIdentCmpConst(
 		mp, pexpr, IMDType::EcmptEq /* cmp_type */, 10 /* ulVal */);
 
 	return CUtils::PexprLogicalSelect(mp, pexpr, pexprPred);
@@ -794,7 +803,7 @@ CTestUtils::PexprLogicalSelectCmpToConst(CMemoryPool *mp)
 //		Generate a Select expression with an array compare
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp)
 {
 	return PexprLogicalSelectArrayCmp(mp, CScalarArrayCmp::EarrcmpAny,
@@ -811,7 +820,7 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp)
 //		type (=, !=, <, etc).
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 									   CScalarArrayCmp::EArrCmpType earrcmptype,
 									   IMDType::ECmpType ecmptype)
@@ -822,7 +831,7 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 	{
 		pdrgpiVals->Append(GPOS_NEW(mp) INT(val));
 	}
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		PexprLogicalSelectArrayCmp(mp, earrcmptype, ecmptype, pdrgpiVals);
 	pdrgpiVals->Release();
 	return pexprSelect;
@@ -839,7 +848,7 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 //		values.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 									   CScalarArrayCmp::EArrCmpType earrcmptype,
 									   IMDType::ECmpType ecmptype,
@@ -849,11 +858,11 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 	GPOS_ASSERT(IMDType::EcmptOther > ecmptype);
 
 	// generate a get expression
-	CExpression *pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
 
 	// get the first column
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
-	CColRef *colref = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 
 	// construct an array of integers
 	CExpressionArray *pdrgpexprArrayElems = GPOS_NEW(mp) CExpressionArray(mp);
@@ -861,7 +870,7 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 	const ULONG ulValsLength = pdrgpiVals->Size();
 	for (ULONG ul = 0; ul < ulValsLength; ul++)
 	{
-		CExpression *pexprArrayElem =
+		gpos::Ref<CExpression> pexprArrayElem =
 			CUtils::PexprScalarConstInt4(mp, *(*pdrgpiVals)[ul]);
 		pdrgpexprArrayElems->Append(pexprArrayElem);
 	}
@@ -881,17 +890,17 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 //		nested NOT nodes
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithOddNestedNot(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprGet = PexprLogicalGet(mp);
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPred =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopNot);
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(pexprPred);
-	CExpression *pexprNot =
+	gpos::Ref<CExpression> pexprNot =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopNot, pdrgpexpr);
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprNot);
@@ -905,26 +914,26 @@ CTestUtils::PexprLogicalSelectWithOddNestedNot(CMemoryPool *mp)
 //		Generate a random select expression with nested AND-OR-NOT predicate
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithNestedAndOrNot(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	CExpression *pexprGet = PexprLogicalGet(mp);
-	CExpression *pexprPredAnd =
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprPredAnd =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopAnd);
-	CExpression *pexprPredOr =
+	gpos::Ref<CExpression> pexprPredOr =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopOr);
-	CExpression *pexprPredNot =
+	gpos::Ref<CExpression> pexprPredNot =
 		PexprScalarNestedPreds(mp, pexprGet, CScalarBoolOp::EboolopNot);
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(pexprPredAnd);
 	pdrgpexpr->Append(pexprPredOr);
 	pdrgpexpr->Append(pexprPredNot);
-	CExpression *pexprOr =
+	gpos::Ref<CExpression> pexprOr =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopOr, pdrgpexpr);
-	CExpression *pexprPred = CUtils::PexprNegate(mp, pexprOr);
+	gpos::Ref<CExpression> pexprPred = CUtils::PexprNegate(mp, pexprOr);
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprPred);
 }
@@ -938,7 +947,7 @@ CTestUtils::PexprLogicalSelectWithNestedAndOrNot(CMemoryPool *mp)
 //		table get
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSubqueryWithConstTableGet(CMemoryPool *mp,
 												  COperator::EOperatorId op_id)
 {
@@ -947,26 +956,27 @@ CTestUtils::PexprLogicalSubqueryWithConstTableGet(CMemoryPool *mp,
 				COperator::EopScalarSubqueryAll == op_id);
 
 	CWStringConst strNameR(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdidR =
+	gpos::Ref<CMDIdGPDB> pmdidR =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_TEST_REL_OID1, 1, 1);
-	CTableDescriptor *ptabdescR =
+	gpos::Ref<CTableDescriptor> ptabdescR =
 		PtabdescCreate(mp, 3 /*num_cols*/, pmdidR, CName(&strNameR));
 
-	CExpression *pexprOuter = PexprLogicalGet(mp, ptabdescR, &strNameR);
-	CExpression *pexprConstTableGet =
+	gpos::Ref<CExpression> pexprOuter =
+		PexprLogicalGet(mp, ptabdescR, &strNameR);
+	gpos::Ref<CExpression> pexprConstTableGet =
 		PexprConstTableGet(mp, 3 /* ulElements */);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
-	const CColRef *pcrInner = pcrs->PcrAny();
+	gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
 	pcrs = pexprOuter->DeriveOutputColumns();
-	const CColRef *pcrOuter = pcrs->PcrAny();
+	const gpos::Ref<CColRef> pcrOuter = pcrs->PcrAny();
 
 	const CWStringConst *str = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("="));
 
-	CExpression *pexprSubquery = nullptr;
+	gpos::Ref<CExpression> pexprSubquery = nullptr;
 	if (COperator::EopScalarSubqueryAny == op_id)
 	{
 		// construct ANY subquery expression
@@ -1001,7 +1011,7 @@ CTestUtils::PexprLogicalSubqueryWithConstTableGet(CMemoryPool *mp,
 //		Generate a random select expression with constant ANY subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithConstAnySubquery(CMemoryPool *mp)
 {
 	return PexprLogicalSubqueryWithConstTableGet(
@@ -1016,7 +1026,7 @@ CTestUtils::PexprLogicalSelectWithConstAnySubquery(CMemoryPool *mp)
 //		Generate a random select expression with constant ALL subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithConstAllSubquery(CMemoryPool *mp)
 {
 	return PexprLogicalSubqueryWithConstTableGet(
@@ -1031,13 +1041,14 @@ CTestUtils::PexprLogicalSelectWithConstAllSubquery(CMemoryPool *mp)
 //		Generate correlated select; wrapper
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp)
 {
-	CExpression *pexprOuter = PexprLogicalGet(mp);
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CExpression> pexprOuter = PexprLogicalGet(mp);
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 
-	CExpression *pexpr = PexprLogicalSelectCorrelated(mp, outer_refs, 8);
+	gpos::Ref<CExpression> pexpr =
+		PexprLogicalSelectCorrelated(mp, outer_refs, 8);
 
 	pexprOuter->Release();
 
@@ -1053,22 +1064,24 @@ CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp)
 //		Generate a select on top of outer join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectOnOuterJoin(CMemoryPool *mp)
 {
 	// generate a pair of get expressions
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	CSubqueryTestUtils::GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
-	const CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
-	const CColRef *pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprOuterJoinPred =
+	const gpos::Ref<CColRef> pcrOuter =
+		pexprOuter->DeriveOutputColumns()->PcrAny();
+	const gpos::Ref<CColRef> pcrInner =
+		pexprInner->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprOuterJoinPred =
 		CUtils::PexprScalarEqCmp(mp, pcrOuter, pcrInner);
-	CExpression *pexprOuterJoin =
+	gpos::Ref<CExpression> pexprOuterJoin =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
 								 pexprOuter, pexprInner, pexprOuterJoinPred);
-	CExpression *pexprPred = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprPred = CUtils::PexprScalarEqCmp(
 		mp, pcrInner, CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
 	return CUtils::PexprLogicalSelect(mp, pexprOuterJoin, pexprPred);
@@ -1084,9 +1097,10 @@ CTestUtils::PexprLogicalSelectOnOuterJoin(CMemoryPool *mp)
 //		level: correlated, exclusively external, non-correlated
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
-										 CColRefSet *outer_refs, ULONG ulLevel)
+										 gpos::Ref<CColRefSet> outer_refs,
+										 ULONG ulLevel)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1095,10 +1109,10 @@ CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
 		return PexprLogicalGet(mp);
 	}
 
-	CExpression *pexpr =
+	gpos::Ref<CExpression> pexpr =
 		PexprLogicalSelectCorrelated(mp, outer_refs, ulLevel - 1);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	GPOS_ASSERT(outer_refs->IsDisjoint(pcrs));
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -1140,11 +1154,11 @@ CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
 			break;
 	}
 
-	CExpression *pexprCorrelation =
+	gpos::Ref<CExpression> pexprCorrelation =
 		CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 	// assemble select
-	CExpression *pexprResult = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprResult = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalSelect(mp), pexpr, pexprCorrelation);
 
 	return pexprResult;
@@ -1158,9 +1172,10 @@ CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
 //		Generate a Project expression that re-maps a single column
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalProject(CMemoryPool *mp, CExpression *pexpr,
-								CColRef *colref, CColRef *new_colref)
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalProject(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+								gpos::Ref<CColRef> colref,
+								gpos::Ref<CColRef> new_colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -1184,20 +1199,20 @@ CTestUtils::PexprLogicalProject(CMemoryPool *mp, CExpression *pexpr,
 //		Generate a randomized project expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalProject(CMemoryPool *mp)
 {
 	// generate a get expression
-	CExpression *pexpr = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexpr = PexprLogicalGet(mp);
 
 	// get output columns
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	CColRef *colref = pcrs->PcrAny();
+	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 
 	// create new column to which we will an existing one remap to
-	CColRef *new_colref = col_factory->PcrCreate(colref);
+	gpos::Ref<CColRef> new_colref = col_factory->PcrCreate(colref);
 
 	return PexprLogicalProject(mp, pexpr, colref, new_colref);
 }
@@ -1210,15 +1225,15 @@ CTestUtils::PexprLogicalProject(CMemoryPool *mp)
 //		Generate correlated Project over GbAgg
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalProjectGbAggCorrelated(CMemoryPool *mp)
 {
 	// create a GbAgg expression
-	CExpression *pexprGbAgg = PexprLogicalGbAggCorrelated(mp);
+	gpos::Ref<CExpression> pexprGbAgg = PexprLogicalGbAggCorrelated(mp);
 
-	CExpression *pexprPrjList =
+	gpos::Ref<CExpression> pexprPrjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp));
-	CExpression *pexprProject = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprProject = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalProject(mp), pexprGbAgg, pexprPrjList);
 
 	return pexprProject;
@@ -1232,18 +1247,18 @@ CTestUtils::PexprLogicalProjectGbAggCorrelated(CMemoryPool *mp)
 //		Generate correlated join
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalJoinCorrelated(CMemoryPool *mp)
 {
-	CExpression *pexprLeft = PexprLogicalSelectCorrelated(mp);
-	CExpression *pexprRight = PexprLogicalSelectCorrelated(mp);
+	gpos::Ref<CExpression> pexprLeft = PexprLogicalSelectCorrelated(mp);
+	gpos::Ref<CExpression> pexprRight = PexprLogicalSelectCorrelated(mp);
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(pexprLeft);
 	pdrgpexpr->Append(pexprRight);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 
 	EqualityPredicate(mp, pcrsLeft, pcrsRight, pdrgpexpr);
 
@@ -1260,18 +1275,18 @@ CTestUtils::PexprLogicalJoinCorrelated(CMemoryPool *mp)
 //		Generate join with a partitioned and indexed inner child
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalJoinWithPartitionedAndIndexedInnerChild(CMemoryPool *mp)
 {
-	CExpression *pexprLeft = PexprLogicalGet(mp);
-	CExpression *pexprRight = PexprLogicalDynamicGetWithIndexes(mp);
+	gpos::Ref<CExpression> pexprLeft = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprRight = PexprLogicalDynamicGetWithIndexes(mp);
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(pexprLeft);
 	pdrgpexpr->Append(pexprRight);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 
 	EqualityPredicate(mp, pcrsLeft, pcrsRight, pdrgpexpr);
 
@@ -1288,7 +1303,7 @@ CTestUtils::PexprLogicalJoinWithPartitionedAndIndexedInnerChild(CMemoryPool *mp)
 //		Generate randomized n-ary join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -1306,7 +1321,7 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 //		Generate randomized n-ary join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp)
 {
 	const ULONG ulRels = 4;
@@ -1314,22 +1329,22 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp)
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CExpressionArray *pdrgpexprConjuncts = GPOS_NEW(mp) CExpressionArray(mp);
 
-	CExpression *pexprInit = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInit = PexprLogicalGet(mp);
 	pdrgpexpr->Append(pexprInit);
 
 	// build pairwise joins, extract predicate and input, then discard join
 	for (ULONG ul = 0; ul < ulRels; ul++)
 	{
-		CExpression *pexprNext = PexprLogicalGet(mp);
+		gpos::Ref<CExpression> pexprNext = PexprLogicalGet(mp);
 		pdrgpexpr->Append(pexprNext);
 
 		pexprInit->AddRef();
 		pexprNext->AddRef();
 
-		CExpression *pexprJoin =
+		gpos::Ref<CExpression> pexprJoin =
 			PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprInit, pexprNext);
 
-		CExpression *pexprPredicate = (*pexprJoin)[2];
+		gpos::Ref<CExpression> pexprPredicate = (*pexprJoin)[2];
 
 		pexprPredicate->AddRef();
 		pdrgpexprConjuncts->Append(pexprPredicate);
@@ -1353,24 +1368,29 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp)
 //		Generate left outer join on top of n-ary join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLeftOuterJoinOnNAryJoin(CMemoryPool *mp)
 {
-	CExpression *pexprNAryJoin = PexprLogicalNAryJoin(mp);
-	CExpression *pexprLOJInnerChild = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprNAryJoin = PexprLogicalNAryJoin(mp);
+	gpos::Ref<CExpression> pexprLOJInnerChild = PexprLogicalGet(mp);
 
 	// get a random column from LOJ inner child output
-	CColRef *pcrLeft1 = pexprLOJInnerChild->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrLeft1 =
+		pexprLOJInnerChild->DeriveOutputColumns()->PcrAny();
 
 	// get a random column from NAry join second child
-	CColRef *pcrLeft2 = (*pexprNAryJoin)[1]->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrLeft2 =
+		(*pexprNAryJoin)[1]->DeriveOutputColumns()->PcrAny();
 
 	// get a random column from NAry join output
-	CColRef *pcrRight = pexprNAryJoin->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrRight =
+		pexprNAryJoin->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprPred1 = CUtils::PexprScalarEqCmp(mp, pcrLeft1, pcrRight);
-	CExpression *pexprPred2 = CUtils::PexprScalarEqCmp(mp, pcrLeft2, pcrRight);
-	CExpression *pexprPred =
+	gpos::Ref<CExpression> pexprPred1 =
+		CUtils::PexprScalarEqCmp(mp, pcrLeft1, pcrRight);
+	gpos::Ref<CExpression> pexprPred2 =
+		CUtils::PexprScalarEqCmp(mp, pcrLeft2, pcrRight);
+	gpos::Ref<CExpression> pexprPred =
 		CPredicateUtils::PexprConjunction(mp, pexprPred1, pexprPred2);
 	pexprPred1->Release();
 	pexprPred2->Release();
@@ -1381,19 +1401,22 @@ CTestUtils::PexprLeftOuterJoinOnNAryJoin(CMemoryPool *mp)
 }
 
 
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprRightOuterJoin(CMemoryPool *mp)
 {
-	CExpression *pexprInnerChild = PexprLogicalGet(mp);
-	CExpression *pexprOuterChild = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInnerChild = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprOuterChild = PexprLogicalGet(mp);
 
 	// get a random column from inner child output
-	CColRef *pcrLeft = pexprInnerChild->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrLeft =
+		pexprInnerChild->DeriveOutputColumns()->PcrAny();
 
 	// get a random column from outer child output
-	CColRef *pcrRight = pexprOuterChild->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrRight =
+		pexprOuterChild->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprPred = CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
+	gpos::Ref<CExpression> pexprPred =
+		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 	return GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalRightOuterJoin(mp),
@@ -1409,29 +1432,34 @@ CTestUtils::PexprRightOuterJoin(CMemoryPool *mp)
 //		Generate n-ary join expression on top of left outer join
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprNAryJoinOnLeftOuterJoin(CMemoryPool *mp)
 {
-	CExpression *pexprNAryJoin = PexprLogicalNAryJoin(mp);
-	CColRef *pcrNAryJoin = (*pexprNAryJoin)[0]->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprScalar = (*pexprNAryJoin)[pexprNAryJoin->Arity() - 1];
+	gpos::Ref<CExpression> pexprNAryJoin = PexprLogicalNAryJoin(mp);
+	gpos::Ref<CColRef> pcrNAryJoin =
+		(*pexprNAryJoin)[0]->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CExpression> pexprScalar =
+		(*pexprNAryJoin)[pexprNAryJoin->Arity() - 1];
 
 	// copy NAry-Join children
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CUtils::AddRefAppend(pdrgpexpr, pexprNAryJoin->PdrgPexpr());
 
 	// generate LOJ expression
-	CExpression *pexprLOJOuterChild = PexprLogicalGet(mp);
-	CExpression *pexprLOJInnerChild = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprLOJOuterChild = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprLOJInnerChild = PexprLogicalGet(mp);
 
 	// get a random column from LOJ outer child output
-	CColRef *pcrLeft = pexprLOJOuterChild->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrLeft =
+		pexprLOJOuterChild->DeriveOutputColumns()->PcrAny();
 
 	// get a random column from LOJ inner child output
-	CColRef *pcrRight = pexprLOJInnerChild->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> pcrRight =
+		pexprLOJInnerChild->DeriveOutputColumns()->PcrAny();
 
-	CExpression *pexprPred = CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
-	CExpression *pexprLOJ = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPred =
+		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
+	gpos::Ref<CExpression> pexprLOJ = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
 					pexprLOJOuterChild, pexprLOJInnerChild, pexprPred);
 
@@ -1439,7 +1467,7 @@ CTestUtils::PexprNAryJoinOnLeftOuterJoin(CMemoryPool *mp)
 	pdrgpexpr->Replace(pdrgpexpr->Size() - 1, pexprLOJ);
 
 	// create new scalar predicate for NAry join
-	CExpression *pexprNewPred =
+	gpos::Ref<CExpression> pexprNewPred =
 		CUtils::PexprScalarEqCmp(mp, pcrNAryJoin, pcrRight);
 	pdrgpexpr->Append(
 		CPredicateUtils::PexprConjunction(mp, pexprScalar, pexprNewPred));
@@ -1459,15 +1487,16 @@ CTestUtils::PexprNAryJoinOnLeftOuterJoin(CMemoryPool *mp)
 //		Generate a limit expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalLimit(CMemoryPool *mp, CExpression *pexpr, LINT iStart,
-							  LINT iRows, BOOL fGlobal, BOOL fHasCount)
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalLimit(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+							  LINT iStart, LINT iRows, BOOL fGlobal,
+							  BOOL fHasCount)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(0 <= iStart);
 	GPOS_ASSERT(0 <= iRows);
 
-	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 	return GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalLimit(mp, pos, fGlobal, fHasCount,
@@ -1484,7 +1513,7 @@ CTestUtils::PexprLogicalLimit(CMemoryPool *mp, CExpression *pexpr, LINT iStart,
 //		Generate a randomized limit expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalLimit(CMemoryPool *mp)
 {
 	return PexprLogicalLimit(mp, PexprLogicalGet(mp),
@@ -1504,24 +1533,24 @@ CTestUtils::PexprLogicalLimit(CMemoryPool *mp)
 //		Generate a randomized aggregate expression with sum agg function
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGbAggWithSum(CMemoryPool *mp)
 {
-	CExpression *pexprGb = PexprLogicalGbAgg(mp);
+	gpos::Ref<CExpression> pexprGb = PexprLogicalGbAgg(mp);
 
 	// get a random column from Gb child
-	CColRef *colref = (*pexprGb)[0]->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> colref = (*pexprGb)[0]->DeriveOutputColumns()->PcrAny();
 
 	// generate a SUM expression
-	CExpression *pexprProjElem = PexprPrjElemWithSum(mp, colref);
-	CExpression *pexprPrjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprProjElem = PexprPrjElemWithSum(mp, colref);
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprProjElem);
 
 	(*pexprGb)[0]->AddRef();
 	CColRefArray *colref_array =
 		CLogicalGbAgg::PopConvert(pexprGb->Pop())->Pdrgpcr();
 	colref_array->AddRef();
-	CExpression *pexprGbWithSum = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprGbWithSum = CUtils::PexprLogicalGbAggGlobal(
 		mp, colref_array, (*pexprGb)[0], pexprPrjList);
 
 	// release old Gb expression
@@ -1538,11 +1567,12 @@ CTestUtils::PexprLogicalGbAggWithSum(CMemoryPool *mp)
 //		Generate a randomized aggregate expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalGbAggWithInput(CMemoryPool *mp, CExpression *pexprInput)
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalGbAggWithInput(CMemoryPool *mp,
+									   gpos::Ref<CExpression> pexprInput)
 {
 	// get the first few columns
-	CColRefSet *pcrs = pexprInput->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprInput->DeriveOutputColumns();
 
 	ULONG num_cols = std::min(3u, pcrs->Size());
 
@@ -1554,7 +1584,7 @@ CTestUtils::PexprLogicalGbAggWithInput(CMemoryPool *mp, CExpression *pexprInput)
 		colref_array->Append(crsi.Pcr());
 	}
 
-	CExpression *pexprList =
+	gpos::Ref<CExpression> pexprList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp));
 	return CUtils::PexprLogicalGbAggGlobal(mp, colref_array, pexprInput,
 										   pexprList);
@@ -1568,7 +1598,7 @@ CTestUtils::PexprLogicalGbAggWithInput(CMemoryPool *mp, CExpression *pexprInput)
 //		Generate a randomized aggregate expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGbAgg(CMemoryPool *mp)
 {
 	return PexprLogicalGbAggWithInput(mp, PexprLogicalGet(mp));
@@ -1582,29 +1612,30 @@ CTestUtils::PexprLogicalGbAgg(CMemoryPool *mp)
 //		Generate a project element with sum agg function
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprPrjElemWithSum(CMemoryPool *mp, CColRef *colref)
+gpos::Ref<CExpression>
+CTestUtils::PexprPrjElemWithSum(CMemoryPool *mp, gpos::Ref<CColRef> colref)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate a SUM expression
-	CMDIdGPDB *pmdidSumAgg =
+	gpos::Ref<CMDIdGPDB> pmdidSumAgg =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_SUM_AGG);
 	CWStringConst *pstrAggFunc =
 		GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("sum"));
-	CExpression *pexprScalarAgg = CUtils::PexprAggFunc(
+	gpos::Ref<CExpression> pexprScalarAgg = CUtils::PexprAggFunc(
 		mp, pmdidSumAgg, pstrAggFunc, colref, false /*is_distinct*/,
 		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/
 	);
 
 	// map a computed column to SUM expression
-	CScalar *pop = CScalar::PopConvert(pexprScalarAgg->Pop());
-	IMDId *mdid_type = pop->MdidType();
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
+	gpos::Ref<CScalar> pop = CScalar::PopConvert(pexprScalarAgg->Pop());
+	gpos::Ref<IMDId> mdid_type = pop->MdidType();
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	CWStringConst str(GPOS_WSZ_LIT("sum_col"));
 	CName name(mp, &str);
-	CColRef *pcrComputed = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
-		pmdtype, pop->TypeModifier(), name);
+	gpos::Ref<CColRef> pcrComputed =
+		COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype,
+													pop->TypeModifier(), name);
 
 	return CUtils::PexprScalarProjectElement(mp, pcrComputed, pexprScalarAgg);
 }
@@ -1618,15 +1649,15 @@ CTestUtils::PexprPrjElemWithSum(CMemoryPool *mp, CColRef *colref)
 //		Generate a randomized group by over join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGbAggOverJoin(CMemoryPool *mp)
 {
 	// generate a join expression
-	CExpression *pexprJoin = PexprLogicalJoin<CLogicalInnerJoin>(mp);
+	gpos::Ref<CExpression> pexprJoin = PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 	// include one grouping column
 	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
-	CColRef *colref = pexprJoin->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> colref = pexprJoin->DeriveOutputColumns()->PcrAny();
 	colref_array->Append(colref);
 
 	return CUtils::PexprLogicalGbAggGlobal(
@@ -1642,21 +1673,21 @@ CTestUtils::PexprLogicalGbAggOverJoin(CMemoryPool *mp)
 //		Generate a dedup group by over inner join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGbAggDedupOverInnerJoin(CMemoryPool *mp)
 {
 	// generate a join expression
-	CExpression *pexprJoin = PexprLogicalJoin<CLogicalInnerJoin>(mp);
+	gpos::Ref<CExpression> pexprJoin = PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 	// get join's outer child
-	CExpression *pexprOuter = (*pexprJoin)[0];
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CExpression> pexprOuter = (*pexprJoin)[0];
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
 
 	// grouping columns: all columns from outer child
 	CColRefArray *pdrgpcrGrp = pcrs->Pdrgpcr(mp);
 
 	// outer child keys: get a random column from its output columns
-	CColRef *colref = pcrs->PcrAny();
+	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 	CColRefArray *pdrgpcrKeys = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcrKeys->Append(colref);
 
@@ -1677,17 +1708,17 @@ CTestUtils::PexprLogicalGbAggDedupOverInnerJoin(CMemoryPool *mp)
 //		Generate correlated GbAgg
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalGbAggCorrelated(CMemoryPool *mp)
 {
-	CExpression *pexpr = PexprLogicalSelectCorrelated(mp);
+	gpos::Ref<CExpression> pexpr = PexprLogicalSelectCorrelated(mp);
 
 	// include one grouping column
 	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
-	CColRef *colref = pexpr->DeriveOutputColumns()->PcrAny();
+	gpos::Ref<CColRef> colref = pexpr->DeriveOutputColumns()->PcrAny();
 	colref_array->Append(colref);
 
-	CExpression *pexprList =
+	gpos::Ref<CExpression> pexprList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp));
 	return CUtils::PexprLogicalGbAggGlobal(mp, colref_array, pexpr, pexprList);
 }
@@ -1701,20 +1732,20 @@ CTestUtils::PexprLogicalGbAggCorrelated(CMemoryPool *mp)
 //		the given number of elements
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 {
 	GPOS_ASSERT(0 < ulElements);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		md_accessor->PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	// create an integer column descriptor
 	CWStringConst strName(GPOS_WSZ_LIT("A"));
 	CName name(&strName);
-	CColumnDescriptor *pcoldescInt =
+	gpos::Ref<CColumnDescriptor> pcoldescInt =
 		GPOS_NEW(mp) CColumnDescriptor(mp, pmdtypeint4, default_type_modifier,
 									   name, 1 /* attno */, false /*IsNullable*/
 		);
@@ -1728,13 +1759,13 @@ CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 
 	for (ULONG ul = 0; ul < ulElements; ul++)
 	{
-		IDatumInt4 *datum =
+		gpos::Ref<IDatumInt4> datum =
 			pmdtypeint4->CreateInt4Datum(mp, ul, false /* is_null */);
 		IDatumArray *pdrgpdatum = GPOS_NEW(mp) IDatumArray(mp);
-		pdrgpdatum->Append((IDatum *) datum);
+		pdrgpdatum->Append((gpos::Ref<IDatum>) datum);
 		pdrgpdrgpdatum->Append(pdrgpdatum);
 	}
-	CLogicalConstTableGet *popConstTableGet =
+	gpos::Ref<CLogicalConstTableGet> popConstTableGet =
 		GPOS_NEW(mp) CLogicalConstTableGet(mp, pdrgpcoldesc, pdrgpdrgpdatum);
 
 	return GPOS_NEW(mp) CExpression(mp, popConstTableGet);
@@ -1748,7 +1779,7 @@ CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 //		Generate logical const table get expression with one column and 5 elements
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprConstTableGet5(CMemoryPool *mp)
 {
 	return PexprConstTableGet(mp, 5 /* ulElements */);
@@ -1762,18 +1793,20 @@ CTestUtils::PexprConstTableGet5(CMemoryPool *mp)
 //		Generate logical insert expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalInsert(CMemoryPool *mp)
 {
-	CExpression *pexprCTG = PexprConstTableGet(mp, 1 /* ulElements */);
+	gpos::Ref<CExpression> pexprCTG =
+		PexprConstTableGet(mp, 1 /* ulElements */);
 
-	CColRefSet *pcrs = pexprCTG->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprCTG->DeriveOutputColumns();
 	CColRefArray *colref_array = pcrs->Pdrgpcr(mp);
 
 	CWStringConst strName(GPOS_WSZ_LIT("BaseTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = PtabdescCreate(mp, 1, mdid, CName(&strName));
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescCreate(mp, 1, mdid, CName(&strName));
 
 	return GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalInsert(mp, ptabdesc, colref_array), pexprCTG);
@@ -1787,21 +1820,22 @@ CTestUtils::PexprLogicalInsert(CMemoryPool *mp)
 //		Generate logical delete expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalDelete(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("BaseTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = PtabdescCreate(mp, 1, mdid, CName(&strName));
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescCreate(mp, 1, mdid, CName(&strName));
 	CWStringConst strAlias(GPOS_WSZ_LIT("BaseTableAlias"));
 
-	CExpression *pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
 
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRefArray *colref_array = pcrs->Pdrgpcr(mp);
 
-	CColRef *colref = pcrs->PcrFirst();
+	gpos::Ref<CColRef> colref = pcrs->PcrFirst();
 
 	ptabdesc->AddRef();
 
@@ -1819,22 +1853,23 @@ CTestUtils::PexprLogicalDelete(CMemoryPool *mp)
 //		Generate logical update expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalUpdate(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("BaseTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = PtabdescCreate(mp, 1, mdid, CName(&strName));
+	gpos::Ref<CTableDescriptor> ptabdesc =
+		PtabdescCreate(mp, 1, mdid, CName(&strName));
 	CWStringConst strAlias(GPOS_WSZ_LIT("BaseTableAlias"));
 
-	CExpression *pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
 
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRefArray *pdrgpcrDelete = pcrs->Pdrgpcr(mp);
 	CColRefArray *pdrgpcrInsert = pcrs->Pdrgpcr(mp);
 
-	CColRef *colref = pcrs->PcrFirst();
+	gpos::Ref<CColRef> colref = pcrs->PcrFirst();
 
 	ptabdesc->AddRef();
 
@@ -1853,8 +1888,9 @@ CTestUtils::PexprLogicalUpdate(CMemoryPool *mp)
 //		Generate a dynamic get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalDynamicGet(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+gpos::Ref<CExpression>
+CTestUtils::PexprLogicalDynamicGet(CMemoryPool *mp,
+								   gpos::Ref<CTableDescriptor> ptabdesc,
 								   const CWStringConst *pstrTableAlias,
 								   ULONG ulPartIndex)
 {
@@ -1877,13 +1913,13 @@ CTestUtils::PexprLogicalDynamicGet(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 //		Generate a dynamic get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalDynamicGet(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("PartTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID_PARTITIONED, 1, 1);
-	CTableDescriptor *ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		PtabdescCreate(mp, 3, mdid, CName(&strName), true /*fPartitioned*/);
 	CWStringConst strAlias(GPOS_WSZ_LIT("PartTableAlias"));
 
@@ -1900,28 +1936,31 @@ CTestUtils::PexprLogicalDynamicGet(CMemoryPool *mp)
 //		partition key
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithEqPredicateOverDynamicGet(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("PartTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID_PARTITIONED, 1, 1);
-	CTableDescriptor *ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		PtabdescCreate(mp, 3, mdid, CName(&strName), true /*fPartitioned*/);
 	CWStringConst strAlias(GPOS_WSZ_LIT("PartTableAlias"));
 
-	CExpression *pexprDynamicGet =
+	gpos::Ref<CExpression> pexprDynamicGet =
 		PexprLogicalDynamicGet(mp, ptabdesc, &strAlias, GPOPT_TEST_PART_INDEX);
 
 	// construct scalar comparison
-	CLogicalDynamicGet *popDynamicGet =
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 		CLogicalDynamicGet::PopConvert(pexprDynamicGet->Pop());
 	CColRef2dArray *pdrgpdrgpcr = popDynamicGet->PdrgpdrgpcrPart();
-	CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
-	CExpression *pexprScalarIdent = CUtils::PexprScalarIdent(mp, colref);
+	gpos::Ref<CColRef> colref =
+		CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
+	gpos::Ref<CExpression> pexprScalarIdent =
+		CUtils::PexprScalarIdent(mp, colref);
 
-	CExpression *pexprConst = CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
-	CExpression *pexprScalar =
+	gpos::Ref<CExpression> pexprConst =
+		CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
+	gpos::Ref<CExpression> pexprScalar =
 		CUtils::PexprScalarEqCmp(mp, pexprScalarIdent, pexprConst);
 
 	return CUtils::PexprLogicalSelect(mp, pexprDynamicGet, pexprScalar);
@@ -1936,28 +1975,31 @@ CTestUtils::PexprLogicalSelectWithEqPredicateOverDynamicGet(CMemoryPool *mp)
 //		partition key
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectWithLTPredicateOverDynamicGet(CMemoryPool *mp)
 {
 	CWStringConst strName(GPOS_WSZ_LIT("PartTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp)
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp)
 		CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID_PARTITIONED, 1, 1);
-	CTableDescriptor *ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		PtabdescCreate(mp, 3, mdid, CName(&strName), true /*fPartitioned*/);
 	CWStringConst strAlias(GPOS_WSZ_LIT("PartTableAlias"));
 
-	CExpression *pexprDynamicGet =
+	gpos::Ref<CExpression> pexprDynamicGet =
 		PexprLogicalDynamicGet(mp, ptabdesc, &strAlias, GPOPT_TEST_PART_INDEX);
 
 	// construct scalar comparison
-	CLogicalDynamicGet *popDynamicGet =
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 		CLogicalDynamicGet::PopConvert(pexprDynamicGet->Pop());
 	CColRef2dArray *pdrgpdrgpcr = popDynamicGet->PdrgpdrgpcrPart();
-	CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
-	CExpression *pexprScalarIdent = CUtils::PexprScalarIdent(mp, colref);
+	gpos::Ref<CColRef> colref =
+		CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
+	gpos::Ref<CExpression> pexprScalarIdent =
+		CUtils::PexprScalarIdent(mp, colref);
 
-	CExpression *pexprConst = CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
-	CExpression *pexprScalar = CUtils::PexprScalarCmp(
+	gpos::Ref<CExpression> pexprConst =
+		CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
+	gpos::Ref<CExpression> pexprScalar = CUtils::PexprScalarCmp(
 		mp, pexprScalarIdent, pexprConst, IMDType::EcmptL);
 
 	return CUtils::PexprLogicalSelect(mp, pexprDynamicGet, pexprScalar);
@@ -1971,7 +2013,7 @@ CTestUtils::PexprLogicalSelectWithLTPredicateOverDynamicGet(CMemoryPool *mp)
 //		Generate a logical TVF expression with 2 constant arguments
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalTVFTwoArgs(CMemoryPool *mp)
 {
 	return PexprLogicalTVF(mp, 2);
@@ -1985,7 +2027,7 @@ CTestUtils::PexprLogicalTVFTwoArgs(CMemoryPool *mp)
 //		Generate a logical TVF expression with 3 constant arguments
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalTVFThreeArgs(CMemoryPool *mp)
 {
 	return PexprLogicalTVF(mp, 3);
@@ -1999,7 +2041,7 @@ CTestUtils::PexprLogicalTVFThreeArgs(CMemoryPool *mp)
 //		Generate a logical TVF expression with no arguments
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalTVFNoArgs(CMemoryPool *mp)
 {
 	return PexprLogicalTVF(mp, 0);
@@ -2013,25 +2055,25 @@ CTestUtils::PexprLogicalTVFNoArgs(CMemoryPool *mp)
 //		Generate a TVF expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalTVF(CMemoryPool *mp, ULONG ulArgs)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	const WCHAR *wszFuncName = GPOS_WSZ_LIT("generate_series");
 
-	IMDId *mdid =
+	gpos::Ref<IMDId> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT8_GENERATE_SERIES);
 	CWStringConst *str_func_name = GPOS_NEW(mp) CWStringConst(mp, wszFuncName);
 
-	const IMDTypeInt8 *pmdtypeint8 =
+	const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
 		md_accessor->PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 	// create an integer column descriptor
 	CWStringConst strName(GPOS_WSZ_LIT("generate_series"));
 	CName name(&strName);
 
-	CColumnDescriptor *pcoldescInt = GPOS_NEW(mp)
+	gpos::Ref<CColumnDescriptor> pcoldescInt = GPOS_NEW(mp)
 		CColumnDescriptor(mp, pmdtypeint8, default_type_modifier, name,
 						  1 /* attno */, false /*IsNullable*/);
 
@@ -2039,10 +2081,10 @@ CTestUtils::PexprLogicalTVF(CMemoryPool *mp, ULONG ulArgs)
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 	pdrgpcoldesc->Append(pcoldescInt);
 
-	IMDId *mdid_return_type = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid_return_type = pmdtypeint8->MDId();
 	mdid_return_type->AddRef();
 
-	CLogicalTVF *popTVF = GPOS_NEW(mp)
+	gpos::Ref<CLogicalTVF> popTVF = GPOS_NEW(mp)
 		CLogicalTVF(mp, mdid, mdid_return_type, str_func_name, pdrgpcoldesc);
 
 	if (0 == ulArgs)
@@ -2055,9 +2097,10 @@ CTestUtils::PexprLogicalTVF(CMemoryPool *mp, ULONG ulArgs)
 	for (ULONG ul = 0; ul < ulArgs; ul++)
 	{
 		ULONG ulArg = 1;
-		IDatum *datum = (IDatum *) pmdtypeint8->CreateInt8Datum(
-			mp, ulArg, false /* is_null */);
-		CScalarConst *popConst = GPOS_NEW(mp) CScalarConst(mp, datum);
+		gpos::Ref<IDatum> datum =
+			(gpos::Ref<IDatum>) pmdtypeint8->CreateInt8Datum(
+				mp, ulArg, false /* is_null */);
+		gpos::Ref<CScalarConst> popConst = GPOS_NEW(mp) CScalarConst(mp, datum);
 		pdrgpexprArgs->Append(GPOS_NEW(mp) CExpression(mp, popConst));
 	}
 
@@ -2072,10 +2115,10 @@ CTestUtils::PexprLogicalTVF(CMemoryPool *mp, ULONG ulArgs)
 //		Generate a CTE producer on top of a select
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalCTEProducerOverSelect(CMemoryPool *mp, ULONG ulCTEId)
 {
-	CExpression *pexprSelect = CTestUtils::PexprLogicalSelect(mp);
+	gpos::Ref<CExpression> pexprSelect = CTestUtils::PexprLogicalSelect(mp);
 	CColRefArray *colref_array =
 		pexprSelect->DeriveOutputColumns()->Pdrgpcr(mp);
 
@@ -2092,7 +2135,7 @@ CTestUtils::PexprLogicalCTEProducerOverSelect(CMemoryPool *mp, ULONG ulCTEId)
 //		Generate a CTE producer on top of a select
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalCTEProducerOverSelect(CMemoryPool *mp)
 {
 	return PexprLogicalCTEProducerOverSelect(mp, 0);
@@ -2106,13 +2149,14 @@ CTestUtils::PexprLogicalCTEProducerOverSelect(CMemoryPool *mp)
 //		Generate an expression with CTE producer and consumer
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprCTETree(CMemoryPool *mp)
 {
 	ULONG ulCTEId = 0;
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
-	CExpression *pexprProducer = PexprLogicalCTEProducerOverSelect(mp, ulCTEId);
+	gpos::Ref<CExpression> pexprProducer =
+		PexprLogicalCTEProducerOverSelect(mp, ulCTEId);
 	COptCtxt::PoctxtFromTLS()->Pcteinfo()->AddCTEProducer(pexprProducer);
 
 	pdrgpexpr->Append(pexprProducer);
@@ -2121,7 +2165,7 @@ CTestUtils::PexprCTETree(CMemoryPool *mp)
 		CLogicalCTEProducer::PopConvert(pexprProducer->Pop())->Pdrgpcr();
 	CColRefArray *pdrgpcrConsumer = CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
 
-	CExpression *pexprConsumer = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprConsumer = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumer));
 
 	pdrgpexpr->Append(pexprConsumer);
@@ -2137,7 +2181,7 @@ CTestUtils::PexprCTETree(CMemoryPool *mp)
 //		Generate a dynamic get expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSequence(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -2154,7 +2198,7 @@ CTestUtils::PexprLogicalSequence(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 //		Generate a logical sequence expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSequence(CMemoryPool *mp)
 {
 	const ULONG ulRels = 2;
@@ -2165,14 +2209,14 @@ CTestUtils::PexprLogicalSequence(CMemoryPool *mp)
 	// build an array of get expressions
 	for (ULONG ul = 0; ul < ulRels; ul++)
 	{
-		CExpression *pexpr = PexprLogicalGet(mp);
+		gpos::Ref<CExpression> pexpr = PexprLogicalGet(mp);
 		pdrgpexpr->Append(pexpr);
 	}
 
-	CExpression *pexprCTG = PexprConstTableGet(mp, ulCTGElements);
+	gpos::Ref<CExpression> pexprCTG = PexprConstTableGet(mp, ulCTGElements);
 	pdrgpexpr->Append(pexprCTG);
 
-	CExpression *pexprDynamicGet = PexprLogicalDynamicGet(mp);
+	gpos::Ref<CExpression> pexprDynamicGet = PexprLogicalDynamicGet(mp);
 	pdrgpexpr->Append(pexprDynamicGet);
 
 	return PexprLogicalSequence(mp, pdrgpexpr);
@@ -2186,13 +2230,13 @@ CTestUtils::PexprLogicalSequence(CMemoryPool *mp)
 //		Generate tree of unions recursively
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 {
 	// stack check in recursion
 	GPOS_CHECK_STACK_SIZE;
 
-	CExpression *pexpr = nullptr;
+	gpos::Ref<CExpression> pexpr = nullptr;
 
 	if (0 == ulDepth)
 	{
@@ -2207,19 +2251,21 @@ CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 
 		for (ULONG i = 0; i < 3; i++)
 		{
-			CExpression *pexprInput = PexprLogicalUnion(mp, ulDepth - 1);
-			COperator *pop = pexprInput->Pop();
+			gpos::Ref<CExpression> pexprInput =
+				PexprLogicalUnion(mp, ulDepth - 1);
+			gpos::Ref<COperator> pop = pexprInput->Pop();
 			CColRefArray *colref_array = nullptr;
 
 			if (pop->Eopid() == COperator::EopLogicalGet)
 			{
-				CLogicalGet *popGet = CLogicalGet::PopConvert(pop);
+				gpos::Ref<CLogicalGet> popGet = CLogicalGet::PopConvert(pop);
 				colref_array = popGet->PdrgpcrOutput();
 			}
 			else
 			{
 				GPOS_ASSERT(COperator::EopLogicalUnion == pop->Eopid());
-				CLogicalUnion *popUnion = CLogicalUnion::PopConvert(pop);
+				gpos::Ref<CLogicalUnion> popUnion =
+					CLogicalUnion::PopConvert(pop);
 				colref_array = popUnion->PdrgpcrOutput();
 			}
 			pdrgpexprInput->Append(pexprInput);
@@ -2255,9 +2301,9 @@ CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 //		Generate a logical sequence project expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSequenceProject(CMemoryPool *mp, OID oidFunc,
-										CExpression *pexprInput)
+										gpos::Ref<CExpression> pexprInput)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
@@ -2268,19 +2314,20 @@ CTestUtils::PexprLogicalSequenceProject(CMemoryPool *mp, OID oidFunc,
 	COrderSpecArray *pdrgpos = GPOS_NEW(mp) COrderSpecArray(mp);
 	CWindowFrameArray *pdrgwf = GPOS_NEW(mp) CWindowFrameArray(mp);
 
-	CLogicalSequenceProject *popSeqProj = GPOS_NEW(mp) CLogicalSequenceProject(
-		mp,
-		GPOS_NEW(mp)
-			CDistributionSpecHashed(pdrgpexpr, true /*fNullsCollocated*/),
-		pdrgpos, pdrgwf);
+	gpos::Ref<CLogicalSequenceProject> popSeqProj = GPOS_NEW(mp)
+		CLogicalSequenceProject(mp,
+								GPOS_NEW(mp) CDistributionSpecHashed(
+									pdrgpexpr, true /*fNullsCollocated*/),
+								pdrgpos, pdrgwf);
 
-	IMDId *mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oidFunc);
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid);
+	gpos::Ref<IMDId> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oidFunc);
+	const gpos::Ref<IMDFunction> pmdfunc = md_accessor->RetrieveFunc(mdid);
 
-	IMDId *mdid_return_type = pmdfunc->GetResultTypeMdid();
+	gpos::Ref<IMDId> mdid_return_type = pmdfunc->GetResultTypeMdid();
 	mdid_return_type->AddRef();
 
-	CExpression *pexprWinFunc = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprWinFunc = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CScalarWindowFunc(
 				mp, mdid, mdid_return_type,
 				GPOS_NEW(mp) CWStringConst(
@@ -2289,11 +2336,11 @@ CTestUtils::PexprLogicalSequenceProject(CMemoryPool *mp, OID oidFunc,
 				false /*is_star_arg*/, false /*is_simple_agg*/
 				));
 	// window function call is not a cast and so does not need a type modifier
-	CColRef *pcrComputed = col_factory->PcrCreate(
+	gpos::Ref<CColRef> pcrComputed = col_factory->PcrCreate(
 		md_accessor->RetrieveType(pmdfunc->GetResultTypeMdid()),
 		default_type_modifier);
 
-	CExpression *pexprPrjList = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprPrjList = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CScalarProjectList(mp),
 		CUtils::PexprScalarProjectElement(mp, pcrComputed, pexprWinFunc));
 
@@ -2309,10 +2356,10 @@ CTestUtils::PexprLogicalSequenceProject(CMemoryPool *mp, OID oidFunc,
 //		Generate a random expression with one window function
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprOneWindowFunction(CMemoryPool *mp)
 {
-	CExpression *pexprGet = PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
 
 	OID row_number_oid = COptCtxt::PoctxtFromTLS()
 							 ->GetOptimizerConfig()
@@ -2331,10 +2378,10 @@ CTestUtils::PexprOneWindowFunction(CMemoryPool *mp)
 //		Generate a random expression with two window functions
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprTwoWindowFunctions(CMemoryPool *mp)
 {
-	CExpression *pexprWinFunc = PexprOneWindowFunction(mp);
+	gpos::Ref<CExpression> pexprWinFunc = PexprOneWindowFunction(mp);
 
 	OID rank_oid = COptCtxt::PoctxtFromTLS()
 					   ->GetOptimizerConfig()
@@ -2366,7 +2413,7 @@ CTestUtils::PdrgpexprJoins(CMemoryPool *mp,
 	CExpressionJoinsArray *pdrgpexpr = GPOS_NEW(mp) CExpressionJoinsArray(mp);
 	for (ULONG i = 0; i < ulRels; i++)
 	{
-		CExpression *pexpr = nullptr;
+		gpos::Ref<CExpression> pexpr = nullptr;
 		if (fCrossProduct)
 		{
 			pexpr = PexprLogicalGet(mp, &pstrRel[i], &pstrRel[i], pulRel[i]);
@@ -2384,7 +2431,7 @@ CTestUtils::PdrgpexprJoins(CMemoryPool *mp,
 		}
 		else
 		{
-			CExpression *pexprJoin = nullptr;
+			gpos::Ref<CExpression> pexprJoin = nullptr;
 			if (fCrossProduct)
 			{
 				// create a cross product
@@ -2420,7 +2467,7 @@ CTestUtils::PdrgpexprJoins(CMemoryPool *mp,
 //		Generate an n-ary join expression using given array of relation names
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 								 ULONG *pulRel, ULONG ulRels,
 								 BOOL fCrossProduct)
@@ -2428,7 +2475,7 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulRels; ul++)
 	{
-		CExpression *pexpr =
+		gpos::Ref<CExpression> pexpr =
 			PexprLogicalGet(mp, &pstrRel[ul], &pstrRel[ul], pulRel[ul]);
 		pdrgpexpr->Append(pexpr);
 	}
@@ -2439,12 +2486,14 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 		pdrgpexprPred = GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels - 1; ul++)
 		{
-			CExpression *pexprLeft = (*pdrgpexpr)[ul];
-			CExpression *pexprRight = (*pdrgpexpr)[ul + 1];
+			gpos::Ref<CExpression> pexprLeft = (*pdrgpexpr)[ul];
+			gpos::Ref<CExpression> pexprRight = (*pdrgpexpr)[ul + 1];
 
 			// get any two columns; one from each side
-			CColRef *pcrLeft = pexprLeft->DeriveOutputColumns()->PcrAny();
-			CColRef *pcrRight = pexprRight->DeriveOutputColumns()->PcrAny();
+			gpos::Ref<CColRef> pcrLeft =
+				pexprLeft->DeriveOutputColumns()->PcrAny();
+			gpos::Ref<CColRef> pcrRight =
+				pexprRight->DeriveOutputColumns()->PcrAny();
 			pdrgpexprPred->Append(
 				CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight));
 		}
@@ -2465,37 +2514,40 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+CTestUtils::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 						CColRefArray *colref_array)
 {
 	// generate required columns
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 
-	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
-	CDistributionSpec *pds = GPOS_NEW(mp)
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 
-	CRewindabilitySpec *prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
 
-	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
+	gpos::Ref<CPartitionPropagationSpec> pps =
+		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
-	CEnfdOrder *peo = GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
+	gpos::Ref<CEnfdOrder> peo =
+		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
 
 	// we require exact matching on distribution since final query results must be sent to master
-	CEnfdDistribution *ped =
+	gpos::Ref<CEnfdDistribution> ped =
 		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 
-	CEnfdRewindability *per =
+	gpos::Ref<CEnfdRewindability> per =
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
 
-	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
+	gpos::Ref<CEnfdPartitionPropagation> pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
 
-	CCTEReq *pcter = COptCtxt::PoctxtFromTLS()->Pcteinfo()->PcterProducers(mp);
+	gpos::Ref<CCTEReq> pcter =
+		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PcterProducers(mp);
 
-	CReqdPropPlan *prpp =
+	gpos::Ref<CReqdPropPlan> prpp =
 		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
 
 	colref_array->AddRef();
@@ -2503,7 +2555,7 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRef *colref = (*colref_array)[ul];
+		gpos::Ref<CColRef> colref = (*colref_array)[ul];
 		CMDName *mdname = GPOS_NEW(mp) CMDName(mp, colref->Name().Pstr());
 		pdrgpmdname->Append(mdname);
 	}
@@ -2522,17 +2574,17 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr)
+CTestUtils::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pexpr->DeriveOutputColumns());
 
 	// keep a subset of columns
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
 	{
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		if (1 != colref->Id() % GPOPT_TEST_REL_WIDTH)
 		{
 			pcrsOutput->Include(colref);
@@ -2545,44 +2597,47 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr)
 	CColRefSetIter crsiOutput(*pcrsOutput);
 	while (crsiOutput.Advance())
 	{
-		CColRef *colref = crsiOutput.Pcr();
+		gpos::Ref<CColRef> colref = crsiOutput.Pcr();
 		colref_array->Append(colref);
 	}
 
 	// generate a sort order
-	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 	pos->Append(GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_LT_OP),
 				pcrsOutput->PcrAny(), COrderSpec::EntFirst);
 
-	CDistributionSpec *pds = GPOS_NEW(mp)
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 
-	CRewindabilitySpec *prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
 
-	CEnfdOrder *peo = GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
+	gpos::Ref<CEnfdOrder> peo =
+		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
 
 	// we require exact matching on distribution since final query results must be sent to master
-	CEnfdDistribution *ped =
+	gpos::Ref<CEnfdDistribution> ped =
 		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 
-	CEnfdRewindability *per =
+	gpos::Ref<CEnfdRewindability> per =
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
 
-	CCTEReq *pcter = COptCtxt::PoctxtFromTLS()->Pcteinfo()->PcterProducers(mp);
+	gpos::Ref<CCTEReq> pcter =
+		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PcterProducers(mp);
 
-	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
+	gpos::Ref<CPartitionPropagationSpec> pps =
+		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
+	gpos::Ref<CEnfdPartitionPropagation> pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
 
-	CReqdPropPlan *prpp =
+	gpos::Ref<CReqdPropPlan> prpp =
 		GPOS_NEW(mp) CReqdPropPlan(pcrsOutput, peo, ped, per, pepp, pcter);
 
 	CMDNameArray *pdrgpmdname = GPOS_NEW(mp) CMDNameArray(mp);
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRef *colref = (*colref_array)[ul];
+		gpos::Ref<CColRef> colref = (*colref_array)[ul];
 		CMDName *mdname = GPOS_NEW(mp) CMDName(mp, colref->Name().Pstr());
 		pdrgpmdname->Append(mdname);
 	}
@@ -2599,8 +2654,9 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr)
 //		Helper for generating a nested AND/OR/NOT tree
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp, CExpression *pexpr,
+gpos::Ref<CExpression>
+CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexpr,
 								   CScalarBoolOp::EBoolOperator eboolop)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -2609,17 +2665,18 @@ CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp, CExpression *pexpr,
 				CScalarBoolOp::EboolopOr == eboolop ||
 				CScalarBoolOp::EboolopNot == eboolop);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
-	CExpression *pexprConstActual = CUtils::PexprScalarConstInt4(mp, 3 /*val*/);
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrLeft = pcrs->PcrAny();
+	gpos::Ref<CExpression> pexprConstActual =
+		CUtils::PexprScalarConstInt4(mp, 3 /*val*/);
 
-	CExpression *pexprPredActual =
+	gpos::Ref<CExpression> pexprPredActual =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pexprConstActual);
-	CExpression *pexprPredExpected = nullptr;
+	gpos::Ref<CExpression> pexprPredExpected = nullptr;
 
 	if (CScalarBoolOp::EboolopNot != eboolop)
 	{
-		CExpression *pexprConstExpected =
+		gpos::Ref<CExpression> pexprConstExpected =
 			CUtils::PexprScalarConstInt4(mp, 5 /*val*/);
 		pexprPredExpected =
 			CUtils::PexprScalarEqCmp(mp, pcrLeft, pexprConstExpected);
@@ -2633,7 +2690,7 @@ CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp, CExpression *pexpr,
 		pdrgpexprActual->Append(pexprPredExpected);
 	}
 
-	CExpression *pexprBoolOp =
+	gpos::Ref<CExpression> pexprBoolOp =
 		CUtils::PexprScalarBoolOp(mp, eboolop, pdrgpexprActual);
 	CExpressionArray *pdrgpexprExpected = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexprExpected->Append(pexprBoolOp);
@@ -2656,8 +2713,8 @@ CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp, CExpression *pexpr,
 //		containing the given operator type. NULL if not found
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprFindFirstExpressionWithOpId(CExpression *pexpr,
+gpos::Ref<CExpression>
+CTestUtils::PexprFindFirstExpressionWithOpId(gpos::Ref<CExpression> pexpr,
 											 COperator::EOperatorId op_id)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -2669,7 +2726,7 @@ CTestUtils::PexprFindFirstExpressionWithOpId(CExpression *pexpr,
 	ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprFound =
+		gpos::Ref<CExpression> pexprFound =
 			PexprFindFirstExpressionWithOpId((*pexpr)[ul], op_id);
 		if (nullptr != pexprFound)
 		{
@@ -2689,15 +2746,15 @@ CTestUtils::PexprFindFirstExpressionWithOpId(CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 void
-CTestUtils::EqualityPredicate(CMemoryPool *mp, CColRefSet *pcrsLeft,
-							  CColRefSet *pcrsRight,
+CTestUtils::EqualityPredicate(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsLeft,
+							  gpos::Ref<CColRefSet> pcrsRight,
 							  CExpressionArray *pdrgpexpr)
 {
-	CColRef *pcrLeft = pcrsLeft->PcrAny();
-	CColRef *pcrRight = pcrsRight->PcrAny();
+	gpos::Ref<CColRef> pcrLeft = pcrsLeft->PcrAny();
+	gpos::Ref<CColRef> pcrRight = pcrsRight->PcrAny();
 
 	// generate correlated predicate
-	CExpression *pexprCorrelation =
+	gpos::Ref<CExpression> pexprCorrelation =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 	pdrgpexpr->Append(pexprCorrelation);
@@ -2712,12 +2769,12 @@ CTestUtils::EqualityPredicate(CMemoryPool *mp, CColRefSet *pcrsLeft,
 //		Create an INT2 point
 //
 //---------------------------------------------------------------------------
-CPoint *
+gpos::Ref<CPoint>
 CTestUtils::PpointInt2(CMemoryPool *mp, INT i)
 {
-	CDatumInt2GPDB *datum =
+	gpos::Ref<CDatumInt2GPDB> datum =
 		GPOS_NEW(mp) CDatumInt2GPDB(m_sysidDefault, (SINT) i);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	return point;
 }
 
@@ -2730,11 +2787,12 @@ CTestUtils::PpointInt2(CMemoryPool *mp, INT i)
 //		Create an INT4 point
 //
 //---------------------------------------------------------------------------
-CPoint *
+gpos::Ref<CPoint>
 CTestUtils::PpointInt4(CMemoryPool *mp, INT i)
 {
-	CDatumInt4GPDB *datum = GPOS_NEW(mp) CDatumInt4GPDB(m_sysidDefault, i);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<CDatumInt4GPDB> datum =
+		GPOS_NEW(mp) CDatumInt4GPDB(m_sysidDefault, i);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	return point;
 }
 
@@ -2747,12 +2805,12 @@ CTestUtils::PpointInt4(CMemoryPool *mp, INT i)
 //		Create an INT4 point with null value
 //
 //---------------------------------------------------------------------------
-CPoint *
+gpos::Ref<CPoint>
 CTestUtils::PpointInt4NullVal(CMemoryPool *mp)
 {
-	CDatumInt4GPDB *datum =
+	gpos::Ref<CDatumInt4GPDB> datum =
 		GPOS_NEW(mp) CDatumInt4GPDB(m_sysidDefault, 0, true /* is_null */);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	return point;
 }
 
@@ -2765,12 +2823,12 @@ CTestUtils::PpointInt4NullVal(CMemoryPool *mp)
 //		Create an INT8 point
 //
 //---------------------------------------------------------------------------
-CPoint *
+gpos::Ref<CPoint>
 CTestUtils::PpointInt8(CMemoryPool *mp, INT i)
 {
-	CDatumInt8GPDB *datum =
+	gpos::Ref<CDatumInt8GPDB> datum =
 		GPOS_NEW(mp) CDatumInt8GPDB(m_sysidDefault, (LINT) i);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	return point;
 }
 
@@ -2782,11 +2840,12 @@ CTestUtils::PpointInt8(CMemoryPool *mp, INT i)
 //		Create a point
 //
 //---------------------------------------------------------------------------
-CPoint *
+gpos::Ref<CPoint>
 CTestUtils::PpointBool(CMemoryPool *mp, BOOL value)
 {
-	CDatumBoolGPDB *datum = GPOS_NEW(mp) CDatumBoolGPDB(m_sysidDefault, value);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<CDatumBoolGPDB> datum =
+		GPOS_NEW(mp) CDatumBoolGPDB(m_sysidDefault, value);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	return point;
 }
 
@@ -2799,7 +2858,7 @@ CTestUtils::PpointBool(CMemoryPool *mp, BOOL value)
 //		Return query logical expression from minidump
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CTestUtils::PexprReadQuery(CMemoryPool *mp, const CHAR *szQueryFileName)
 {
 	CHAR *szQueryDXL = CDXLUtils::Read(mp, szQueryFileName);
@@ -2814,7 +2873,7 @@ CTestUtils::PexprReadQuery(CMemoryPool *mp, const CHAR *szQueryFileName)
 
 	// translate DXL tree into CExpression
 	CTranslatorDXLToExpr trdxl2expr(mp, md_accessor);
-	CExpression *pexprQuery = trdxl2expr.PexprTranslateQuery(
+	gpos::Ref<CExpression> pexprQuery = trdxl2expr.PexprTranslateQuery(
 		ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 		ptroutput->GetCTEProducerDXLArray());
 
@@ -2857,7 +2916,7 @@ CTestUtils::EresTranslate(CMemoryPool *mp, const CHAR *szQueryFileName,
 
 	// translate DXL tree into CExpression
 	CTranslatorDXLToExpr ptrdxl2expr(mp, md_accessor);
-	CExpression *pexprQuery = ptrdxl2expr.PexprTranslateQuery(
+	gpos::Ref<CExpression> pexprQuery = ptrdxl2expr.PexprTranslateQuery(
 		ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 		ptroutput->GetCTEProducerDXLArray());
 
@@ -2879,18 +2938,18 @@ CTestUtils::EresTranslate(CMemoryPool *mp, const CHAR *szQueryFileName,
 	eng.Optimize();
 #endif	//GPOS_DEBUG
 
-	gpopt::CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::Ref<gpopt::CExpression> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	pexprPlan->OsPrint(oss);
 
 	// translate plan back to DXL
 	CTranslatorExprToDXL ptrexpr2dxl(mp, md_accessor, PdrgpiSegments(mp));
-	CDXLNode *pdxlnPlan = ptrexpr2dxl.PdxlnTranslate(pexprPlan, pqc->PdrgPcr(),
-													 pqc->Pdrgpmdname());
+	gpos::Ref<CDXLNode> pdxlnPlan = ptrexpr2dxl.PdxlnTranslate(
+		pexprPlan, pqc->PdrgPcr(), pqc->Pdrgpmdname());
 	GPOS_ASSERT(nullptr != pdxlnPlan);
 
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
 	CWStringDynamic strTranslatedPlan(mp);
@@ -3027,9 +3086,10 @@ CTestUtils::CreateExpectedAndActualFile(CMemoryPool *mp, const CHAR *file_name,
 //---------------------------------------------------------------------------
 BOOL
 CTestUtils::FPlanMatch(CMemoryPool *mp, IOstream &os,
-					   const CDXLNode *pdxlnActual, ULLONG ullPlanIdActual,
-					   ULLONG ullPlanSpaceSizeActual,
-					   const CDXLNode *pdxlnExpected, ULLONG ullPlanIdExpected,
+					   const gpos::Ref<CDXLNode> pdxlnActual,
+					   ULLONG ullPlanIdActual, ULLONG ullPlanSpaceSizeActual,
+					   const gpos::Ref<CDXLNode> pdxlnExpected,
+					   ULLONG ullPlanIdExpected,
 					   ULLONG ullPlanSpaceSizeExpected, const CHAR *file_name)
 {
 	if (nullptr == pdxlnActual && nullptr == pdxlnExpected)
@@ -3136,9 +3196,9 @@ CTestUtils::FPlanMatch(CMemoryPool *mp, IOstream &os,
 //---------------------------------------------------------------------------
 BOOL
 CTestUtils::FPlanCompare(CMemoryPool *mp, IOstream &os,
-						 const CDXLNode *pdxlnActual, ULLONG ullPlanIdActual,
-						 ULLONG ullPlanSpaceSizeActual,
-						 const CDXLNode *pdxlnExpected,
+						 const gpos::Ref<CDXLNode> pdxlnActual,
+						 ULLONG ullPlanIdActual, ULLONG ullPlanSpaceSizeActual,
+						 const gpos::Ref<CDXLNode> pdxlnExpected,
 						 ULLONG ullPlanIdExpected,
 						 ULLONG ullPlanSpaceSizeExpected, BOOL fMatchPlans,
 						 INT iCmpSpaceSize, const CHAR *file_name)
@@ -3259,7 +3319,8 @@ GPOS_RESULT
 CTestUtils::EresRunMinidump(CMemoryPool *mp, CMDAccessor *md_accessor,
 							const CHAR *file_name, ULONG *pulTestCounter,
 							ULONG ulSessionId, ULONG ulCmdId, BOOL fMatchPlans,
-							INT iCmpSpaceSize, IConstExprEvaluator *pceeval)
+							INT iCmpSpaceSize,
+							gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
@@ -3274,7 +3335,7 @@ CTestUtils::EresRunMinidump(CMemoryPool *mp, CMDAccessor *md_accessor,
 	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 	GPOS_CHECK_ABORT;
 
-	COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+	gpos::Ref<COptimizerConfig> optimizer_config = pdxlmd->GetOptimizerConfig();
 
 	if (nullptr == optimizer_config)
 	{
@@ -3291,7 +3352,7 @@ CTestUtils::EresRunMinidump(CMemoryPool *mp, CMDAccessor *md_accessor,
 	optimizer_config->GetEnumeratorCfg()->SetSampleValidPlans(
 		false /*fSampleValidPlans*/);
 
-	CDXLNode *pdxlnPlan = nullptr;
+	gpos::Ref<CDXLNode> pdxlnPlan = nullptr;
 
 	CHAR *szMinidumpFileName = SzMinidumpFileName(mp, file_name);
 
@@ -3354,7 +3415,7 @@ CTestUtils::EresRunMinidumps(CMemoryPool *,	 // pmpInput,
 							 ULONG ulCmdId, BOOL fMatchPlans,
 							 BOOL fTestSpacePruning,
 							 const CHAR *,	// szMDFilePath,
-							 IConstExprEvaluator *pceeval)
+							 gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_RESULT eres = GPOS_OK;
 	BOOL fSuccess = true;
@@ -3429,7 +3490,7 @@ GPOS_RESULT
 CTestUtils::EresRunMinidumpsUsingOneMDFile(
 	CMemoryPool *mp, const CHAR *szMDFilePath, const CHAR *rgszFileNames[],
 	ULONG *pulTestCounter, ULONG ulSessionId, ULONG ulCmdId, BOOL fMatchPlans,
-	INT iCmpSpaceSize, IConstExprEvaluator *pceeval)
+	INT iCmpSpaceSize, gpos::Ref<IConstExprEvaluator> pceeval)
 {
 	GPOS_ASSERT(nullptr != rgszFileNames);
 	GPOS_ASSERT(nullptr != szMDFilePath);
@@ -3442,7 +3503,8 @@ CTestUtils::EresRunMinidumpsUsingOneMDFile(
 	GPOS_CHECK_ABORT;
 
 	// set up MD providers
-	CMDProviderMemory *pmdp = GPOS_NEW(mp) CMDProviderMemory(mp, szMDFilePath);
+	gpos::Ref<CMDProviderMemory> pmdp =
+		GPOS_NEW(mp) CMDProviderMemory(mp, szMDFilePath);
 	GPOS_CHECK_ABORT;
 
 	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
@@ -3512,7 +3574,7 @@ CTestUtils::EresSamplePlans(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		// set up MD providers
-		CMDProviderMemory *pmdp =
+		gpos::Ref<CMDProviderMemory> pmdp =
 			GPOS_NEW(mp) CMDProviderMemory(mp, rgszFileNames[ul]);
 		GPOS_CHECK_ABORT;
 
@@ -3526,7 +3588,8 @@ CTestUtils::EresSamplePlans(const CHAR *rgszFileNames[], ULONG ulTests,
 			pdrgpmdp->Append(pmdp);
 		}
 
-		COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+		gpos::Ref<COptimizerConfig> optimizer_config =
+			pdxlmd->GetOptimizerConfig();
 
 		if (nullptr == optimizer_config)
 		{
@@ -3552,11 +3615,12 @@ CTestUtils::EresSamplePlans(const CHAR *rgszFileNames[], ULONG ulTests,
 			// scope for MD accessor
 			CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
 
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments, ulSessionId,
-				ulCmdId, optimizer_config,
-				nullptr	 // pceeval
-			);
+			gpos::Ref<CDXLNode> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments,
+					ulSessionId, ulCmdId, optimizer_config,
+					nullptr	 // pceeval
+				);
 
 			GPOS_CHECK_ABORT;
 
@@ -3650,7 +3714,7 @@ CTestUtils::EresCheckPlans(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		// set up MD providers
-		CMDProviderMemory *pmdp =
+		gpos::Ref<CMDProviderMemory> pmdp =
 			GPOS_NEW(mp) CMDProviderMemory(mp, rgszFileNames[ul]);
 		GPOS_CHECK_ABORT;
 
@@ -3664,7 +3728,8 @@ CTestUtils::EresCheckPlans(const CHAR *rgszFileNames[], ULONG ulTests,
 			pdrgpmdp->Append(pmdp);
 		}
 
-		COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+		gpos::Ref<COptimizerConfig> optimizer_config =
+			pdxlmd->GetOptimizerConfig();
 
 		if (nullptr == optimizer_config)
 		{
@@ -3693,11 +3758,12 @@ CTestUtils::EresCheckPlans(const CHAR *rgszFileNames[], ULONG ulTests,
 			// scope for MD accessor
 			CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
 
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments, ulSessionId,
-				ulCmdId, optimizer_config,
-				nullptr	 // pceeval
-			);
+			gpos::Ref<CDXLNode> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments,
+					ulSessionId, ulCmdId, optimizer_config,
+					nullptr	 // pceeval
+				);
 
 			GPOS_CHECK_ABORT;
 
@@ -3727,7 +3793,7 @@ CTestUtils::EresCheckPlans(const CHAR *rgszFileNames[], ULONG ulTests,
 //
 //---------------------------------------------------------------------------
 ULONG
-CTestUtils::UlSegments(COptimizerConfig *optimizer_config)
+CTestUtils::UlSegments(gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 	ULONG ulSegments = GPOPT_TEST_SEGMENTS;
@@ -3781,7 +3847,7 @@ CTestUtils::EresCheckOptimizedPlan(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		// set up MD providers
-		CMDProviderMemory *pmdp =
+		gpos::Ref<CMDProviderMemory> pmdp =
 			GPOS_NEW(mp) CMDProviderMemory(mp, rgszFileNames[ul]);
 		GPOS_CHECK_ABORT;
 
@@ -3795,7 +3861,8 @@ CTestUtils::EresCheckOptimizedPlan(const CHAR *rgszFileNames[], ULONG ulTests,
 			pdrgpmdp->Append(pmdp);
 		}
 
-		COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+		gpos::Ref<COptimizerConfig> optimizer_config =
+			pdxlmd->GetOptimizerConfig();
 		GPOS_ASSERT(nullptr != optimizer_config);
 
 		if (nullptr != pdrgpcp)
@@ -3813,11 +3880,12 @@ CTestUtils::EresCheckOptimizedPlan(const CHAR *rgszFileNames[], ULONG ulTests,
 			// scope for MD accessor
 			CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
 
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments, ulSessionId,
-				ulCmdId, optimizer_config,
-				nullptr	 // pceeval
-			);
+			gpos::Ref<CDXLNode> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, &mda, pdxlmd, rgszFileNames[ul], ulSegments,
+					ulSessionId, ulCmdId, optimizer_config,
+					nullptr	 // pceeval
+				);
 			if (!pfdpc(pdxlnPlan))
 			{
 				eres = GPOS_FAILED;
@@ -3862,20 +3930,20 @@ CTestUtils::EresCheckOptimizedPlan(const CHAR *rgszFileNames[], ULONG ulTests,
 //		Create a datum with a given type, encoded value and int value.
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CTestUtils::CreateGenericDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   IMDId *mdid_type,
+							   gpos::Ref<IMDId> mdid_type,
 							   CWStringDynamic *pstrEncodedValue, LINT value)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	ULONG ulbaSize = 0;
 	BYTE *data =
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
 
-	CDXLDatumGeneric *dxl_datum = nullptr;
+	gpos::Ref<CDXLDatumGeneric> dxl_datum = nullptr;
 	if (CMDTypeGenericGPDB::IsTimeRelatedTypeMappableToDouble(mdid_type))
 	{
 		dxl_datum = GPOS_NEW(mp) CDXLDatumStatsDoubleMappable(
@@ -3896,7 +3964,7 @@ CTestUtils::CreateGenericDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 							 false /*is_const_null*/, data, ulbaSize);
 	}
 
-	IDatum *datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
+	gpos::Ref<IDatum> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 	dxl_datum->Release();
 
 	return datum;
@@ -3910,26 +3978,26 @@ CTestUtils::CreateGenericDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 //		Create a datum with a given type and double value
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CTestUtils::CreateDoubleDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  IMDId *mdid_type, CDouble value)
+							  gpos::Ref<IMDId> mdid_type, CDouble value)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	ULONG ulbaSize = 0;
 	CWStringDynamic *pstrW =
 		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("AAAABXc="));
 	BYTE *data = CDXLUtils::DecodeByteArrayFromString(mp, pstrW, &ulbaSize);
-	CDXLDatumGeneric *dxl_datum = nullptr;
+	gpos::Ref<CDXLDatumGeneric> dxl_datum = nullptr;
 
 	dxl_datum = GPOS_NEW(mp) CDXLDatumStatsDoubleMappable(
 		mp, mdid_type, default_type_modifier, false /*is_const_null*/, data,
 		ulbaSize, CDouble(value));
 
 
-	IDatum *datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
+	gpos::Ref<IDatum> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 	dxl_datum->Release();
 	GPOS_DELETE(pstrW);
 	return datum;
@@ -3945,9 +4013,10 @@ CTestUtils::CreateDoubleDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 //              Caller takes ownership of returned pointer.
 //
 //---------------------------------------------------------------------------
-CConstraintInterval *
+gpos::Ref<CConstraintInterval>
 CTestUtils::PciGenericInterval(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const CMDIdGPDB &mdidType, CColRef *colref,
+							   const CMDIdGPDB &mdidType,
+							   gpos::Ref<CColRef> colref,
 							   CWStringDynamic *pstrLower, LINT lLower,
 							   CRange::ERangeInclusion eriLeft,
 							   CWStringDynamic *pstrUpper, LINT lUpper,
@@ -3955,14 +4024,14 @@ CTestUtils::PciGenericInterval(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
-	IDatum *pdatumLower = CTestUtils::CreateGenericDatum(
+	gpos::Ref<IDatum> pdatumLower = CTestUtils::CreateGenericDatum(
 		mp, md_accessor, GPOS_NEW(mp) CMDIdGPDB(mdidType), pstrLower, lLower);
-	IDatum *pdatumUpper = CTestUtils::CreateGenericDatum(
+	gpos::Ref<IDatum> pdatumUpper = CTestUtils::CreateGenericDatum(
 		mp, md_accessor, GPOS_NEW(mp) CMDIdGPDB(mdidType), pstrUpper, lUpper);
 
 	CRangeArray *pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_date);
-	CRange *prange =
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_date);
+	gpos::Ref<CRange> prange =
 		GPOS_NEW(mp) CRange(mdid, COptCtxt::PoctxtFromTLS()->Pcomp(),
 							pdatumLower, eriLeft, pdatumUpper, eriRight);
 	pdrgprng->Append(prange);
@@ -3978,15 +4047,17 @@ CTestUtils::PciGenericInterval(CMemoryPool *mp, CMDAccessor *md_accessor,
 //		Helper for generating a scalar compare identifier to a constant
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprScalarCmpIdentToConstant(CMemoryPool *mp, CExpression *pexpr)
+gpos::Ref<CExpression>
+CTestUtils::PexprScalarCmpIdentToConstant(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
-	CColRef *pcrAny = pcrs->PcrAny();
-	CExpression *pexprConst = CUtils::PexprScalarConstInt4(mp, 10 /* val */);
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRef> pcrAny = pcrs->PcrAny();
+	gpos::Ref<CExpression> pexprConst =
+		CUtils::PexprScalarConstInt4(mp, 10 /* val */);
 
 	return CUtils::PexprScalarEqCmp(mp, pcrAny, pexprConst);
 }
@@ -4000,13 +4071,14 @@ CTestUtils::PexprScalarCmpIdentToConstant(CMemoryPool *mp, CExpression *pexpr)
 //		Helper for generating an exists subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprExistsSubquery(CMemoryPool *mp, CExpression *pexprOuter)
+gpos::Ref<CExpression>
+CTestUtils::PexprExistsSubquery(CMemoryPool *mp,
+								gpos::Ref<CExpression> pexprOuter)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
 
 	return CSubqueryTestUtils::PexprSubqueryExistential(
 		mp, COperator::EopScalarSubqueryExists, pexprOuter, pexprInner,
@@ -4023,19 +4095,19 @@ CTestUtils::PexprExistsSubquery(CMemoryPool *mp, CExpression *pexprOuter)
 //		Helper for generating an ALL subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexpSubqueryAll(CMemoryPool *mp, CExpression *pexprOuter)
+gpos::Ref<CExpression>
+CTestUtils::PexpSubqueryAll(CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
-	const CColRef *pcrOuter = outer_refs->PcrAny();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrOuter = outer_refs->PcrAny();
 
 
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
-	const CColRef *pcrInner = pcrsInner->PcrAny();
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrInner = pcrsInner->PcrAny();
 
 	return GPOS_NEW(mp) CExpression(
 		mp,
@@ -4054,19 +4126,19 @@ CTestUtils::PexpSubqueryAll(CMemoryPool *mp, CExpression *pexprOuter)
 //		Helper for generating an ANY subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexpSubqueryAny(CMemoryPool *mp, CExpression *pexprOuter)
+gpos::Ref<CExpression>
+CTestUtils::PexpSubqueryAny(CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
-	const CColRef *pcrOuter = outer_refs->PcrAny();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrOuter = outer_refs->PcrAny();
 
 
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
-	const CColRef *pcrInner = pcrsInner->PcrAny();
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
+	const gpos::Ref<CColRef> pcrInner = pcrsInner->PcrAny();
 
 	return GPOS_NEW(mp) CExpression(
 		mp,
@@ -4085,13 +4157,14 @@ CTestUtils::PexpSubqueryAny(CMemoryPool *mp, CExpression *pexprOuter)
 //		Helper for generating a not exists subquery
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprNotExistsSubquery(CMemoryPool *mp, CExpression *pexprOuter)
+gpos::Ref<CExpression>
+CTestUtils::PexprNotExistsSubquery(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprOuter)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CExpression *pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
 
 	return CSubqueryTestUtils::PexprSubqueryExistential(
 		mp, COperator::EopScalarSubqueryNotExists, pexprOuter, pexprInner,
@@ -4109,8 +4182,8 @@ CTestUtils::PexprNotExistsSubquery(CMemoryPool *mp, CExpression *pexprOuter)
 //  	 return the first subexpression it encounters that has the given id
 //
 //---------------------------------------------------------------------------
-const CExpression *
-CTestUtils::PexprFirst(const CExpression *pexpr,
+const gpos::Ref<CExpression>
+CTestUtils::PexprFirst(const gpos::Ref<CExpression> pexpr,
 					   const COperator::EOperatorId op_id)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -4125,7 +4198,8 @@ CTestUtils::PexprFirst(const CExpression *pexpr,
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		const CExpression *pexprFirst = PexprFirst((*pexpr)[ul], op_id);
+		const gpos::Ref<CExpression> pexprFirst =
+			PexprFirst((*pexpr)[ul], op_id);
 		if (nullptr != pexprFirst)
 		{
 			return pexprFirst;
@@ -4144,9 +4218,9 @@ CTestUtils::PexprFirst(const CExpression *pexpr,
 //		Generate a scalar AND expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprAnd(CMemoryPool *mp, CExpression *pexprActual,
-					 CExpression *pexprExpected)
+gpos::Ref<CExpression>
+CTestUtils::PexprAnd(CMemoryPool *mp, gpos::Ref<CExpression> pexprActual,
+					 gpos::Ref<CExpression> pexprExpected)
 {
 	GPOS_ASSERT(nullptr != pexprActual);
 	GPOS_ASSERT(nullptr != pexprExpected);
@@ -4167,9 +4241,9 @@ CTestUtils::PexprAnd(CMemoryPool *mp, CExpression *pexprActual,
 //		Generate a scalar OR expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprOr(CMemoryPool *mp, CExpression *pexprActual,
-					CExpression *pexprExpected)
+gpos::Ref<CExpression>
+CTestUtils::PexprOr(CMemoryPool *mp, gpos::Ref<CExpression> pexprActual,
+					gpos::Ref<CExpression> pexprExpected)
 {
 	GPOS_ASSERT(nullptr != pexprActual);
 	GPOS_ASSERT(nullptr != pexprExpected);
@@ -4237,7 +4311,8 @@ CTestUtils::EresUnittest_RunTestsWithoutAdditionalTraceFlags(
 
 // Create Equivalence Class based on the breakpoints
 CColRefSetArray *
-CTestUtils::createEquivalenceClasses(CMemoryPool *mp, CColRefSet *pcrs,
+CTestUtils::createEquivalenceClasses(CMemoryPool *mp,
+									 gpos::Ref<CColRefSet> pcrs,
 									 const INT setBoundary[])
 {
 	INT i = 0;
@@ -4246,19 +4321,19 @@ CTestUtils::createEquivalenceClasses(CMemoryPool *mp, CColRefSet *pcrs,
 	CColRefSetArray *pdrgcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
 	CColRefSetIter crsi(*pcrs);
-	CColRefSet *pcrsLoop = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsLoop = GPOS_NEW(mp) CColRefSet(mp);
 
 	while (crsi.Advance())
 	{
 		if (i == setBoundary[bpIndex])
 		{
 			pdrgcrs->Append(pcrsLoop);
-			CColRefSet *pcrsLoop1 = GPOS_NEW(mp) CColRefSet(mp);
+			gpos::Ref<CColRefSet> pcrsLoop1 = GPOS_NEW(mp) CColRefSet(mp);
 			pcrsLoop = pcrsLoop1;
 			bpIndex++;
 		}
 
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		pcrsLoop->Include(colref);
 		i++;
 	}

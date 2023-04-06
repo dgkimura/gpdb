@@ -27,8 +27,9 @@ using namespace gpopt;
 // to redistribute outer child to match inner on the join keys.
 BOOL
 CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
-	CMemoryPool *mp, CExpression *pexprInner, CExpression *pexprScalar,
-	CTableDescriptor *ptabDesc, const CColRefSet *pcrsDist)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprInner,
+	gpos::Ref<CExpression> pexprScalar, gpos::Ref<CTableDescriptor> ptabDesc,
+	const gpos::Ref<CColRefSet> pcrsDist)
 {
 	IMDRelation::Ereldistrpolicy ereldist = ptabDesc->GetRelDistribution();
 
@@ -42,9 +43,10 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	}
 
 	// now consider hash distributed table
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
-	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
-	CColRefSet *pcrsInnerRefs = GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
+	gpos::Ref<CColRefSet> pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsInnerRefs =
+		GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
 	pcrsInnerRefs->Intersection(pcrsInnerOutput);
 
 	// Distribution key set of inner GET must be subset of inner columns used in
@@ -53,14 +55,14 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	pcrsInnerRefs->Release();
 	if (fCanOuterIndexApply)
 	{
-		CColRefSet *pcrsEquivPredInner = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrsEquivPredInner = GPOS_NEW(mp) CColRefSet(mp);
 		// extract array of join predicates from join condition expression
 		CExpressionArray *pdrgpexpr =
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
-			CExpression *pexprPred = (*pdrgpexpr)[ul];
-			CColRefSet *pcrsPred = pexprPred->DeriveUsedColumns();
+			gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
+			gpos::Ref<CColRefSet> pcrsPred = pexprPred->DeriveUsedColumns();
 
 			// if it doesn't have equi-join predicate on the distribution key,
 			// we can't transform to left outer index apply, because only
@@ -100,9 +102,9 @@ CXformJoin2IndexApplyGeneric::Exfp(CExpressionHandle &exprhdl) const
 
 // actual transform
 void
-CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -111,29 +113,29 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	// all predicates that could be used as index predicates, this includes the
 	// join predicates and selection predicates of selects right above the get
-	CExpression *pexprAllPredicates = pexprScalar;
+	gpos::Ref<CExpression> pexprAllPredicates = pexprScalar;
 
 	// a select node that sits right on top of the get node (if it exists, NULL otherwise)
-	CExpression *selectThatIsParentOfGet = nullptr;
+	gpos::Ref<CExpression> selectThatIsParentOfGet = nullptr;
 
 	// the logical get node (dynamic or regular get) at the bottom of the inner tree
-	CExpression *pexprGet = nullptr;
+	gpos::Ref<CExpression> pexprGet = nullptr;
 
 	// the highest node of the right child that gets inserted above the index get
 	// into the alternative, or NULL if there is no such node
 	// (this is a project, GbAgg or a select node above a project or GbAgg)
-	CExpression *nodesToInsertAboveIndexGet = nullptr;
+	gpos::Ref<CExpression> nodesToInsertAboveIndexGet = nullptr;
 
 	// the cut-off point for "nodesAboveIndexGet", this node is below nodesAboveIndexGet
 	// but it doesn't get inserted into the alternative anymore
 	// (or NULL, if nodesAboveIndexGet == NULL)
-	CExpression *endOfNodesToInsertAboveIndexGet = nullptr;
+	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet = nullptr;
 
 	// Example:
 	//
@@ -163,14 +165,15 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 	//                                                  index/residual preds
 
 	// info on the get node (a get node or a dynamic get)
-	CTableDescriptor *ptabdescInner = nullptr;
-	const CColRefSet *distributionCols = nullptr;
-	CLogicalDynamicGet *popDynamicGet = nullptr;
+	gpos::Ref<CTableDescriptor> ptabdescInner = nullptr;
+	const gpos::Ref<CColRefSet> distributionCols = nullptr;
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
 	// like project and GbAgg and select, until we find a logical get
-	for (CExpression *pexprCurrInnerChild = pexprInner; nullptr == pexprGet;
+	for (gpos::Ref<CExpression> pexprCurrInnerChild = pexprInner;
+		 nullptr == pexprGet;
 		 pexprCurrInnerChild =
 			 (nullptr == pexprGet ? (*pexprCurrInnerChild)[0] : nullptr))
 	{
@@ -197,7 +200,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 						return;
 					}
 
-					CColRefSet *joinPredUsedCols = GPOS_NEW(mp)
+					gpos::Ref<CColRefSet> joinPredUsedCols = GPOS_NEW(mp)
 						CColRefSet(mp, *(pexprScalar->DeriveUsedColumns()));
 
 					joinPredUsedCols->Exclude(
@@ -221,8 +224,9 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 					if (COperator::EopLogicalGbAgg ==
 						pexprCurrInnerChild->Pop()->Eopid())
 					{
-						CLogicalGbAgg *grbyAggOp = CLogicalGbAgg::PopConvert(
-							pexprCurrInnerChild->Pop());
+						gpos::Ref<CLogicalGbAgg> grbyAggOp =
+							CLogicalGbAgg::PopConvert(
+								pexprCurrInnerChild->Pop());
 
 						GPOS_ASSERT(nullptr != grbyAggOp);
 						if (nullptr != grbyAggOp->Pdrgpcr() &&
@@ -232,7 +236,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 							// on the inner side if the grouping columns are a superset of the
 							// distribution columns. This way, we can put a groupby locally on top
 							// of each of the gets on every segment.
-							CColRefSet *groupingCols = GPOS_NEW(mp)
+							gpos::Ref<CColRefSet> groupingCols = GPOS_NEW(mp)
 								CColRefSet(mp, grbyAggOp->Pdrgpcr());
 
 							// if there are multiple groupbys, then check the intersection of their grouping cols
@@ -261,7 +265,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 
 			case COperator::EopLogicalGet:
 			{
-				CLogicalGet *popGet =
+				gpos::Ref<CLogicalGet> popGet =
 					CLogicalGet::PopConvert(pexprCurrInnerChild->Pop());
 
 				ptabdescInner = popGet->Ptabdesc();

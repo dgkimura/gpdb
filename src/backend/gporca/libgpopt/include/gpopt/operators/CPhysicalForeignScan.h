@@ -32,8 +32,8 @@ public:
 	CPhysicalForeignScan(const CPhysicalForeignScan &) = delete;
 
 	// ctor
-	CPhysicalForeignScan(CMemoryPool *, const CName *, CTableDescriptor *,
-						 CColRefArray *);
+	CPhysicalForeignScan(CMemoryPool *, const CName *,
+						 gpos::Ref<CTableDescriptor>, CColRefArray *);
 
 	// ident accessors
 	EOperatorId
@@ -50,14 +50,14 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive rewindability
-	CRewindabilitySpec *
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -74,20 +74,20 @@ public:
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		const gpos::Ref<CEnfdRewindability> per) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalForeignScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalForeignScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalForeignScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalForeignScan *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalForeignScan> >(pop);
 	}
 
 };	// class CPhysicalForeignScan

@@ -68,8 +68,8 @@ private:
 		~CDummyConstDXLNodeEvaluator() override = default;
 
 		// evaluate the given DXL node representing an expression and returns a dummy value as DXL
-		gpdxl::CDXLNode *EvaluateExpr(
-			const gpdxl::CDXLNode *pdxlnExpr) override;
+		gpos::Ref<gpdxl::CDXLNode> EvaluateExpr(
+			const gpos::Ref<gpdxl::CDXLNode> pdxlnExpr) override;
 
 		// can evaluate expressions
 		BOOL

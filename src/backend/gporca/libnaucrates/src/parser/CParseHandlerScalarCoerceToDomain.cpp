@@ -66,9 +66,10 @@ CParseHandlerScalarCoerceToDomain::StartElement(
 		}
 
 		// parse and create scalar coerce
-		CDXLScalarCoerceToDomain *dxl_op = (CDXLScalarCoerceToDomain *)
-			CDXLOperatorFactory::MakeDXLCoerceToDomain(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::Ref<CDXLScalarCoerceToDomain> dxl_op =
+			(gpos::Ref<CDXLScalarCoerceToDomain>)
+				CDXLOperatorFactory::MakeDXLCoerceToDomain(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 

@@ -34,10 +34,10 @@ class CMDIdScCmp : public IMDId
 {
 private:
 	// mdid of source type
-	CMDIdGPDB *m_mdid_left;
+	gpos::Ref<CMDIdGPDB> m_mdid_left;
 
 	// mdid of destinatin type
-	CMDIdGPDB *m_mdid_right;
+	gpos::Ref<CMDIdGPDB> m_mdid_right;
 
 	// comparison type
 	IMDType::ECmpType m_comparision_type;
@@ -55,7 +55,7 @@ public:
 	CMDIdScCmp(const CMDIdScCmp &) = delete;
 
 	// ctor
-	CMDIdScCmp(CMDIdGPDB *left_mdid, CMDIdGPDB *right_mdid,
+	CMDIdScCmp(gpos::Ref<CMDIdGPDB> left_mdid, gpos::Ref<CMDIdGPDB> right_mdid,
 			   IMDType::ECmpType cmp_type);
 
 	// dtor
@@ -78,10 +78,10 @@ public:
 	}
 
 	// left type id
-	IMDId *GetLeftMdid() const;
+	gpos::Ref<IMDId> GetLeftMdid() const;
 
 	// right type id
-	IMDId *GetRightMdid() const;
+	gpos::Ref<IMDId> GetRightMdid() const;
 
 	IMDType::ECmpType
 	ParseCmpType() const
@@ -90,7 +90,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG HashValue() const override;
@@ -111,20 +111,22 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdScCmp *
-	CastMdid(const IMDId *mdid)
+	static const gpos::Ref<CMDIdScCmp>
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidScCmp == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdScCmp *>(mdid);
+		return dynamic_cast<const gpos::Ref<CMDIdScCmp> >(mdid);
 	}
 
 	// make a copy in the given memory pool
-	IMDId *
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_left = CMDIdGPDB::CastMdid(m_mdid_left->Copy(mp));
-		CMDIdGPDB *mdid_right = CMDIdGPDB::CastMdid(m_mdid_right->Copy(mp));
+		gpos::Ref<CMDIdGPDB> mdid_left =
+			CMDIdGPDB::CastMdid(m_mdid_left->Copy(mp));
+		gpos::Ref<CMDIdGPDB> mdid_right =
+			CMDIdGPDB::CastMdid(m_mdid_right->Copy(mp));
 
 		return GPOS_NEW(mp)
 			CMDIdScCmp(mdid_left, mdid_right, m_comparision_type);

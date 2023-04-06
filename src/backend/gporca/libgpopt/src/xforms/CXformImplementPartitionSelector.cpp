@@ -47,9 +47,10 @@ CXformImplementPartitionSelector::CXformImplementPartitionSelector(
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementPartitionSelector::Transform(CXformContext *pxfctxt,
-											CXformResult *pxfres GPOS_UNUSED,
-											CExpression *pexpr) const
+CXformImplementPartitionSelector::Transform(gpos::Ref<CXformContext> pxfctxt,
+											gpos::Ref<CXformResult> pxfres
+												GPOS_UNUSED,
+											gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -58,11 +59,11 @@ CXformImplementPartitionSelector::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalPartitionSelector *popSelector =
+	gpos::Ref<CLogicalPartitionSelector> popSelector =
 		CLogicalPartitionSelector::PopConvert(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 
-	IMDId *mdid = popSelector->MDId();
+	gpos::Ref<IMDId> mdid = popSelector->MDId();
 
 	// addref all components
 	pexprRelational->AddRef();
@@ -73,7 +74,7 @@ CXformImplementPartitionSelector::Transform(CXformContext *pxfctxt,
 	const ULONG ulLevels = popSelector->UlPartLevels();
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
-		CExpression *pexprFilter = popSelector->PexprPartFilter(ul);
+		gpos::Ref<CExpression> pexprFilter = popSelector->PexprPartFilter(ul);
 		GPOS_ASSERT(nullptr != pexprFilter);
 		pexprFilter->AddRef();
 		BOOL fInserted GPOS_ASSERTS_ONLY =

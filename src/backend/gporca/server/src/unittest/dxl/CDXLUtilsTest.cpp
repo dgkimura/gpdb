@@ -130,7 +130,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *node = CDXLUtils::GetPlanDXLNode(
+	gpos::Ref<CDXLNode> node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, nullptr /*xsd_file_path*/, &plan_id, &plan_space_size);
 
 	// serialize with document header

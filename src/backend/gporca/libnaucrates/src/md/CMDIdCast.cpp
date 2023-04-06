@@ -25,7 +25,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdCast::CMDIdCast(CMDIdGPDB *mdid_src, CMDIdGPDB *mdid_dest)
+CMDIdCast::CMDIdCast(gpos::Ref<CMDIdGPDB> mdid_src,
+					 gpos::Ref<CMDIdGPDB> mdid_dest)
 	: m_mdid_src(mdid_src),
 	  m_mdid_dest(mdid_dest),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
@@ -92,7 +93,7 @@ CMDIdCast::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdCast::MdidSrc() const
 {
 	return m_mdid_src;
@@ -106,7 +107,7 @@ CMDIdCast::MdidSrc() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdCast::MdidDest() const
 {
 	return m_mdid_dest;
@@ -121,14 +122,14 @@ CMDIdCast::MdidDest() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdCast::Equals(const IMDId *mdid) const
+CMDIdCast::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidCastFunc != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdCast *mdid_cast_func = CMDIdCast::CastMdid(mdid);
+	const gpos::Ref<CMDIdCast> mdid_cast_func = CMDIdCast::CastMdid(mdid);
 
 	return m_mdid_src->Equals(mdid_cast_func->MdidSrc()) &&
 		   m_mdid_dest->Equals(mdid_cast_func->MdidDest());

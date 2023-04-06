@@ -68,34 +68,34 @@ private:
 	CMemoryPool *m_mp;
 
 	// type id
-	IMDId *m_mdid;
-	IMDId *m_distr_opfamily;
-	IMDId *m_legacy_distr_opfamily;
+	gpos::Ref<IMDId> m_mdid;
+	gpos::Ref<IMDId> m_distr_opfamily;
+	gpos::Ref<IMDId> m_legacy_distr_opfamily;
 
 	// mdids of different operators
-	IMDId *m_mdid_op_eq;
-	IMDId *m_mdid_op_neq;
-	IMDId *m_mdid_op_lt;
-	IMDId *m_mdid_op_leq;
-	IMDId *m_mdid_op_gt;
-	IMDId *m_mdid_op_geq;
-	IMDId *m_mdid_op_cmp;
-	IMDId *m_mdid_type_array;
+	gpos::Ref<IMDId> m_mdid_op_eq;
+	gpos::Ref<IMDId> m_mdid_op_neq;
+	gpos::Ref<IMDId> m_mdid_op_lt;
+	gpos::Ref<IMDId> m_mdid_op_leq;
+	gpos::Ref<IMDId> m_mdid_op_gt;
+	gpos::Ref<IMDId> m_mdid_op_geq;
+	gpos::Ref<IMDId> m_mdid_op_cmp;
+	gpos::Ref<IMDId> m_mdid_type_array;
 
 	// min aggregate
-	IMDId *m_mdid_min;
+	gpos::Ref<IMDId> m_mdid_min;
 
 	// max aggregate
-	IMDId *m_mdid_max;
+	gpos::Ref<IMDId> m_mdid_max;
 
 	// avg aggregate
-	IMDId *m_mdid_avg;
+	gpos::Ref<IMDId> m_mdid_avg;
 
 	// sum aggregate
-	IMDId *m_mdid_sum;
+	gpos::Ref<IMDId> m_mdid_sum;
 
 	// count aggregate
-	IMDId *m_mdid_count;
+	gpos::Ref<IMDId> m_mdid_count;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
@@ -105,7 +105,7 @@ private:
 	static CMDName m_mdname;
 
 	// a null datum of this type (used for statistics comparison)
-	IDatum *m_datum_null;
+	gpos::Ref<IDatum> m_datum_null;
 
 public:
 	CMDTypeInt2GPDB(const CMDTypeInt2GPDB &) = delete;
@@ -117,8 +117,8 @@ public:
 	~CMDTypeInt2GPDB() override;
 
 	// factory method for creating INT2 datums
-	IDatumInt2 *CreateInt2Datum(CMemoryPool *mp, SINT value,
-								BOOL is_null) const override;
+	gpos::Ref<IDatumInt2> CreateInt2Datum(CMemoryPool *mp, SINT value,
+										  BOOL is_null) const override;
 
 	// accessors
 	const CWStringDynamic *
@@ -128,18 +128,18 @@ public:
 	}
 
 	// accessor of metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
-	IMDId *GetDistrOpfamilyMdid() const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyMdid() const override;
 
 	// accessor of type name
 	CMDName Mdname() const override;
 
 	// id of specified comparison operator type
-	IMDId *GetMdidForCmpType(ECmpType cmp_type) const override;
+	gpos::Ref<IMDId> GetMdidForCmpType(ECmpType cmp_type) const override;
 
 	// id of specified aggregate type
-	IMDId *GetMdidForAggType(EAggType agg_type) const override;
+	gpos::Ref<IMDId> GetMdidForAggType(EAggType agg_type) const override;
 
 	// is type redistributable
 	BOOL
@@ -184,7 +184,7 @@ public:
 	}
 
 	// metadata id of b-tree lookup operator
-	const IMDId *
+	const gpos::Ref<IMDId>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp;
@@ -205,14 +205,14 @@ public:
 	}
 
 	// metadata id of array type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetArrayTypeMdid() const override
 	{
 		return m_mdid_type_array;
 	}
 
 	// id of the relation corresponding to a composite type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetBaseRelMdid() const override
 	{
 		return nullptr;
@@ -222,29 +222,30 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// return the null constant for this type
-	IDatum *
+	gpos::Ref<IDatum>
 	DatumNull() const override
 	{
 		return m_datum_null;
 	}
 
 	// transformation method for generating datum from CDXLScalarConstValue
-	IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const override;
+	gpos::Ref<IDatum> GetDatumForDXLConstVal(
+		const gpos::Ref<CDXLScalarConstValue> dxl_op) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-								const CDXLDatum *dxl_datum) const override;
+	gpos::Ref<IDatum> GetDatumForDXLDatum(
+		CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const override;
 
 	// generate the DXL datum from IDatum
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;
+	gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
+									 gpos::Ref<IDatum> datum) const override;
 
 	// generate the DXL datum representing null value
-	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
+	gpos::Ref<CDXLDatum> GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
-	CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-										  IDatum *datum) const override;
+	gpos::Ref<CDXLScalarConstValue> GetDXLOpScConst(
+		CMemoryPool *mp, gpos::Ref<IDatum> datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

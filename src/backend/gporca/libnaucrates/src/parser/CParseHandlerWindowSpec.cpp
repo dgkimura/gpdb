@@ -148,10 +148,10 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 	// sorting columns
-	CDXLNode *sort_col_list_dxlnode = nullptr;
+	gpos::Ref<CDXLNode> sort_col_list_dxlnode = nullptr;
 
 	// window frame associated with the window key
-	CDXLWindowFrame *window_frame = nullptr;
+	gpos::Ref<CDXLWindowFrame> window_frame = nullptr;
 
 	if (1 == this->Length())
 	{

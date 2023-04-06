@@ -32,7 +32,7 @@ const CHAR *CEnfdOrder::m_szOrderMatching[EomSentinel] = {"satisfy"};
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdOrder::CEnfdOrder(COrderSpec *pos, EOrderMatching eom)
+CEnfdOrder::CEnfdOrder(gpos::Ref<COrderSpec> pos, EOrderMatching eom)
 	: m_pos(pos), m_eom(eom)
 {
 	GPOS_ASSERT(nullptr != pos);
@@ -64,7 +64,7 @@ CEnfdOrder::~CEnfdOrder()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdOrder::FCompatible(COrderSpec *pos) const
+CEnfdOrder::FCompatible(gpos::Ref<COrderSpec> pos) const
 {
 	GPOS_ASSERT(nullptr != pos);
 
@@ -105,7 +105,7 @@ CEnfdOrder::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdOrder::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdOrder::Epet(CExpressionHandle &exprhdl, gpos::Ref<CPhysical> popPhysical,
 				 BOOL fOrderReqd) const
 {
 	if (fOrderReqd)

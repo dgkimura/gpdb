@@ -172,19 +172,19 @@ private:
 		}
 	};
 
-	// a simple wrapper of an SGroupInfo * plus an index into its array of SExpressionInfos
+	// a simple wrapper of an gpos::Ref<SGroupInfo>  plus an index into its array of SExpressionInfos
 	// this identifies a group and one expression belonging to that group
 	struct SGroupAndExpression
 	{
-		SGroupInfo *m_group_info{nullptr};
+		gpos::Ref<SGroupInfo> m_group_info{nullptr};
 		ULONG m_expr_index{gpos::ulong_max};
 
 		SGroupAndExpression() = default;
-		SGroupAndExpression(SGroupInfo *g, ULONG ix)
+		SGroupAndExpression(gpos::Ref<SGroupInfo> g, ULONG ix)
 			: m_group_info(g), m_expr_index(ix)
 		{
 		}
-		SExpressionInfo *
+		gpos::Ref<SExpressionInfo>
 		GetExprInfo() const
 		{
 			return m_expr_index == gpos::ulong_max
@@ -210,7 +210,7 @@ private:
 	struct SExpressionInfo : public CRefCount<SExpressionInfo>
 	{
 		// the expression
-		CExpression *m_expr;
+		gpos::Ref<CExpression> m_expr;
 
 		// left/right child group/expr info (group for left/right child of m_expr),
 		// we do not keep a refcount for these
@@ -235,9 +235,9 @@ private:
 		CDouble m_atom_base_table_rows;
 
 		// stores atom ids that are fufilled by a PS in this expression
-		CBitSet *m_contain_PS;
+		gpos::Ref<CBitSet> m_contain_PS;
 
-		SExpressionInfo(CMemoryPool *mp, CExpression *expr,
+		SExpressionInfo(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 						const SGroupAndExpression &left_child_expr_info,
 						const SGroupAndExpression &right_child_expr_info,
 						SExpressionProperties &properties)
@@ -257,7 +257,7 @@ private:
 			this->UnionPSProperties(right_child_expr_info.GetExprInfo());
 		}
 
-		SExpressionInfo(CMemoryPool *mp, CExpression *expr,
+		SExpressionInfo(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 						SExpressionProperties &properties)
 			: m_expr(expr),
 			  m_properties(properties),
@@ -290,7 +290,7 @@ private:
 		}
 
 		void
-		UnionPSProperties(SExpressionInfo *other) const
+		UnionPSProperties(gpos::Ref<SExpressionInfo> other) const
 		{
 			m_contain_PS->Union(other->m_contain_PS);
 		}
@@ -316,14 +316,14 @@ private:
 	struct SGroupInfo : public CRefCount<SGroupInfo>
 	{
 		// the set of atoms, this uniquely identifies the group
-		CBitSet *m_atoms;
+		gpos::Ref<CBitSet> m_atoms;
 		// infos of the best (lowest cost) expressions (so far, if at the current level)
 		// for each interesting property
 		SExpressionInfoArray *m_best_expr_info_array;
 		CDouble m_cardinality;
 		CDouble m_lowest_expr_cost;
 
-		SGroupInfo(CMemoryPool *mp, CBitSet *atoms)
+		SGroupInfo(CMemoryPool *mp, gpos::Ref<CBitSet> atoms)
 			: m_atoms(atoms), m_cardinality(-1.0), m_lowest_expr_cost(-1.0)
 		{
 			m_best_expr_info_array = GPOS_NEW(mp) SExpressionInfoArray(mp);
@@ -372,7 +372,7 @@ private:
 
 	// hashing function
 	static ULONG
-	UlHashBitSet(const CBitSet *pbs)
+	UlHashBitSet(const gpos::Ref<CBitSet> pbs)
 	{
 		GPOS_ASSERT(nullptr != pbs);
 
@@ -381,7 +381,8 @@ private:
 
 	// equality function
 	static BOOL
-	FEqualBitSet(const CBitSet *pbsFst, const CBitSet *pbsSnd)
+	FEqualBitSet(const gpos::Ref<CBitSet> pbsFst,
+				 const gpos::Ref<CBitSet> pbsSnd)
 	{
 		GPOS_ASSERT(nullptr != pbsFst);
 		GPOS_ASSERT(nullptr != pbsSnd);
@@ -439,21 +440,23 @@ private:
 	CDouble m_cross_prod_penalty;
 
 	// outer references, if any
-	CColRefSet *m_outer_refs;
+	gpos::Ref<CColRefSet> m_outer_refs;
 
 	CMemoryPool *m_mp;
 
-	SLevelInfo *
+	gpos::Ref<SLevelInfo>
 	Level(ULONG l)
 	{
 		return (*m_join_levels)[l];
 	}
 
 	// build expression linking given groups
-	CExpression *PexprBuildInnerJoinPred(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::Ref<CExpression> PexprBuildInnerJoinPred(gpos::Ref<CBitSet> pbsFst,
+												   gpos::Ref<CBitSet> pbsSnd);
 
 	// compute cost of a join expression in a group
-	void ComputeCost(SExpressionInfo *expr_info, CDouble join_cardinality);
+	void ComputeCost(gpos::Ref<SExpressionInfo> expr_info,
+					 CDouble join_cardinality);
 
 	// if we need to keep track of used edges, make a map that
 	// speeds up this usage check
@@ -461,10 +464,11 @@ private:
 
 	// add a select node with any remaining edges (predicates) that have
 	// not been incorporated in the join tree
-	CExpression *AddSelectNodeForRemainingEdges(CExpression *join_expr);
+	gpos::Ref<CExpression> AddSelectNodeForRemainingEdges(
+		gpos::Ref<CExpression> join_expr);
 
 	// mark all the edges used in a join tree
-	void RecursivelyMarkEdgesAsUsed(CExpression *expr);
+	void RecursivelyMarkEdgesAsUsed(gpos::Ref<CExpression> expr);
 
 	// enumerate all possible joins between left_level-way joins on the left side
 	// and right_level-way joins on the right side, resulting in left_level + right_level-way joins
@@ -472,17 +476,18 @@ private:
 
 	void GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo);
 
-	void DeriveStats(CExpression *pexpr) override;
+	void DeriveStats(gpos::Ref<CExpression> pexpr) override;
 
 	// create a CLogicalJoin and a CExpression to join two groups, for a required property
-	SExpressionInfo *GetJoinExprForProperties(
-		SGroupInfo *left_child, SGroupInfo *right_child,
+	gpos::Ref<SExpressionInfo> GetJoinExprForProperties(
+		gpos::Ref<SGroupInfo> left_child, gpos::Ref<SGroupInfo> right_child,
 		SExpressionProperties &required_properties);
 
 	// get a join expression from two child groups with specified child expressions
-	SExpressionInfo *GetJoinExpr(const SGroupAndExpression &left_child_expr,
-								 const SGroupAndExpression &right_child_expr,
-								 SExpressionProperties &result_properties);
+	gpos::Ref<SExpressionInfo> GetJoinExpr(
+		const SGroupAndExpression &left_child_expr,
+		const SGroupAndExpression &right_child_expr,
+		SExpressionProperties &result_properties);
 
 	// does "prop" provide all the properties of "other_prop" plus maybe more?
 	static BOOL IsASupersetOfProperties(SExpressionProperties &prop,
@@ -494,25 +499,26 @@ private:
 
 	// get best expression in a group for a given set of properties
 	static SGroupAndExpression GetBestExprForProperties(
-		SGroupInfo *group_info, SExpressionProperties &props);
+		gpos::Ref<SGroupInfo> group_info, SExpressionProperties &props);
 
 	// add a new property to an existing predicate
-	static void AddNewPropertyToExpr(SExpressionInfo *expr_info,
+	static void AddNewPropertyToExpr(gpos::Ref<SExpressionInfo> expr_info,
 									 SExpressionProperties props);
 
 	// enumerate bushy joins (joins where both children are also joins) of level "current_level"
 	void SearchBushyJoinOrders(ULONG current_level);
 
 	// look up an existing group or create a new one, with an expression to be used for stats
-	SGroupInfo *LookupOrCreateGroupInfo(SLevelInfo *levelInfo, CBitSet *atoms,
-										SExpressionInfo *stats_expr_info);
+	gpos::Ref<SGroupInfo> LookupOrCreateGroupInfo(
+		gpos::Ref<SLevelInfo> levelInfo, gpos::Ref<CBitSet> atoms,
+		gpos::Ref<SExpressionInfo> stats_expr_info);
 	// add a new expression to a group, unless there already is an existing expression that dominates it
-	void AddExprToGroupIfNecessary(SGroupInfo *group_info,
-								   SExpressionInfo *new_expr_info);
+	void AddExprToGroupIfNecessary(gpos::Ref<SGroupInfo> group_info,
+								   gpos::Ref<SExpressionInfo> new_expr_info);
 
-	void PopulateDPEInfo(SExpressionInfo *join_expr_info,
-						 SGroupInfo *left_group_info,
-						 SGroupInfo *right_group_info);
+	void PopulateDPEInfo(gpos::Ref<SExpressionInfo> join_expr_info,
+						 gpos::Ref<SGroupInfo> left_group_info,
+						 gpos::Ref<SGroupInfo> right_group_info);
 
 	void FinalizeDPLevel(ULONG level);
 
@@ -537,7 +543,8 @@ public:
 	CJoinOrderDPv2(CMemoryPool *mp, CExpressionArray *pdrgpexprAtoms,
 				   CExpressionArray *innerJoinConjuncts,
 				   CExpressionArray *onPredConjuncts,
-				   ULongPtrArray *childPredIndexes, CColRefSet *outerRefs);
+				   ULongPtrArray *childPredIndexes,
+				   gpos::Ref<CColRefSet> outerRefs);
 
 	// dtor
 	~CJoinOrderDPv2() override;
@@ -545,12 +552,12 @@ public:
 	// main handler
 	virtual void PexprExpand();
 
-	CExpression *GetNextOfTopK();
+	gpos::Ref<CExpression> GetNextOfTopK();
 
 	// check for NIJs
-	BOOL IsRightChildOfNIJ(SGroupInfo *groupInfo,
-						   CExpression **onPredToUse = nullptr,
-						   CBitSet **requiredBitsOnLeft = nullptr);
+	BOOL IsRightChildOfNIJ(gpos::Ref<SGroupInfo> groupInfo,
+						   gpos::Ref<CExpression> *onPredToUse = nullptr,
+						   gpos::Ref<CBitSet> *requiredBitsOnLeft = nullptr);
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;

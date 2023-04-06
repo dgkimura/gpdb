@@ -108,7 +108,7 @@ CMDRequest::Serialize(CXMLSerializer *xml_serializer)
 	const ULONG ulMdids = m_mdid_array->Size();
 	for (ULONG ul = 0; ul < ulMdids; ul++)
 	{
-		IMDId *mdid = (*m_mdid_array)[ul];
+		gpos::Ref<IMDId> mdid = (*m_mdid_array)[ul];
 		xml_serializer->OpenElement(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			CDXLTokens::GetDXLTokenStr(EdxltokenMdid));

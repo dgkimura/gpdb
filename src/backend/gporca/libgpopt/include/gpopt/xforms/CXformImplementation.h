@@ -34,7 +34,7 @@ public:
 	CXformImplementation(const CXformImplementation &) = delete;
 
 	// ctor
-	explicit CXformImplementation(CExpression *);
+	explicit CXformImplementation(gpos::Ref<CExpression>);
 
 	// dtor
 	~CXformImplementation() override;

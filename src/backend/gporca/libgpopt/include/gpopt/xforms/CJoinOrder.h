@@ -56,10 +56,10 @@ public:
 	struct SEdge : public CRefCount<SEdge>, public DbgPrintMixin<SEdge>
 	{
 		// cover of edge
-		CBitSet *m_pbs;
+		gpos::Ref<CBitSet> m_pbs;
 
 		// associated conjunct
-		CExpression *m_pexpr;
+		gpos::Ref<CExpression> m_pexpr;
 
 		// tracks if the associated join is a LOJ:
 		// check the derived classes of CJoinOrder, but here is a high-level summary:
@@ -72,7 +72,7 @@ public:
 		BOOL m_fUsed;
 
 		// ctor
-		SEdge(CMemoryPool *mp, CExpression *pexpr, ULONG loj_num);
+		SEdge(CMemoryPool *mp, gpos::Ref<CExpression> pexpr, ULONG loj_num);
 
 		// dtor
 		~SEdge() override;
@@ -94,13 +94,13 @@ public:
 						public DbgPrintMixin<SComponent>
 	{
 		// cover
-		CBitSet *m_pbs;
+		gpos::Ref<CBitSet> m_pbs;
 
 		// set of edges associated with this component (stored as indexes into m_rgpedge array)
-		CBitSet *m_edge_set;
+		gpos::Ref<CBitSet> m_edge_set;
 
 		// associated expression
-		CExpression *m_pexpr;
+		gpos::Ref<CExpression> m_pexpr;
 
 		// a flag to component edge as used
 		BOOL m_fUsed;
@@ -156,12 +156,13 @@ public:
 		EPosition m_position;
 
 		// ctor
-		SComponent(CMemoryPool *mp, CExpression *expr,
+		SComponent(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
 		// ctor
-		SComponent(CExpression *expr, CBitSet *pbs, CBitSet *edge_set,
+		SComponent(gpos::Ref<CExpression> expr, gpos::Ref<CBitSet> pbs,
+				   gpos::Ref<CBitSet> edge_set,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
@@ -192,13 +193,13 @@ protected:
 	CMemoryPool *m_mp;
 
 	// edges
-	SEdge **m_rgpedge;
+	gpos::Ref<SEdge> *m_rgpedge;
 
 	// number of edges
 	ULONG m_ulEdges;
 
 	// components
-	SComponent **m_rgpcomp;
+	gpos::Ref<SComponent> *m_rgpcomp;
 
 	// number of components
 	ULONG m_ulComps;
@@ -211,16 +212,17 @@ protected:
 	void ComputeEdgeCover();
 
 	// combine the two given components using applicable edges
-	SComponent *PcompCombine(SComponent *comp1, SComponent *comp2);
+	gpos::Ref<SComponent> PcompCombine(gpos::Ref<SComponent> comp1,
+									   gpos::Ref<SComponent> comp2);
 
 	// derive stats on a given component
-	virtual void DeriveStats(CExpression *pexpr);
+	virtual void DeriveStats(gpos::Ref<CExpression> pexpr);
 
 	// mark edges used by expression
-	void MarkUsedEdges(SComponent *comp);
+	void MarkUsedEdges(gpos::Ref<SComponent> comp);
 
 	// add component to to component array
-	void AddComponent(CMemoryPool *mp, CExpression *expr, INT loj_id,
+	void AddComponent(CMemoryPool *mp, gpos::Ref<CExpression> expr, INT loj_id,
 					  EPosition position, INT comp_num);
 
 private:
@@ -244,10 +246,12 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// is this a valid join combination
-	static BOOL IsValidJoinCombination(SComponent *comp1, SComponent *comp2);
+	static BOOL IsValidJoinCombination(gpos::Ref<SComponent> comp1,
+									   gpos::Ref<SComponent> comp2);
 
 	// are these childs of the same LOJ
-	static BOOL IsChildOfSameLOJ(SComponent *comp1, SComponent *comp2);
+	static BOOL IsChildOfSameLOJ(gpos::Ref<SComponent> comp1,
+								 gpos::Ref<SComponent> comp2);
 
 	virtual CXform::EXformId
 	EOriginXForm() const

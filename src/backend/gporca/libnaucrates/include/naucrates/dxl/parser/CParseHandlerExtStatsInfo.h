@@ -29,7 +29,7 @@ class CParseHandlerExtStatsInfo : public CParseHandlerBase
 {
 private:
 	// extstat infos list
-	CMDExtStatsInfo *m_extinfo;
+	gpos::Ref<CMDExtStatsInfo> m_extinfo;
 
 	// process the start of an element
 	void StartElement(
@@ -60,7 +60,7 @@ public:
 	~CParseHandlerExtStatsInfo() override;
 
 	// returns the constructed bucket
-	CMDExtStatsInfo *GetInfo() const;
+	gpos::Ref<CMDExtStatsInfo> GetInfo() const;
 };
 }  // namespace gpdxl
 

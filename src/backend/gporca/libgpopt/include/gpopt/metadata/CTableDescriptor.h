@@ -49,7 +49,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// mdid of the table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// name of table
 	CName m_name;
@@ -98,7 +98,7 @@ public:
 	CTableDescriptor(const CTableDescriptor &) = delete;
 
 	// ctor
-	CTableDescriptor(CMemoryPool *, IMDId *mdid, const CName &,
+	CTableDescriptor(CMemoryPool *, gpos::Ref<IMDId> mdid, const CName &,
 					 BOOL convert_hash_to_random,
 					 IMDRelation::Ereldistrpolicy rel_distr_policy,
 					 IMDRelation::Erelstoragetype erelstoragetype,
@@ -109,23 +109,23 @@ public:
 	~CTableDescriptor() override;
 
 	// add a column to the table descriptor
-	void AddColumn(CColumnDescriptor *);
+	void AddColumn(gpos::Ref<CColumnDescriptor>);
 
 	// add the column at the specified position to the list of distribution columns
-	void AddDistributionColumn(ULONG ulPos, IMDId *opfamily);
+	void AddDistributionColumn(ULONG ulPos, gpos::Ref<IMDId> opfamily);
 
 	// add the column at the specified position to the list of partition columns
 	void AddPartitionColumn(ULONG ulPos);
 
 	// add a keyset
-	BOOL FAddKeySet(CBitSet *pbs);
+	BOOL FAddKeySet(gpos::Ref<CBitSet> pbs);
 
 	// accessors
 	ULONG ColumnCount() const;
-	const CColumnDescriptor *Pcoldesc(ULONG) const;
+	const gpos::Ref<CColumnDescriptor> Pcoldesc(ULONG) const;
 
 	// mdid accessor
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid;
@@ -221,7 +221,7 @@ public:
 
 	// helper function for finding the index of a column descriptor in
 	// an array of column descriptors
-	static ULONG UlPos(const CColumnDescriptor *,
+	static ULONG UlPos(const gpos::Ref<CColumnDescriptor>,
 					   const CColumnDescriptorArray *);
 
 	IOstream &OsPrint(IOstream &os) const;

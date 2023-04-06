@@ -55,10 +55,10 @@ public:
 	CColRefTable(const CColRefTable &) = delete;
 
 	// ctors
-	CColRefTable(const CColumnDescriptor *pcd, ULONG id, const CName *pname,
-				 ULONG ulOpSource);
+	CColRefTable(const gpos::Ref<CColumnDescriptor> pcd, ULONG id,
+				 const CName *pname, ULONG ulOpSource);
 
-	CColRefTable(const IMDType *pmdtype, INT type_modifier, INT attno,
+	CColRefTable(const gpos::Ref<IMDType> pmdtype, INT type_modifier, INT attno,
 				 BOOL is_nullable, ULONG id, const CName *pname,
 				 ULONG ulOpSource, BOOL is_dist_col,
 				 ULONG ulWidth = gpos::ulong_max);
@@ -118,11 +118,11 @@ public:
 	}
 
 	// conversion
-	static CColRefTable *
-	PcrConvert(CColRef *cr)
+	static gpos::Ref<CColRefTable>
+	PcrConvert(gpos::Ref<CColRef> cr)
 	{
 		GPOS_ASSERT(cr->Ecrt() == CColRef::EcrtTable);
-		return dynamic_cast<CColRefTable *>(cr);
+		return dynamic_cast<gpos::Ref<CColRefTable> >(cr);
 	}
 
 

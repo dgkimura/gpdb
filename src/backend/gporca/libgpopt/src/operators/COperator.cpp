@@ -107,7 +107,7 @@ COperator::EfsDeriveFromChildren(CExpressionHandle &exprhdl,
 //		Derive function properties from child expressions
 //
 //---------------------------------------------------------------------------
-CFunctionProp *
+gpos::Ref<CFunctionProp>
 COperator::PfpDeriveFromChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IMDFunction::EFuncStbl efsDefault,
 								 BOOL fHasVolatileFunctionScan, BOOL fScan)
@@ -128,7 +128,7 @@ COperator::PfpDeriveFromChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Return an addref'ed copy of the operator
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 COperator::PopCopyDefault()
 {
 	this->AddRef();

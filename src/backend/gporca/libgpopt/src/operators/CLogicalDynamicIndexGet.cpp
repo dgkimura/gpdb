@@ -53,10 +53,10 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
-	CMemoryPool *mp, const IMDIndex *pmdindex, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, ULONG part_idx_id,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, ULONG part_idx_id, CColRefArray *pdrgpcrOutput,
+	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, part_idx_id,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_pindexdesc(nullptr),
@@ -112,7 +112,7 @@ CLogicalDynamicIndexGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicIndexGet::Matches(COperator *pop) const
+CLogicalDynamicIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicIndex(this, pop);
 }
@@ -125,7 +125,7 @@ CLogicalDynamicIndexGet::Matches(COperator *pop) const
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalDynamicIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
@@ -140,12 +140,13 @@ CLogicalDynamicIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDynamicIndexGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());
+	const gpos::Ref<IMDIndex> pmdindex =
+		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 
 	CColRefArray *pdrgpcrOutput = nullptr;
@@ -210,7 +211,7 @@ CLogicalDynamicIndexGet::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDynamicIndexGet::PstatsDerive(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
 									  IStatisticsArray *stats_ctxt) const

@@ -45,12 +45,13 @@ public:
 
 	// ctor
 	CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-				 IConstExprEvaluator *pceeval,
-				 COptimizerConfig *optimizer_config);
+				 gpos::Ref<IConstExprEvaluator> pceeval,
+				 gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// ctor
 	CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-				 IConstExprEvaluator *pceeval, ICostModel *pcm);
+				 gpos::Ref<IConstExprEvaluator> pceeval,
+				 gpos::Ref<ICostModel> pcm);
 
 	// dtor
 	~CAutoOptCtxt();

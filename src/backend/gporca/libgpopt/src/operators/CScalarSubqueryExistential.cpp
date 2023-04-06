@@ -54,7 +54,7 @@ CScalarSubqueryExistential::~CScalarSubqueryExistential() = default;
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarSubqueryExistential::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -71,7 +71,7 @@ CScalarSubqueryExistential::MdidType() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryExistential::Matches(COperator *pop) const
+CScalarSubqueryExistential::Matches(gpos::Ref<COperator> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 
@@ -87,11 +87,11 @@ CScalarSubqueryExistential::Matches(COperator *pop) const
 //		Derive partition consumers
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CScalarSubqueryExistential::PpartinfoDerive(CMemoryPool *,	// mp,
 											CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 	ppartinfoChild->AddRef();
 	return ppartinfoChild;

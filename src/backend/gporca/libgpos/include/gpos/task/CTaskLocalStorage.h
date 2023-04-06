@@ -57,11 +57,11 @@ public:
 	void Reset(CMemoryPool *mp);
 
 	// accessors
-	void Store(CTaskLocalStorageObject *);
-	CTaskLocalStorageObject *Get(const Etlsidx);
+	void Store(gpos::Ref<CTaskLocalStorageObject>);
+	gpos::Ref<CTaskLocalStorageObject> Get(const Etlsidx);
 
 	// delete object
-	void Remove(CTaskLocalStorageObject *);
+	void Remove(gpos::Ref<CTaskLocalStorageObject>);
 
 	// equality function -- used for hashtable
 	static BOOL

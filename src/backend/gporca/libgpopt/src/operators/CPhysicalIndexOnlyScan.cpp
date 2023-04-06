@@ -29,9 +29,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalIndexOnlyScan::CPhysicalIndexOnlyScan(
-	CMemoryPool *mp, CIndexDescriptor *pindexdesc, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, CColRefArray *pdrgpcrOutput,
-	COrderSpec *pos)
+	CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, CColRefArray *pdrgpcrOutput,
+	gpos::Ref<COrderSpec> pos)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	  m_pindexdesc(pindexdesc),
 	  m_ulOriginOpId(ulOriginOpId),
@@ -66,7 +67,7 @@ CPhysicalIndexOnlyScan::~CPhysicalIndexOnlyScan()
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalIndexOnlyScan::EpetOrder(CExpressionHandle &,	// exprhdl
-								  const CEnfdOrder *peo) const
+								  const gpos::Ref<CEnfdOrder> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -111,7 +112,7 @@ CPhysicalIndexOnlyScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalIndexOnlyScan::Matches(COperator *pop) const
+CPhysicalIndexOnlyScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchIndex(this, pop);
 }

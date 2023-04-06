@@ -62,15 +62,15 @@ CXformImplementCTEProducer::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementCTEProducer::Transform(CXformContext *pxfctxt,
-									  CXformResult *pxfres,
-									  CExpression *pexpr) const
+CXformImplementCTEProducer::Transform(gpos::Ref<CXformContext> pxfctxt,
+									  gpos::Ref<CXformResult> pxfres,
+									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalCTEProducer *popCTEProducer =
+	gpos::Ref<CLogicalCTEProducer> popCTEProducer =
 		CLogicalCTEProducer::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
@@ -81,11 +81,11 @@ CXformImplementCTEProducer::Transform(CXformContext *pxfctxt,
 	colref_array->AddRef();
 
 	// child of CTEProducer operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create physical CTE Producer
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalCTEProducer(mp, id, colref_array),
 					pexprChild);
 

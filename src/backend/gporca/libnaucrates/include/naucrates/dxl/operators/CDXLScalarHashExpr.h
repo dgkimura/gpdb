@@ -34,13 +34,13 @@ class CDXLScalarHashExpr : public CDXLScalar
 {
 private:
 	// catalog Oid of the distribution opfamily
-	IMDId *m_mdid_opfamily;
+	gpos::Ref<IMDId> m_mdid_opfamily;
 
 public:
 	CDXLScalarHashExpr(CDXLScalarHashExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarHashExpr(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarHashExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	~CDXLScalarHashExpr() override;
 
@@ -50,20 +50,20 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *MdidOpfamily() const;
+	gpos::Ref<IMDId> MdidOpfamily() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLScalarHashExpr *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarHashExpr>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarHashExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarHashExpr *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarHashExpr> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -76,7 +76,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

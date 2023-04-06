@@ -36,7 +36,7 @@ private:
 	ExprPredToExprPredPartMap *m_phmPexprPartPred;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 public:
 	CLogicalSelect(const CLogicalSelect &) = delete;
@@ -45,7 +45,7 @@ public:
 	explicit CLogicalSelect(CMemoryPool *mp);
 
 	// ctor
-	CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc);
+	CLogicalSelect(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc);
 
 	// dtor
 	~CLogicalSelect() override;
@@ -64,7 +64,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -75,11 +75,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -87,7 +87,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -95,7 +95,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const override
 	{
@@ -121,18 +121,19 @@ public:
 	}
 
 	// conversion function
-	static CLogicalSelect *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalSelect>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSelect == pop->Eopid());
 
-		return dynamic_cast<CLogicalSelect *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalSelect>>(pop);
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 };	// class CLogicalSelect
 

@@ -46,7 +46,7 @@ CParseHandlerExtStatsInfo::~CParseHandlerExtStatsInfo()
 //		The metadata (info) constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDExtStatsInfo *
+gpos::Ref<CMDExtStatsInfo>
 CParseHandlerExtStatsInfo::GetInfo() const
 {
 	return m_extinfo;
@@ -121,7 +121,7 @@ CParseHandlerExtStatsInfo::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenKeys,
 		EdxltokenExtendedStatsInfo);
 
-	CBitSet *bs_keys = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::Ref<CBitSet> bs_keys = GPOS_NEW(m_mp) CBitSet(m_mp);
 	for (ULONG i = 0; i < keys->Size(); i++)
 	{
 		bs_keys->ExchangeSet(*(*keys)[i]);

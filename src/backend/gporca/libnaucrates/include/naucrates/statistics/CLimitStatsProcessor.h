@@ -22,9 +22,9 @@ class CLimitStatsProcessor
 {
 public:
 	// limit
-	static CStatistics *CalcLimitStats(CMemoryPool *mp,
-									   const CStatistics *input_stats,
-									   CDouble input_limit_rows);
+	static gpos::Ref<CStatistics> CalcLimitStats(
+		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
+		CDouble input_limit_rows);
 };
 }  // namespace gpnaucrates
 

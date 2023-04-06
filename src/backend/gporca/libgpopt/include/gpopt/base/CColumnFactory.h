@@ -57,11 +57,13 @@ private:
 	CSyncHashtable<CColRef, ULONG> m_sht;
 
 	// implementation of factory methods
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
-					   const CName &name);
-	CColRef *PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
-					   const CName &name, ULONG ulOpSource,
-					   BOOL mark_as_used = true, IMDId *mdid_table = nullptr);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<IMDType> pmdtype,
+								 INT type_modifier, ULONG id,
+								 const CName &name);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc,
+								 ULONG id, const CName &name, ULONG ulOpSource,
+								 BOOL mark_as_used = true,
+								 gpos::Ref<IMDId> mdid_table = nullptr);
 
 public:
 	CColumnFactory(const CColumnFactory &) = delete;
@@ -76,43 +78,49 @@ public:
 	void Initialize();
 
 	// create a column reference given only its type and type modifier, used for computed columns
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<IMDType> pmdtype,
+								 INT type_modifier);
 
 	// create column reference given its type, type modifier, and name
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier,
-					   const CName &name);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<IMDType> pmdtype,
+								 INT type_modifier, const CName &name);
 
 	// create a column reference given its descriptor and name
-	CColRef *PcrCreate(const CColumnDescriptor *pcoldescr, const CName &name,
-					   ULONG ulOpSource, BOOL mark_as_used, IMDId *mdid_table);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldescr,
+								 const CName &name, ULONG ulOpSource,
+								 BOOL mark_as_used,
+								 gpos::Ref<IMDId> mdid_table);
 
 	// create a column reference given its type, attno, nullability and name
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier,
-					   IMDId *mdid_table, INT attno, BOOL is_nullable, ULONG id,
-					   const CName &name, ULONG ulOpSource, BOOL isDistCol,
-					   ULONG ulWidth = gpos::ulong_max);
+	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<IMDType> pmdtype,
+								 INT type_modifier, gpos::Ref<IMDId> mdid_table,
+								 INT attno, BOOL is_nullable, ULONG id,
+								 const CName &name, ULONG ulOpSource,
+								 BOOL isDistCol,
+								 ULONG ulWidth = gpos::ulong_max);
 
 	// create a column reference with the same type as passed column reference
-	CColRef *
-	PcrCreate(const CColRef *colref)
+	gpos::Ref<CColRef>
+	PcrCreate(const gpos::Ref<CColRef> colref)
 	{
 		return PcrCreate(colref->RetrieveType(), colref->TypeModifier());
 	}
 
 	// add mapping between computed column to its used columns
-	void AddComputedToUsedColsMap(CExpression *pexpr);
+	void AddComputedToUsedColsMap(gpos::Ref<CExpression> pexpr);
 
 	// lookup the set of used column references (if any) based on id of computed column
-	const CColRefSet *PcrsUsedInComputedCol(const CColRef *pcrComputedCol);
+	const gpos::Ref<CColRefSet> PcrsUsedInComputedCol(
+		const gpos::Ref<CColRef> pcrComputedCol);
 
 	// create a copy of the given colref
-	CColRef *PcrCopy(const CColRef *colref);
+	gpos::Ref<CColRef> PcrCopy(const gpos::Ref<CColRef> colref);
 
 	// lookup by id
-	CColRef *LookupColRef(ULONG id);
+	gpos::Ref<CColRef> LookupColRef(ULONG id);
 
 	// destructor
-	void Destroy(CColRef *);
+	void Destroy(gpos::Ref<CColRef>);
 
 };	// class CColumnFactory
 }  // namespace gpopt

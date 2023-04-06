@@ -419,7 +419,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	// the root of the parsed DXL tree
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *root_dxl_node = CDXLUtils::GetPlanDXLNode(
+	gpos::Ref<CDXLNode> root_dxl_node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, szValidationPath, &plan_id, &plan_space_size);
 
 	GPOS_CHECK_ABORT;
@@ -488,8 +488,8 @@ CParseHandlerTest::EresParseAndSerializeQuery(CMemoryPool *mp,
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	CDXLNode *root_dxlnode =
-		const_cast<CDXLNode *>(pq2dxlresult->CreateDXLNode());
+	gpos::Ref<CDXLNode> root_dxlnode =
+		const_cast<gpos::Ref<CDXLNode> >(pq2dxlresult->CreateDXLNode());
 	CDXLNodeArray *dxl_array =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetOutputColumnsDXLArray());
 	CDXLNodeArray *cte_producers =
@@ -606,7 +606,7 @@ CParseHandlerTest::EresParseAndSerializeMDRequest(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	CMDRequest *pmdr =
+	gpos::Ref<CMDRequest> pmdr =
 		CDXLUtils::ParseDXLToMDRequest(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != pmdr);
@@ -645,7 +645,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 												   BOOL fValidate)
 {
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -681,7 +681,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	GPOS_ASSERT(nullptr != statistics_array);
 
-	CStatistics *stats = (*statistics_array)[0];
+	gpos::Ref<CStatistics> stats = (*statistics_array)[0];
 	GPOS_ASSERT(stats);
 
 	stats->Rows();
@@ -734,7 +734,7 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr(CMemoryPool *mp,
 	}
 
 	// the root of the parsed DXL tree
-	CDXLNode *root_dxl_node = CDXLUtils::ParseDXLToScalarExprDXLNode(
+	gpos::Ref<CDXLNode> root_dxl_node = CDXLUtils::ParseDXLToScalarExprDXLNode(
 		mp, dxl_string, szValidationPath);
 	GPOS_CHECK_ABORT;
 

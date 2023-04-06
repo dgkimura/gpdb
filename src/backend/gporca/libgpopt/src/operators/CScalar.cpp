@@ -29,7 +29,7 @@ using namespace gpopt;
 //		Create base container of derived properties
 //
 //---------------------------------------------------------------------------
-CDrvdProp *
+gpos::Ref<CDrvdProp>
 CScalar::PdpCreate(CMemoryPool *mp) const
 {
 	return GPOS_NEW(mp) CDrvdPropScalar(mp);
@@ -44,7 +44,7 @@ CScalar::PdpCreate(CMemoryPool *mp) const
 //		Create base container of required properties
 //
 //---------------------------------------------------------------------------
-CReqdProp *
+gpos::Ref<CReqdProp>
 CScalar::PrpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -296,12 +296,12 @@ CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
+CScalar::EberEvaluate(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	COperator *pop = pexprScalar->Pop();
+	gpos::Ref<COperator> pop = pexprScalar->Pop();
 	GPOS_ASSERT(pop->FScalar());
 
 	const ULONG arity = pexprScalar->Arity();
@@ -312,7 +312,7 @@ CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
 		// do not recurse into subqueries
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprChild = (*pexprScalar)[ul];
+			gpos::Ref<CExpression> pexprChild = (*pexprScalar)[ul];
 			EBoolEvalResult eberChild = EberEvaluate(mp, pexprChild);
 			pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(eberChild));
 		}
@@ -367,22 +367,23 @@ CScalar::FHasNonScalarFunction(CExpressionHandle &exprhdl)
 //		Combine partition consumer arrays of all scalar children
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl)
 {
 	const ULONG arity = exprhdl.Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CPartInfo *ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
+	gpos::Ref<CPartInfo> ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		if (exprhdl.FScalarChild(ul))
 		{
-			CPartInfo *ppartinfoChild = exprhdl.DeriveScalarPartitionInfo(ul);
+			gpos::Ref<CPartInfo> ppartinfoChild =
+				exprhdl.DeriveScalarPartitionInfo(ul);
 			GPOS_ASSERT(nullptr != ppartinfoChild);
-			CPartInfo *ppartinfoCombined =
+			gpos::Ref<CPartInfo> ppartinfoCombined =
 				CPartInfo::PpartinfoCombine(mp, ppartinfo, ppartinfoChild);
 			ppartinfo->Release();
 			ppartinfo = ppartinfoCombined;

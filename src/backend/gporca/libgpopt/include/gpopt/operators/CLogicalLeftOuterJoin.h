@@ -64,7 +64,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -77,7 +77,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -96,13 +96,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftOuterJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftOuterJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftOuterJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftOuterJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftOuterJoin> >(pop);
 	}
 
 };	// class CLogicalLeftOuterJoin

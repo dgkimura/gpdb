@@ -65,7 +65,7 @@ CXformTest::EresUnittest_ApplyXforms()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 	Pfpexpr rgpf[] = {
 		CTestUtils::PexprLogicalApplyWithOuterRef<CLogicalInnerApply>,
 		CTestUtils::PexprLogicalApply<CLogicalLeftSemiApply>,
@@ -106,7 +106,7 @@ CXformTest::EresUnittest_ApplyXforms()
 	};
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -120,7 +120,7 @@ CXformTest::EresUnittest_ApplyXforms()
 		COstreamString oss(&str);
 
 		// generate simple expression
-		CExpression *pexpr = rgpf[ul](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[ul](mp);
 		ApplyExprXforms(mp, oss, pexpr);
 
 		GPOS_TRACE(str.GetBuffer());
@@ -145,7 +145,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -157,7 +157,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 
 	// create producer
 	ULONG ulCTEId = 0;
-	CExpression *pexprProducer =
+	gpos::Ref<CExpression> pexprProducer =
 		CTestUtils::PexprLogicalCTEProducerOverSelect(mp, ulCTEId);
 	COptCtxt::PoctxtFromTLS()->Pcteinfo()->AddCTEProducer(pexprProducer);
 
@@ -167,19 +167,19 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 		CLogicalCTEProducer::PopConvert(pexprProducer->Pop())->Pdrgpcr();
 	CColRefArray *pdrgpcrConsumer = CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
 
-	CExpression *pexprConsumer = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprConsumer = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumer));
 
 	pdrgpexpr->Append(pexprConsumer);
 	COptCtxt::PoctxtFromTLS()->Pcteinfo()->IncrementConsumers(ulCTEId);
 
 	pexprConsumer->AddRef();
-	CExpression *pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		CTestUtils::PexprLogicalSelect(mp, pexprConsumer);
 	pdrgpexpr->Append(pexprSelect);
 
 	pexprSelect->AddRef();
-	CExpression *pexprAnchor = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAnchor = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprSelect);
 
 	pdrgpexpr->Append(pexprAnchor);
@@ -208,7 +208,8 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 //
 //---------------------------------------------------------------------------
 void
-CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
+CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os,
+							gpos::Ref<CExpression> pexpr)
 {
 	os << std::endl << "EXPR:" << std::endl;
 	(void) pexpr->OsPrint(os);
@@ -217,12 +218,12 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 	{
 		if (CXformFactory::Pxff()->IsXformIdUsed((CXform::EXformId) ulXformId))
 		{
-			CXform *pxform =
+			gpos::Ref<CXform> pxform =
 				CXformFactory::Pxff()->Pxf((CXform::EXformId) ulXformId);
 			os << std::endl << "XFORM " << pxform->SzId() << ":" << std::endl;
 
-			CXformContext *pxfctxt = GPOS_NEW(mp) CXformContext(mp);
-			CXformResult *pxfres = GPOS_NEW(mp) CXformResult(mp);
+			gpos::Ref<CXformContext> pxfctxt = GPOS_NEW(mp) CXformContext(mp);
+			gpos::Ref<CXformResult> pxfres = GPOS_NEW(mp) CXformResult(mp);
 
 #ifdef GPOS_DEBUG
 			if (pxform->FCheckPattern(pexpr) &&
@@ -242,7 +243,7 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 
 				pxform->Transform(pxfctxt, pxfres, pexpr);
 
-				CExpression *pexprResult = pxfres->PexprNext();
+				gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 				while (nullptr != pexprResult)
 				{
 					GPOS_ASSERT(pexprResult->FMatchDebug(pexprResult));
@@ -267,18 +268,19 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 //		Generate a randomized star join tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CXformTest::PexprStarJoinTree(CMemoryPool *mp, ULONG ulTabs)
 {
-	CExpression *pexprLeft = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprLeft = CTestUtils::PexprLogicalGet(mp);
 
 	for (ULONG ul = 1; ul < ulTabs; ul++)
 	{
-		CColRef *pcrLeft = pexprLeft->DeriveOutputColumns()->PcrAny();
-		CExpression *pexprRight = CTestUtils::PexprLogicalGet(mp);
-		CColRef *pcrRight = pexprRight->DeriveOutputColumns()->PcrAny();
+		gpos::Ref<CColRef> pcrLeft = pexprLeft->DeriveOutputColumns()->PcrAny();
+		gpos::Ref<CExpression> pexprRight = CTestUtils::PexprLogicalGet(mp);
+		gpos::Ref<CColRef> pcrRight =
+			pexprRight->DeriveOutputColumns()->PcrAny();
 
-		CExpression *pexprPred =
+		gpos::Ref<CExpression> pexprPred =
 			CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 		pexprLeft = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
@@ -297,7 +299,7 @@ CXformTest::PexprStarJoinTree(CMemoryPool *mp, ULONG ulTabs)
 //		Generate a randomized star join tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CXformTest::PexprJoinTree(CMemoryPool *mp)
 {
 	return PexprStarJoinTree(mp, 3);
@@ -320,8 +322,9 @@ CXformTest::EresUnittest_Mapping()
 		if (CXformFactory::Pxff()->IsXformIdUsed((CXform::EXformId) ul))
 		{
 			CXform::EXformId exfid = (CXform::EXformId) ul;
-			CXform *pxform = CXformFactory::Pxff()->Pxf(exfid);
-			CXform *pxformMapped = CXformFactory::Pxff()->Pxf(pxform->SzId());
+			gpos::Ref<CXform> pxform = CXformFactory::Pxff()->Pxf(exfid);
+			gpos::Ref<CXform> pxformMapped =
+				CXformFactory::Pxff()->Pxf(pxform->SzId());
 			GPOS_ASSERT(pxform == pxformMapped);
 		}
 	}

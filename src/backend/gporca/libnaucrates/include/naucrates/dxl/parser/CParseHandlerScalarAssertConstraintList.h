@@ -36,10 +36,10 @@ class CParseHandlerScalarAssertConstraintList : public CParseHandlerScalarOp
 {
 private:
 	// scalar assert operator
-	CDXLScalarAssertConstraintList *m_dxl_op;
+	gpos::Ref<CDXLScalarAssertConstraintList> m_dxl_op;
 
 	// current assert constraint
-	CDXLScalarAssertConstraint *m_dxl_op_assert_constraint;
+	gpos::Ref<CDXLScalarAssertConstraint> m_dxl_op_assert_constraint;
 
 	// array of assert constraint nodes parsed so far
 	CDXLNodeArray *m_dxlnode_assert_constraints_parsed_array;

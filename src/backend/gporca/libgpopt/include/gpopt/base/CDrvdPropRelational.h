@@ -74,22 +74,22 @@ private:
 	CMemoryPool *m_mp;
 
 	// bitset representing whether property has been derived
-	CBitSet *m_is_prop_derived;
+	gpos::Ref<CBitSet> m_is_prop_derived;
 
 	// output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::Ref<CColRefSet> m_pcrsOutput;
 
 	// columns not defined in the underlying operator tree
-	CColRefSet *m_pcrsOuter;
+	gpos::Ref<CColRefSet> m_pcrsOuter;
 
 	// output columns that do not allow null values
-	CColRefSet *m_pcrsNotNull;
+	gpos::Ref<CColRefSet> m_pcrsNotNull;
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *m_pcrsCorrelatedApply;
+	gpos::Ref<CColRefSet> m_pcrsCorrelatedApply;
 
 	// key collection
-	CKeyCollection *m_pkc;
+	gpos::Ref<CKeyCollection> m_pkc;
 
 	// functional dependencies
 	CFunctionalDependencyArray *m_pdrgpfd;
@@ -101,15 +101,15 @@ private:
 	ULONG m_ulJoinDepth;
 
 	// partition table consumers
-	CPartInfo *m_ppartinfo;
+	gpos::Ref<CPartInfo> m_ppartinfo;
 
 	// constraint property
-	CPropConstraint *m_ppc;
+	gpos::Ref<CPropConstraint> m_ppc;
 
 	// function properties
-	CFunctionProp *m_pfp;
+	gpos::Ref<CFunctionProp> m_pfp;
 
-	CTableDescriptor *m_table_descriptor;
+	gpos::Ref<CTableDescriptor> m_table_descriptor;
 
 	// helper for getting applicable FDs from child
 	static CFunctionalDependencyArray *DeriveChildFunctionalDependencies(
@@ -134,19 +134,19 @@ private:
 
 protected:
 	// output columns
-	CColRefSet *DeriveOutputColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CExpressionHandle &);
 
 	// outer references
-	CColRefSet *DeriveOuterReferences(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveOuterReferences(CExpressionHandle &);
 
 	// nullable columns
-	CColRefSet *DeriveNotNullColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(CExpressionHandle &);
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *DeriveCorrelatedApplyColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns(CExpressionHandle &);
 
 	// key collection
-	CKeyCollection *DeriveKeyCollection(CExpressionHandle &);
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(CExpressionHandle &);
 
 	// functional dependencies
 	CFunctionalDependencyArray *DeriveFunctionalDependencies(
@@ -159,15 +159,15 @@ protected:
 	ULONG DeriveJoinDepth(CExpressionHandle &);
 
 	// partition consumers
-	CPartInfo *DerivePartitionInfo(CExpressionHandle &);
+	gpos::Ref<CPartInfo> DerivePartitionInfo(CExpressionHandle &);
 
 	// constraint property
-	CPropConstraint *DerivePropertyConstraint(CExpressionHandle &);
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(CExpressionHandle &);
 
 	// function properties
-	CFunctionProp *DeriveFunctionProperties(CExpressionHandle &);
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties(CExpressionHandle &);
 
-	CTableDescriptor *DeriveTableDescriptor(CExpressionHandle &);
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(CExpressionHandle &);
 
 public:
 	CDrvdPropRelational(const CDrvdPropRelational &) = delete;
@@ -193,22 +193,22 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// output columns
-	CColRefSet *GetOutputColumns() const;
+	gpos::Ref<CColRefSet> GetOutputColumns() const;
 
 	// outer references
-	CColRefSet *GetOuterReferences() const;
+	gpos::Ref<CColRefSet> GetOuterReferences() const;
 
 	// nullable columns
-	CColRefSet *GetNotNullColumns() const;
+	gpos::Ref<CColRefSet> GetNotNullColumns() const;
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *GetCorrelatedApplyColumns() const;
+	gpos::Ref<CColRefSet> GetCorrelatedApplyColumns() const;
 
 	// key collection
-	CKeyCollection *GetKeyCollection() const;
+	gpos::Ref<CKeyCollection> GetKeyCollection() const;
 
 	// functional dependencies
 	CFunctionalDependencyArray *GetFunctionalDependencies() const;
@@ -220,21 +220,22 @@ public:
 	ULONG GetJoinDepth() const;
 
 	// partition consumers
-	CPartInfo *GetPartitionInfo() const;
+	gpos::Ref<CPartInfo> GetPartitionInfo() const;
 
 	// constraint property
-	CPropConstraint *GetPropertyConstraint() const;
+	gpos::Ref<CPropConstraint> GetPropertyConstraint() const;
 
 	// function properties
-	CFunctionProp *GetFunctionProperties() const;
+	gpos::Ref<CFunctionProp> GetFunctionProperties() const;
 
-	CTableDescriptor *GetTableDescriptor() const;
+	gpos::Ref<CTableDescriptor> GetTableDescriptor() const;
 
 	// shorthand for conversion
-	static CDrvdPropRelational *GetRelationalProperties(CDrvdProp *pdp);
+	static gpos::Ref<CDrvdPropRelational> GetRelationalProperties(
+		gpos::Ref<CDrvdProp> pdp);
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

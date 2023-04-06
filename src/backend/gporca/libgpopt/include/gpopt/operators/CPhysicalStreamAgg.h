@@ -29,21 +29,22 @@ class CPhysicalStreamAgg : public CPhysicalAgg
 {
 private:
 	// local order spec
-	COrderSpec *m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// set representation of minimal grouping columns
-	CColRefSet *m_pcrsMinimalGrpCols;
+	gpos::Ref<CColRefSet> m_pcrsMinimalGrpCols;
 
 	// construct order spec on grouping column so that it covers required order spec
-	static COrderSpec *PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
-								   CColRefArray *pdrgpcrGrp);
+	static gpos::Ref<COrderSpec> PosCovering(CMemoryPool *mp,
+											 gpos::Ref<COrderSpec> posRequired,
+											 CColRefArray *pdrgpcrGrp);
 
 protected:
 	// compute required sort columns of the n-th child
-	COrderSpec *PosRequiredStreamAgg(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 COrderSpec *posRequired, ULONG child_index,
-									 CColRefArray *pdrgpcrGrp) const;
+	gpos::Ref<COrderSpec> PosRequiredStreamAgg(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<COrderSpec> posRequired, ULONG child_index,
+		CColRefArray *pdrgpcrGrp) const;
 
 	// initialize the order spec using the given array of columns
 	void InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder);
@@ -88,9 +89,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				COrderSpec *posRequired, ULONG child_index,
+				gpos::Ref<COrderSpec> posRequired, ULONG child_index,
 				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG			   //ulOptReq
 	) const override
@@ -104,8 +105,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -113,21 +114,22 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		const gpos::Ref<CEnfdOrder> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalStreamAgg *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalStreamAgg>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalStreamAgg == pop->Eopid() ||
 					EopPhysicalStreamAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CPhysicalStreamAgg *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalStreamAgg> >(pop);
 	}
 
 };	// class CPhysicalStreamAgg

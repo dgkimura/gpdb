@@ -47,7 +47,7 @@ private:
 	INT m_attno;
 
 	// column type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	INT m_type_modifier;
 
@@ -61,15 +61,15 @@ private:
 	ULONG m_length;
 
 	// default value expression
-	gpdxl::CDXLNode *m_dxl_default_val;
+	gpos::Ref<gpdxl::CDXLNode> m_dxl_default_val;
 
 public:
 	CMDColumn(const CMDColumn &) = delete;
 
 	// ctor
-	CMDColumn(CMDName *mdname, INT attrnum, IMDId *mdid_type, INT type_modifier,
-			  BOOL is_nullable, BOOL is_dropped,
-			  gpdxl::CDXLNode *dxl_dafault_value,
+	CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
+			  INT type_modifier, BOOL is_nullable, BOOL is_dropped,
+			  gpos::Ref<gpdxl::CDXLNode> dxl_dafault_value,
 			  ULONG length = gpos::ulong_max);
 
 	// dtor
@@ -79,7 +79,7 @@ public:
 	CMDName Mdname() const override;
 
 	// column type
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	INT TypeModifier() const override;
 

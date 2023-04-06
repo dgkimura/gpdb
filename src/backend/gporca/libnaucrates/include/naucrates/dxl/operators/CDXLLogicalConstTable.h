@@ -65,7 +65,7 @@ public:
 	}
 
 	// return the column descriptor at a given position
-	CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
+	gpos::Ref<CDXLColDescr> GetColumnDescrAt(ULONG ul) const;
 
 	// number of columns
 	ULONG Arity() const;
@@ -86,25 +86,26 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static CDXLLogicalConstTable *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLLogicalConstTable>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalConstTable == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalConstTable *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLLogicalConstTable> >(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

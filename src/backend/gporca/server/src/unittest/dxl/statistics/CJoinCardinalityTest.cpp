@@ -45,7 +45,7 @@ CJoinCardinalityTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -212,7 +212,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 	};
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
 	ULongPtrArray *cols = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -264,8 +264,8 @@ CJoinCardinalityTest::EresUnittest_Join()
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
-		CStatistics *pstats1 = (*pdrgpstatBefore)[0];
-		CStatistics *pstats2 = (*pdrgpstatBefore)[1];
+		gpos::Ref<CStatistics> pstats1 = (*pdrgpstatBefore)[0];
+		gpos::Ref<CStatistics> pstats2 = (*pdrgpstatBefore)[1];
 
 		GPOS_CHECK_ABORT;
 
@@ -275,7 +275,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		CStatsPredJoinArray *join_preds_stats = pf(mp);
 
 		// calculate the output stats
-		IStatistics *pstatsOutput = nullptr;
+		gpos::Ref<IStatistics> pstatsOutput = nullptr;
 		if (left_outer_join)
 		{
 			pstatsOutput =

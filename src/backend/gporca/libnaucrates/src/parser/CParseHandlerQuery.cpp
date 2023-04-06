@@ -71,7 +71,7 @@ CParseHandlerQuery::~CParseHandlerQuery()
 //		Root of constructed DXL plan
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerQuery::CreateDXLNode() const
 {
 	return m_dxl_node;

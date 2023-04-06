@@ -51,7 +51,7 @@ public:
 	CLogicalApply(const CLogicalApply &) = delete;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -68,7 +68,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -78,7 +78,7 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -86,7 +86,7 @@ public:
 	}
 
 	// derive keys
-	CKeyCollection *
+	gpos::Ref<CKeyCollection>
 	DeriveKeyCollection(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -94,7 +94,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -106,7 +106,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *
+	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				 IStatisticsArray *	 // stats_ctxt
 	) const override
@@ -129,9 +129,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsInput,
-						 ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   gpos::Ref<CColRefSet> pcrsInput,
+								   ULONG child_index) const override;
 
 	// return true if operator is a correlated apply
 	virtual BOOL
@@ -172,13 +172,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CLogicalApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FApply(pop));
 
-		return dynamic_cast<CLogicalApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalApply> >(pop);
 	}
 
 };	// class CLogicalApply

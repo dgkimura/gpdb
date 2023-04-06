@@ -53,8 +53,8 @@ const CWindowFrame CWindowFrame::m_wfEmpty;
 //---------------------------------------------------------------------------
 CWindowFrame::CWindowFrame(
 	CMemoryPool *mp, EFrameSpec efs, EFrameBoundary efbLeading,
-	EFrameBoundary efbTrailing, CExpression *pexprLeading,
-	CExpression *pexprTrailing, EFrameExclusionStrategy efes,
+	EFrameBoundary efbTrailing, gpos::Ref<CExpression> pexprLeading,
+	gpos::Ref<CExpression> pexprTrailing, EFrameExclusionStrategy efes,
 	OID start_in_range_func, OID end_in_range_func, OID in_range_coll,
 	bool in_range_asc, bool in_range_nulls_first)
 	: m_efs(efs),
@@ -130,7 +130,7 @@ CWindowFrame::~CWindowFrame()
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Matches(const CWindowFrame *pwf) const
+CWindowFrame::Matches(const gpos::Ref<CWindowFrame> pwf) const
 {
 	return m_efs == pwf->Efs() && m_efbLeading == pwf->EfbLeading() &&
 		   m_efbTrailing == pwf->EfbTrailing() && m_efes == pwf->Efes() &&
@@ -179,7 +179,7 @@ CWindowFrame::HashValue() const
 //		Return a copy of the window frame with remapped columns
 //
 //---------------------------------------------------------------------------
-CWindowFrame *
+gpos::Ref<CWindowFrame>
 CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 										 UlongToColRefMap *colref_mapping,
 										 BOOL must_exist)
@@ -190,14 +190,14 @@ CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 		return this;
 	}
 
-	CExpression *pexprLeading = nullptr;
+	gpos::Ref<CExpression> pexprLeading = nullptr;
 	if (nullptr != m_pexprLeading)
 	{
 		pexprLeading = m_pexprLeading->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, must_exist);
 	}
 
-	CExpression *pexprTrailing = nullptr;
+	gpos::Ref<CExpression> pexprTrailing = nullptr;
 	if (nullptr != m_pexprTrailing)
 	{
 		pexprTrailing = m_pexprTrailing->PexprCopyWithRemappedColumns(

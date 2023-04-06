@@ -36,7 +36,7 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicBitmapTableGet::CLogicalDynamicBitmapTableGet(
-	CMemoryPool *mp, CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameTableAlias, ULONG ulPartIndex,
 	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
 	IMdIdArray *partition_mdids)
@@ -100,7 +100,7 @@ CLogicalDynamicBitmapTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicBitmapTableGet::Matches(COperator *pop) const
+CLogicalDynamicBitmapTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicBitmapScan(this, pop);
 }
@@ -114,7 +114,7 @@ CLogicalDynamicBitmapTableGet::Matches(COperator *pop) const
 //		Derive the constraint property.
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::Ref<CPropConstraint>
 CLogicalDynamicBitmapTableGet::DerivePropertyConstraint(
 	CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
@@ -130,7 +130,7 @@ CLogicalDynamicBitmapTableGet::DerivePropertyConstraint(
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalDynamicBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 													 CExpressionHandle &exprhdl)
 {
@@ -145,7 +145,7 @@ CLogicalDynamicBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDynamicBitmapTableGet::PstatsDerive(CMemoryPool *mp,
 											CExpressionHandle &exprhdl,
 											IStatisticsArray *stats_ctxt) const
@@ -184,7 +184,7 @@ CLogicalDynamicBitmapTableGet::OsPrint(IOstream &os) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

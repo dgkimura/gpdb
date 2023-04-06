@@ -31,10 +31,10 @@ class CScalarNullIf : public CScalar
 {
 private:
 	// operator id
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// does operator return NULL on NULL input?
 	BOOL m_returns_null_on_null_input;
@@ -46,7 +46,8 @@ public:
 	CScalarNullIf(const CScalarNullIf &) = delete;
 
 	// ctor
-	CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
+	CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+				  gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarNullIf() override;
@@ -59,14 +60,14 @@ public:
 	}
 
 	// operator id
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MdIdOp() const
 	{
 		return m_mdid_op;
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -83,7 +84,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -93,7 +94,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -106,13 +107,13 @@ public:
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static CScalarNullIf *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarNullIf>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarNullIf == pop->Eopid());
 
-		return dynamic_cast<CScalarNullIf *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarNullIf> >(pop);
 	}
 
 };	// class CScalarNullIf

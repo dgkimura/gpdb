@@ -89,7 +89,7 @@ CLogicalDifference::DeriveMaxCard(CMemoryPool *,  // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
@@ -127,7 +127,7 @@ CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IStatisticsArray *	 // not used
 ) const
@@ -140,26 +140,26 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::Ref<CColRefSet> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
-	CExpression *pexprScCond =
+	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, m_pdrgpdrgpcrInput);
 
 	// compute the statistics for LASJ
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	CStatsPredJoinArray *join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is an LASJ
 		);
-	IStatistics *LASJ_stats =
+	gpos::Ref<IStatistics> LASJ_stats =
 		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
 									  true /* DoIgnoreLASJHistComputation */
 		);
@@ -170,7 +170,7 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// computed columns
 	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, LASJ_stats,
 		(*m_pdrgpdrgpcrInput)[0],  // we group by the columns of the first child
 		pdrgpulComputedCols,	   // no computed columns for set ops

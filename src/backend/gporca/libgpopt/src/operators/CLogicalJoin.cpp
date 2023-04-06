@@ -47,7 +47,7 @@ CLogicalJoin::CLogicalJoin(CMemoryPool *mp, CXform::EXformId origin_xform)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalJoin::Matches(COperator *pop) const
+CLogicalJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -60,7 +60,7 @@ CLogicalJoin::Matches(COperator *pop) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   IStatisticsArray *stats_ctxt) const
 {

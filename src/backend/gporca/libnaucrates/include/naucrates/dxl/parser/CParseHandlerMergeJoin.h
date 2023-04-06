@@ -35,7 +35,7 @@ class CParseHandlerMergeJoin : public CParseHandlerPhysicalOp
 {
 private:
 	// the merge join operator
-	CDXLPhysicalMergeJoin *m_dxl_op;
+	gpos::Ref<CDXLPhysicalMergeJoin> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

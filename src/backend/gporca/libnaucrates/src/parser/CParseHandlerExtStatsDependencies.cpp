@@ -126,7 +126,8 @@ CParseHandlerExtStatsDependencies::EndElement(
 		CParseHandlerExtStatsDependency *parse_handler_ext_stats_dep =
 			dynamic_cast<CParseHandlerExtStatsDependency *>((*this)[ul]);
 
-		CMDDependency *dep = parse_handler_ext_stats_dep->GetDependencyAt();
+		gpos::Ref<CMDDependency> dep =
+			parse_handler_ext_stats_dep->GetDependencyAt();
 		dep->AddRef();
 
 		m_dependencies->Append(dep);

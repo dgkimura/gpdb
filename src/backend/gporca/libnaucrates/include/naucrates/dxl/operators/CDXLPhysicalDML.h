@@ -44,7 +44,7 @@ private:
 	const EdxlDmlType m_dxl_dml_type;
 
 	// target table descriptor
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// list of source column ids
 	ULongPtrArray *m_src_colids_array;
@@ -59,7 +59,7 @@ private:
 	ULONG m_segid_colid;
 
 	// direct dispatch info for insert statements
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;
 
 	// Is Split Update
 	BOOL m_fSplit;
@@ -69,10 +69,10 @@ public:
 
 	// ctor
 	CDXLPhysicalDML(CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-					CDXLTableDescr *table_descr,
+					gpos::Ref<CDXLTableDescr> table_descr,
 					ULongPtrArray *src_colids_array, ULONG action_colid,
 					ULONG ctid_colid, ULONG segid_colid,
-					CDXLDirectDispatchInfo *dxl_direct_dispatch_info,
+					gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info,
 					BOOL fSplit);
 
 	// dtor
@@ -92,7 +92,7 @@ public:
 	}
 
 	// target table descriptor
-	CDXLTableDescr *
+	gpos::Ref<CDXLTableDescr>
 	GetDXLTableDescr() const
 	{
 		return m_dxl_table_descr;
@@ -127,7 +127,7 @@ public:
 	}
 
 	// direct dispatch info
-	CDXLDirectDispatchInfo *
+	gpos::Ref<CDXLDirectDispatchInfo>
 	GetDXLDirectDispatchInfo() const
 	{
 		return m_direct_dispatch_info;
@@ -143,22 +143,22 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDML *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalDML>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDML == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalDML *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalDML> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

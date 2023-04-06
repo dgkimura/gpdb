@@ -41,7 +41,7 @@ const CHAR *CEnfdDistribution::m_szDistributionMatching[EdmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdDistribution::CEnfdDistribution(CDistributionSpec *pds,
+CEnfdDistribution::CEnfdDistribution(gpos::Ref<CDistributionSpec> pds,
 									 EDistributionMatching edm)
 	: m_pds(pds), m_edm(edm)
 {
@@ -74,7 +74,7 @@ CEnfdDistribution::~CEnfdDistribution()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdDistribution::FCompatible(CDistributionSpec *pds) const
+CEnfdDistribution::FCompatible(gpos::Ref<CDistributionSpec> pds) const
 {
 	GPOS_ASSERT(nullptr != pds);
 
@@ -125,12 +125,14 @@ CEnfdDistribution::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdDistribution::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
+						gpos::Ref<CPhysical> popPhysical,
 						BOOL fDistribReqd) const
 {
 	if (fDistribReqd)
 	{
-		CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+		gpos::Ref<CDistributionSpec> pds =
+			CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
 
 		if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&
 			CDistributionSpec::EdtHashed == PdsRequired()->Edt() &&

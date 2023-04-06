@@ -18,9 +18,9 @@ using namespace gpopt;
 
 
 //  return a statistics object for a project operation
-CStatistics *
+gpos::Ref<CStatistics>
 CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
-									  const CStatistics *input_stats,
+									  const gpos::Ref<CStatistics> input_stats,
 									  ULongPtrArray *projection_colids,
 									  UlongToIDatumMap *datum_map)
 {
@@ -49,7 +49,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 			BOOL is_well_defined = false;
 			if (nullptr != datum_map)
 			{
-				IDatum *datum = datum_map->Find(&colid);
+				gpos::Ref<IDatum> datum = datum_map->Find(&colid);
 				if (nullptr != datum)
 				{
 					is_well_defined = true;
@@ -66,7 +66,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 			}
 
 			CHistogram *proj_col_histogram = nullptr;
-			CColRef *colref = col_factory->LookupColRef(colid);
+			gpos::Ref<CColRef> colref = col_factory->LookupColRef(colid);
 			GPOS_ASSERT(nullptr != colref);
 
 			if (0 == proj_col_bucket->Size() &&
@@ -96,7 +96,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 		const CDouble *width = input_stats->GetWidth(colid);
 		if (nullptr == width)
 		{
-			CColRef *colref = col_factory->LookupColRef(colid);
+			gpos::Ref<CColRef> colref = col_factory->LookupColRef(colid);
 			GPOS_ASSERT(nullptr != colref);
 
 			CDouble width =
@@ -113,7 +113,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 
 	CDouble input_rows = input_stats->Rows();
 	// create an output stats object
-	CStatistics *projection_stats = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> projection_stats = GPOS_NEW(mp) CStatistics(
 		mp, histograms_new, colid_width_mapping, input_rows,
 		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
 

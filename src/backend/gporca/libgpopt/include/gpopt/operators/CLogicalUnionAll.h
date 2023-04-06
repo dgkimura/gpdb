@@ -62,9 +62,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -75,7 +75,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -93,23 +93,24 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 
 	// conversion function
-	static CLogicalUnionAll *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalUnionAll>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUnionAll == pop->Eopid());
 
-		return dynamic_cast<CLogicalUnionAll *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalUnionAll> >(pop);
 	}
 
 	// derive statistics based on union all semantics
-	static IStatistics *PstatsDeriveUnionAll(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl);
+	static gpos::Ref<IStatistics> PstatsDeriveUnionAll(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 };	// class CLogicalUnionAll
 

@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CPartInfo::CPartInfoEntry);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, IMDId *mdid,
+CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
 										  CPartKeysArray *pdrgppartkeys)
 	: m_scan_id(scan_id), m_mdid(mdid), m_pdrgppartkeys(pdrgppartkeys)
 {
@@ -62,9 +62,10 @@ CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 //		part keys to this entry, using the existing keys and the given hashmap
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry *
+gpos::Ref<CPartInfo::CPartInfoEntry>
 CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
-	CMemoryPool *mp, CColRefSet *pcrs, UlongToColRefMap *colref_mapping)
+	CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
+	UlongToColRefMap *colref_mapping)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 	GPOS_ASSERT(nullptr != colref_mapping);
@@ -75,7 +76,7 @@ CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
 	const ULONG size = m_pdrgppartkeys->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartKeys *ppartkeys = (*m_pdrgppartkeys)[ul];
+		gpos::Ref<CPartKeys> ppartkeys = (*m_pdrgppartkeys)[ul];
 
 		if (ppartkeys->FOverlap(pcrs))
 		{
@@ -115,10 +116,10 @@ CPartInfo::CPartInfoEntry::OsPrint(IOstream &os) const
 //		Copy part info entry into given memory pool
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry *
+gpos::Ref<CPartInfo::CPartInfoEntry>
 CPartInfo::CPartInfoEntry::PpartinfoentryCopy(CMemoryPool *mp) const
 {
-	IMDId *mdid = MDId();
+	gpos::Ref<IMDId> mdid = MDId();
 	mdid->AddRef();
 
 	// copy part keys
@@ -182,7 +183,8 @@ CPartInfo::~CPartInfo()
 //
 //---------------------------------------------------------------------------
 void
-CPartInfo::AddPartConsumer(CMemoryPool *mp, ULONG scan_id, IMDId *mdid,
+CPartInfo::AddPartConsumer(CMemoryPool *mp, ULONG scan_id,
+						   gpos::Ref<IMDId> mdid,
 						   CColRef2dArray *pdrgpdrgpcrPart)
 {
 	CPartKeysArray *pdrgppartkeys = GPOS_NEW(mp) CPartKeysArray(mp);
@@ -207,7 +209,7 @@ CPartInfo::FContainsScanId(ULONG scan_id) const
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
+		gpos::Ref<CPartInfoEntry> ppartinfoentry = (*m_pdrgppartentries)[ul];
 		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return true;
@@ -239,7 +241,7 @@ CPartInfo::ScanId(ULONG ulPos) const
 //		Return relation mdid of the entry at the given position
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CPartInfo::GetRelMdId(ULONG ulPos) const
 {
 	return (*m_pdrgppartentries)[ulPos]->MDId();
@@ -274,7 +276,7 @@ CPartInfo::PdrgppartkeysByScanId(ULONG scan_id) const
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
+		gpos::Ref<CPartInfoEntry> ppartinfoentry = (*m_pdrgppartentries)[ul];
 		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return ppartinfoentry->Pdrgppartkeys();
@@ -292,14 +294,14 @@ CPartInfo::PdrgppartkeysByScanId(ULONG scan_id) const
 //		Return a new part info object with an additional set of remapped keys
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 									 CColRefArray *pdrgpcrDest) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrSrc);
 	GPOS_ASSERT(nullptr != pdrgpcrDest);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrSrc);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrSrc);
 	UlongToColRefMap *colref_mapping =
 		CUtils::PhmulcrMapping(mp, pdrgpcrSrc, pdrgpcrDest);
 
@@ -309,11 +311,11 @@ CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 	const ULONG size = m_pdrgppartentries->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
+		gpos::Ref<CPartInfoEntry> ppartinfoentry = (*m_pdrgppartentries)[ul];
 
 		// if this entry has keys that overlap with the source columns then
 		// add another set of keys to it using the destination columns
-		CPartInfoEntry *ppartinfoentryNew =
+		gpos::Ref<CPartInfoEntry> ppartinfoentryNew =
 			ppartinfoentry->PpartinfoentryAddRemappedKeys(mp, pcrs,
 														  colref_mapping);
 		pdrgppartentries->Append(ppartinfoentryNew);
@@ -333,9 +335,9 @@ CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 //		Combine two part info objects
 //
 //---------------------------------------------------------------------------
-CPartInfo *
-CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
-							CPartInfo *ppartinfoSnd)
+gpos::Ref<CPartInfo>
+CPartInfo::PpartinfoCombine(CMemoryPool *mp, gpos::Ref<CPartInfo> ppartinfoFst,
+							gpos::Ref<CPartInfo> ppartinfoSnd)
 {
 	GPOS_ASSERT(nullptr != ppartinfoFst);
 	GPOS_ASSERT(nullptr != ppartinfoSnd);
@@ -350,7 +352,7 @@ CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
 	const ULONG length = ppartinfoSnd->m_pdrgppartentries->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry =
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
 			(*(ppartinfoSnd->m_pdrgppartentries))[ul];
 		CPartKeysArray *pdrgppartkeys =
 			ppartinfoFst->PdrgppartkeysByScanId(ppartinfoentry->ScanId());
@@ -366,7 +368,7 @@ CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
 		}
 		else
 		{
-			CPartInfoEntry *ppartinfoentryCopy =
+			gpos::Ref<CPartInfoEntry> ppartinfoentryCopy =
 				ppartinfoentry->PpartinfoentryCopy(mp);
 			pdrgppartentries->Append(ppartinfoentryCopy);
 		}
@@ -390,7 +392,7 @@ CPartInfo::OsPrint(IOstream &os) const
 	os << "Part Consumers: ";
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
+		gpos::Ref<CPartInfoEntry> ppartinfoentry = (*m_pdrgppartentries)[ul];
 		ppartinfoentry->OsPrint(os);
 
 		// separator

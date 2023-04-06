@@ -42,17 +42,17 @@ public:
 
 	// ctors
 	explicit CKeyCollection(CMemoryPool *mp);
-	CKeyCollection(CMemoryPool *mp, CColRefSet *pcrs);
+	CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
 	CKeyCollection(CMemoryPool *mp, CColRefArray *colref_array);
 
 	// dtor
 	~CKeyCollection() override;
 
 	// add individual set -- takes ownership
-	void Add(CColRefSet *pcrs);
+	void Add(gpos::Ref<CColRefSet> pcrs);
 
 	// check if set forms a key
-	BOOL FKey(const CColRefSet *pcrs, BOOL fExactMatch = true) const;
+	BOOL FKey(const gpos::Ref<CColRefSet> pcrs, BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
 	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;
@@ -71,7 +71,7 @@ public:
 	CColRefArray *PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
 
 	// extract key at given position
-	CColRefSet *PcrsKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::Ref<CColRefSet> PcrsKey(CMemoryPool *mp, ULONG ul) const;
 
 	// number of keys
 	ULONG

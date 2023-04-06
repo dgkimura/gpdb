@@ -49,8 +49,8 @@ public:
 	}
 
 	// factory function for BOOL datums
-	virtual IDatumBool *CreateBoolDatum(CMemoryPool *mp, BOOL value,
-										BOOL is_null) const = 0;
+	virtual gpos::Ref<IDatumBool> CreateBoolDatum(CMemoryPool *mp, BOOL value,
+												  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

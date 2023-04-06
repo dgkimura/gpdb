@@ -67,8 +67,8 @@ public:
 
 	// actual transform
 	void
-	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-			  CExpression *pexpr) const override
+	Transform(gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+			  gpos::Ref<CExpression> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -77,9 +77,9 @@ public:
 		CMemoryPool *mp = pxfctxt->Pmp();
 
 		// extract components
-		CExpression *pexprLeft = (*pexpr)[0];
-		CExpression *pexprRight = (*pexpr)[1];
-		CExpression *pexprScalar = (*pexpr)[2];
+		gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 		TLogicalApply *popApply = TLogicalApply::PopConvert(pexpr->Pop());
 		CColRefArray *colref_array = popApply->PdrgPcrInner();
 
@@ -91,7 +91,7 @@ public:
 		pexprScalar->AddRef();
 
 		// assemble physical operator
-		CExpression *pexprPhysicalApply = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CExpression> pexprPhysicalApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
 				TPhysicalJoin(mp, colref_array, popApply->EopidOriginSubq()),

@@ -28,7 +28,7 @@ FORCE_GENERATE_DBGSTR(CXform);
 //		ctor
 //
 //---------------------------------------------------------------------------
-CXform::CXform(CExpression *pexpr) : m_pexpr(pexpr)
+CXform::CXform(gpos::Ref<CExpression> pexpr) : m_pexpr(pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(FCheckPattern(pexpr));
@@ -82,7 +82,7 @@ CXform::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXform::FCheckPattern(CExpression *pexpr) const
+CXform::FCheckPattern(gpos::Ref<CExpression> pexpr) const
 {
 	return pexpr->FMatchPattern(PexprPattern());
 }
@@ -97,7 +97,8 @@ CXform::FCheckPattern(CExpression *pexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXform::FPromising(CMemoryPool *mp, const CXform *pxform, CExpression *pexpr)
+CXform::FPromising(CMemoryPool *mp, const gpos::Ref<CXform> pxform,
+				   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pxform);
 	GPOS_ASSERT(nullptr != pexpr);
@@ -135,10 +136,10 @@ CXform::FEqualIds(const CHAR *szIdOne, const CHAR *szIdTwo)
 //		Caller takes ownership of the returned set
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsNLJoinXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfLeftOuterJoin2NLJoin));
 	(void) pbs->ExchangeSet(
@@ -160,10 +161,10 @@ CXform::PbsNLJoinXforms(CMemoryPool *mp)
 //		Caller takes ownership of the returned set
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsIndexJoinXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfJoin2BitmapIndexGetApply));
 	(void) pbs->ExchangeSet(
@@ -181,10 +182,10 @@ CXform::PbsIndexJoinXforms(CMemoryPool *mp)
 //		Caller takes ownership of the returned set
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsBitmapIndexXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfSelect2BitmapBoolOp));
 	(void) pbs->ExchangeSet(
@@ -197,10 +198,10 @@ CXform::PbsBitmapIndexXforms(CMemoryPool *mp)
 
 //	returns a set containing all xforms that generate a plan with hash join
 //	Caller takes ownership of the returned set
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsHashJoinXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfLeftOuterJoin2HashJoin));
@@ -218,10 +219,10 @@ CXform::PbsHashJoinXforms(CMemoryPool *mp)
 	return pbs;
 }
 
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsJoinOrderInQueryXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfExpandNAryJoinDP));
@@ -239,10 +240,10 @@ CXform::PbsJoinOrderInQueryXforms(CMemoryPool *mp)
 	return pbs;
 }
 
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsJoinOrderOnGreedyXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfExpandNAryJoinDP));
@@ -256,10 +257,10 @@ CXform::PbsJoinOrderOnGreedyXforms(CMemoryPool *mp)
 	return pbs;
 }
 
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsJoinOrderOnExhaustiveXforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	(void) pbs->ExchangeSet(
 		GPOPT_DISABLE_XFORM_TF(CXform::ExfExpandNAryJoinDPv2));
@@ -267,10 +268,10 @@ CXform::PbsJoinOrderOnExhaustiveXforms(CMemoryPool *mp)
 	return pbs;
 }
 
-CBitSet *
+gpos::Ref<CBitSet>
 CXform::PbsJoinOrderOnExhaustive2Xforms(CMemoryPool *mp)
 {
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	(void) pbs->ExchangeSet(GPOPT_DISABLE_XFORM_TF(CXform::ExfExpandNAryJoin));
 	(void) pbs->ExchangeSet(

@@ -151,9 +151,10 @@ CPhysicalAgg::~CPhysicalAgg()
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CColRefSet *pcrsRequired, ULONG child_index,
+						   gpos::Ref<CColRefSet> pcrsRequired,
+						   ULONG child_index,
 						   CDrvdPropArray *,  // pdrgpdpCtxt
 						   ULONG			  // ulOptReq
 )
@@ -171,23 +172,23 @@ CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
-							  CColRefArray *pdrgpcrGrp)
+							  gpos::Ref<CColRefSet> pcrsRequired,
+							  ULONG child_index, CColRefArray *pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	GPOS_ASSERT(
 		0 == child_index &&
 		"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include grouping columns
 	pcrs->Include(pdrgpcrGrp);
 	pcrs->Union(pcrsRequired);
 
-	CColRefSet *pcrsOutput =
+	gpos::Ref<CColRefSet> pcrsOutput =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
 	pcrs->Release();
 
@@ -202,10 +203,11 @@ CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsInput, ULONG child_index,
-							 ULONG ulOptReq, CColRefArray *pdrgpcgGrp,
+							 gpos::Ref<CDistributionSpec> pdsInput,
+							 ULONG child_index, ULONG ulOptReq,
+							 CColRefArray *pdrgpcgGrp,
 							 CColRefArray *pdrgpcrGrpMinimal) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -241,7 +243,7 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			CColRefArray *grpAndDistinctCols = GPOS_NEW(mp) CColRefArray(mp);
 			grpAndDistinctCols->AppendArray(m_pdrgpcr);
 			grpAndDistinctCols->AppendArray(m_pdrgpcrArgDQA);
-			CDistributionSpec *pdsSpec =
+			gpos::Ref<CDistributionSpec> pdsSpec =
 				PdsMaximalHashed(mp, grpAndDistinctCols);
 			grpAndDistinctCols->Release();
 			return pdsSpec;
@@ -268,12 +270,12 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		if no such distribution can be created, return a Singleton distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
-	CDistributionSpecHashed *pdshashedMaximal =
+	gpos::Ref<CDistributionSpecHashed> pdshashedMaximal =
 		CDistributionSpecHashed::PdshashedMaximal(
 			mp, colref_array, true /*fNullsColocated*/
 		);
@@ -295,9 +297,9 @@ CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 //		Compute required distribution of the n-th child of a global agg
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsInput,
+								   gpos::Ref<CDistributionSpec> pdsInput,
 								   ULONG child_index, CColRefArray *pdrgpcrGrp,
 								   CColRefArray *pdrgpcrGrpMinimal,
 								   ULONG ulOptReq) const
@@ -345,7 +347,7 @@ CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		aggregate operator
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 {
 	GPOS_ASSERT(COperator::EgbaggtypeIntermediate == m_egbaggtype);
@@ -359,11 +361,11 @@ CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 	const ULONG length = m_pdrgpcr->Size() - m_pdrgpcrArgDQA->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRef *colref = (*m_pdrgpcr)[ul];
+		gpos::Ref<CColRef> colref = (*m_pdrgpcr)[ul];
 		colref_array->Append(colref);
 	}
 
-	CDistributionSpec *pds = PdsMaximalHashed(mp, colref_array);
+	gpos::Ref<CDistributionSpec> pds = PdsMaximalHashed(mp, colref_array);
 	colref_array->Release();
 
 	return pds;
@@ -378,9 +380,10 @@ CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CRewindabilitySpec *prsRequired, ULONG child_index,
+						  gpos::Ref<CRewindabilitySpec> prsRequired,
+						  ULONG child_index,
 						  CDrvdPropArray *,	 // pdrgpdpCtxt
 						  ULONG				 // ulOptReq
 ) const
@@ -389,7 +392,7 @@ CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (prsRequired->IsOriginNLJoin())
 	{
-		CRewindabilitySpec *prs = GPOS_NEW(mp) CRewindabilitySpec(
+		gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 			CRewindabilitySpec::ErtNone, prsRequired->Emht());
 		return prs;
 	}
@@ -405,10 +408,10 @@ CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *pcter,
+						   gpos::Ref<CCTEReq> pcter,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -432,14 +435,14 @@ CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalAgg::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 
 	// include grouping columns
 	pcrs->Include(PdrgpcrGroupingCols());
@@ -461,10 +464,11 @@ CPhysicalAgg::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtUniversal == pds->Edt() &&
 		IMDFunction::EfsVolatile ==
@@ -505,7 +509,7 @@ CPhysicalAgg::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalAgg::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -528,7 +532,7 @@ CPhysicalAgg::HashValue() const
 	ULONG ulaggstage = (ULONG) m_aggStage;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColRef *colref = (*m_pdrgpcr)[ul];
+		gpos::Ref<CColRef> colref = (*m_pdrgpcr)[ul];
 		ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(colref));
 	}
 
@@ -548,14 +552,15 @@ CPhysicalAgg::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalAgg::Matches(COperator *pop) const
+CPhysicalAgg::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalAgg *popAgg = dynamic_cast<CPhysicalAgg *>(pop);
+	gpos::Ref<CPhysicalAgg> popAgg =
+		dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
 	{
@@ -587,12 +592,13 @@ CPhysicalAgg::Matches(COperator *pop) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalAgg::EpetDistribution(CExpressionHandle &exprhdl,
-							   const CEnfdDistribution *ped) const
+							   const gpos::Ref<CEnfdDistribution> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the aggregate node
-	CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
 
 	if (ped->FCompatible(pds))
 	{
@@ -623,10 +629,11 @@ CPhysicalAgg::EpetDistribution(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalAgg::EpetRewindability(CExpressionHandle &exprhdl,
-								const CEnfdRewindability *per) const
+								const gpos::Ref<CEnfdRewindability> per) const
 {
 	// get rewindability delivered by the Agg node
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::Ref<CRewindabilitySpec> prs =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required rewindability is already provided

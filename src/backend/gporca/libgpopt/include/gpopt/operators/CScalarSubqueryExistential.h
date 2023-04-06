@@ -40,10 +40,10 @@ public:
 	~CScalarSubqueryExistential() override;
 
 	// return the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -53,7 +53,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -63,18 +63,18 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *PpartinfoDerive(CMemoryPool *mp,
-							   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> PpartinfoDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubqueryExistential *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarSubqueryExistential>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryExists == pop->Eopid() ||
 					EopScalarSubqueryNotExists == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryExistential *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarSubqueryExistential> >(pop);
 	}
 
 };	// class CScalarSubqueryExistential

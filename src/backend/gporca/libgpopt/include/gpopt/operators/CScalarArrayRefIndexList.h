@@ -71,7 +71,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -81,7 +81,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -91,7 +91,7 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(
@@ -100,13 +100,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayRefIndexList *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarArrayRefIndexList>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayRefIndexList == pop->Eopid());
 
-		return dynamic_cast<CScalarArrayRefIndexList *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarArrayRefIndexList> >(pop);
 	}
 
 };	// class CScalarArrayRefIndexList

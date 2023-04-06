@@ -64,7 +64,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -72,7 +72,7 @@ public:
 		// may have additional children that are ignored, e.g., scalar children
 		GPOS_ASSERT(1 <= exprhdl.Arity());
 
-		CColRefSet *pcrs = exprhdl.DeriveNotNullColumns(1);
+		gpos::Ref<CColRefSet> pcrs = exprhdl.DeriveNotNullColumns(1);
 		pcrs->AddRef();
 
 		return pcrs;
@@ -83,7 +83,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -113,13 +113,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalRightOuterJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalRightOuterJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalRightOuterJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalRightOuterJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalRightOuterJoin> >(pop);
 	}
 
 };	// class CLogicalRightOuterJoin

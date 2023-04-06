@@ -113,7 +113,7 @@ CLogicalLeftOuterCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalLeftOuterCorrelatedApply::Matches(COperator *pop) const
+CLogicalLeftOuterCorrelatedApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -132,7 +132,7 @@ CLogicalLeftOuterCorrelatedApply::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalLeftOuterCorrelatedApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

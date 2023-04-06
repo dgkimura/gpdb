@@ -62,14 +62,15 @@ CXformDynamicIndexGet2DynamicIndexScan::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformDynamicIndexGet2DynamicIndexScan::Transform(
-	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_ASSERTS_ONLY) const
+	gpos::Ref<CXformContext> pxfctxt GPOS_ASSERTS_ONLY,
+	gpos::Ref<CXformResult> pxfres GPOS_UNUSED,
+	gpos::Ref<CExpression> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicIndexGet *popIndexGet =
+	gpos::Ref<CLogicalDynamicIndexGet> popIndexGet =
 		CLogicalDynamicIndexGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
@@ -78,13 +79,13 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	GPOS_ASSERT(pname != nullptr);
 
 	// extract components
-	CExpression *pexprIndexCond = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprIndexCond = (*pexpr)[0];
 	pexprIndexCond->AddRef();
 
-	CTableDescriptor *ptabdesc = popIndexGet->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popIndexGet->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CIndexDescriptor *pindexdesc = popIndexGet->Pindexdesc();
+	gpos::Ref<CIndexDescriptor> pindexdesc = popIndexGet->Pindexdesc();
 	pindexdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
@@ -94,14 +95,14 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	CColRef2dArray *pdrgpdrgpcrPart = popIndexGet->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 
-	COrderSpec *pos = popIndexGet->Pos();
+	gpos::Ref<COrderSpec> pos = popIndexGet->Pos();
 	pos->AddRef();
 
 	popIndexGet->GetPartitionMdids()->AddRef();
 	popIndexGet->GetRootColMappingPerPart()->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalDynamicIndexScan(
 						mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(), pname,

@@ -86,7 +86,7 @@ CLogicalLeftAntiSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl)
 {
@@ -104,7 +104,7 @@ CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl) const
 {
@@ -119,19 +119,19 @@ CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalLeftAntiSemiJoin::PstatsDerive(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
 									   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 	CStatsPredJoinArray *join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*LASJ*/);
-	IStatistics *pstatsLASJoin =
+	gpos::Ref<IStatistics> pstatsLASJoin =
 		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
 									  true /* DoIgnoreLASJHistComputation */
 		);

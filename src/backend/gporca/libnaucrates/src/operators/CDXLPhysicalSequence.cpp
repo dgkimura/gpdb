@@ -79,7 +79,7 @@ CDXLPhysicalSequence::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalSequence::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *dxlnode) const
+									 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -106,7 +106,7 @@ CDXLPhysicalSequence::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSequence::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSequence::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -114,7 +114,7 @@ CDXLPhysicalSequence::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

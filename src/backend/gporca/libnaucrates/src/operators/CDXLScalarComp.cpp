@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructs a scalar comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, IMDId *mdid_op,
+CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 							   const CWStringConst *comparison_operator_name)
 	: CDXLScalar(mp),
 	  m_mdid(mdid_op),
@@ -72,7 +72,7 @@ CDXLScalarComp::GetComparisonOpName() const
 //		Comparison operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarComp::MDId() const
 {
 	return m_mdid;
@@ -117,7 +117,7 @@ CDXLScalarComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *node) const
+							   const gpos::Ref<CDXLNode> node) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -149,14 +149,15 @@ CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarComp::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLScalarComp::AssertValid(const gpos::Ref<CDXLNode> node,
+							BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
 	GPOS_ASSERT(2 == arity);
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 						child_dxlnode->GetOperator()->GetDXLOperatorType() ||
 					EdxloptypeLogical ==

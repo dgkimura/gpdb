@@ -27,7 +27,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionRoutedDistribute::CPhysicalMotionRoutedDistribute(
-	CMemoryPool *mp, CDistributionSpecRouted *pdsRouted)
+	CMemoryPool *mp, gpos::Ref<CDistributionSpecRouted> pdsRouted)
 	: CPhysicalMotion(mp), m_pdsRouted(pdsRouted), m_pcrsRequiredLocal(nullptr)
 {
 	GPOS_ASSERT(nullptr != pdsRouted);
@@ -61,14 +61,14 @@ CPhysicalMotionRoutedDistribute::~CPhysicalMotionRoutedDistribute()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRoutedDistribute::Matches(COperator *pop) const
+CPhysicalMotionRoutedDistribute::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalMotionRoutedDistribute *popRoutedDistribute =
+	gpos::Ref<CPhysicalMotionRoutedDistribute> popRoutedDistribute =
 		CPhysicalMotionRoutedDistribute::PopConvert(pop);
 
 	return m_pdsRouted->Matches(popRoutedDistribute->m_pdsRouted);
@@ -82,21 +82,21 @@ CPhysicalMotionRoutedDistribute::Matches(COperator *pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CPhysicalMotionRoutedDistribute::PcrsRequired(CMemoryPool *mp,
-											  CExpressionHandle &exprhdl,
-											  CColRefSet *pcrsRequired,
-											  ULONG child_index,
-											  CDrvdPropArray *,	 // pdrgpdpCtxt
-											  ULONG				 // ulOptReq
+gpos::Ref<CColRefSet>
+CPhysicalMotionRoutedDistribute::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
+	CDrvdPropArray *,  // pdrgpdpCtxt
+	ULONG			   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
+	gpos::Ref<CColRefSet> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
-	CColRefSet *pcrsChildReqd =
+	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
@@ -112,9 +112,9 @@ CPhysicalMotionRoutedDistribute::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRoutedDistribute::FProvidesReqdCols(CExpressionHandle &exprhdl,
-												   CColRefSet *pcrsRequired,
-												   ULONG  // ulOptReq
+CPhysicalMotionRoutedDistribute::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::Ref<CColRefSet> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -130,7 +130,7 @@ CPhysicalMotionRoutedDistribute::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionRoutedDistribute::EpetOrder(CExpressionHandle &,	 // exprhdl
-										   const CEnfdOrder *	 // peo
+										   const gpos::Ref<CEnfdOrder>	// peo
 ) const
 {
 	return CEnfdProp::EpetRequired;
@@ -145,10 +145,10 @@ CPhysicalMotionRoutedDistribute::EpetOrder(CExpressionHandle &,	 // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionRoutedDistribute::PosRequired(CMemoryPool *mp,
-											 CExpressionHandle &,  // exprhdl
-											 COrderSpec *,		   //posInput
+											 CExpressionHandle &,	 // exprhdl
+											 gpos::Ref<COrderSpec>,	 //posInput
 											 ULONG
 #ifdef GPOS_DEBUG
 												 child_index
@@ -171,7 +171,7 @@ CPhysicalMotionRoutedDistribute::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionRoutedDistribute::PosDerive(CMemoryPool *mp,
 										   CExpressionHandle &	// exprhdl
 ) const
@@ -205,13 +205,13 @@ CPhysicalMotionRoutedDistribute::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionRoutedDistribute *
-CPhysicalMotionRoutedDistribute::PopConvert(COperator *pop)
+gpos::Ref<CPhysicalMotionRoutedDistribute>
+CPhysicalMotionRoutedDistribute::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRoutedDistribute == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionRoutedDistribute *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalMotionRoutedDistribute> >(pop);
 }
 
 // EOF

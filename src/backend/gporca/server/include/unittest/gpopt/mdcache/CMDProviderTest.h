@@ -34,7 +34,7 @@ class CMDProviderTest
 {
 private:
 	// test lookup of MD objects with given MD provider
-	static void TestMDLookup(CMemoryPool *mp, IMDProvider *pmdp);
+	static void TestMDLookup(CMemoryPool *mp, gpos::Ref<IMDProvider> pmdp);
 
 public:
 	// file for the file-based MD provider

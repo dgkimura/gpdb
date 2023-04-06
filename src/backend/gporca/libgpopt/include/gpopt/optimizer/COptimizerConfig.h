@@ -46,83 +46,86 @@ class COptimizerConfig : public CRefCount<COptimizerConfig>
 {
 private:
 	// plan enumeration configuration
-	CEnumeratorConfig *m_enumerator_cfg;
+	gpos::Ref<CEnumeratorConfig> m_enumerator_cfg;
 
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::Ref<CStatisticsConfig> m_stats_conf;
 
 	// CTE configuration
-	CCTEConfig *m_cte_conf;
+	gpos::Ref<CCTEConfig> m_cte_conf;
 
 	// cost model configuration
-	ICostModel *m_cost_model;
+	gpos::Ref<ICostModel> m_cost_model;
 
 	// hint configuration
-	CHint *m_hint;
+	gpos::Ref<CHint> m_hint;
 
 	// default window oids
-	CWindowOids *m_window_oids;
+	gpos::Ref<CWindowOids> m_window_oids;
 
 public:
 	// ctor
-	COptimizerConfig(CEnumeratorConfig *pec, CStatisticsConfig *stats_config,
-					 CCTEConfig *pcteconf, ICostModel *pcm, CHint *phint,
-					 CWindowOids *pdefoidsGPDB);
+	COptimizerConfig(gpos::Ref<CEnumeratorConfig> pec,
+					 gpos::Ref<CStatisticsConfig> stats_config,
+					 gpos::Ref<CCTEConfig> pcteconf, gpos::Ref<ICostModel> pcm,
+					 gpos::Ref<CHint> phint,
+					 gpos::Ref<CWindowOids> pdefoidsGPDB);
 
 	// dtor
 	~COptimizerConfig() override;
 
 
 	// plan enumeration configuration
-	CEnumeratorConfig *
+	gpos::Ref<CEnumeratorConfig>
 	GetEnumeratorCfg() const
 	{
 		return m_enumerator_cfg;
 	}
 
 	// statistics configuration
-	CStatisticsConfig *
+	gpos::Ref<CStatisticsConfig>
 	GetStatsConf() const
 	{
 		return m_stats_conf;
 	}
 
 	// CTE configuration
-	CCTEConfig *
+	gpos::Ref<CCTEConfig>
 	GetCteConf() const
 	{
 		return m_cte_conf;
 	}
 
 	// cost model configuration
-	ICostModel *
+	gpos::Ref<ICostModel>
 	GetCostModel() const
 	{
 		return m_cost_model;
 	}
 
 	// default window oids
-	CWindowOids *
+	gpos::Ref<CWindowOids>
 	GetWindowOids() const
 	{
 		return m_window_oids;
 	}
 
 	// hint configuration
-	CHint *
+	gpos::Ref<CHint>
 	GetHint() const
 	{
 		return m_hint;
 	}
 
 	// generate default optimizer configurations
-	static COptimizerConfig *PoconfDefault(CMemoryPool *mp);
+	static gpos::Ref<COptimizerConfig> PoconfDefault(CMemoryPool *mp);
 
 	// generate default optimizer configurations with the given cost model
-	static COptimizerConfig *PoconfDefault(CMemoryPool *mp, ICostModel *pcm);
+	static gpos::Ref<COptimizerConfig> PoconfDefault(CMemoryPool *mp,
+													 gpos::Ref<ICostModel> pcm);
 
 	void Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-				   CBitSet *pbsTrace) const;
+				   gpos::Ref<CBitSet> pbsTrace) const;
 
 };	// class COptimizerConfig
 

@@ -35,7 +35,7 @@ private:
 	ULONG m_cursor;
 
 	// current cursor link
-	CBitSet::CBitSetLink *m_bsl;
+	gpos::Ref<CBitSet::CBitSetLink> m_bsl;
 
 	// is iterator active or exhausted
 	BOOL m_active;

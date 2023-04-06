@@ -35,7 +35,7 @@ class CParseHandlerWindowOids : public CParseHandlerBase
 {
 private:
 	// deafult oids
-	CWindowOids *m_window_oids;
+	gpos::Ref<CWindowOids> m_window_oids;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return system specific window oids
-	CWindowOids *GetWindowOids() const;
+	gpos::Ref<CWindowOids> GetWindowOids() const;
 };
 }  // namespace gpdxl
 

@@ -68,7 +68,7 @@ CDXLScalarIndexCondList::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIndexCondList::SerializeToDXL(CXMLSerializer *xml_serializer,
-										const CDXLNode *node) const
+										const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -88,7 +88,7 @@ CDXLScalarIndexCondList::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIndexCondList::AssertValid(const CDXLNode *node,
+CDXLScalarIndexCondList::AssertValid(const gpos::Ref<CDXLNode> node,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(nullptr != node);
@@ -98,7 +98,7 @@ CDXLScalarIndexCondList::AssertValid(const CDXLNode *node,
 		const ULONG arity = node->Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CDXLNode *child_dxlnode = (*node)[ul];
+			gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 			GPOS_ASSERT(EdxloptypeScalar ==
 						child_dxlnode->GetOperator()->GetDXLOperatorType());
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

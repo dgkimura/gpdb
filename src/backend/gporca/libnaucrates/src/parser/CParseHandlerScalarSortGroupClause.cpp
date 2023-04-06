@@ -64,7 +64,7 @@ CParseHandlerScalarSortGroupClause::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 		EdxltokenMDTypeHashable, EdxltokenScalarSortGroupClause);
 
-	CDXLScalarSortGroupClause *dxl_op =
+	gpos::Ref<CDXLScalarSortGroupClause> dxl_op =
 		GPOS_NEW(m_mp) CDXLScalarSortGroupClause(m_mp, index, eqop, sortop,
 												 nullsfirst, hashable);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

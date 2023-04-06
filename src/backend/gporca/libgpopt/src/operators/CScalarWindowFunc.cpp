@@ -33,8 +33,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp, IMDId *mdid_func,
-									 IMDId *mdid_return_type,
+CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp,
+									 gpos::Ref<IMDId> mdid_func,
+									 gpos::Ref<IMDId> mdid_return_type,
 									 const CWStringConst *pstrFunc,
 									 EWinStage ewinstage, BOOL is_distinct,
 									 BOOL is_star_arg, BOOL is_simple_agg)
@@ -55,7 +56,8 @@ CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp, IMDId *mdid_func,
 	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid);
 	if (!m_fAgg)
 	{
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		const gpos::Ref<IMDFunction> pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid);
 		m_efs = pmdfunc->GetFuncStability();
 	}
 	else
@@ -100,11 +102,12 @@ CScalarWindowFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarWindowFunc::Matches(COperator *pop) const
+CScalarWindowFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarWindowFunc *popFunc = CScalarWindowFunc::PopConvert(pop);
+		gpos::Ref<CScalarWindowFunc> popFunc =
+			CScalarWindowFunc::PopConvert(pop);
 
 		// match if the func id, and properties are identical
 		return ((popFunc->IsDistinct() == m_is_distinct) &&

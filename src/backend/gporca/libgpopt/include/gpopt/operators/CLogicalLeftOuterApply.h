@@ -64,16 +64,16 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl) override
 	{
 		GPOS_ASSERT(3 == exprhdl.Arity());
@@ -82,7 +82,7 @@ public:
 	}
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -95,7 +95,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -114,13 +114,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftOuterApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftOuterApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftOuterApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftOuterApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftOuterApply> >(pop);
 	}
 
 };	// class CLogicalLeftOuterApply

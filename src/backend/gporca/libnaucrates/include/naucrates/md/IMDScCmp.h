@@ -43,16 +43,16 @@ public:
 	}
 
 	// left type
-	virtual IMDId *GetLeftMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetLeftMdid() const = 0;
 
 	// right type
-	virtual IMDId *GetRightMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetRightMdid() const = 0;
 
 	// comparison type
 	virtual IMDType::ECmpType ParseCmpType() const = 0;
 
 	// comparison operator id
-	virtual IMDId *MdIdOp() const = 0;
+	virtual gpos::Ref<IMDId> MdIdOp() const = 0;
 };
 
 }  // namespace gpmd

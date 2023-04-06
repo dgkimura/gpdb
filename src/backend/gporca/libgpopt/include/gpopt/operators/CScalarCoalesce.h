@@ -32,7 +32,7 @@ class CScalarCoalesce : public CScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -41,7 +41,7 @@ public:
 	CScalarCoalesce(const CScalarCoalesce &) = delete;
 
 	// ctor
-	CScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarCoalesce(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarCoalesce() override;
@@ -61,7 +61,7 @@ public:
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -71,7 +71,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -81,7 +81,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -100,13 +100,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarCoalesce *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarCoalesce>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCoalesce == pop->Eopid());
 
-		return dynamic_cast<CScalarCoalesce *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarCoalesce> >(pop);
 	}
 
 };	// class CScalarCoalesce

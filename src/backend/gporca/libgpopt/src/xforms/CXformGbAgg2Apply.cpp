@@ -51,7 +51,8 @@ CXformGbAgg2Apply::CXformGbAgg2Apply(CMemoryPool *mp)
 CXform::EXformPromise
 CXformGbAgg2Apply::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popGbAgg =
+		CLogicalGbAgg::PopConvert(exprhdl.Pop());
 	if (popGbAgg->FGlobal() && exprhdl.DeriveHasSubquery(1))
 	{
 		return CXform::ExfpHigh;

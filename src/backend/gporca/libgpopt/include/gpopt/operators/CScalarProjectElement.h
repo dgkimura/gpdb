@@ -33,14 +33,14 @@ class CScalarProjectElement : public CScalar
 {
 private:
 	// defined column reference
-	CColRef *m_pcr;
+	gpos::Ref<CColRef> m_pcr;
 
 
 public:
 	CScalarProjectElement(const CScalarProjectElement &) = delete;
 
 	// ctor
-	CScalarProjectElement(CMemoryPool *mp, CColRef *colref)
+	CScalarProjectElement(CMemoryPool *mp, gpos::Ref<CColRef> colref)
 		: CScalar(mp), m_pcr(colref)
 	{
 		GPOS_ASSERT(nullptr != colref);
@@ -64,7 +64,7 @@ public:
 	}
 
 	// defined column reference accessor
-	CColRef *
+	gpos::Ref<CColRef>
 	Pcr() const
 	{
 		return m_pcr;
@@ -74,39 +74,39 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return locally defined columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsDefined(CMemoryPool *mp,
 				CExpressionHandle &	 // exprhdl
 				) override
 	{
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(m_pcr);
 
 		return pcrs;
 	}
 
 	// conversion function
-	static CScalarProjectElement *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarProjectElement>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarProjectElement == pop->Eopid());
 
-		return dynamic_cast<CScalarProjectElement *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarProjectElement> >(pop);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarProjectElemet::MdidType()");

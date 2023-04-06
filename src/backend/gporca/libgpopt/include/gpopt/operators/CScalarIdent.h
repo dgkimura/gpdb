@@ -32,14 +32,14 @@ class CScalarIdent : public CScalar
 {
 private:
 	// column
-	const CColRef *m_pcr;
+	const gpos::Ref<CColRef> m_pcr;
 
 
 public:
 	CScalarIdent(const CScalarIdent &) = delete;
 
 	// ctor
-	CScalarIdent(CMemoryPool *mp, const CColRef *colref)
+	CScalarIdent(CMemoryPool *mp, const gpos::Ref<CColRef> colref)
 		: CScalar(mp), m_pcr(colref)
 	{
 	}
@@ -62,7 +62,7 @@ public:
 	}
 
 	// accessor
-	const CColRef *
+	const gpos::Ref<CColRef>
 	Pcr() const
 	{
 		return m_pcr;
@@ -72,54 +72,55 @@ public:
 	ULONG HashValue() const override;
 
 	static ULONG
-	HashValue(const CScalarIdent *pscalarIdent)
+	HashValue(const gpos::Ref<CScalarIdent> pscalarIdent)
 	{
 		return CColRef::HashValue(pscalarIdent->Pcr());
 	}
 
 	static BOOL
-	Equals(const CScalarIdent *left, const CScalarIdent *right)
+	Equals(const gpos::Ref<CScalarIdent> left,
+		   const gpos::Ref<CScalarIdent> right)
 	{
 		return CColRef::Equals(left->Pcr(), right->Pcr());
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 
 	// return locally used columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp,
 			 CExpressionHandle &  // exprhdl
 
 			 ) override
 	{
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(m_pcr);
 
 		return pcrs;
 	}
 
 	// conversion function
-	static CScalarIdent *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarIdent>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarIdent == pop->Eopid());
 
-		return dynamic_cast<CScalarIdent *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarIdent> >(pop);
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// the type modifier of the scalar expression
 	INT TypeModifier() const override;
@@ -128,16 +129,18 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// is the given expression a scalar cast of a scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr);
+	static BOOL FCastedScId(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar cast of given scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FCastedScId(gpos::Ref<CExpression> pexpr,
+							gpos::Ref<CColRef> colref);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr);
+	static BOOL FAllowedFuncScId(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FAllowedFuncScId(gpos::Ref<CExpression> pexpr,
+								 gpos::Ref<CColRef> colref);
 
 };	// class CScalarIdent
 

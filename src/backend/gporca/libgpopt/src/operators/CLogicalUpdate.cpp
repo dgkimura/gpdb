@@ -48,10 +48,12 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
+							   gpos::Ref<CTableDescriptor> ptabdesc,
 							   CColRefArray *pdrgpcrDelete,
-							   CColRefArray *pdrgpcrInsert, CColRef *pcrCtid,
-							   CColRef *pcrSegmentId, BOOL fSplit)
+							   CColRefArray *pdrgpcrInsert,
+							   gpos::Ref<CColRef> pcrCtid,
+							   gpos::Ref<CColRef> pcrSegmentId, BOOL fSplit)
 	: CLogical(mp),
 	  m_ptabdesc(ptabdesc),
 	  m_pdrgpcrDelete(pdrgpcrDelete),
@@ -98,14 +100,14 @@ CLogicalUpdate::~CLogicalUpdate()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUpdate::Matches(COperator *pop) const
+CLogicalUpdate::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalUpdate *popUpdate = CLogicalUpdate::PopConvert(pop);
+	gpos::Ref<CLogicalUpdate> popUpdate = CLogicalUpdate::PopConvert(pop);
 
 	return m_pcrCtid == popUpdate->PcrCtid() &&
 		   m_pcrSegmentId == popUpdate->PcrSegmentId() &&
@@ -147,7 +149,7 @@ CLogicalUpdate::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist)
@@ -156,8 +158,9 @@ CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
 	CColRefArray *pdrgpcrInsert =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
-	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
-	CColRef *pcrSegmentId =
+	gpos::Ref<CColRef> pcrCtid =
+		CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
+	gpos::Ref<CColRef> pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
@@ -174,12 +177,12 @@ CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrInsert);
 	pcrsOutput->Include(m_pcrCtid);
 	pcrsOutput->Include(m_pcrSegmentId);
@@ -195,7 +198,7 @@ CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalUpdate::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -242,7 +245,7 @@ CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalUpdate::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
 							 IStatisticsArray *	 // not used

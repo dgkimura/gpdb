@@ -86,7 +86,8 @@ CMinidumpWithConstExprEvaluatorTest::
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	IConstExprEvaluator *pceeval = GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
+	gpos::Ref<IConstExprEvaluator> pceeval =
+		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	BOOL fMatchPlans = true;
 

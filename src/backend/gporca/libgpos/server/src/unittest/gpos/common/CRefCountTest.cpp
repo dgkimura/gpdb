@@ -96,7 +96,7 @@ CRefCountTest::EresUnittest_DeletableObjects()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CDeletableTest *pdt = GPOS_NEW(mp) CDeletableTest;
+	gpos::Ref<CDeletableTest> pdt = GPOS_NEW(mp) CDeletableTest;
 
 	GPOS_TRY
 	{

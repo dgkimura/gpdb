@@ -29,9 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDCastGPDB::CMDCastGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						 IMDId *mdid_src, IMDId *mdid_dest,
-						 BOOL is_binary_coercible, IMDId *mdid_cast_func,
+CMDCastGPDB::CMDCastGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						 CMDName *mdname, gpos::Ref<IMDId> mdid_src,
+						 gpos::Ref<IMDId> mdid_dest, BOOL is_binary_coercible,
+						 gpos::Ref<IMDId> mdid_cast_func,
 						 EmdCoercepathType path_type)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -79,7 +80,7 @@ CMDCastGPDB::~CMDCastGPDB()
 //		Mdid of cast object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MDId() const
 {
 	return m_mdid;
@@ -107,7 +108,7 @@ CMDCastGPDB::Mdname() const
 //		Source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MdidSrc() const
 {
 	return m_mdid_src;
@@ -121,7 +122,7 @@ CMDCastGPDB::MdidSrc() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MdidDest() const
 {
 	return m_mdid_dest;
@@ -135,7 +136,7 @@ CMDCastGPDB::MdidDest() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::GetCastFuncMdId() const
 {
 	return m_mdid_cast_func;

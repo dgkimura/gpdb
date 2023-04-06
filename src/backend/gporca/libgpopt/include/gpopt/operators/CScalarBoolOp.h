@@ -86,7 +86,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -96,7 +96,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -106,13 +106,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarBoolOp *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarBoolOp>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBoolOp == pop->Eopid());
 
-		return dynamic_cast<CScalarBoolOp *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarBoolOp> >(pop);
 	}
 
 	// boolean expression evaluation
@@ -122,7 +122,7 @@ public:
 	static BOOL FCommutative(EBoolOperator eboolop);
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

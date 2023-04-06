@@ -51,7 +51,8 @@ CXformFactoryTest::EresUnittest_Basic()
 {
 #ifdef GPOS_DEBUG
 
-	CXform *pxf = CXformFactory::Pxff()->Pxf(CXform::ExfGet2TableScan);
+	gpos::Ref<CXform> pxf =
+		CXformFactory::Pxff()->Pxf(CXform::ExfGet2TableScan);
 	GPOS_ASSERT(CXform::ExfGet2TableScan == pxf->Exfid());
 
 	pxf = CXformFactory::Pxff()->Pxf(CXform::ExfImplementInnerJoin);

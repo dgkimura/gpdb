@@ -34,8 +34,8 @@ private:
 public:
 	// ctors
 	explicit CPhysicalTableScan(CMemoryPool *mp);
-	CPhysicalTableScan(CMemoryPool *, const CName *, CTableDescriptor *,
-					   CColRefArray *);
+	CPhysicalTableScan(CMemoryPool *, const CName *,
+					   gpos::Ref<CTableDescriptor>, CColRefArray *);
 
 	// ident accessors
 	EOperatorId
@@ -55,7 +55,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -66,22 +66,22 @@ public:
 
 
 	// conversion function
-	static CPhysicalTableScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalTableScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalTableScan == pop->Eopid() ||
 					EopPhysicalForeignScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalTableScan *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalTableScan> >(pop);
 	}
 
 	// statistics derivation during costing
-	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	gpos::Ref<IStatistics>
+	PstatsDerive(CMemoryPool *,				// mp
+				 CExpressionHandle &,		// exprhdl
+				 gpos::Ref<CReqdPropPlan>,	// prpplan
+				 IStatisticsArray *			//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -90,7 +90,7 @@ public:
 		return nullptr;
 	}
 
-	CRewindabilitySpec *
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override

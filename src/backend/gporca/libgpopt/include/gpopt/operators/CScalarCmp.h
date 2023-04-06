@@ -35,7 +35,7 @@ class CScalarCmp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// comparison operator name
 	const CWStringConst *m_pstrOp;
@@ -54,8 +54,8 @@ private:
 
 public:
 	// ctor
-	CScalarCmp(CMemoryPool *mp, IMDId *mdid_op, const CWStringConst *pstrOp,
-			   IMDType::ECmpType cmp_type);
+	CScalarCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+			   const CWStringConst *pstrOp, IMDType::ECmpType cmp_type);
 
 	// dtor
 	~CScalarCmp() override
@@ -91,13 +91,13 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -116,33 +116,34 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarCmp *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarCmp>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCmp == pop->Eopid());
 
-		return dynamic_cast<CScalarCmp *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarCmp> >(pop);
 	}
 
 	// get commuted scalar comparision operator
-	virtual CScalarCmp *PopCommutedOp(CMemoryPool *mp);
+	virtual gpos::Ref<CScalarCmp> PopCommutedOp(CMemoryPool *mp);
 
 	// get the string representation of a metadata object
 	static CWStringConst *Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   IMDId *mdid);
+							   gpos::Ref<IMDId> mdid);
 
 	// get metadata id of the commuted operator
-	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop);
+	static gpos::Ref<IMDId> PmdidCommuteOp(CMDAccessor *md_accessor,
+										   gpos::Ref<COperator> pop);
 
 
 

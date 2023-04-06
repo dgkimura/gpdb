@@ -57,7 +57,8 @@ CXformPushGbBelowJoin::CXformPushGbBelowJoin(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformPushGbBelowJoin::CXformPushGbBelowJoin(CExpression *pexprPattern)
+CXformPushGbBelowJoin::CXformPushGbBelowJoin(
+	gpos::Ref<CExpression> pexprPattern)
 	: CXformExploration(pexprPattern)
 {
 }
@@ -74,7 +75,8 @@ CXformPushGbBelowJoin::CXformPushGbBelowJoin(CExpression *pexprPattern)
 CXform::EXformPromise
 CXformPushGbBelowJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popGbAgg =
+		CLogicalGbAgg::PopConvert(exprhdl.Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		return CXform::ExfpNone;
@@ -93,8 +95,9 @@ CXformPushGbBelowJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformPushGbBelowJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformPushGbBelowJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -102,7 +105,8 @@ CXformPushGbBelowJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
+	gpos::Ref<CExpression> pexprResult =
+		CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{

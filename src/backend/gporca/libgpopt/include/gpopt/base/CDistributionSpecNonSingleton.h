@@ -72,12 +72,13 @@ public:
 	}
 
 	// does current distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpression> pexpr) override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType
@@ -98,13 +99,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecNonSingleton *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecNonSingleton>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtNonSingleton == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecNonSingleton *>(pds);
+		return dynamic_cast<gpos::Ref<CDistributionSpecNonSingleton> >(pds);
 	}
 
 };	// class CDistributionSpecNonSingleton

@@ -38,20 +38,22 @@ class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 {
 private:
 	// helper for splitting correlations into external and residual
-	static BOOL FSplitCorrelations(CMemoryPool *mp, CExpression *pexprOuter,
-								   CExpression *pexprInner,
+	static BOOL FSplitCorrelations(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprOuter,
+								   gpos::Ref<CExpression> pexprInner,
 								   CExpressionArray *pdrgpexprAllCorr,
 								   CExpressionArray **ppdrgpexprExternal,
 								   CExpressionArray **ppdrgpexprResidual,
-								   CColRefSet **ppcrsInnerUsed);
+								   gpos::Ref<CColRefSet> *ppcrsInnerUsed);
 
 	// helper for collecting correlations
-	static BOOL FDecorrelate(CMemoryPool *mp, CExpression *pexpr,
-							 CExpression **ppexprInnerNew,
+	static BOOL FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+							 gpos::Ref<CExpression> *ppexprInnerNew,
 							 CExpressionArray **ppdrgpexprCorr);
 
 	// decorrelate semi apply with external correlations
-	static CExpression *PexprDecorrelate(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprDecorrelate(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 public:
 	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(
@@ -65,8 +67,8 @@ public:
 	}
 
 	// ctor with a passed pattern
-	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(CMemoryPool *mp,
-												   CExpression *pexprPattern)
+	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPattern)
 		: CXformApply2Join<CLogicalLeftSemiApply, CLogicalInnerJoin>(
 			  mp, pexprPattern)
 	{
@@ -92,8 +94,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 };	// class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 

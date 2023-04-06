@@ -50,7 +50,7 @@ public:
 	~CColRefSetIter() = default;
 
 	// current colref
-	CColRef *Pcr() const;
+	gpos::Ref<CColRef> Pcr() const;
 
 };	// class CColRefSetIter
 }  // namespace gpopt

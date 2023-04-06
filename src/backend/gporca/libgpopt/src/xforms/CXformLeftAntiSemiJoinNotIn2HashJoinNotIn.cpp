@@ -68,9 +68,9 @@ CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Exfp(
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(CXformContext *pxfctxt,
-													 CXformResult *pxfres,
-													 CExpression *pexpr) const
+CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -81,7 +81,7 @@ CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(CXformContext *pxfctxt,
 
 	if (pxfres->Pdrgpexpr()->Size() == 0)
 	{
-		CExpression *pexprProcessed = nullptr;
+		gpos::Ref<CExpression> pexprProcessed = nullptr;
 		if (CXformUtils::FProcessGPDBAntiSemiHashJoin(pxfctxt->Pmp(), pexpr,
 													  &pexprProcessed))
 		{

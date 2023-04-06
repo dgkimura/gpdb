@@ -40,10 +40,11 @@ public:
 	explicit CLogicalForeignGet(CMemoryPool *mp);
 
 	CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
-					   CTableDescriptor *ptabdesc);
+					   gpos::Ref<CTableDescriptor> ptabdesc);
 
 	CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
-					   CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput);
+					   gpos::Ref<CTableDescriptor> ptabdesc,
+					   CColRefArray *pdrgpcrOutput);
 
 	// ident accessors
 	EOperatorId
@@ -60,23 +61,23 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp,
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalForeignGet has no children");
@@ -95,13 +96,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalForeignGet *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalForeignGet>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalForeignGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalForeignGet *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalForeignGet> >(pop);
 	}
 
 };	// class CLogicalForeignGet

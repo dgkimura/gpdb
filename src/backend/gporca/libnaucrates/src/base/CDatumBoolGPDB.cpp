@@ -37,9 +37,9 @@ CDatumBoolGPDB::CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null)
 	: m_value(value), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = dynamic_cast<const CMDTypeBoolGPDB *>(
-					  md_accessor->PtMDType<IMDTypeBool>(sysid))
-					  ->MDId();
+	gpos::Ref<IMDId> mdid = dynamic_cast<const gpos::Ref<CMDTypeBoolGPDB> >(
+								md_accessor->PtMDType<IMDTypeBool>(sysid))
+								->MDId();
 	mdid->AddRef();
 
 	m_mdid = mdid;
@@ -59,7 +59,7 @@ CDatumBoolGPDB::CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumBoolGPDB::CDatumBoolGPDB(IMDId *mdid, BOOL value, BOOL is_null)
+CDatumBoolGPDB::CDatumBoolGPDB(gpos::Ref<IMDId> mdid, BOOL value, BOOL is_null)
 	: m_mdid(mdid), m_value(value), m_is_null(is_null)
 {
 	GPOS_ASSERT(nullptr != m_mdid);
@@ -139,7 +139,7 @@ CDatumBoolGPDB::Size() const
 //		Accessor of type information (MDId)
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDatumBoolGPDB::MDId() const
 {
 	return m_mdid;
@@ -193,15 +193,15 @@ CDatumBoolGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumBoolGPDB::Matches(const IDatum *other) const
+CDatumBoolGPDB::Matches(const gpos::Ref<IDatum> other) const
 {
 	if (!other->MDId()->Equals(m_mdid))
 	{
 		return false;
 	}
 
-	const CDatumBoolGPDB *other_cast =
-		dynamic_cast<const CDatumBoolGPDB *>(other);
+	const gpos::Ref<CDatumBoolGPDB> other_cast =
+		dynamic_cast<const gpos::Ref<CDatumBoolGPDB> >(other);
 
 	if (!other_cast->IsNull() && !IsNull())
 	{
@@ -224,7 +224,7 @@ CDatumBoolGPDB::Matches(const IDatum *other) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::Ref<IDatum>
 CDatumBoolGPDB::MakeCopy(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();

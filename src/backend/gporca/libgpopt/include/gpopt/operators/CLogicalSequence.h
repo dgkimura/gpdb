@@ -53,7 +53,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 
 	// sensitivity to order of inputs
@@ -64,7 +64,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -78,11 +78,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -90,11 +90,11 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -106,9 +106,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-			 ULONG child_index) const override
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index) const override
 	{
 		const ULONG ulLastChildIndex = exprhdl.Arity() - 1;
 		if (child_index == ulLastChildIndex)
@@ -122,14 +122,14 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *
+	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
 				 IStatisticsArray *	 //stats_ctxt
 	) const override
 	{
 		// pass through stats from last child
-		IStatistics *stats = exprhdl.Pstats(exprhdl.Arity() - 1);
+		gpos::Ref<IStatistics> stats = exprhdl.Pstats(exprhdl.Arity() - 1);
 		stats->AddRef();
 
 		return stats;
@@ -154,13 +154,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSequence *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalSequence>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequence == pop->Eopid());
 
-		return dynamic_cast<CLogicalSequence *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalSequence> >(pop);
 	}
 
 };	// class CLogicalSequence

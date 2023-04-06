@@ -34,7 +34,8 @@ public:
 	CDXLLogicalForeignGet(CDXLLogicalForeignGet &) = delete;
 
 	// ctor
-	CDXLLogicalForeignGet(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLLogicalForeignGet(CMemoryPool *mp,
+						  gpos::Ref<CDXLTableDescr> table_descr);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;
@@ -43,13 +44,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLLogicalForeignGet *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLLogicalForeignGet>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalForeignGet == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalForeignGet *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLLogicalForeignGet> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

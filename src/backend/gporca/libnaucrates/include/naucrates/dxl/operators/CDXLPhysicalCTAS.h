@@ -45,7 +45,7 @@ private:
 	CDXLColDescrArray *m_col_descr_array;
 
 	// storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
@@ -75,7 +75,7 @@ public:
 	CDXLPhysicalCTAS(CMemoryPool *mp, CMDName *mdname_schema,
 					 CMDName *mdname_rel,
 					 CDXLColDescrArray *dxl_col_descr_array,
-					 CDXLCtasStorageOptions *dxl_ctas_storage_options,
+					 gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
 					 IMDRelation::Ereldistrpolicy rel_distr_policy,
 					 ULongPtrArray *distr_column_pos_array,
 					 IMdIdArray *distr_opclasses, BOOL is_temporary,
@@ -149,7 +149,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::Ref<CDXLCtasStorageOptions>
 	GetDxlCtasStorageOption() const
 	{
 		return m_dxl_ctas_storage_option;
@@ -162,22 +162,22 @@ public:
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalCTAS *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalCTAS>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalCTAS == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLPhysicalCTAS *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalCTAS> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

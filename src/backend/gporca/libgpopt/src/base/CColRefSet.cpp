@@ -83,7 +83,7 @@ CColRefSet::~CColRefSet() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FMember(const CColRef *colref) const
+CColRefSet::FMember(const gpos::Ref<CColRef> colref) const
 {
 	return CBitSet::Get(colref->Id());
 }
@@ -96,7 +96,7 @@ CColRefSet::FMember(const CColRef *colref) const
 //		Return random member
 //
 //---------------------------------------------------------------------------
-CColRef *
+gpos::Ref<CColRef>
 CColRefSet::PcrAny() const
 {
 	// for now return the first column
@@ -111,7 +111,7 @@ CColRefSet::PcrAny() const
 //		Return first member
 //
 //---------------------------------------------------------------------------
-CColRef *
+gpos::Ref<CColRef>
 CColRefSet::PcrFirst() const
 {
 	CColRefSetIter crsi(*this);
@@ -133,7 +133,7 @@ CColRefSet::PcrFirst() const
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRef *colref)
+CColRefSet::Include(const gpos::Ref<CColRef> colref)
 {
 	CBitSet::ExchangeSet(colref->Id());
 }
@@ -167,7 +167,7 @@ CColRefSet::Include(const CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRefSet *pcrs)
+CColRefSet::Include(const gpos::Ref<CColRefSet> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -186,7 +186,7 @@ CColRefSet::Include(const CColRefSet *pcrs)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRef *colref)
+CColRefSet::Exclude(const gpos::Ref<CColRef> colref)
 {
 	CBitSet::ExchangeClear(colref->Id());
 }
@@ -201,7 +201,7 @@ CColRefSet::Exclude(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRefSet *pcrs)
+CColRefSet::Exclude(const gpos::Ref<CColRefSet> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -238,7 +238,8 @@ CColRefSet::Exclude(const CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Replace(const CColRef *pcrOut, const CColRef *pcrIn)
+CColRefSet::Replace(const gpos::Ref<CColRef> pcrOut,
+					const gpos::Ref<CColRef> pcrIn)
 {
 	if (FMember(pcrOut))
 	{
@@ -368,7 +369,7 @@ CColRefSet::OsPrint(IOstream &os, ULONG ulLenMax) const
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance() && ul < std::min(length, ulLenMax))
 	{
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		colref->OsPrint(os);
 		if (ul < length - 1)
 		{
@@ -399,7 +400,7 @@ CColRefSet::ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())
 	{
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		ULONG colid = colref->Id();
 		colids->Append(GPOS_NEW(mp) ULONG(colid));
 	}
@@ -432,10 +433,11 @@ CColRefSet::FContained(const CColRefSetArray *pdrgpcrs)
 }
 
 BOOL
-CColRefSet::FIntersects(const CColRefSet *pcrs)
+CColRefSet::FIntersects(const gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
-	CColRefSet *intersecting_colrefset = GPOS_NEW(m_mp) CColRefSet(m_mp, *this);
+	gpos::Ref<CColRefSet> intersecting_colrefset =
+		GPOS_NEW(m_mp) CColRefSet(m_mp, *this);
 	intersecting_colrefset->Intersection(pcrs);
 
 	BOOL intersects = intersecting_colrefset->Size() > 0;
@@ -453,7 +455,7 @@ CColRefSet::FIntersects(const CColRefSet *pcrs)
 //		column ref sets
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs)
+CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 	GPOS_ASSERT(nullptr != pcrs);
@@ -467,12 +469,12 @@ CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs)
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
 	{
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		BOOL fFound = false;
 		const ULONG length = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < length && !fFound; ul++)
 		{
-			CColRefSet *pcrs = (*pdrgpcrs)[ul];
+			gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul];
 			if (pcrs->FMember(colref))
 			{
 				fFound = true;

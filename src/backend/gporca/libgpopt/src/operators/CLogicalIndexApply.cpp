@@ -25,7 +25,7 @@ CLogicalIndexApply::CLogicalIndexApply(CMemoryPool *mp)
 CLogicalIndexApply::CLogicalIndexApply(CMemoryPool *mp,
 									   CColRefArray *pdrgpcrOuterRefs,
 									   BOOL fOuterJoin,
-									   CExpression *origJoinPred)
+									   gpos::Ref<CExpression> origJoinPred)
 	: CLogicalApply(mp),
 	  m_pdrgpcrOuterRefs(pdrgpcrOuterRefs),
 	  m_fOuterJoin(fOuterJoin),
@@ -67,7 +67,7 @@ CLogicalIndexApply::PxfsCandidates(CMemoryPool *mp) const
 }
 
 BOOL
-CLogicalIndexApply::Matches(COperator *pop) const
+CLogicalIndexApply::Matches(gpos::Ref<COperator> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 
@@ -81,16 +81,17 @@ CLogicalIndexApply::Matches(COperator *pop) const
 }
 
 
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IStatisticsArray *	 // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(2 /*child_index*/);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarRepChild(2 /*child_index*/);
 
 	// join stats of the children
 	IStatisticsArray *statistics_array = GPOS_NEW(mp) IStatisticsArray(mp);
@@ -98,24 +99,24 @@ CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	statistics_array->Append(outer_stats);
 	inner_side_stats->AddRef();
 	statistics_array->Append(inner_side_stats);
-	IStatistics *stats = CJoinStatsProcessor::CalcAllJoinStats(
+	gpos::Ref<IStatistics> stats = CJoinStatsProcessor::CalcAllJoinStats(
 		mp, statistics_array, pexprScalar,
-		const_cast<CLogicalIndexApply *>(this));
+		const_cast<gpos::Ref<CLogicalIndexApply> >(this));
 	statistics_array->Release();
 
 	return stats;
 }
 
 // return a copy of the operator with remapped columns
-COperator *
+gpos::Ref<COperator>
 CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
 {
-	COperator *result = nullptr;
+	gpos::Ref<COperator> result = nullptr;
 	CColRefArray *colref_array = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOuterRefs, colref_mapping, must_exist);
-	CExpression *remapped_orig_join_pred = nullptr;
+	gpos::Ref<CExpression> remapped_orig_join_pred = nullptr;
 
 	if (nullptr != m_origJoinPred)
 	{

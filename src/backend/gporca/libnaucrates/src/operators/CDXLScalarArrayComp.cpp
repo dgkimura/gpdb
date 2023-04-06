@@ -25,7 +25,8 @@ using namespace gpdxl;
 //		Constructs a ScalarArrayComp node
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayComp::CDXLScalarArrayComp(CMemoryPool *mp, IMDId *mdid_op,
+CDXLScalarArrayComp::CDXLScalarArrayComp(CMemoryPool *mp,
+										 gpos::Ref<IMDId> mdid_op,
 										 const CWStringConst *str_opname,
 										 EdxlArrayCompType comparison_type)
 	: CDXLScalarComp(mp, mdid_op, str_opname),
@@ -108,7 +109,7 @@ CDXLScalarArrayComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarArrayComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									const CDXLNode *dxlnode) const
+									const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -136,7 +137,7 @@ CDXLScalarArrayComp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayComp::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarArrayComp::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								 BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -144,7 +145,7 @@ CDXLScalarArrayComp::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

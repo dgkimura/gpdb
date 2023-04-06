@@ -73,21 +73,22 @@ CXformGbAgg2ScalarAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformGbAgg2ScalarAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
 	// extract components
-	CExpression *pexprRel = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRel = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref children
 	pexprRel->AddRef();
@@ -100,7 +101,7 @@ CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalScalarAgg(
 			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),

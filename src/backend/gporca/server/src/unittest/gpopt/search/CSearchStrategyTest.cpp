@@ -68,7 +68,7 @@ CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
 							  PfnOptimize pfnOptimize)
 {
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -77,7 +77,7 @@ CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
 	{
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
-		CExpression *pexpr = pfnGenerator(mp);
+		gpos::Ref<CExpression> pexpr = pfnGenerator(mp);
 		pfnOptimize(mp, pexpr, search_stage_array);
 		pexpr->Release();
 	}
@@ -249,7 +249,8 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
+CSearchStrategyTest::BuildMemo(CMemoryPool *mp,
+							   gpos::Ref<CExpression> pexprInput,
 							   CSearchStageArray *search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
@@ -268,7 +269,7 @@ CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
 	eng.Init(pqc, search_stage_array);
 	eng.Optimize();
 
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 	oss << std::endl << "OUTPUT PLAN:" << std::endl;
 	(void) pexprPlan->OsPrint(oss);

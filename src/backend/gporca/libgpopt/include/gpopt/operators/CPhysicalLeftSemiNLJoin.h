@@ -52,16 +52,17 @@ public:
 	}
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalLeftSemiNLJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalLeftSemiNLJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftSemiNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftSemiNLJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalLeftSemiNLJoin> >(pop);
 	}
 
 

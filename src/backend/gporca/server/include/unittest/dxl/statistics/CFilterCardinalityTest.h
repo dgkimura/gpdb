@@ -35,7 +35,7 @@ using namespace gpos;
 class CFilterCardinalityTest
 {
 	// shorthand for functions for generating the disjunctive filter predicates
-	typedef CStatsPred *(FnPstatspredDisj)(CMemoryPool *mp);
+	typedef gpos::Ref<CStatsPred>(FnPstatspredDisj)(CMemoryPool *mp);
 
 private:
 	// triplet consisting of comparison type, double value and its byte array representation
@@ -64,72 +64,80 @@ private:
 		SStatsFilterSTestCase rgstatsdisjtc[], ULONG ulTestCases);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj1(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj1(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj2(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj2(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj3(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj3(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj4(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj4(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj5(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj5(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj6(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj6(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj7(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj7(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj8(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj8(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj9(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredDisj9(CMemoryPool *mp);
 
 	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredDiffCol1(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredNestedPredDiffCol1(CMemoryPool *mp);
 
 	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredDiffCol2(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredNestedPredDiffCol2(CMemoryPool *mp);
 
 	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredCommonCol1(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredCommonCol2(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedSharedCol(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol1(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol2(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol3(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol4(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjDifferentCol1(CMemoryPool *mp);
-
-	static CStatsPred *PstatspredDisjOverConjMultipleIdenticalCols(
+	static gpos::Ref<CStatsPred> PstatspredNestedPredCommonCol1(
 		CMemoryPool *mp);
 
-	static CStatsPred *PstatspredArrayCmpAnySimple(CMemoryPool *mp);
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredNestedPredCommonCol2(
+		CMemoryPool *mp);
 
-	static CStatsPred *PstatspredArrayCmpAnyDuplicate(CMemoryPool *mp);
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredNestedSharedCol(CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjSameCol1(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjSameCol2(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjSameCol3(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjSameCol4(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjDifferentCol1(
+		CMemoryPool *mp);
+
+	static gpos::Ref<CStatsPred> PstatspredDisjOverConjMultipleIdenticalCols(
+		CMemoryPool *mp);
+
+	static gpos::Ref<CStatsPred> PstatspredArrayCmpAnySimple(CMemoryPool *mp);
+
+	static gpos::Ref<CStatsPred> PstatspredArrayCmpAnyDuplicate(
+		CMemoryPool *mp);
 
 
 	// conjunctive predicates
-	static CStatsPred *PstatspredConj(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredConj(CMemoryPool *mp);
 
 	// generate an array of filter given a column identifier, comparison type, and array of integer point
 	static CStatsPredPtrArry *PdrgpstatspredInteger(
@@ -141,18 +149,18 @@ private:
 		CMemoryPool *mp, ULONG colid, SStatsCmpValElem statsCmpValElem);
 
 	// create a filter on a column with null values
-	static CStatsPred *PstatspredNullableCols(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredNullableCols(CMemoryPool *mp);
 
 	// create a point filter where the constant is null
-	static CStatsPred *PstatspredWithNullConstant(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredWithNullConstant(CMemoryPool *mp);
 
 	// create a 'is not null' point filter
-	static CStatsPred *PstatspredNotNull(CMemoryPool *mp);
+	static gpos::Ref<CStatsPred> PstatspredNotNull(CMemoryPool *mp);
 
 	// compare the derived statistics with the statistics in the outputfile
 	static GPOS_RESULT EresUnittest_CStatisticsCompare(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CStatisticsArray *pdrgpstatBefore, CStatsPred *pred_stats,
+		CStatisticsArray *pdrgpstatBefore, gpos::Ref<CStatsPred> pred_stats,
 		const CHAR *szDXLOutput, BOOL fApplyTwice = false);
 
 public:

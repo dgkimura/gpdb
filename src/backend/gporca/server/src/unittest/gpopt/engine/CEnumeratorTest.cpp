@@ -176,7 +176,7 @@ CEnumeratorTest::EresUnittest()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoMotions(CExpression *pexpr)
+CEnumeratorTest::FHasNoMotions(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalMotionGather,
@@ -198,7 +198,7 @@ CEnumeratorTest::FHasNoMotions(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoMotionBroadcast(CExpression *pexpr)
+CEnumeratorTest::FHasNoMotionBroadcast(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalMotionBroadcast,
@@ -217,7 +217,7 @@ CEnumeratorTest::FHasNoMotionBroadcast(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoMotionRedistribute(CExpression *pexpr)
+CEnumeratorTest::FHasNoMotionRedistribute(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalMotionHashDistribute,
@@ -236,7 +236,7 @@ CEnumeratorTest::FHasNoMotionRedistribute(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoMotionGather(CExpression *pexpr)
+CEnumeratorTest::FHasNoMotionGather(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalMotionGather,
@@ -254,7 +254,7 @@ CEnumeratorTest::FHasNoMotionGather(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoSort(CExpression *pexpr)
+CEnumeratorTest::FHasNoSort(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalSort,
@@ -273,7 +273,7 @@ CEnumeratorTest::FHasNoSort(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoSpool(CExpression *pexpr)
+CEnumeratorTest::FHasNoSpool(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalSpool,
@@ -293,7 +293,7 @@ CEnumeratorTest::FHasNoSpool(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoPartPropagation(CExpression *pexpr)
+CEnumeratorTest::FHasNoPartPropagation(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopPhysicalPartitionSelector};
@@ -310,7 +310,7 @@ CEnumeratorTest::FHasNoPartPropagation(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnumeratorTest::FHasNoOneStageAgg(CExpression *pexpr)
+CEnumeratorTest::FHasNoOneStageAgg(gpos::Ref<CExpression> pexpr)
 {
 	return !CUtils::FHasOneStagePhysicalAgg(pexpr);
 }

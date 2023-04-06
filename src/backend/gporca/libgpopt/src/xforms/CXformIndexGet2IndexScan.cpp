@@ -44,10 +44,11 @@ CXformIndexGet2IndexScan::CXformIndexGet2IndexScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformIndexGet2IndexScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalIndexGet *popGet = CLogicalIndexGet::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalIndexGet> popGet =
+		CLogicalIndexGet::PopConvert(exprhdl.Pop());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
-	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CIndexDescriptor> pindexdesc = popGet->Pindexdesc();
 	BOOL possible_ao_table = ptabdesc->IsAORowOrColTable() ||
 							 ptabdesc->RetrieveRelStorageType() ==
 								 IMDRelation::ErelstorageMixedPartitioned;
@@ -75,21 +76,22 @@ CXformIndexGet2IndexScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexScan::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformIndexGet2IndexScan::Transform(gpos::Ref<CXformContext> pxfctxt,
+									gpos::Ref<CXformResult> pxfres,
+									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalIndexGet *pop = CLogicalIndexGet::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalIndexGet> pop =
+		CLogicalIndexGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
-	CTableDescriptor *ptabdesc = pop->Ptabdesc();
+	gpos::Ref<CIndexDescriptor> pindexdesc = pop->Pindexdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = pop->Ptabdesc();
 
 	// extract components
-	CExpression *pexprIndexCond = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprIndexCond = (*pexpr)[0];
 	if (pexprIndexCond->DeriveHasSubquery())
 	{
 		return;
@@ -102,14 +104,14 @@ CXformIndexGet2IndexScan::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 
-	COrderSpec *pos = pop->Pos();
+	gpos::Ref<COrderSpec> pos = pop->Pos();
 	GPOS_ASSERT(nullptr != pos);
 	pos->AddRef();
 
 	// addref all children
 	pexprIndexCond->AddRef();
 
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalIndexScan(
 			mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),

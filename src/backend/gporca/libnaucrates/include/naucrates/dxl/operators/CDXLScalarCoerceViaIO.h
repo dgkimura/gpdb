@@ -45,8 +45,9 @@ public:
 	CDXLScalarCoerceViaIO(const CDXLScalarCoerceViaIO &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						  EdxlCoercionForm dxl_coerce_format, INT location);
+	CDXLScalarCoerceViaIO(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						  INT type_modifier, EdxlCoercionForm dxl_coerce_format,
+						  INT location);
 
 	~CDXLScalarCoerceViaIO() override = default;
 
@@ -61,13 +62,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarCoerceViaIO *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarCoerceViaIO>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCoerceViaIO == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarCoerceViaIO *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarCoerceViaIO> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

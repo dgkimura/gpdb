@@ -19,10 +19,11 @@ namespace gpnaucrates
 class CUnionAllStatsProcessor
 {
 public:
-	static CStatistics *CreateStatsForUnionAll(
-		CMemoryPool *mp, const CStatistics *stats_first_child,
-		const CStatistics *stats_second_child, ULongPtrArray *output_colids,
-		ULongPtrArray *first_child_colids, ULongPtrArray *second_child_colids);
+	static gpos::Ref<CStatistics> CreateStatsForUnionAll(
+		CMemoryPool *mp, const gpos::Ref<CStatistics> stats_first_child,
+		const gpos::Ref<CStatistics> stats_second_child,
+		ULongPtrArray *output_colids, ULongPtrArray *first_child_colids,
+		ULongPtrArray *second_child_colids);
 };
 }  // namespace gpnaucrates
 

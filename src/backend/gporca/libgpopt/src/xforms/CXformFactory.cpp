@@ -89,7 +89,7 @@ CXformFactory::~CXformFactory()
 //
 //---------------------------------------------------------------------------
 void
-CXformFactory::Add(CXform *pxform)
+CXformFactory::Add(gpos::Ref<CXform> pxform)
 {
 	GPOS_ASSERT(nullptr != pxform);
 	CXform::EXformId exfid = pxform->Exfid();
@@ -306,10 +306,10 @@ CXformFactory::Instantiate()
 //		Accessor of xform array
 //
 //---------------------------------------------------------------------------
-CXform *
+gpos::Ref<CXform>
 CXformFactory::Pxf(CXform::EXformId exfid) const
 {
-	CXform *pxf = m_rgpxf[exfid];
+	gpos::Ref<CXform> pxf = m_rgpxf[exfid];
 	GPOS_ASSERT(pxf->Exfid() == exfid);
 
 	return pxf;
@@ -324,7 +324,7 @@ CXformFactory::Pxf(CXform::EXformId exfid) const
 //		Accessor by xform name
 //
 //---------------------------------------------------------------------------
-CXform *
+gpos::Ref<CXform>
 CXformFactory::Pxf(const CHAR *szXformName) const
 {
 	return m_phmszxform->Find(szXformName);

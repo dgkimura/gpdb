@@ -36,16 +36,15 @@ class CDrvdPropCtxtRelational : public CDrvdPropCtxt
 private:
 protected:
 	// copy function
-	CDrvdPropCtxt *
+	gpos::Ref<CDrvdPropCtxt>
 	PdpctxtCopy(CMemoryPool *mp) const override
 	{
 		return GPOS_NEW(mp) CDrvdPropCtxtRelational(mp);
 	}
 
 	// add props to context
-	void
-	AddProps(CDrvdProp *  // pdp
-			 ) override
+	void AddProps(gpos::Ref<CDrvdProp>	// pdp
+				  ) override
 	{
 		// derived relational context is currently empty
 	}
@@ -74,12 +73,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDrvdPropCtxtRelational *
-	PdpctxtrelConvert(CDrvdPropCtxt *pdpctxt)
+	static gpos::Ref<CDrvdPropCtxtRelational>
+	PdpctxtrelConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<CDrvdPropCtxtRelational *>(pdpctxt);
+		return dynamic_cast<gpos::Ref<CDrvdPropCtxtRelational> >(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtRelational

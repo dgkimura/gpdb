@@ -23,7 +23,7 @@
 using namespace gpdxl;
 using namespace gpmd;
 
-CDXLExtStatsInfo::CDXLExtStatsInfo(CMemoryPool *mp, IMDId *mdid,
+CDXLExtStatsInfo::CDXLExtStatsInfo(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 								   CMDName *mdname,
 								   CMDExtStatsInfoArray *extstats_info_array)
 	: m_mp(mp),
@@ -52,7 +52,7 @@ CDXLExtStatsInfo::~CDXLExtStatsInfo()
 //		Returns the metadata id of this extended stats metadata object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLExtStatsInfo::MDId() const
 {
 	return m_mdid;
@@ -127,8 +127,9 @@ CDXLExtStatsInfo::Serialize(CXMLSerializer *xml_serializer) const
 //		Dummy extended stats info
 //
 //---------------------------------------------------------------------------
-CDXLExtStatsInfo *
-CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(CMemoryPool *mp, IMDId *mdid)
+gpos::Ref<CDXLExtStatsInfo>
+CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(CMemoryPool *mp,
+											 gpos::Ref<IMDId> mdid)
 {
 	CAutoP<CWStringDynamic> str;
 	str = GPOS_NEW(mp) CWStringDynamic(mp, mdid->GetBuffer());

@@ -34,10 +34,10 @@ class CScalarFunc : public CScalar
 {
 protected:
 	// func id
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -63,8 +63,9 @@ public:
 	explicit CScalarFunc(CMemoryPool *mp);
 
 	// ctor
-	CScalarFunc(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				INT return_type_modifier, const CWStringConst *pstrFunc);
+	CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				gpos::Ref<IMDId> mdid_return_type, INT return_type_modifier,
+				const CWStringConst *pstrFunc);
 
 	// dtor
 	~CScalarFunc() override;
@@ -87,7 +88,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -97,7 +98,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -107,7 +108,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -120,13 +121,13 @@ public:
 	BOOL FHasNonScalarFunction(CExpressionHandle &exprhdl) override;
 
 	// conversion function
-	static CScalarFunc *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarFunc>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarFunc == pop->Eopid());
 
-		return dynamic_cast<CScalarFunc *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarFunc> >(pop);
 	}
 
 
@@ -134,12 +135,12 @@ public:
 	const CWStringConst *PstrFunc() const;
 
 	// func id
-	IMDId *FuncMdId() const;
+	gpos::Ref<IMDId> FuncMdId() const;
 
 	INT TypeModifier() const override;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// function stability
 	IMDFunction::EFuncStbl EfsGetFunctionStability() const;

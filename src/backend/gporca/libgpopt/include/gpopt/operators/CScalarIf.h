@@ -42,7 +42,7 @@ class CScalarIf : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -51,7 +51,7 @@ public:
 	CScalarIf(const CScalarIf &) = delete;
 
 	// ctor
-	CScalarIf(CMemoryPool *mp, IMDId *mdid);
+	CScalarIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid);
 
 	// dtor
 	~CScalarIf() override
@@ -75,7 +75,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -85,7 +85,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -95,7 +95,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -113,13 +113,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarIf *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarIf>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarIf == pop->Eopid());
 
-		return dynamic_cast<CScalarIf *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarIf> >(pop);
 	}
 
 };	// class CScalarIf

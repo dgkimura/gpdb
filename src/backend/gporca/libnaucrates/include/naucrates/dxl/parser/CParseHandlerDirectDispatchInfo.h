@@ -41,7 +41,7 @@ private:
 	CDXLDatum2dArray *m_datum_array_combination;
 
 	// direct dispatch spec
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;
 
 	// true indicates m_dispatch_identifer_datum_array contains raw
 	// gp_segment_id values rather than hashable datums
@@ -75,7 +75,7 @@ public:
 	~CParseHandlerDirectDispatchInfo() override;
 
 	// accessor to the parsed direct dispatch spec
-	CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo() const;
+	gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo() const;
 };
 }  // namespace gpdxl
 

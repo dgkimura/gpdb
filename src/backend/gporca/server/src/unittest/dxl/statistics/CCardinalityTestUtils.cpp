@@ -37,8 +37,8 @@ CCardinalityTestUtils::PbucketIntegerClosedLowerBound(CMemoryPool *mp,
 													  CDouble frequency,
 													  CDouble distinct)
 {
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, iLower);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
 	BOOL is_upper_closed = false;
 	if (ppLower->Equals(ppUpper))
@@ -57,8 +57,8 @@ CCardinalityTestUtils::PbucketInteger(CMemoryPool *mp, INT iLower, INT iUpper,
 									  BOOL is_upper_closed, CDouble frequency,
 									  CDouble distinct)
 {
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, iLower);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
 	return GPOS_NEW(mp) CBucket(ppLower, ppUpper, is_lower_closed,
 								is_upper_closed, frequency, distinct);
@@ -69,7 +69,7 @@ CBucket *
 CCardinalityTestUtils::PbucketSingletonBoolVal(CMemoryPool *mp, BOOL fValue,
 											   CDouble frequency)
 {
-	CPoint *ppLower = CTestUtils::PpointBool(mp, fValue);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointBool(mp, fValue);
 
 	// lower bound is also upper bound
 	ppLower->AddRef();
@@ -155,56 +155,58 @@ CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-CPoint *
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointGeneric(CMemoryPool *mp, OID oid,
 									 CWStringDynamic *pstrEncodedValue,
 									 LINT value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oid);
-	IDatum *datum = CTestUtils::CreateGenericDatum(mp, md_accessor, mdid,
-												   pstrEncodedValue, value);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oid);
+	gpos::Ref<IDatum> datum = CTestUtils::CreateGenericDatum(
+		mp, md_accessor, mdid, pstrEncodedValue, value);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 
 	return point;
 }
 
 // helper function to generate a point of numeric datatype
-CPoint *
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 									 CWStringDynamic *pstrEncodedValue,
 									 CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
+	gpos::Ref<CMDIdGPDB> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid);
 
 	ULONG ulbaSize = 0;
 	BYTE *data =
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
 
-	CDXLDatumStatsDoubleMappable *dxl_datum = GPOS_NEW(mp)
+	gpos::Ref<CDXLDatumStatsDoubleMappable> dxl_datum = GPOS_NEW(mp)
 		CDXLDatumStatsDoubleMappable(mp, mdid, default_type_modifier,
 									 false /*is_const_null*/, data, ulbaSize,
 									 value);
 
-	IDatum *datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<IDatum> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 	dxl_datum->Release();
 
 	return point;
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-CPoint *
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointDouble(CMemoryPool *mp, OID oid, CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oid);
-	IDatum *datum = CTestUtils::CreateDoubleDatum(mp, md_accessor, mdid, value);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, oid);
+	gpos::Ref<IDatum> datum =
+		CTestUtils::CreateDoubleDatum(mp, md_accessor, mdid, value);
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
 
 	return point;
 }
@@ -239,7 +241,8 @@ CCardinalityTestUtils::PrintHist(CMemoryPool *mp, const char *pcPrefix,
 
 // helper function to print the statistics object
 void
-CCardinalityTestUtils::PrintStats(CMemoryPool *mp, const IStatistics *stats)
+CCardinalityTestUtils::PrintStats(CMemoryPool *mp,
+								  const gpos::Ref<IStatistics> stats)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);

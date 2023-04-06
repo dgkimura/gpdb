@@ -29,24 +29,24 @@ class CPhysicalInnerHashJoin : public CPhysicalHashJoin
 {
 private:
 	// helper for computing a hashed distribution matching the given distribution
-	CDistributionSpecHashed *PdshashedCreateMatching(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
+	gpos::Ref<CDistributionSpecHashed> PdshashedCreateMatching(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashed,
 		ULONG ulSourceChild) const;
 
 	// helper for deriving hash join distribution from hashed children
-	CDistributionSpec *PdsDeriveFromHashedChildren(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedChildren(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 	// helper for deriving hash join distribution from replicated outer child
-	CDistributionSpec *PdsDeriveFromReplicatedOuter(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromReplicatedOuter(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 	// helper for deriving hash join distribution from hashed outer child
-	CDistributionSpec *PdsDeriveFromHashedOuter(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedOuter(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 public:
 	CPhysicalInnerHashJoin(const CPhysicalInnerHashJoin &) = delete;
@@ -78,24 +78,24 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalInnerHashJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalInnerHashJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalInnerHashJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalInnerHashJoin> >(pop);
 	}
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CDistributionSpec> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
-	CPartitionPropagationSpec *PppsRequired(
+	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
+		gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 };	// class CPhysicalInnerHashJoin
 

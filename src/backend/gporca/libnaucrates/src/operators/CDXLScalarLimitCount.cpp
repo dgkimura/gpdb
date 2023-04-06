@@ -70,7 +70,7 @@ CDXLScalarLimitCount::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarLimitCount::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *node) const
+									 const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -91,7 +91,7 @@ CDXLScalarLimitCount::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarLimitCount::AssertValid(const CDXLNode *node,
+CDXLScalarLimitCount::AssertValid(const gpos::Ref<CDXLNode> node,
 								  BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
@@ -99,7 +99,7 @@ CDXLScalarLimitCount::AssertValid(const CDXLNode *node,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*node)[idx];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

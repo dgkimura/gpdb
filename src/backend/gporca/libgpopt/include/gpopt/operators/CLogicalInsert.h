@@ -32,7 +32,7 @@ class CLogicalInsert : public CLogical
 {
 private:
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// source columns
 	CColRefArray *m_pdrgpcrSource;
@@ -44,7 +44,7 @@ public:
 	explicit CLogicalInsert(CMemoryPool *mp);
 
 	// ctor
-	CLogicalInsert(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	CLogicalInsert(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
 				   CColRefArray *colref_array);
 
 	// dtor
@@ -72,7 +72,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -82,7 +82,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -92,21 +92,21 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 // mp
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -118,7 +118,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -126,10 +126,10 @@ public:
 	}
 
 	// compute required stats columns of the n-th child
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *,		   // mp
 			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *pcrsInput,
+			 gpos::Ref<CColRefSet> pcrsInput,
 			 ULONG	// child_index
 	) const override
 	{
@@ -144,12 +144,13 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -163,13 +164,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInsert *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalInsert>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInsert == pop->Eopid());
 
-		return dynamic_cast<CLogicalInsert *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalInsert> >(pop);
 	}
 
 	// debug print

@@ -98,7 +98,7 @@ public:
 	virtual ULONG VersionMinor() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -123,15 +123,15 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdGPDB *
-	CastMdid(const IMDId *mdid)
+	static const gpos::Ref<CMDIdGPDB>
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid);
 
-		return dynamic_cast<const CMDIdGPDB *>(mdid);
+		return dynamic_cast<const gpos::Ref<CMDIdGPDB> >(mdid);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
 		return GPOS_NEW(mp) CMDIdGPDB(*this);

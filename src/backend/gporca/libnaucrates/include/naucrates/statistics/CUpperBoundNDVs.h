@@ -40,7 +40,7 @@ class CUpperBoundNDVs
 {
 private:
 	// set of column references
-	CColRefSet *m_column_refset;
+	gpos::Ref<CColRefSet> m_column_refset;
 
 	// upper bound of ndvs
 	CDouble m_upper_bound_ndv;
@@ -49,7 +49,8 @@ public:
 	CUpperBoundNDVs(const CUpperBoundNDVs &) = delete;
 
 	// ctor
-	CUpperBoundNDVs(CColRefSet *column_refset, CDouble upper_bound_ndv)
+	CUpperBoundNDVs(gpos::Ref<CColRefSet> column_refset,
+					CDouble upper_bound_ndv)
 		: m_column_refset(column_refset), m_upper_bound_ndv(upper_bound_ndv)
 	{
 		GPOS_ASSERT(nullptr != m_column_refset);
@@ -70,7 +71,7 @@ public:
 
 	// check if the column is present
 	BOOL
-	IsPresent(const CColRef *column_ref) const
+	IsPresent(const gpos::Ref<CColRef> column_ref) const
 	{
 		return m_column_refset->FMember(column_ref);
 	}

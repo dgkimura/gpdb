@@ -28,7 +28,7 @@ using namespace gpdbcost;
 //		Create default cost model
 //
 //---------------------------------------------------------------------------
-ICostModel *
+gpos::Ref<ICostModel>
 ICostModel::PcmDefault(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_DEFAULT_SEGMENT_COUNT);

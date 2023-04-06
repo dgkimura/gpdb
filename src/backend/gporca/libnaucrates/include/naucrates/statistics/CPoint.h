@@ -38,7 +38,7 @@ class CPoint : public CRefCount<CPoint>, public DbgPrintMixin<CPoint>
 {
 private:
 	// datum corresponding to the point
-	IDatum *m_datum;
+	gpos::Ref<IDatum> m_datum;
 
 public:
 	CPoint &operator=(CPoint &) = delete;
@@ -46,38 +46,39 @@ public:
 	CPoint(const CPoint &) = delete;
 
 	// c'tor
-	explicit CPoint(IDatum *);
+	explicit CPoint(gpos::Ref<IDatum>);
 
 	// get underlying datum
-	IDatum *
+	gpos::Ref<IDatum>
 	GetDatum() const
 	{
 		return m_datum;
 	}
 
 	// is this point equal to another
-	BOOL Equals(const CPoint *) const;
+	BOOL Equals(const gpos::Ref<CPoint>) const;
 
 	// is this point not equal to another
-	BOOL IsNotEqual(const CPoint *) const;
+	BOOL IsNotEqual(const gpos::Ref<CPoint>) const;
 
 	// less than
-	BOOL IsLessThan(const CPoint *) const;
+	BOOL IsLessThan(const gpos::Ref<CPoint>) const;
 
 	// less than or equals
-	BOOL IsLessThanOrEqual(const CPoint *) const;
+	BOOL IsLessThanOrEqual(const gpos::Ref<CPoint>) const;
 
 	// greater than
-	BOOL IsGreaterThan(const CPoint *) const;
+	BOOL IsGreaterThan(const gpos::Ref<CPoint>) const;
 
 	// greater than or equals
-	BOOL IsGreaterThanOrEqual(const CPoint *) const;
+	BOOL IsGreaterThanOrEqual(const gpos::Ref<CPoint>) const;
 
 	// distance between two points
-	CDouble Distance(const CPoint *) const;
+	CDouble Distance(const gpos::Ref<CPoint>) const;
 
 	// distance between two points, taking bounds into account
-	CDouble Width(const CPoint *, BOOL include_lower, BOOL include_upper) const;
+	CDouble Width(const gpos::Ref<CPoint>, BOOL include_lower,
+				  BOOL include_upper) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;
@@ -89,13 +90,16 @@ public:
 	}
 
 	// translate the point into its DXL representation
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor) const;
+	gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
+									 CMDAccessor *md_accessor) const;
 
 	// minimum of two points using <=
-	static CPoint *MinPoint(CPoint *point1, CPoint *point2);
+	static gpos::Ref<CPoint> MinPoint(gpos::Ref<CPoint> point1,
+									  gpos::Ref<CPoint> point2);
 
 	// maximum of two points using >=
-	static CPoint *MaxPoint(CPoint *point1, CPoint *point2);
+	static gpos::Ref<CPoint> MaxPoint(gpos::Ref<CPoint> point1,
+									  gpos::Ref<CPoint> point2);
 };	// class CPoint
 
 // array of CPoints

@@ -28,7 +28,7 @@ using namespace gpopt;
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalLeftAntiSemiApply::DeriveKeyCollection(CMemoryPool *,  // mp
 											   CExpressionHandle &exprhdl) const
 {
@@ -82,7 +82,7 @@ CLogicalLeftAntiSemiApply::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalLeftAntiSemiApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

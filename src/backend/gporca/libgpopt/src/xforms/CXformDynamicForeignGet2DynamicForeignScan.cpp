@@ -61,22 +61,22 @@ CXformDynamicForeignGet2DynamicForeignScan::Exfp(CExpressionHandle &  //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformDynamicForeignGet2DynamicForeignScan::Transform(CXformContext *pxfctxt,
-													  CXformResult *pxfres,
-													  CExpression *pexpr) const
+CXformDynamicForeignGet2DynamicForeignScan::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicForeignGet *popGet =
+	gpos::Ref<CLogicalDynamicForeignGet> popGet =
 		CLogicalDynamicForeignGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
@@ -91,7 +91,7 @@ CXformDynamicForeignGet2DynamicForeignScan::Transform(CXformContext *pxfctxt,
 	popGet->GetRootColMappingPerPart()->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalDynamicForeignScan(
 				mp, pname, ptabdesc, popGet->UlOpId(), popGet->ScanId(),
 				pdrgpcrOutput, pdrgpdrgpcrPart, popGet->GetPartitionMdids(),

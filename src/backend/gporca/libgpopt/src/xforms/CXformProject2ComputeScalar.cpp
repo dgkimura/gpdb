@@ -51,9 +51,9 @@ CXformProject2ComputeScalar::CXformProject2ComputeScalar(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformProject2ComputeScalar::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformProject2ComputeScalar::Transform(gpos::Ref<CXformContext> pxfctxt,
+									   gpos::Ref<CXformResult> pxfres,
+									   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -62,15 +62,15 @@ CXformProject2ComputeScalar::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref all children
 	pexprRelational->AddRef();
 	pexprScalar->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprComputeScalar =
+	gpos::Ref<CExpression> pexprComputeScalar =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPhysicalComputeScalar(mp),
 								 pexprRelational, pexprScalar);
 

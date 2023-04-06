@@ -134,7 +134,7 @@ CParseHandlerMDGPDBCheckConstraint::EndElement(
 	CParseHandlerScalarOp *op_parse_handler =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
 
-	CDXLNode *dxlnode_scalar_expr = op_parse_handler->CreateDXLNode();
+	gpos::Ref<CDXLNode> dxlnode_scalar_expr = op_parse_handler->CreateDXLNode();
 	GPOS_ASSERT(nullptr != dxlnode_scalar_expr);
 	dxlnode_scalar_expr->AddRef();
 

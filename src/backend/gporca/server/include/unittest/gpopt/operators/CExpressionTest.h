@@ -36,29 +36,29 @@ namespace gpopt
 class CExpressionTest
 {
 private:
-	static CReqdPropPlan *PrppCreateRequiredProperties(CMemoryPool *mp,
-													   CColRefSet *pcrs);
+	static gpos::Ref<CReqdPropPlan> PrppCreateRequiredProperties(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
 
-	static CExpression *PexprCreateGbyWithColumnFormat(
+	static gpos::Ref<CExpression> PexprCreateGbyWithColumnFormat(
 		CMemoryPool *mp, const WCHAR *wszColNameFormat);
 
 	// helper for testing required column computation
 	static GPOS_RESULT EresComputeReqdCols(const CHAR *szFilePath);
 
 	// helper for checking cached required columns
-	static GPOS_RESULT EresCheckCachedReqdCols(CMemoryPool *mp,
-											   CExpression *pexpr,
-											   CReqdPropPlan *prppInput);
+	static GPOS_RESULT EresCheckCachedReqdCols(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CReqdPropPlan> prppInput);
 
 	// helper function for the FValidPlan tests
 	static void SetupPlanForFValidPlanTest(CMemoryPool *mp,
-										   CExpression **ppexprGby,
-										   CColRefSet **ppcrs,
-										   CExpression **ppexprPlan,
-										   CReqdPropPlan **pprpp);
+										   gpos::Ref<CExpression> *ppexprGby,
+										   gpos::Ref<CColRefSet> *ppcrs,
+										   gpos::Ref<CExpression> *ppexprPlan,
+										   gpos::Ref<CReqdPropPlan> *pprpp);
 
 	// return an expression with several joins
-	static CExpression *PexprComplexJoinTree(CMemoryPool *mp);
+	static gpos::Ref<CExpression> PexprComplexJoinTree(CMemoryPool *mp);
 
 public:
 	// unittests

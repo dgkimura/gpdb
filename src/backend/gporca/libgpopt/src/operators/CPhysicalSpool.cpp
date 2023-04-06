@@ -52,9 +52,10 @@ CPhysicalSpool::~CPhysicalSpool() = default;
 //		Compute required output columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalSpool::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 )
@@ -74,9 +75,10 @@ CPhysicalSpool::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalSpool::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
+							gpos::Ref<COrderSpec> posRequired,
+							ULONG child_index,
 							CDrvdPropArray *,  // pdrgpdpCtxt
 							ULONG			   // ulOptReq
 ) const
@@ -95,9 +97,10 @@ CPhysicalSpool::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalSpool::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CDistributionSpec *pdsRequired, ULONG child_index,
+							gpos::Ref<CDistributionSpec> pdsRequired,
+							ULONG child_index,
 							CDrvdPropArray *,  // pdrgpdpCtxt
 							ULONG			   // ulOptReq
 ) const
@@ -115,10 +118,10 @@ CPhysicalSpool::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalSpool::PcteRequired(CMemoryPool *,		   //mp,
 							 CExpressionHandle &,  //exprhdl,
-							 CCTEReq *pcter,
+							 gpos::Ref<CCTEReq> pcter,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -140,9 +143,9 @@ CPhysicalSpool::PcteRequired(CMemoryPool *,		   //mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalSpool::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CRewindabilitySpec *prsRequired,
+							gpos::Ref<CRewindabilitySpec> prsRequired,
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index
@@ -188,7 +191,7 @@ CPhysicalSpool::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //--------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalSpool::PosDerive(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const
 {
@@ -204,7 +207,7 @@ CPhysicalSpool::PosDerive(CMemoryPool *,  // mp
 //		Derive distribution
 //
 //--------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalSpool::PdsDerive(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const
 {
@@ -220,10 +223,11 @@ CPhysicalSpool::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //--------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalSpool::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CRewindabilitySpec *prsChild = exprhdl.Pdpplan(0 /*child_index*/)->Prs();
+	gpos::Ref<CRewindabilitySpec> prsChild =
+		exprhdl.Pdpplan(0 /*child_index*/)->Prs();
 	CRewindabilitySpec::EMotionHazardType motion_hazard =
 		(!FEager() && prsChild->HasMotionHazard())
 			? CRewindabilitySpec::EmhtMotion
@@ -243,11 +247,11 @@ CPhysicalSpool::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSpool::Matches(COperator *pop) const
+CPhysicalSpool::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
-		CPhysicalSpool *popSpool = CPhysicalSpool::PopConvert(pop);
+		gpos::Ref<CPhysicalSpool> popSpool = CPhysicalSpool::PopConvert(pop);
 		return m_eager == popSpool->FEager();
 	}
 
@@ -271,7 +275,7 @@ CPhysicalSpool::HashValue() const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalSpool::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::Ref<CColRefSet> pcrsRequired,
 								  ULONG	 // ulOptReq
 ) const
 {
@@ -289,7 +293,7 @@ CPhysicalSpool::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSpool::EpetOrder(CExpressionHandle &,	// exprhdl
-						  const CEnfdOrder *
+						  const gpos::Ref<CEnfdOrder>
 #ifdef GPOS_DEBUG
 							  peo
 #endif	// GPOS_DEBUG
@@ -313,7 +317,7 @@ CPhysicalSpool::EpetOrder(CExpressionHandle &,	// exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSpool::EpetDistribution(CExpressionHandle & /*exprhdl*/,
-								 const CEnfdDistribution *
+								 const gpos::Ref<CEnfdDistribution>
 #ifdef GPOS_DEBUG
 									 ped
 #endif	// GPOS_DEBUG
@@ -336,8 +340,8 @@ CPhysicalSpool::EpetDistribution(CExpressionHandle & /*exprhdl*/,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalSpool::EpetRewindability(CExpressionHandle &,		  // exprhdl
-								  const CEnfdRewindability *  // per
+CPhysicalSpool::EpetRewindability(CExpressionHandle &,	// exprhdl
+								  const gpos::Ref<CEnfdRewindability>  // per
 ) const
 {
 	// no need for enforcing rewindability on output
@@ -346,16 +350,17 @@ CPhysicalSpool::EpetRewindability(CExpressionHandle &,		  // exprhdl
 
 
 BOOL
-CPhysicalSpool::FValidContext(CMemoryPool *, COptimizationContext *poc,
+CPhysicalSpool::FValidContext(CMemoryPool *,
+							  gpos::Ref<COptimizationContext> poc,
 							  COptimizationContextArray *pdrgpocChild) const
 {
 	GPOS_ASSERT(nullptr != pdrgpocChild);
 	GPOS_ASSERT(1 == pdrgpocChild->Size());
 
-	COptimizationContext *pocChild = (*pdrgpocChild)[0];
-	CCostContext *pccBest = pocChild->PccBest();
+	gpos::Ref<COptimizationContext> pocChild = (*pdrgpocChild)[0];
+	gpos::Ref<CCostContext> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
-	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
+	gpos::Ref<CDrvdPropPlan> pdpplanChild = pccBest->Pdpplan();
 
 	// partition selections that happen outside of a physical spool does not do
 	// any good on rescan: a physical spool blocks the rescan from the entire
@@ -384,7 +389,8 @@ CPhysicalSpool::FValidContext(CMemoryPool *, COptimizationContext *poc,
 	//       +--CScalarCmp (<)
 	//          |--CScalarIdent "a" (0)
 	//          +--CScalarIdent "partkey" (10)
-	CPartitionPropagationSpec *pps_req = poc->Prpp()->Pepp()->PppsRequired();
+	gpos::Ref<CPartitionPropagationSpec> pps_req =
+		poc->Prpp()->Pepp()->PppsRequired();
 	if (pdpplanChild->Ppps()->IsUnsupportedPartSelector(pps_req))
 	{
 		return false;
@@ -394,7 +400,7 @@ CPhysicalSpool::FValidContext(CMemoryPool *, COptimizationContext *poc,
 	// the physical spool is streaming with a motion underneath it.
 	// We do not want to add a blocking spool over a spool as spooling twice will be expensive,
 	// hence invalidate this context.
-	CEnfdRewindability *per = poc->Prpp()->Per();
+	gpos::Ref<CEnfdRewindability> per = poc->Prpp()->Per();
 	if (per->PrsRequired()->HasMotionHazard() &&
 		pdpplanChild->Prs()->HasMotionHazard())
 	{

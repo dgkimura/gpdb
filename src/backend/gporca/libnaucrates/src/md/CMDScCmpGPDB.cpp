@@ -29,9 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *left_mdid, IMDId *right_mdid,
-						   IMDType::ECmpType cmp_type, IMDId *mdid_op)
+CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, gpos::Ref<IMDId> left_mdid,
+						   gpos::Ref<IMDId> right_mdid,
+						   IMDType::ECmpType cmp_type, gpos::Ref<IMDId> mdid_op)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -77,7 +78,7 @@ CMDScCmpGPDB::~CMDScCmpGPDB()
 //		Mdid of comparison object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::MDId() const
 {
 	return m_mdid;
@@ -105,7 +106,7 @@ CMDScCmpGPDB::Mdname() const
 //		Left type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::GetLeftMdid() const
 {
 	return m_mdid_left;
@@ -119,7 +120,7 @@ CMDScCmpGPDB::GetLeftMdid() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::GetRightMdid() const
 {
 	return m_mdid_right;
@@ -133,7 +134,7 @@ CMDScCmpGPDB::GetRightMdid() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::MdIdOp() const
 {
 	return m_mdid_op;

@@ -215,7 +215,7 @@ CParseHandlerLogicalSetOp::EndElement(const XMLCh *const,  // element_uri,
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 
 	cold_descr_dxl_array->AddRef();
-	CDXLLogicalSetOp *dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLLogicalSetOp> dxl_op = GPOS_NEW(m_mp)
 		CDXLLogicalSetOp(m_mp, setop_type, cold_descr_dxl_array,
 						 m_input_colids_arrays, m_cast_across_input_req);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

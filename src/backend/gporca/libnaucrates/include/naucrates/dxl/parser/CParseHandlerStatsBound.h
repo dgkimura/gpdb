@@ -38,7 +38,7 @@ class CParseHandlerStatsBound : public CParseHandlerBase
 {
 private:
 	// dxl datum representing the bound
-	CDXLDatum *m_dxl_datum;
+	gpos::Ref<CDXLDatum> m_dxl_datum;
 
 	// is stats bound closed
 	BOOL m_is_stats_bound_closed;
@@ -69,7 +69,7 @@ public:
 	~CParseHandlerStatsBound() override;
 
 	// return the dxl datum representing the bound point
-	CDXLDatum *
+	gpos::Ref<CDXLDatum>
 	GetDatumVal() const
 	{
 		return m_dxl_datum;

@@ -51,7 +51,7 @@ private:
 	const ULONG m_id;
 
 	// column type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// column type modifier
 	INT m_iTypeModifer;
@@ -60,14 +60,15 @@ public:
 	CDXLColRef(const CDXLColRef &) = delete;
 
 	// ctor/dtor
-	CDXLColRef(CMDName *mdname, ULONG id, IMDId *mdid_type, INT type_modifier);
+	CDXLColRef(CMDName *mdname, ULONG id, gpos::Ref<IMDId> mdid_type,
+			   INT type_modifier);
 
 	~CDXLColRef() override;
 
 	// accessors
 	const CMDName *MdName() const;
 
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	INT TypeModifier() const;
 

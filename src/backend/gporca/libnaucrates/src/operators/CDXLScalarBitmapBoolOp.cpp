@@ -29,7 +29,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(CMemoryPool *mp,
-											   IMDId *mdid_type,
+											   gpos::Ref<IMDId> mdid_type,
 											   EdxlBitmapBoolOp bitmap_op_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type), m_bitmap_op_type(bitmap_op_type)
 {
@@ -73,7 +73,7 @@ CDXLScalarBitmapBoolOp::GetDXLOperator() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarBitmapBoolOp::MdidType() const
 {
 	return m_mdid_type;
@@ -137,7 +137,7 @@ CDXLScalarBitmapBoolOp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarBitmapBoolOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *dxlnode) const
+									   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -167,11 +167,11 @@ CDXLScalarBitmapBoolOp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapBoolOp::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBitmapBoolOp::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									BOOL validate_children) const
 {
 	EdxlBitmapBoolOp bitmap_bool_dxlop =
-		((CDXLScalarBitmapBoolOp *) dxlnode->GetOperator())
+		((gpos::Ref<CDXLScalarBitmapBoolOp>) dxlnode->GetOperator())
 			->GetDXLBitmapOpType();
 
 	GPOS_ASSERT((bitmap_bool_dxlop == EdxlbitmapAnd) ||
@@ -183,7 +183,7 @@ CDXLScalarBitmapBoolOp::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		Edxlopid dxl_operator = dxlnode_arg->GetOperator()->GetDXLOperator();
 
 		GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_operator ||

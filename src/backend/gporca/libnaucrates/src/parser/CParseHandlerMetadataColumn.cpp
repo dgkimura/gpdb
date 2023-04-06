@@ -195,7 +195,7 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,	 // element_uri,
 //		Return the constructed list of metadata columns
 //
 //---------------------------------------------------------------------------
-CMDColumn *
+gpos::Ref<CMDColumn>
 CParseHandlerMetadataColumn::GetMdCol()
 {
 	return m_mdcol;

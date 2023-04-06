@@ -38,7 +38,7 @@ class CIndexDescriptor : public CRefCount<CIndexDescriptor>,
 {
 private:
 	// mdid of the index
-	IMDId *m_pmdidIndex;
+	gpos::Ref<IMDId> m_pmdidIndex;
 
 	// name of index
 	CName m_name;
@@ -59,7 +59,8 @@ public:
 	CIndexDescriptor(const CIndexDescriptor &) = delete;
 
 	// ctor
-	CIndexDescriptor(CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
+	CIndexDescriptor(CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex,
+					 const CName &name,
 					 CColumnDescriptorArray *pdrgcoldescKeyCols,
 					 CColumnDescriptorArray *pdrgcoldescIncludedCols,
 					 BOOL is_clustered, IMDIndex::EmdindexType emdindt);
@@ -74,7 +75,7 @@ public:
 	ULONG UlIncludedColumns() const;
 
 	// index mdid accessor
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_pmdidIndex;
@@ -117,9 +118,9 @@ public:
 	BOOL SupportsIndexOnlyScan() const;
 
 	// create an index descriptor
-	static CIndexDescriptor *Pindexdesc(CMemoryPool *mp,
-										const CTableDescriptor *ptabdesc,
-										const IMDIndex *pmdindex);
+	static gpos::Ref<CIndexDescriptor> Pindexdesc(
+		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
+		const gpos::Ref<IMDIndex> pmdindex);
 
 	IOstream &OsPrint(IOstream &os) const;
 

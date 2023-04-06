@@ -180,9 +180,10 @@ CJobGroupExpressionOptimization::~CJobGroupExpressionOptimization() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionOptimization::Init(CGroupExpression *pgexpr,
-									  COptimizationContext *poc, ULONG ulOptReq,
-									  CReqdPropPlan *prppCTEProducer)
+CJobGroupExpressionOptimization::Init(gpos::Ref<CGroupExpression> pgexpr,
+									  gpos::Ref<COptimizationContext> poc,
+									  ULONG ulOptReq,
+									  gpos::Ref<CReqdPropPlan> prppCTEProducer)
 {
 	GPOS_ASSERT(nullptr != poc);
 
@@ -280,8 +281,9 @@ CJobGroupExpressionOptimization::InitChildGroupsOptimization(
 	// initialize required relational properties computation
 	m_pexprhdlRel = GPOS_NEW(psc->GetGlobalMemoryPool())
 		CExpressionHandle(psc->GetGlobalMemoryPool());
-	CGroupExpression *pgexprForStats = m_pgexpr->Pgroup()->PgexprBestPromise(
-		psc->GetGlobalMemoryPool(), m_pgexpr);
+	gpos::Ref<CGroupExpression> pgexprForStats =
+		m_pgexpr->Pgroup()->PgexprBestPromise(psc->GetGlobalMemoryPool(),
+											  m_pgexpr);
 	if (nullptr != pgexprForStats)
 	{
 		m_pexprhdlRel->Attach(pgexprForStats);
@@ -359,19 +361,19 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 		m_pexprhdlPlan->UlPreviousOptimizedChildIndex(m_ulChildIndex);
 
 	// retrieve plan properties of the optimal implementation of previous child group
-	CGroup *pgroupChild = (*m_pgexpr)[ulPrevChildIndex];
+	gpos::Ref<CGroup> pgroupChild = (*m_pgexpr)[ulPrevChildIndex];
 	if (pgroupChild->FScalar())
 	{
 		// exit if previous child is a scalar group
 		return;
 	}
 
-	COptimizationContext *pocChild = pgroupChild->PocLookupBest(
+	gpos::Ref<COptimizationContext> pocChild = pgroupChild->PocLookupBest(
 		psc->GetGlobalMemoryPool(), psc->Peng()->UlSearchStages(),
 		m_pexprhdlPlan->Prpp(ulPrevChildIndex));
 	GPOS_ASSERT(nullptr != pocChild);
 
-	CCostContext *pccChildBest = pocChild->PccBest();
+	gpos::Ref<CCostContext> pccChildBest = pocChild->PccBest();
 	if (nullptr == pccChildBest)
 	{
 		// failed to optimize child
@@ -399,7 +401,7 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 	m_pdrgpdp->Append(exprhdl.Pdp());
 
 	// copy stats of child's best cost context to current stats context
-	IStatistics *pstat = pccChildBest->Pstats();
+	gpos::Ref<IStatistics> pstat = pccChildBest->Pstats();
 	pstat->AddRef();
 	m_pdrgpstatCurrentCtxt->Append(pstat);
 }
@@ -458,7 +460,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 {
 	GPOS_ASSERT(!FChildrenScheduled());
 
-	CGroup *pgroupChild = (*m_pgexpr)[m_ulChildIndex];
+	gpos::Ref<CGroup> pgroupChild = (*m_pgexpr)[m_ulChildIndex];
 	if (pgroupChild->FScalar())
 	{
 		if (!m_pexprhdlPlan->FNextChildIndex(&m_ulChildIndex))
@@ -483,7 +485,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 	CUtils::AddRefAppend(stats_ctxt, m_pdrgpstatCurrentCtxt);
 
 	// compute required relational properties
-	CReqdPropRelational *prprel = nullptr;
+	gpos::Ref<CReqdPropRelational> prprel = nullptr;
 	if (CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
 	{
 		// copy requirements from origin context
@@ -498,10 +500,11 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 	prprel->AddRef();
 
 	// schedule optimization job for current child group
-	COptimizationContext *pocChild = GPOS_NEW(psc->GetGlobalMemoryPool())
-		COptimizationContext(psc->GetGlobalMemoryPool(), pgroupChild,
-							 m_pexprhdlPlan->Prpp(m_ulChildIndex), prprel,
-							 stats_ctxt, psc->Peng()->UlCurrSearchStage());
+	gpos::Ref<COptimizationContext> pocChild =
+		GPOS_NEW(psc->GetGlobalMemoryPool())
+			COptimizationContext(psc->GetGlobalMemoryPool(), pgroupChild,
+								 m_pexprhdlPlan->Prpp(m_ulChildIndex), prprel,
+								 stats_ctxt, psc->Peng()->UlCurrSearchStage());
 
 	if (pgroupChild == m_pgexpr->Pgroup() && pocChild->Matches(m_poc))
 	{
@@ -622,12 +625,12 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 	}
 
 	// compute group expression cost under current context
-	COptimizationContext *poc = pjgeo->m_poc;
-	CGroupExpression *pgexpr = pjgeo->m_pgexpr;
+	gpos::Ref<COptimizationContext> poc = pjgeo->m_poc;
+	gpos::Ref<CGroupExpression> pgexpr = pjgeo->m_pgexpr;
 	COptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
-	CCostContext *pcc =
+	gpos::Ref<CCostContext> pcc =
 		pgexpr->PccComputeCost(psc->GetGlobalMemoryPool(), poc, ulOptReq,
 							   pdrgpoc, false /*fPruned*/, CCost(0.0));
 
@@ -671,7 +674,7 @@ CJobGroupExpressionOptimization::EevtFinalize(CSchedulerContext *,	// psc
 	GPOS_ASSERT(!pjgeo->m_fChildOptimizationFailed);
 
 #ifdef GPOS_DEBUG
-	CCostContext *pcc = pjgeo->m_poc->PccBest();
+	gpos::Ref<CCostContext> pcc = pjgeo->m_poc->PccBest();
 #endif	// GPOS_DEBUG
 
 	GPOS_ASSERT(nullptr != pcc);
@@ -709,10 +712,9 @@ CJobGroupExpressionOptimization::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionOptimization::ScheduleJob(CSchedulerContext *psc,
-											 CGroupExpression *pgexpr,
-											 COptimizationContext *poc,
-											 ULONG ulOptReq, CJob *pjParent)
+CJobGroupExpressionOptimization::ScheduleJob(
+	CSchedulerContext *psc, gpos::Ref<CGroupExpression> pgexpr,
+	gpos::Ref<COptimizationContext> poc, ULONG ulOptReq, CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExpressionOptimization);
 
@@ -733,8 +735,8 @@ CJobGroupExpressionOptimization::ScheduleJob(CSchedulerContext *psc,
 //---------------------------------------------------------------------------
 BOOL
 CJobGroupExpressionOptimization::FScheduleCTEOptimization(
-	CSchedulerContext *psc, CGroupExpression *pgexpr, COptimizationContext *poc,
-	ULONG ulOptReq, CJob *pjParent)
+	CSchedulerContext *psc, gpos::Ref<CGroupExpression> pgexpr,
+	gpos::Ref<COptimizationContext> poc, ULONG ulOptReq, CJob *pjParent)
 {
 	GPOS_ASSERT(nullptr != psc);
 
@@ -760,8 +762,9 @@ CJobGroupExpressionOptimization::FScheduleCTEOptimization(
 	}
 
 	// compute new requirements for CTE producer based on delivered properties of consumers plan
-	CReqdPropPlan *prppCTEProducer = COptimizationContext::PrppCTEProducer(
-		psc->GetGlobalMemoryPool(), poc, psc->Peng()->UlSearchStages());
+	gpos::Ref<CReqdPropPlan> prppCTEProducer =
+		COptimizationContext::PrppCTEProducer(psc->GetGlobalMemoryPool(), poc,
+											  psc->Peng()->UlSearchStages());
 	if (nullptr == prppCTEProducer)
 	{
 		// failed to create CTE producer requirements

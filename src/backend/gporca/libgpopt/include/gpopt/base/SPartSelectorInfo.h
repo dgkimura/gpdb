@@ -17,13 +17,14 @@ struct SPartSelectorInfoEntry
 	ULONG m_selector_id;
 
 	// filter stored in the partition selector
-	CExpression *m_filter_expr;
+	gpos::Ref<CExpression> m_filter_expr;
 
 	// statistics of the subtree of the partition selector
-	IStatistics *m_stats;
+	gpos::Ref<IStatistics> m_stats;
 
-	SPartSelectorInfoEntry(ULONG mSelectorId, CExpression *mFilterExpr,
-						   IStatistics *mStats)
+	SPartSelectorInfoEntry(ULONG mSelectorId,
+						   gpos::Ref<CExpression> mFilterExpr,
+						   gpos::Ref<IStatistics> mStats)
 		: m_selector_id(mSelectorId),
 		  m_filter_expr(mFilterExpr),
 		  m_stats(mStats)

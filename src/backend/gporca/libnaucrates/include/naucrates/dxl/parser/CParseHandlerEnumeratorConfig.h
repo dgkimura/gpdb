@@ -34,7 +34,7 @@ class CParseHandlerEnumeratorConfig : public CParseHandlerBase
 {
 private:
 	// enumerator configuration
-	CEnumeratorConfig *m_enumerator_cfg;
+	gpos::Ref<CEnumeratorConfig> m_enumerator_cfg;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CEnumeratorConfig *GetEnumeratorCfg() const;
+	gpos::Ref<CEnumeratorConfig> GetEnumeratorCfg() const;
 };
 }  // namespace gpdxl
 

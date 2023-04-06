@@ -60,7 +60,7 @@ CTableDescriptorTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -69,9 +69,9 @@ CTableDescriptorTest::EresUnittest_Basic()
 					 CTestUtils::GetCostModel(mp));
 
 	CWStringConst strName(GPOS_WSZ_LIT("MyTable"));
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidRel, GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		CTestUtils::PtabdescCreate(mp, 10, mdid, CName(&strName));
 
 #ifdef GPOS_DEBUG

@@ -255,7 +255,7 @@ CLogicalGbAgg::~CLogicalGbAgg()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalGbAgg::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -289,12 +289,12 @@ CLogicalGbAgg::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAgg::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include the intersection of the grouping columns and the child's output
 	pcrs->Include(Pdrgpcr());
@@ -314,14 +314,14 @@ CLogicalGbAgg::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAgg::DeriveOuterReferences(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl)
 {
-	CColRefSet *pcrsGrp = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsGrp = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrp->Include(m_pdrgpcr);
 
-	CColRefSet *outer_refs =
+	gpos::Ref<CColRefSet> outer_refs =
 		CLogical::DeriveOuterReferences(mp, exprhdl, pcrsGrp);
 	pcrsGrp->Release();
 
@@ -336,15 +336,15 @@ CLogicalGbAgg::DeriveOuterReferences(CMemoryPool *mp,
 //		Derive constraint property
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::Ref<CPropConstraint>
 CLogicalGbAgg::DerivePropertyConstraint(CMemoryPool *mp,
 										CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsGrouping = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsGrouping = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrouping->Include(m_pdrgpcr);
 
 	// get the constraints on the grouping columns only
-	CPropConstraint *ppc =
+	gpos::Ref<CPropConstraint> ppc =
 		PpcDeriveConstraintRestrict(mp, exprhdl, pcrsGrouping);
 	pcrsGrouping->Release();
 
@@ -360,9 +360,10 @@ CLogicalGbAgg::DerivePropertyConstraint(CMemoryPool *mp,
 //		Compute required stats columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::Ref<CColRefSet> pcrsInput,
+						ULONG child_index) const
 {
 	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index, m_pdrgpcr);
 }
@@ -376,13 +377,13 @@ CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required stats columns for a GbAgg
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsInput, ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
 							 CColRefArray *pdrgpcrGrp) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include grouping columns
 	pcrs->Include(pdrgpcrGrp);
@@ -396,8 +397,8 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const ULONG ulGrpCols = m_pdrgpcr->Size();
 	for (ULONG ul = 0; ul < ulGrpCols; ul++)
 	{
-		CColRef *pcrGrpCol = (*m_pdrgpcr)[ul];
-		const CColRefSet *pcrsUsed =
+		gpos::Ref<CColRef> pcrGrpCol = (*m_pdrgpcr)[ul];
+		const gpos::Ref<CColRefSet> pcrsUsed =
 			col_factory->PcrsUsedInComputedCol(pcrGrpCol);
 		if (nullptr != pcrsUsed)
 		{
@@ -405,7 +406,7 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		}
 	}
 
-	CColRefSet *pcrsRequired =
+	gpos::Ref<CColRefSet> pcrsRequired =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrs, child_index);
 	pcrs->Release();
 
@@ -421,13 +422,13 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive not null columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAgg::DeriveNotNullColumns(CMemoryPool *mp,
 									CExpressionHandle &exprhdl) const
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include grouping columns
 	pcrs->Include(Pdrgpcr());
@@ -458,7 +459,7 @@ CLogicalGbAgg::HashValue() const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColRef *colref = (*m_pdrgpcr)[ul];
+		gpos::Ref<CColRef> colref = (*m_pdrgpcr)[ul];
 		ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(colref));
 	}
 
@@ -477,11 +478,11 @@ CLogicalGbAgg::HashValue() const
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 								   CExpressionHandle &exprhdl) const
 {
-	CKeyCollection *pkc = nullptr;
+	gpos::Ref<CKeyCollection> pkc = nullptr;
 
 	// Gb produces a key only if it's global
 	if (FGlobal())
@@ -501,7 +502,7 @@ CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 		else
 		{
 			// scalar and single-group aggs produce one row that constitutes a key
-			CColRefSet *pcrs = exprhdl.DeriveDefinedColumns(1);
+			gpos::Ref<CColRefSet> pcrs = exprhdl.DeriveDefinedColumns(1);
 
 			if (0 == pcrs->Size())
 			{
@@ -555,14 +556,15 @@ CLogicalGbAgg::DeriveMaxCard(CMemoryPool *,	 //mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAgg::Matches(COperator *pop) const
+CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalGbAgg *popAgg = dynamic_cast<CLogicalGbAgg *>(pop);
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		dynamic_cast<gpos::Ref<CLogicalGbAgg> >(pop);
 
 	return FGeneratesDuplicates() == popAgg->FGeneratesDuplicates() &&
 		   popAgg->Egbaggtype() == m_egbaggtype &&
@@ -612,10 +614,11 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
+gpos::Ref<IStatistics>
+CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 							CColRefArray *pdrgpcrGroupingCols,
-							ULongPtrArray *pdrgpulComputedCols, CBitSet *keys)
+							ULongPtrArray *pdrgpulComputedCols,
+							gpos::Ref<CBitSet> keys)
 {
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();
 
@@ -623,13 +626,13 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
 	ULongPtrArray *pdrgpulGroupingCols = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ul = 0; ul < ulGroupingCols; ul++)
 	{
-		CColRef *colref = (*pdrgpcrGroupingCols)[ul];
+		gpos::Ref<CColRef> colref = (*pdrgpcrGroupingCols)[ul];
 		pdrgpulGroupingCols->Append(GPOS_NEW(mp) ULONG(colref->Id()));
 	}
 
-	IStatistics *stats = CGroupByStatsProcessor::CalcGroupByStats(
-		mp, dynamic_cast<CStatistics *>(child_stats), pdrgpulGroupingCols,
-		pdrgpulComputedCols, keys);
+	gpos::Ref<IStatistics> stats = CGroupByStatsProcessor::CalcGroupByStats(
+		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
+		pdrgpulGroupingCols, pdrgpulComputedCols, keys);
 
 	// clean up
 	pdrgpulGroupingCols->Release();
@@ -646,20 +649,20 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							IStatisticsArray *	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
 	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
-	IStatistics *stats = PstatsDerive(mp, child_stats, Pdrgpcr(),
-									  pdrgpulComputedCols, nullptr /*keys*/);
+	gpos::Ref<IStatistics> stats = PstatsDerive(
+		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, nullptr /*keys*/);
 
 	pdrgpulComputedCols->Release();
 

@@ -64,7 +64,7 @@ public:
 
 private:
 	// type information
-	const IMDType *m_pmdtype;
+	const gpos::Ref<IMDType> m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;
@@ -76,7 +76,7 @@ private:
 	EUsedStatus m_used;
 
 	// table info
-	IMDId *m_mdid_table;
+	gpos::Ref<IMDId> m_mdid_table;
 
 public:
 	CColRef(const CColRef &) = delete;
@@ -90,14 +90,14 @@ public:
 	};
 
 	// ctor
-	CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
+	CColRef(const gpos::Ref<IMDType> pmdtype, const INT type_modifier, ULONG id,
 			const CName *pname);
 
 	// dtor
 	virtual ~CColRef();
 
 	// accessor to type info
-	const IMDType *
+	const gpos::Ref<IMDType>
 	RetrieveType() const
 	{
 		return m_pmdtype;
@@ -134,7 +134,7 @@ public:
 	// static hash functions
 	static ULONG HashValue(const ULONG &);
 
-	static ULONG HashValue(const CColRef *colref);
+	static ULONG HashValue(const gpos::Ref<CColRef> colref);
 
 	// equality function for hash table
 	static BOOL
@@ -145,7 +145,8 @@ public:
 
 	// equality function
 	static BOOL
-	Equals(const CColRef *pcrFirst, const CColRef *pcrSecond)
+	Equals(const gpos::Ref<CColRef> pcrFirst,
+		   const gpos::Ref<CColRef> pcrSecond)
 	{
 		return Equals(pcrFirst->Id(), pcrSecond->Id());
 	}
@@ -215,14 +216,14 @@ public:
 		return m_used;
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	GetMdidTable() const
 	{
 		return m_mdid_table;
 	};
 
 	void
-	SetMdidTable(IMDId *mdid_table)
+	SetMdidTable(gpos::Ref<IMDId> mdid_table)
 	{
 		m_mdid_table = mdid_table;
 	}

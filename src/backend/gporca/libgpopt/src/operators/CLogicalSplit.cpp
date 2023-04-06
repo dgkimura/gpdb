@@ -48,8 +48,10 @@ CLogicalSplit::CLogicalSplit(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalSplit::CLogicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
-							 CColRefArray *pdrgpcrInsert, CColRef *pcrCtid,
-							 CColRef *pcrSegmentId, CColRef *pcrAction)
+							 CColRefArray *pdrgpcrInsert,
+							 gpos::Ref<CColRef> pcrCtid,
+							 gpos::Ref<CColRef> pcrSegmentId,
+							 gpos::Ref<CColRef> pcrAction)
 	: CLogical(mp),
 	  m_pdrgpcrDelete(pdrgpcrDelete),
 	  m_pdrgpcrInsert(pdrgpcrInsert),
@@ -95,11 +97,11 @@ CLogicalSplit::~CLogicalSplit()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSplit::Matches(COperator *pop) const
+CLogicalSplit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CLogicalSplit *popSplit = CLogicalSplit::PopConvert(pop);
+		gpos::Ref<CLogicalSplit> popSplit = CLogicalSplit::PopConvert(pop);
 
 		return m_pcrCtid == popSplit->PcrCtid() &&
 			   m_pcrSegmentId == popSplit->PcrSegmentId() &&
@@ -140,7 +142,7 @@ CLogicalSplit::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalSplit::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -149,10 +151,11 @@ CLogicalSplit::PopCopyWithRemappedColumns(CMemoryPool *mp,
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
 	CColRefArray *pdrgpcrInsert =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
-	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
-	CColRef *pcrSegmentId =
+	gpos::Ref<CColRef> pcrCtid =
+		CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
+	gpos::Ref<CColRef> pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
-	CColRef *pcrAction =
+	gpos::Ref<CColRef> pcrAction =
 		CUtils::PcrRemap(m_pcrAction, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
@@ -167,12 +170,12 @@ CLogicalSplit::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalSplit::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Union(exprhdl.DeriveOutputColumns(0));
 	pcrs->Include(m_pcrAction);
 
@@ -188,7 +191,7 @@ CLogicalSplit::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalSplit::DeriveKeyCollection(CMemoryPool *,  // mp
 								   CExpressionHandle &exprhdl) const
 {
@@ -236,13 +239,13 @@ CLogicalSplit::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalSplit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							IStatisticsArray *	// not used
 ) const
 {
 	// split returns double the number of tuples coming from its child
-	IStatistics *stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 
 	return stats->ScaleStats(mp, CDouble(2.0) /*factor*/);
 }

@@ -35,7 +35,7 @@ class CParseHandlerCTEConfig : public CParseHandlerBase
 {
 private:
 	// CTE configuration
-	CCTEConfig *m_cte_conf;
+	gpos::Ref<CCTEConfig> m_cte_conf;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CCTEConfig *GetCteConf() const;
+	gpos::Ref<CCTEConfig> GetCteConf() const;
 };
 }  // namespace gpdxl
 

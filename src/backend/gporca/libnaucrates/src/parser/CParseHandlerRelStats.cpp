@@ -77,7 +77,7 @@ CParseHandlerRelStats::StartElement(const XMLCh *const,	 // element_uri,
 
 
 	// parse metadata id info
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
 		EdxltokenRelationStats);
 

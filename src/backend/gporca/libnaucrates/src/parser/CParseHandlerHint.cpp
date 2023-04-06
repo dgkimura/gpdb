@@ -172,7 +172,7 @@ CParseHandlerHint::GetParseHandlerType() const
 //		Returns the hint configuration
 //
 //---------------------------------------------------------------------------
-CHint *
+gpos::Ref<CHint>
 CParseHandlerHint::GetHint() const
 {
 	return m_hint;

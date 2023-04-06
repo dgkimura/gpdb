@@ -41,7 +41,7 @@ CStatsPredConj::CStatsPredConj(CStatsPredPtrArry *conj_pred_stats_array)
 //		Return the filter at a particular position
 //
 //---------------------------------------------------------------------------
-CStatsPred *
+gpos::Ref<CStatsPred>
 CStatsPredConj::GetPredStats(ULONG pos) const
 {
 	return (*m_conj_pred_stats_array)[pos];

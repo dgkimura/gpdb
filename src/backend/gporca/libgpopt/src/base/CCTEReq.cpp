@@ -29,7 +29,8 @@ FORCE_GENERATE_DBGSTR(CCTEReq::CCTEReqEntry);
 //
 //---------------------------------------------------------------------------
 CCTEReq::CCTEReqEntry::CCTEReqEntry(ULONG id, CCTEMap::ECteType ect,
-									BOOL fRequired, CDrvdPropPlan *pdpplan)
+									BOOL fRequired,
+									gpos::Ref<CDrvdPropPlan> pdpplan)
 	: m_id(id), m_ect(ect), m_fRequired(fRequired), m_pdpplan(pdpplan)
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
@@ -82,7 +83,7 @@ CCTEReq::CCTEReqEntry::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CCTEReq::CCTEReqEntry::Equals(CCTEReqEntry *pcre) const
+CCTEReq::CCTEReqEntry::Equals(gpos::Ref<CCTEReqEntry> pcre) const
 {
 	GPOS_ASSERT(nullptr != pcre);
 	if (m_id != pcre->Id() || m_ect != pcre->Ect() ||
@@ -91,7 +92,7 @@ CCTEReq::CCTEReqEntry::Equals(CCTEReqEntry *pcre) const
 		return false;
 	}
 
-	CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+	gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 	if (nullptr == m_pdpplan && nullptr == pdpplan)
 	{
 		return true;
@@ -167,10 +168,10 @@ CCTEReq::~CCTEReq()
 //---------------------------------------------------------------------------
 void
 CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
-				CDrvdPropPlan *pdpplan)
+				gpos::Ref<CDrvdPropPlan> pdpplan)
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
-	CCTEReqEntry *pcre =
+	gpos::Ref<CCTEReqEntry> pcre =
 		GPOS_NEW(m_mp) CCTEReqEntry(ulCteId, ect, fRequired, pdpplan);
 	BOOL fSuccess GPOS_ASSERTS_ONLY =
 		m_phmcter->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcre);
@@ -194,9 +195,9 @@ void
 CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
 {
 	ULONG ulProducerId = gpos::ulong_max;
-	CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])
-								 ->GetCostModel()
-								 ->PdpplanProducer(&ulProducerId);
+	gpos::Ref<CDrvdPropPlan> pdpplan = CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])
+										   ->GetCostModel()
+										   ->PdpplanProducer(&ulProducerId);
 	GPOS_ASSERT(nullptr != pdpplan);
 	GPOS_ASSERT(ulProducerId == id &&
 				"unexpected CTE producer plan properties");
@@ -213,7 +214,7 @@ CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
 //		Lookup info for given cte id
 //
 //---------------------------------------------------------------------------
-CCTEReq::CCTEReqEntry *
+gpos::Ref<CCTEReq::CCTEReqEntry>
 CCTEReq::PcreLookup(ULONG ulCteId) const
 {
 	return m_phmcter->Find(&ulCteId);
@@ -228,7 +229,7 @@ CCTEReq::PcreLookup(ULONG ulCteId) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CCTEReq::FSubset(const CCTEReq *pcter) const
+CCTEReq::FSubset(const gpos::Ref<CCTEReq> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 
@@ -248,8 +249,8 @@ CCTEReq::FSubset(const CCTEReq *pcter) const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		const CCTEReqEntry *pcre = hmcri.Value();
-		CCTEReqEntry *pcreOther = pcter->PcreLookup(pcre->Id());
+		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
+		gpos::Ref<CCTEReqEntry> pcreOther = pcter->PcreLookup(pcre->Id());
 		if (nullptr == pcreOther || !pcre->Equals(pcreOther))
 		{
 			return false;
@@ -270,7 +271,7 @@ CCTEReq::FSubset(const CCTEReq *pcter) const
 BOOL
 CCTEReq::FContainsRequirement(const ULONG id, const CCTEMap::ECteType ect) const
 {
-	CCTEReqEntry *pcre = PcreLookup(id);
+	gpos::Ref<CCTEReqEntry> pcre = PcreLookup(id);
 	return (nullptr != pcre && pcre->Ect() == ect);
 }
 
@@ -285,7 +286,7 @@ CCTEReq::FContainsRequirement(const ULONG id, const CCTEMap::ECteType ect) const
 CCTEMap::ECteType
 CCTEReq::Ect(const ULONG id) const
 {
-	CCTEReqEntry *pcre = PcreLookup(id);
+	gpos::Ref<CCTEReqEntry> pcre = PcreLookup(id);
 	GPOS_ASSERT(nullptr != pcre);
 	return pcre->Ect();
 }
@@ -310,7 +311,7 @@ CCTEReq::HashValue() const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance() && ul < ulMaxEntries)
 	{
-		const CCTEReqEntry *pcre = hmcri.Value();
+		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
 		ulHash = gpos::CombineHashes(ulHash, pcre->HashValue());
 		ul++;
 	}
@@ -326,22 +327,22 @@ CCTEReq::HashValue() const
 //		Unresolved CTE requirements given a derived CTE map
 //
 //---------------------------------------------------------------------------
-CCTEReq *
-CCTEReq::PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm)
+gpos::Ref<CCTEReq>
+CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
-	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CCTEReq> pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		// if a cte is marked as required and it is not found in the given map
 		// then keep it as required, else make it optional
-		const CCTEReqEntry *pcre = hmcri.Value();
+		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
 		ULONG id = pcre->Id();
 		BOOL fRequired =
 			pcre->FRequired() && CCTEMap::EctSentinel == pcm->Ect(id);
-		CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
 			pdpplan->AddRef();
@@ -362,20 +363,20 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm)
 //		operator
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CCTEReq::PcterUnresolvedSequence(
-	CMemoryPool *mp, CCTEMap *pcm,
+	CMemoryPool *mp, gpos::Ref<CCTEMap> pcm,
 	CDrvdPropArray *
 		pdrgpdpCtxt	 // context contains derived plan properties of producer tree
 )
 {
 	GPOS_ASSERT(nullptr != pcm);
-	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CCTEReq> pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		const CCTEReqEntry *pcre = hmcri.Value();
+		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
 
 		ULONG id = pcre->Id();
 		CCTEMap::ECteType ect = pcre->Ect();
@@ -387,7 +388,7 @@ CCTEReq::PcterUnresolvedSequence(
 			GPOS_ASSERT(CCTEMap::EctConsumer == ect);
 			GPOS_ASSERT(CCTEMap::EctConsumer == ectDrvd);
 			// already found, so mark it as optional
-			CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+			gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 			GPOS_ASSERT(nullptr != pdpplan);
 			pdpplan->AddRef();
 			pcterUnresolved->Insert(id, ect, false /*fReqiored*/, pdpplan);
@@ -405,7 +406,7 @@ CCTEReq::PcterUnresolvedSequence(
 		{
 			// either required and not found yet, or optional
 			// in both cases, pass it down as is
-			CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+			gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 			GPOS_ASSERT_IMP(nullptr == pdpplan, CCTEMap::EctProducer == ect);
 			if (nullptr != pdpplan)
 			{
@@ -437,16 +438,16 @@ CCTEReq::PcterUnresolvedSequence(
 //		Create a copy of the current requirement where all the entries are marked optional
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CCTEReq::PcterAllOptional(CMemoryPool *mp)
 {
-	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
 
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		const CCTEReqEntry *pcre = hmcri.Value();
-		CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
+		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
 			pdpplan->AddRef();
@@ -466,10 +467,10 @@ CCTEReq::PcterAllOptional(CMemoryPool *mp)
 //		Lookup plan properties for given cte id
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CCTEReq::Pdpplan(ULONG ulCteId) const
 {
-	const CCTEReqEntry *pcre = PcreLookup(ulCteId);
+	const gpos::Ref<CCTEReqEntry> pcre = PcreLookup(ulCteId);
 	if (nullptr != pcre)
 	{
 		return pcre->PdpplanProducer();
@@ -493,7 +494,8 @@ CCTEReq::OsPrint(IOstream &os) const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		CCTEReqEntry *pcre = const_cast<CCTEReqEntry *>(hmcri.Value());
+		gpos::Ref<CCTEReqEntry> pcre =
+			const_cast<gpos::Ref<CCTEReqEntry> >(hmcri.Value());
 		pcre->OsPrint(os);
 	}
 

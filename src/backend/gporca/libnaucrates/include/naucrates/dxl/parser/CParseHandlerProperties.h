@@ -37,10 +37,10 @@ class CParseHandlerProperties : public CParseHandlerBase
 {
 private:
 	// physical properties container
-	CDXLPhysicalProperties *m_dxl_properties;
+	gpos::Ref<CDXLPhysicalProperties> m_dxl_properties;
 
 	// statistics of the physical plan
-	CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
+	gpos::Ref<CDXLStatsDerivedRelation> m_dxl_stats_derived_relation;
 
 	// process the start of an element
 	void StartElement(
@@ -70,10 +70,10 @@ public:
 	~CParseHandlerProperties() override;
 
 	// returns the constructed properties container
-	CDXLPhysicalProperties *GetProperties() const;
+	gpos::Ref<CDXLPhysicalProperties> GetProperties() const;
 
 	// return the derived relation statistics
-	CDXLStatsDerivedRelation *
+	gpos::Ref<CDXLStatsDerivedRelation>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation;

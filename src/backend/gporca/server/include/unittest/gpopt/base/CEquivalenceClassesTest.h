@@ -23,7 +23,7 @@ public:
 	static GPOS_RESULT EresUnittest_NotDisjointEquivalanceClasses();
 	static GPOS_RESULT EresUnittest_IntersectEquivalanceClasses();
 	static CColRefSetArray *createEquivalenceClasses(CMemoryPool *mp,
-													 CColRefSet *pcrs,
+													 gpos::Ref<CColRefSet> pcrs,
 													 int breakpoints[]);
 
 };	// class CEquivalenceClassesTest

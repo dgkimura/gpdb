@@ -44,12 +44,12 @@ private:
 	BOOL m_is_null;
 
 	// type information
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	INT m_type_modifier;
 
 	// cached type information (can be set from const methods)
-	mutable const IMDType *m_cached_type;
+	mutable const gpos::Ref<IMDType> m_cached_type;
 
 	// long int value used for statistic computation
 	LINT m_stats_comp_val_int;
@@ -61,7 +61,7 @@ public:
 	CDatumGenericGPDB(const CDatumGenericGPDB &) = delete;
 
 	// ctor
-	CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid, INT type_modifier,
+	CDatumGenericGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier,
 					  const void *src, ULONG size, BOOL is_null,
 					  LINT stats_comp_val_int, CDouble stats_comp_val_double);
 
@@ -69,7 +69,7 @@ public:
 	~CDatumGenericGPDB() override;
 
 	// accessor of metadata type id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	INT TypeModifier() const override;
 
@@ -86,10 +86,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *datum) const override;
+	BOOL Matches(const gpos::Ref<IDatum> datum) const override;
 
 	// copy datum
-	IDatum *MakeCopy(CMemoryPool *mp) const override;
+	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;
@@ -127,13 +127,14 @@ public:
 	const BYTE *GetByteArrayValue() const override;
 
 	// stats equality
-	BOOL StatsAreEqual(const IDatum *datum) const override;
+	BOOL StatsAreEqual(const gpos::Ref<IDatum> datum) const override;
 
 	// does the datum need to be padded before statistical derivation
 	BOOL NeedsPadding() const override;
 
 	// return the padded datum
-	IDatum *MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const override;
+	gpos::Ref<IDatum> MakePaddedDatum(CMemoryPool *mp,
+									  ULONG col_len) const override;
 
 	// does datum support like predicate
 	BOOL

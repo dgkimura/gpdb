@@ -36,7 +36,8 @@ public:
 	// ctors
 	explicit CDXLPhysicalForeignScan(CMemoryPool *mp);
 
-	CDXLPhysicalForeignScan(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLPhysicalForeignScan(CMemoryPool *mp,
+							gpos::Ref<CDXLTableDescr> table_descr);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;
@@ -45,13 +46,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLPhysicalForeignScan *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalForeignScan>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalForeignScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalForeignScan *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalForeignScan> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

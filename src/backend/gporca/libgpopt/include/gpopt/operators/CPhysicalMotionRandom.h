@@ -31,13 +31,14 @@ class CPhysicalMotionRandom : public CPhysicalMotion
 {
 private:
 	// distribution spec
-	CDistributionSpecRandom *m_pdsRandom;
+	gpos::Ref<CDistributionSpecRandom> m_pdsRandom;
 
 public:
 	CPhysicalMotionRandom(const CPhysicalMotionRandom &) = delete;
 
 	// ctor
-	CPhysicalMotionRandom(CMemoryPool *mp, CDistributionSpecRandom *pdsRandom);
+	CPhysicalMotionRandom(CMemoryPool *mp,
+						  gpos::Ref<CDistributionSpecRandom> pdsRandom);
 
 	// dtor
 	~CPhysicalMotionRandom() override;
@@ -56,7 +57,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const override
 	{
 		return m_pdsRandom;
@@ -70,26 +71,31 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsInput, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::Ref<CColRefSet> pcrsInput,
+									   ULONG child_index,
+									   CDrvdPropArray *pdrgpdpCtxt,
+									   ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  gpos::Ref<COrderSpec> posInput,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -97,8 +103,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -106,7 +112,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		const gpos::Ref<CEnfdOrder> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -116,7 +123,8 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionRandom *PopConvert(COperator *pop);
+	static gpos::Ref<CPhysicalMotionRandom> PopConvert(
+		gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionRandom
 

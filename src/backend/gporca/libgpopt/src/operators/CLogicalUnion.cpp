@@ -67,7 +67,7 @@ CLogicalUnion::~CLogicalUnion() = default;
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalUnion::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -127,7 +127,7 @@ CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							IStatisticsArray *	// not used
 ) const
@@ -136,13 +136,13 @@ CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// union is transformed into a group by over an union all
 	// we follow the same route to compute statistics
-	IStatistics *pstatsUnionAll =
+	gpos::Ref<IStatistics> pstatsUnionAll =
 		CLogicalUnionAll::PstatsDeriveUnionAll(mp, exprhdl);
 
 	// computed columns
 	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsUnionAll,
 		m_pdrgpcrOutput,	  // we group by the output columns
 		pdrgpulComputedCols,  // no computed columns for set ops

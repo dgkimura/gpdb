@@ -228,7 +228,7 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_col_descr_array->AddRef();
 
-	CDXLCtasStorageOptions *ctas_options =
+	gpos::Ref<CDXLCtasStorageOptions> ctas_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 	ctas_options->AddRef();
 

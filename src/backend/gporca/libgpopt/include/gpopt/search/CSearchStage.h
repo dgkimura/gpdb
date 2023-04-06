@@ -51,7 +51,7 @@ private:
 	CCost m_cost_threshold;
 
 	// best plan found at the end of search stage
-	CExpression *m_pexprBest;
+	gpos::Ref<CExpression> m_pexprBest;
 
 	// cost of best plan found
 	CCost m_costBest;
@@ -126,10 +126,10 @@ public:
 	}
 
 	// set best plan found at the end of search stage
-	void SetBestExpr(CExpression *pexpr);
+	void SetBestExpr(gpos::Ref<CExpression> pexpr);
 
 	// best plan found accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprBest() const
 	{
 		return m_pexprBest;

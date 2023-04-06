@@ -42,10 +42,10 @@ class CDXLBucket : public CRefCount<CDXLBucket>
 {
 private:
 	// lower bound value for the bucket
-	CDXLDatum *m_lower_bound_dxl_datum;
+	gpos::Ref<CDXLDatum> m_lower_bound_dxl_datum;
 
 	// max value for the bucket
-	CDXLDatum *m_upper_bound_dxl_datum;
+	gpos::Ref<CDXLDatum> m_upper_bound_dxl_datum;
 
 	// is lower bound closed (i.e., the boundary point is included in the bucket)
 	BOOL m_is_lower_closed;
@@ -62,16 +62,16 @@ private:
 	// serialize the bucket boundary
 	static void SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 									   const CWStringConst *elem_str,
-									   CDXLDatum *dxl_datum,
+									   gpos::Ref<CDXLDatum> dxl_datum,
 									   BOOL is_bound_closed);
 
 public:
 	CDXLBucket(const CDXLBucket &) = delete;
 
 	// ctor
-	CDXLBucket(CDXLDatum *dxl_datum_lower, CDXLDatum *dxl_datum_upper,
-			   BOOL is_lower_closed, BOOL is_upper_closed, CDouble frequency,
-			   CDouble distinct);
+	CDXLBucket(gpos::Ref<CDXLDatum> dxl_datum_lower,
+			   gpos::Ref<CDXLDatum> dxl_datum_upper, BOOL is_lower_closed,
+			   BOOL is_upper_closed, CDouble frequency, CDouble distinct);
 
 	// dtor
 	~CDXLBucket() override;
@@ -91,10 +91,10 @@ public:
 	}
 
 	// min value for the bucket
-	const CDXLDatum *GetDXLDatumLower() const;
+	const gpos::Ref<CDXLDatum> GetDXLDatumLower() const;
 
 	// max value for the bucket
-	const CDXLDatum *GetDXLDatumUpper() const;
+	const gpos::Ref<CDXLDatum> GetDXLDatumUpper() const;
 
 	// frequency
 	CDouble GetFrequency() const;

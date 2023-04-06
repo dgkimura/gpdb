@@ -47,10 +47,10 @@ CLogicalDynamicForeignGet::CLogicalDynamicForeignGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicForeignGet::CLogicalDynamicForeignGet(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids,
-	OID foreign_server_oid, BOOL is_master_only)
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
+	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
+	IMdIdArray *partition_mdids, OID foreign_server_oid, BOOL is_master_only)
 
 
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
@@ -69,13 +69,13 @@ CLogicalDynamicForeignGet::CLogicalDynamicForeignGet(
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicForeignGet::Matches(COperator *pop) const
+CLogicalDynamicForeignGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CLogicalDynamicForeignGet *popGet =
+	gpos::Ref<CLogicalDynamicForeignGet> popGet =
 		CLogicalDynamicForeignGet::PopConvert(pop);
 
 	return Ptabdesc() == popGet->Ptabdesc() &&
@@ -91,7 +91,7 @@ CLogicalDynamicForeignGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDynamicForeignGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -135,17 +135,17 @@ CLogicalDynamicForeignGet::PxfsCandidates(CMemoryPool *mp) const
 	return xform_set;
 }
 
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDynamicForeignGet::PstatsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
 										IStatisticsArray *	// not used
 ) const
 {
 	// requesting stats on distribution columns to estimate data skew
-	IStatistics *pstatsTable =
+	gpos::Ref<IStatistics> pstatsTable =
 		PstatsBaseTable(mp, exprhdl, m_ptabdesc, m_pcrsDist);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 	CUpperBoundNDVs *upper_bound_NDVs =
 		GPOS_NEW(mp) CUpperBoundNDVs(pcrs, pstatsTable->Rows());
 	CStatistics::CastStats(pstatsTable)->AddCardUpperBound(upper_bound_NDVs);

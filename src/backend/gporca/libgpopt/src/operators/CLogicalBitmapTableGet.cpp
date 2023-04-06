@@ -34,11 +34,9 @@ using namespace gpos;
 //		Takes ownership of ptabdesc, pnameTableAlias and pdrgpcrOutput.
 //
 //---------------------------------------------------------------------------
-CLogicalBitmapTableGet::CLogicalBitmapTableGet(CMemoryPool *mp,
-											   CTableDescriptor *ptabdesc,
-											   ULONG ulOriginOpId,
-											   const CName *pnameTableAlias,
-											   CColRefArray *pdrgpcrOutput)
+CLogicalBitmapTableGet::CLogicalBitmapTableGet(
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameTableAlias, CColRefArray *pdrgpcrOutput)
 	: CLogical(mp),
 	  m_ptabdesc(ptabdesc),
 	  m_ulOriginOpId(ulOriginOpId),
@@ -112,7 +110,7 @@ CLogicalBitmapTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalBitmapTableGet::Matches(COperator *pop) const
+CLogicalBitmapTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }
@@ -126,7 +124,7 @@ CLogicalBitmapTableGet::Matches(COperator *pop) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalBitmapTableGet::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &
 #ifdef GPOS_DEBUG
 																 exprhdl
@@ -146,7 +144,7 @@ CLogicalBitmapTableGet::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 											  CExpressionHandle &exprhdl)
 {
@@ -162,7 +160,7 @@ CLogicalBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 //		Derive the constraint property.
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::Ref<CPropConstraint>
 CLogicalBitmapTableGet::DerivePropertyConstraint(
 	CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
@@ -178,7 +176,7 @@ CLogicalBitmapTableGet::DerivePropertyConstraint(
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalBitmapTableGet::PstatsDerive(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 IStatisticsArray *stats_ctxt) const
@@ -217,7 +215,7 @@ CLogicalBitmapTableGet::OsPrint(IOstream &os) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

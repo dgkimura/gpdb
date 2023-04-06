@@ -66,7 +66,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -77,7 +77,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		CEngine eng(mp);
 
 		// generate  join expression
-		CExpression *pexpr =
+		gpos::Ref<CExpression> pexpr =
 			CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 		// generate query context
@@ -86,9 +86,9 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 
-		CGroup *pgroup = eng.PgroupRoot();
+		gpos::Ref<CGroup> pgroup = eng.PgroupRoot();
 		pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(mp) COptimizationContext(
+		gpos::Ref<COptimizationContext> poc = GPOS_NEW(mp) COptimizationContext(
 			mp, pgroup, pqc->Prpp(),
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
 			GPOS_NEW(mp) IStatisticsArray(mp),
@@ -126,8 +126,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 			GPOS_DELETE_ARRAY(pestate);
 		}
 
-		CGroupExpression *pgexprLogical = nullptr;
-		CGroupExpression *pgexprPhysical = nullptr;
+		gpos::Ref<CGroupExpression> pgexprLogical = nullptr;
+		gpos::Ref<CGroupExpression> pgexprPhysical = nullptr;
 		{
 			CGroupProxy gp(pgroup);
 			pgexprLogical = gp.PgexprNextLogical(nullptr /*pgexpr*/);
@@ -256,7 +256,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 			CXformSetIter xsi(*(xform_set));
 			while (xsi.Advance())
 			{
-				CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+				gpos::Ref<CXform> pxform =
+					CXformFactory::Pxff()->Pxf(xsi.TBit());
 				CJobTransformation jt;
 				jt.Init(pgexprLogical, pxform);
 				at.Os() << std::endl
