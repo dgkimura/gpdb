@@ -15,6 +15,7 @@
 #define GPMD_CMDProviderMemory_H
 
 #include "gpos/base.h"
+#include "gpos/common/RefWrapper.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/IMDCacheObject.h"
@@ -58,7 +59,8 @@ class CMDProviderMemory : public IMDProvider
 protected:
 	// hash map of serialized MD objects indexed by their MD id
 	using MDIdToSerializedMDIdMap =
-		gpos::UnorderedMap<gpos::Ref<IMDId>, CWStringDynamic *, mdid_hash,
+		gpos::UnorderedMap<gpos::Ref<IMDId>,
+						   gpos::Ref<gpos::WrapperCWStringDynamic>, mdid_hash,
 						   mdid_equal_to>;
 
 	// metadata objects indexed by their metadata id

@@ -310,7 +310,7 @@ public:
 	static ULONG
 	HashValue(const CCostContext *pcc)
 	{
-		return HashValue(pcc);
+		return COptimizationContext::HashValue(*(pcc->Poc()));
 	}
 
 	// debug print

@@ -85,8 +85,8 @@ public:
 		CMemoryPool *mp,
 		CMDAccessor *md_accessor,  // MD accessor
 		const gpos::Ref<CDXLNode> query,
-		const CDXLNodeArray
-			*query_output_dxlnode_array,  // required output columns
+		const gpos::Ref<CDXLNodeArray>
+			query_output_dxlnode_array,	 // required output columns
 		const gpos::Ref<CDXLNodeArray> cte_producers,
 		gpos::Ref<IConstExprEvaluator>
 			pceeval,		// constant expression evaluator

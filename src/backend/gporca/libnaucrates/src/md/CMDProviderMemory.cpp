@@ -50,11 +50,11 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name)
 	CAutoRg<CHAR> dxl_file;
 	dxl_file = CDXLUtils::Read(mp, file_name);
 
-	CAutoRef<IMDCacheObjectArray> mdcache_obj_array;
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array;
 	mdcache_obj_array = CDXLUtils::ParseDXLToIMDObjectArray(
 		mp, dxl_file.Rgt(), nullptr /*xsd_file_path*/);
 
-	LoadMetadataObjectsFromArray(mp, mdcache_obj_array.Value());
+	LoadMetadataObjectsFromArray(mp, mdcache_obj_array);
 }
 
 //---------------------------------------------------------------------------
@@ -104,7 +104,8 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 			mp, mdcache_obj, true /*fSerializeHeaders*/, false /*findent*/);
 
 		GPOS_CHECK_ABORT;
-		BOOL fInserted = m_mdmap->Insert(mdid_key, str.Value());
+		BOOL fInserted = m_mdmap->Insert(
+			mdid_key, GPOS_NEW(mp) WrapperCWStringDynamic(str.Value()));
 		if (!fInserted)
 		{
 			GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryDuplicate,
@@ -141,7 +142,7 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != m_mdmap);
 
-	const CWStringDynamic *pstrObj = m_mdmap->Find(mdid);
+	const gpos::Ref<WrapperCWStringDynamic> pstrObj = m_mdmap->Find(mdid);
 
 	// result string
 	CAutoP<CWStringDynamic> a_pstrResult;
@@ -201,7 +202,8 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 	else
 	{
 		// copy string into result
-		a_pstrResult = GPOS_NEW(mp) CWStringDynamic(mp, pstrObj->GetBuffer());
+		a_pstrResult =
+			GPOS_NEW(mp) CWStringDynamic(mp, pstrObj->value()->GetBuffer());
 	}
 
 	GPOS_ASSERT(nullptr != a_pstrResult.Value());

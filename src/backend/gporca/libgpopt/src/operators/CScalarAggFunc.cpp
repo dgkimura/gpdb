@@ -105,7 +105,7 @@ CScalarAggFunc::FCountStar() const
 {
 	// TODO,  04/26/2012, make this function system-independent
 	// using MDAccessor
-	return m_pmdidAggFunc->Equals(&CMDIdGPDB::m_mdid_count_star);
+	return m_pmdidAggFunc->Equals(CMDIdGPDB::m_mdid_count_star);
 }
 
 
@@ -122,7 +122,7 @@ CScalarAggFunc::FCountAny() const
 {
 	// TODO,  04/26/2012, make this function system-independent
 	// using MDAccessor
-	return m_pmdidAggFunc->Equals(&CMDIdGPDB::m_mdid_count_any);
+	return m_pmdidAggFunc->Equals(CMDIdGPDB::m_mdid_count_any);
 }
 
 // Is function either min() or max()?

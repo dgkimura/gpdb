@@ -8,6 +8,7 @@
 
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/string/CWStringDynamic.h"
 #include "gpos/types.h"	 // for ULONG
 
 namespace gpos
@@ -49,6 +50,29 @@ public:
 
 using WrapperCDouble = gpos::WrapperRef<CDouble>;
 
-#endif	// !GPOS_RefWrapper_H
+template <class T>
+class WrapperRaw : public CRefCount<WrapperRaw<T>>
+{
+	T *m_obj;
+
+public:
+	WrapperRaw(T *obj) noexcept : m_obj(obj)
+	{
+	}
+	~WrapperRaw()
+	{
+		GPOS_DELETE(m_obj);
+	}
+
+	T *
+	value()
+	{
+		return m_obj;
+	}
+};
+
+using WrapperCWStringDynamic = gpos::WrapperRaw<CWStringDynamic>;
 
 }  // namespace gpos
+
+#endif	// !GPOS_RefWrapper_H
