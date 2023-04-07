@@ -2033,10 +2033,10 @@ CGroup::CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput)
 	GPOS_ASSERT(nullptr != prppInput);
 	GPOS_ASSERT(!FScalar());
 
-	CCost *pcostLowerBound = m_pcostmap->Find(prppInput);
+	gpos::Ref<WrapperCCost> pcostLowerBound = m_pcostmap->Find(prppInput);
 	if (nullptr != pcostLowerBound)
 	{
-		return *pcostLowerBound;
+		return pcostLowerBound->value();
 	}
 
 	CCost costLowerBound = GPOPT_INFINITE_COST;
@@ -2075,8 +2075,8 @@ CGroup::CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput)
 
 
 
-	BOOL fSuccess GPOS_ASSERTS_ONLY =
-		m_pcostmap->Insert(prppInput, GPOS_NEW(mp) CCost(costLowerBound.Get()));
+	BOOL fSuccess GPOS_ASSERTS_ONLY = m_pcostmap->Insert(
+		prppInput, GPOS_NEW(mp) WrapperCCost(costLowerBound));
 	GPOS_ASSERT(fSuccess);
 
 	return costLowerBound;

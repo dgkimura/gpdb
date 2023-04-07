@@ -11,6 +11,8 @@
 #include "gpos/string/CWStringDynamic.h"
 #include "gpos/types.h"	 // for ULONG
 
+#include "gpopt/cost/CCost.h"
+
 namespace gpos
 {
 class UlongRef : public CRefCount<UlongRef>
@@ -49,6 +51,7 @@ public:
 };
 
 using WrapperCDouble = gpos::WrapperRef<CDouble>;
+using WrapperCCost = gpos::WrapperRef<gpopt::CCost>;
 
 template <class T>
 class WrapperRaw : public CRefCount<WrapperRaw<T>>

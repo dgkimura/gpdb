@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/RefWrapper.h"
 
 #include "gpopt/base/CCostContext.h"
 #include "gpopt/engine/CPartialPlan.h"
@@ -86,7 +87,7 @@ private:
 
 	// map of partial plans to their costs
 	using PartialPlanToCostMap =
-		gpos::UnorderedMap<gpos::Ref<CPartialPlan>, CCost *>;
+		gpos::UnorderedMap<gpos::Ref<CPartialPlan>, gpos::Ref<WrapperCCost>>;
 
 
 	// expression id

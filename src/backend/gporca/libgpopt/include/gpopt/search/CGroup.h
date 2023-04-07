@@ -46,7 +46,7 @@ using CGroupArrayWeak = gpos::Vector<gpos::WeakRef<CGroup>>;
 
 // map required plan props to cost lower bound of corresponding plan
 using ReqdPropPlanToCostMap =
-	gpos::UnorderedMap<gpos::Ref<CReqdPropPlan>, CCost *>;
+	gpos::UnorderedMap<gpos::Ref<CReqdPropPlan>, gpos::Ref<WrapperCCost>>;
 
 // optimization levels in ascending order,
 // under a given optimization context, group expressions in higher levels
@@ -124,7 +124,7 @@ private:
 	{
 	private:
 		// cost context in a parent group
-		gpos::Ref<CCostContext> m_pccParent;
+		gpos::WeakRef<CCostContext> m_pccParent;
 
 		// index used when treating current group as a child of group expression
 		ULONG m_ulChildIndex;

@@ -43,13 +43,13 @@ class CPartialPlan : public CRefCount<CPartialPlan>
 {
 private:
 	// root group expression
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// required plan properties of root operator
 	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// cost context of known child plan -- can be null if no child plans are known
-	gpos::Ref<CCostContext> m_pccChild;
+	gpos::WeakRef<CCostContext> m_pccChild;
 
 	// index of known child plan
 	ULONG m_ulChildIndex;
@@ -75,7 +75,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// plan properties accessor
@@ -89,7 +89,7 @@ public:
 	gpos::Ref<CCostContext>
 	PccChild() const
 	{
-		return m_pccChild;
+		return m_pccChild.Lock();
 	}
 
 	// child index accessor

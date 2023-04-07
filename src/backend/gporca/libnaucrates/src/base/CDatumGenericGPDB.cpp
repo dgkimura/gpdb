@@ -398,7 +398,7 @@ CDatumGenericGPDB::MakeCopyOfValue(CMemoryPool *mp, ULONG *dest_length) const
 BOOL
 CDatumGenericGPDB::NeedsPadding() const
 {
-	return MDId()->Equals(&CMDIdGPDB::m_mdid_bpchar);
+	return MDId()->Equals(CMDIdGPDB::m_mdid_bpchar);
 }
 
 //---------------------------------------------------------------------------

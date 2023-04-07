@@ -1123,7 +1123,7 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 
 		// check if cached columns pointer is the same as computed columns pointer,
 		// if this is not the case, then we have re-computed the same set of columns and test should fail
-		if (pcrsChildReqd != exprhdl.Prpp(ul)->PcrsRequired())
+		if (!pcrsChildReqd->Equals(exprhdl.Prpp(ul)->PcrsRequired()))
 		{
 			CAutoTrace at(mp);
 			at.Os() << "\nExpression: \n" << *pexprChild;

@@ -481,17 +481,17 @@ CGroupExpression::CostLowerBound(CMemoryPool *mp,
 	}
 	gpos::Ref<CPartialPlan> ppp = GPOS_NEW(mp)
 		CPartialPlan(SharedFromThis(), prppInput, pccChild, child_index);
-	CCost *pcostLowerBound = m_ppartialplancostmap->Find(ppp);
+	gpos::Ref<WrapperCCost> pcostLowerBound = m_ppartialplancostmap->Find(ppp);
 	if (nullptr != pcostLowerBound)
 	{
-		return *pcostLowerBound;
+		return pcostLowerBound->value();
 	}
 
 	// compute partial plan cost
 	CCost cost = ppp->CostCompute(mp);
 
 	BOOL fSuccess GPOS_ASSERTS_ONLY =
-		m_ppartialplancostmap->Insert(ppp, GPOS_NEW(mp) CCost(cost.Get()));
+		m_ppartialplancostmap->Insert(ppp, GPOS_NEW(mp) WrapperCCost(cost));
 	GPOS_ASSERT(fSuccess);
 
 	return cost;

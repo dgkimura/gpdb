@@ -159,7 +159,7 @@ CCost
 CPartialPlan::CostCompute(CMemoryPool *mp)
 {
 	CExpressionHandle exprhdl(mp);
-	exprhdl.Attach(m_pgexpr);
+	exprhdl.Attach(m_pgexpr.Lock());
 
 	// init required properties of expression
 	exprhdl.DeriveProps(nullptr /*pdpdrvdCtxt*/);

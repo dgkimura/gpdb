@@ -69,7 +69,7 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
 	{
 		gpos::Ref<CGroupExpression> pgexprForStats =
-			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
+			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr.Lock());
 		if (nullptr != pgexprForStats)
 		{
 			m_pgexprForStats = pgexprForStats;
@@ -320,7 +320,6 @@ CCostContext::BreakCostTiesForJoinPlans(
 {
 	GPOS_ASSERT(nullptr != pccFst);
 	GPOS_ASSERT(nullptr != pccSnd);
-	GPOS_ASSERT(nullptr != ppccPrefered);
 	GPOS_ASSERT(nullptr != pfTiesResolved);
 	GPOS_ASSERT(*(pccFst->Poc()) == *(pccSnd->Poc()));
 	GPOS_ASSERT(estCosted == pccFst->Est());

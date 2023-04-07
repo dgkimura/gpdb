@@ -78,7 +78,7 @@ private:
 	EState m_estate;
 
 	// back pointer to owner group expression
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// group expression to be used stats derivation during costing
 	gpos::Ref<CGroupExpression> m_pgexprForStats;
@@ -184,7 +184,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// group expression for stats derivation
