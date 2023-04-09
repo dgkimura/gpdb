@@ -153,6 +153,16 @@ git grep -l 'CWindowFrameArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[
 git grep -l 'CDXLWindowSpecArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLWindowSpecArray \*/gpos::Ref<\1CDXLWindowSpecArray> /g'
 git grep -l 'UlongToExprArrayMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?UlongToExprArrayMap \*/gpos::Ref<\1UlongToExprArrayMap> /g'
 git grep -l 'OIDPairToScaleFactorArrayMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?OIDPairToScaleFactorArrayMap \*/gpos::Ref<\1OIDPairToScaleFactorArrayMap> /g'
+git grep -l 'ColRefToDXLNodeMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ColRefToDXLNodeMap \*/gpos::Ref<\1ColRefToDXLNodeMap> /g'
+git grep -l 'CMDProviderArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDProviderArray \*/gpos::Ref<\1CMDProviderArray> /g'
+git grep -l 'CCostContextArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CCostContextArray \*/gpos::Ref<\1CCostContextArray> /g'
+git grep -l 'CDXLDatum2dArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLDatum2dArray \*/gpos::Ref<\1CDXLDatum2dArray> /g'
+git grep -l 'SourceToArrayPosMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?SourceToArrayPosMap \*/gpos::Ref<\1SourceToArrayPosMap> /g'
+git grep -l 'ColumnToArrayPosMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ColumnToArrayPosMap \*/gpos::Ref<\1ColumnToArrayPosMap> /g'
+git grep -l 'ExprMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ExprMap \*/gpos::Ref<\1ExprMap> /g'
+git grep -l 'CTreeNode2dArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CTreeNode2dArray \*/gpos::Ref<\1CTreeNode2dArray> /g'
+git grep -l 'TMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?TMap \*/gpos::Ref<\1TMap> /g'
+git grep -l 'CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*/gpos::Ref<\1CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>> /g'
 
 ls src/backend/gporca/libgpopt/src/search/CGroup.cpp | xargs sed -ie 's/CGroupProxy gp(this)/CGroupProxy gp(SharedFromThis())/'
 
