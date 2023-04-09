@@ -280,7 +280,7 @@ public:
 				gpos::Ref<IMDProvider> pmdp);
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache,
 				const gpos::Ref<CSystemIdArray> pdrgpsysid,
-				const CMDProviderArray *pdrgpmdp);
+				const gpos::Ref<CMDProviderArray> pdrgpmdp);
 
 	//dtor
 	~CMDAccessor();
@@ -297,7 +297,7 @@ public:
 
 	// register given MD providers
 	void RegisterProviders(const gpos::Ref<CSystemIdArray> pdrgpsysid,
-						   const CMDProviderArray *pdrgpmdp);
+						   const gpos::Ref<CMDProviderArray> pdrgpmdp);
 
 	// interface to an extended stats object from the MD cache
 	const gpos::Ref<IMDExtStats> RetrieveExtStats(gpos::Ref<IMDId> mdid);

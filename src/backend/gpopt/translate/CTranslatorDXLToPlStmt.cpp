@@ -4688,7 +4688,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDirectDispatchInfo(
 		return NIL;
 	}
 
-	CDXLDatum2dArray *dispatch_identifier_datum_arrays =
+	gpos::Ref<CDXLDatum2dArray> dispatch_identifier_datum_arrays =
 		dxl_direct_dispatch_info->GetDispatchIdentifierDatumArray();
 
 	if (dispatch_identifier_datum_arrays == nullptr ||

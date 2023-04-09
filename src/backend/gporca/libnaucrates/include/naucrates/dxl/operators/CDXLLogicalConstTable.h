@@ -36,7 +36,7 @@ private:
 	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// array of datum arrays (const tuples)
-	CDXLDatum2dArray *m_const_tuples_datum_array;
+	gpos::Ref<CDXLDatum2dArray> m_const_tuples_datum_array;
 
 public:
 	CDXLLogicalConstTable(CDXLLogicalConstTable &) = delete;
@@ -44,7 +44,7 @@ public:
 	// ctor
 	CDXLLogicalConstTable(CMemoryPool *mp,
 						  gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
-						  CDXLDatum2dArray *pdrgpdrgpdxldatum);
+						  gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum);
 
 	//dtor
 	~CDXLLogicalConstTable() override;

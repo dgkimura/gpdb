@@ -45,7 +45,7 @@ const CDouble CScaleFactorUtils::InvalidScaleFactor(0.0);
 //		join preds
 //
 //---------------------------------------------------------------------------
-CScaleFactorUtils::OIDPairToScaleFactorArrayMap *
+gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
 CScaleFactorUtils::GenerateScaleFactorMap(
 	CMemoryPool *mp, gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
 	gpos::Ref<CDoubleArray> independent_join_preds)
@@ -54,8 +54,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 
 	// create a hashmap of size 7 as we don't anticipate many join conditions here. Creating a larger map
 	// would be wasted memory.
-	CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-		GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
+	gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
+		scale_factor_hashmap = GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
 
 	// If a dist col = dist col predicate exists, it needs to be the first element in the scale factor array
 	// so that the predicate does not get damped, and any following predicate will be damped accordingly.
@@ -155,7 +155,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
-	OIDPairToScaleFactorArrayMap *scale_factor_hashmap,
+	gpos::Ref<OIDPairToScaleFactorArrayMap> scale_factor_hashmap,
 	gpos::Ref<CDoubleArray> independent_join_preds)
 {
 	CDouble cumulative_scale_factor(1.0);
@@ -266,8 +266,8 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 		gpos::Ref<CDoubleArray> independent_join_preds =
 			GPOS_NEW(mp) CDoubleArray(mp);
 		// create the map of sorted join preds
-		CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-			CScaleFactorUtils::GenerateScaleFactorMap(
+		gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
+			scale_factor_hashmap = CScaleFactorUtils::GenerateScaleFactorMap(
 				mp, join_conds_scale_factors, independent_join_preds);
 
 		cumulative_scale_factor =

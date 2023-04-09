@@ -29,7 +29,7 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalConstTable::CDXLLogicalConstTable(
 	CMemoryPool *mp, gpos::Ref<CDXLColDescrArray> col_descr_array,
-	CDXLDatum2dArray *const_tuples_datum_array)
+	gpos::Ref<CDXLDatum2dArray> const_tuples_datum_array)
 	: CDXLLogical(mp),
 	  m_col_descr_array(col_descr_array),
 	  m_const_tuples_datum_array(const_tuples_datum_array)

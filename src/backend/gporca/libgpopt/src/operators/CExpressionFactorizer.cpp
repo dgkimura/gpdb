@@ -95,7 +95,7 @@ void
 CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 gpos::Ref<CExpressionArray> pdrgpexprFactors,
 								 gpos::Ref<CExpressionArray> pdrgpexprResidual,
-								 ExprMap *pexprmapFactors,
+								 gpos::Ref<ExprMap> pexprmapFactors,
 								 ULONG
 #ifdef GPOS_DEBUG
 									 ulDisjuncts
@@ -143,7 +143,7 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 //		output: [(A=B, 2), (B=C, 2)]
 //
 //---------------------------------------------------------------------------
-CExpressionFactorizer::ExprMap *
+gpos::Ref<CExpressionFactorizer::ExprMap>
 CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 									   gpos::Ref<CExpression> pexpr)
 {
@@ -151,10 +151,10 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 				"input must be an OR expression");
 
 	// a global (expression -> count) map
-	ExprMap *pexprmapGlobal = GPOS_NEW(mp) ExprMap(mp);
+	gpos::Ref<ExprMap> pexprmapGlobal = GPOS_NEW(mp) ExprMap(mp);
 
 	// factors map
-	ExprMap *pexprmapFactors = GPOS_NEW(mp) ExprMap(mp);
+	gpos::Ref<ExprMap> pexprmapFactors = GPOS_NEW(mp) ExprMap(mp);
 
 	// iterate over child disjuncts;
 	// if a disjunct is an AND tree, iterate over its children
@@ -225,7 +225,7 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
 				"input must be an OR expression");
 
 	// build factors map
-	ExprMap *pexprmapFactors = PexprmapFactors(mp, pexpr);
+	gpos::Ref<ExprMap> pexprmapFactors = PexprmapFactors(mp, pexpr);
 
 	gpos::Ref<CExpressionArray> pdrgpexprResidual =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -442,8 +442,8 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
-	CMemoryPool *mp, SourceToArrayPosMap *psrc2array, BOOL fAllowNewSources,
-	ULONG ulOpSourceId)
+	CMemoryPool *mp, gpos::Ref<SourceToArrayPosMap> psrc2array,
+	BOOL fAllowNewSources, ULONG ulOpSourceId)
 {
 	GPOS_ASSERT(nullptr != psrc2array);
 	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr =
@@ -483,8 +483,8 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
-	CMemoryPool *mp, ColumnToArrayPosMap *pcol2array, BOOL fAllowNewSources,
-	gpos::Ref<CColRef> colref)
+	CMemoryPool *mp, gpos::Ref<ColumnToArrayPosMap> pcol2array,
+	BOOL fAllowNewSources, gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pcol2array);
 	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = pcol2array->Find(colref);
@@ -526,7 +526,8 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
 void
 CExpressionFactorizer::StoreBaseOpToColumnExpr(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-	SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array,
+	gpos::Ref<SourceToArrayPosMap> psrc2array,
+	gpos::Ref<ColumnToArrayPosMap> pcol2array,
 	const gpos::Ref<CColRefSet> pcrsProducedByChildren, BOOL fAllowNewSources,
 	ULONG ulPosition)
 {
@@ -600,10 +601,10 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CExpressionFactorizer::PexprAddInferredFilters(CMemoryPool *mp,
-											   gpos::Ref<CExpression> pexpr,
-											   SourceToArrayPosMap *psrc2array,
-											   ColumnToArrayPosMap *pcol2array)
+CExpressionFactorizer::PexprAddInferredFilters(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<SourceToArrayPosMap> psrc2array,
+	gpos::Ref<ColumnToArrayPosMap> pcol2array)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CPredicateUtils::FOr(pexpr));
@@ -729,10 +730,12 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 	// for each source operator, create a map entry which, for every disjunct,
 	// has the array of comparisons using that operator
 	// we initialize the entries with operators appearing in the first disjunct
-	SourceToArrayPosMap *psrc2array = GPOS_NEW(mp) SourceToArrayPosMap(mp);
+	gpos::Ref<SourceToArrayPosMap> psrc2array =
+		GPOS_NEW(mp) SourceToArrayPosMap(mp);
 
 	// create a similar map for computed columns
-	ColumnToArrayPosMap *pcol2array = GPOS_NEW(mp) ColumnToArrayPosMap(mp);
+	gpos::Ref<ColumnToArrayPosMap> pcol2array =
+		GPOS_NEW(mp) ColumnToArrayPosMap(mp);
 
 	gpos::Ref<CColRefSet> pcrsProducedByChildren = nullptr;
 	if (COperator::EopLogicalSelect ==

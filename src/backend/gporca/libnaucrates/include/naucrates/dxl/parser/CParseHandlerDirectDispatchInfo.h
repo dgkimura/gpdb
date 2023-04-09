@@ -38,7 +38,7 @@ private:
 	gpos::Ref<CDXLDatumArray> m_dxl_datum_array;
 
 	// array of datum combinations
-	CDXLDatum2dArray *m_datum_array_combination;
+	gpos::Ref<CDXLDatum2dArray> m_datum_array_combination;
 
 	// direct dispatch spec
 	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;

@@ -2779,7 +2779,7 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 	dxl_col_descr_array->Append(dxl_col_descr);
 
 	// create the array of datum arrays
-	CDXLDatum2dArray *dispatch_identifier_datum_arrays =
+	gpos::Ref<CDXLDatum2dArray> dispatch_identifier_datum_arrays =
 		GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
 	// create a datum array
@@ -3584,7 +3584,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 	gpos::Ref<CDXLNodeArray> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 
 	// array of datum arrays for Values
-	CDXLDatum2dArray *dxl_values_datum_array =
+	gpos::Ref<CDXLDatum2dArray> dxl_values_datum_array =
 		GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
 	// array of input colid arrays
@@ -3798,7 +3798,7 @@ CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
 	else
 	{
 		// create the array of datum arrays
-		CDXLDatum2dArray *dxl_datum_arrays_const_tbl_get =
+		gpos::Ref<CDXLDatum2dArray> dxl_datum_arrays_const_tbl_get =
 			GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
 

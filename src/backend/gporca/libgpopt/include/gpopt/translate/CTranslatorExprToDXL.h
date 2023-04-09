@@ -79,10 +79,10 @@ private:
 	CMDAccessor *m_pmda;
 
 	// mappings CColRef -> CDXLNode used to lookup subplans
-	ColRefToDXLNodeMap *m_phmcrdxln;
+	gpos::Ref<ColRefToDXLNodeMap> m_phmcrdxln;
 
 	// mappings CColRef -> CDXLNode used to for index predicates with outer references
-	ColRefToDXLNodeMap *m_phmcrdxlnIndexLookup;
+	gpos::Ref<ColRefToDXLNodeMap> m_phmcrdxlnIndexLookup;
 
 	// mappings CColRef -> ColId for translating filters for child partitions
 	// (see PdxlnFilterForChildPart())

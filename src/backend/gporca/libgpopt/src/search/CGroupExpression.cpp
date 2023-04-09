@@ -614,12 +614,12 @@ CGroupExpression::PccLookup(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 //		Lookup all valid cost contexts matching given optimization context
 //
 //---------------------------------------------------------------------------
-CCostContextArray *
+gpos::Ref<CCostContextArray>
 CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 								   gpos::Ref<COptimizationContext> poc)
 {
 	GPOS_ASSERT(nullptr != poc);
-	CCostContextArray *pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
+	gpos::Ref<CCostContextArray> pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
 
 	gpos::Ref<CCostContext> pccFound = nullptr;
 	BOOL fValid = false;

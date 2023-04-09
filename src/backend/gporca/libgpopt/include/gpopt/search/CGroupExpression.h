@@ -390,8 +390,8 @@ public:
 									  ULONG ulOptReq);
 
 	// lookup all cost contexts matching given optimization context
-	CCostContextArray *PdrgpccLookupAll(CMemoryPool *mp,
-										gpos::Ref<COptimizationContext> poc);
+	gpos::Ref<CCostContextArray> PdrgpccLookupAll(
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc);
 
 	// insert a cost context in hash table
 	gpos::Ref<CCostContext> PccInsert(gpos::Ref<CCostContext> pcc);

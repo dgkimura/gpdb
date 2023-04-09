@@ -281,7 +281,7 @@ CMDAccessor::CMDAccessor(CMemoryPool *mp, MDCache *pcache, CSystemId sysid,
 //---------------------------------------------------------------------------
 CMDAccessor::CMDAccessor(CMemoryPool *mp, MDCache *pcache,
 						 const gpos::Ref<CSystemIdArray> pdrgpsysid,
-						 const CMDProviderArray *pdrgpmdp)
+						 const gpos::Ref<CMDProviderArray> pdrgpmdp)
 	: m_mp(mp), m_pcache(pcache), m_dLookupTime(0.0), m_dFetchTime(0.0)
 {
 	GPOS_ASSERT(nullptr != m_mp);
@@ -415,7 +415,7 @@ CMDAccessor::RegisterProvider(CSystemId sysid, gpos::Ref<IMDProvider> pmdp)
 //---------------------------------------------------------------------------
 void
 CMDAccessor::RegisterProviders(const gpos::Ref<CSystemIdArray> pdrgpsysid,
-							   const CMDProviderArray *pdrgpmdp)
+							   const gpos::Ref<CMDProviderArray> pdrgpmdp)
 {
 	GPOS_ASSERT(nullptr != pdrgpmdp);
 	GPOS_ASSERT(nullptr != pdrgpsysid);

@@ -36,7 +36,7 @@ class CHashMapIter : public CStackObject
 
 private:
 	// map to iterate
-	const TMap *m_map;
+	const gpos::Ref<TMap> m_map;
 
 	// current hashchain
 	ULONG m_chain_idx;
@@ -63,7 +63,8 @@ public:
 					 &) = delete;
 
 	// ctor
-	CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn>(TMap *ptm)
+	CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn>(
+		gpos::Ref<TMap> ptm)
 		: m_map(ptm), m_chain_idx(0), m_key_idx(0)
 	{
 		GPOS_ASSERT(nullptr != ptm);

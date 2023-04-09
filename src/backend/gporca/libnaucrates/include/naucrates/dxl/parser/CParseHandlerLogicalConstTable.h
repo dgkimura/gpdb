@@ -37,7 +37,7 @@ class CParseHandlerLogicalConstTable : public CParseHandlerLogicalOp
 {
 private:
 	// array of datum arrays
-	CDXLDatum2dArray *m_const_tuples_datum_array;
+	gpos::Ref<CDXLDatum2dArray> m_const_tuples_datum_array;
 
 	// array of datums
 	gpos::Ref<CDXLDatumArray> m_dxl_datum_array;

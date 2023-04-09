@@ -3516,7 +3516,7 @@ CTestUtils::EresRunMinidumpsUsingOneMDFile(
 	GPOS_CHECK_ABORT;
 
 	const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-	CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+	gpos::Ref<CMDProviderArray> pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
 	pdrgpmdp->Append(pmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
@@ -3586,7 +3586,8 @@ CTestUtils::EresSamplePlans(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-		CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+		gpos::Ref<CMDProviderArray> pdrgpmdp =
+			GPOS_NEW(mp) CMDProviderArray(mp);
 		pdrgpmdp->Append(pmdp);
 
 		for (ULONG ulSys = 1; ulSys < pdrgpsysid->Size(); ulSys++)
@@ -3723,7 +3724,8 @@ CTestUtils::EresCheckPlans(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-		CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+		gpos::Ref<CMDProviderArray> pdrgpmdp =
+			GPOS_NEW(mp) CMDProviderArray(mp);
 		pdrgpmdp->Append(pmdp);
 
 		for (ULONG ulSys = 1; ulSys < pdrgpsysid->Size(); ulSys++)
@@ -3853,7 +3855,8 @@ CTestUtils::EresCheckOptimizedPlan(const CHAR *rgszFileNames[], ULONG ulTests,
 		GPOS_CHECK_ABORT;
 
 		const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-		CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+		gpos::Ref<CMDProviderArray> pdrgpmdp =
+			GPOS_NEW(mp) CMDProviderArray(mp);
 		pdrgpmdp->Append(pmdp);
 
 		for (ULONG ulSys = 1; ulSys < pdrgpsysid->Size(); ulSys++)

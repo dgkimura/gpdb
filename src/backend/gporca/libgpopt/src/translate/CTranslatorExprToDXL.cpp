@@ -5289,7 +5289,8 @@ CTranslatorExprToDXL::GetDXLDirectDispatchInfo(gpos::Ref<CExpression> pexprDML)
 
 
 
-	CDXLDatum2dArray *pdrgpdrgpdxldatum = GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
+	gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum =
+		GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 	pdrgpdrgpdxldatum->Append(pdrgpdxldatum);
 	return GPOS_NEW(m_mp) CDXLDirectDispatchInfo(pdrgpdrgpdxldatum, false);
 }

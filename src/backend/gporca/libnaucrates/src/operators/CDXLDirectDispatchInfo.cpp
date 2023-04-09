@@ -32,7 +32,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDirectDispatchInfo::CDXLDirectDispatchInfo(
-	CDXLDatum2dArray *dispatch_identifer_datum_array, BOOL contains_raw_values)
+	gpos::Ref<CDXLDatum2dArray> dispatch_identifer_datum_array,
+	BOOL contains_raw_values)
 	: m_dispatch_identifer_datum_array(dispatch_identifer_datum_array),
 	  m_contains_raw_values(contains_raw_values)
 {

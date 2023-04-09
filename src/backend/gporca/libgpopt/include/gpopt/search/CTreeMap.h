@@ -153,7 +153,7 @@ private:
 		const T *m_value;
 
 		// array of children arrays
-		CTreeNode2dArray *m_pdrgdrgptn;
+		gpos::Ref<CTreeNode2dArray> m_pdrgdrgptn;
 
 		// number of trees rooted in this node
 		ULLONG m_ullCount;
@@ -412,7 +412,7 @@ private:
 		CHashMap<STreeLink, BOOL, STreeLink::HashValue, STreeLink::Equals,
 				 CleanupDelete<STreeLink>, CleanupDelete<BOOL>>;
 
-	TMap *m_ptmap;
+	gpos::Ref<TMap> m_ptmap;
 
 	// map of nodes to outgoing links
 	gpos::Ref<LinkMap> m_plinkmap;

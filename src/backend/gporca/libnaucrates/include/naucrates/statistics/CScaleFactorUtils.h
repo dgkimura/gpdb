@@ -85,14 +85,14 @@ public:
 						   gpos::Ref<CDoubleArray>>::LegacyIterator;
 
 	// generate the hashmap of scale factors grouped by pred tables, also produces array of complex join preds
-	static OIDPairToScaleFactorArrayMap *GenerateScaleFactorMap(
+	static gpos::Ref<OIDPairToScaleFactorArrayMap> GenerateScaleFactorMap(
 		CMemoryPool *mp,
 		gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
 		gpos::Ref<CDoubleArray> complex_join_preds);
 
 	// generate a cumulative scale factor using a modified sqrt algorithm
 	static CDouble CalcCumulativeScaleFactorSqrtAlg(
-		OIDPairToScaleFactorArrayMap *scale_factor_hashmap,
+		gpos::Ref<OIDPairToScaleFactorArrayMap> scale_factor_hashmap,
 		gpos::Ref<CDoubleArray> complex_join_preds);
 
 	// calculate the cumulative join scaling factor

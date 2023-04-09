@@ -1646,9 +1646,10 @@ CHistogram::CombineBuckets(CMemoryPool *mp, gpos::Ref<CBucketArray> buckets,
 
 	gpos::Ref<CBucketArray> result_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	ULONG bucketsToCombine = buckets->Size() - desired_num_buckets;
-	CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> *boundary_factors =
-		GPOS_NEW(mp) CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>(
-			mp, bucketsToCombine);
+	gpos::Ref<CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>>
+		boundary_factors =
+			GPOS_NEW(mp) CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>(
+				mp, bucketsToCombine);
 
 	// loop over the bucket boundaries and determine how much information
 	// we would lose by eliminating them

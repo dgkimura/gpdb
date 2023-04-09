@@ -1085,7 +1085,8 @@ CGroup::RecursiveBuildTreeMap(
 	GPOS_ASSERT_IMP(nullptr != pccParent,
 					child_index < pccParent->Pgexpr()->Arity());
 
-	CCostContextArray *pdrgpcc = pgexprCurrent->PdrgpccLookupAll(mp, poc);
+	gpos::Ref<CCostContextArray> pdrgpcc =
+		pgexprCurrent->PdrgpccLookupAll(mp, poc);
 	const ULONG ulCCSize = pdrgpcc->Size();
 
 	if (0 == ulCCSize)

@@ -93,7 +93,7 @@ CBindingTest::EresUnittest_Basic()
 
 
 	const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-	CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+	gpos::Ref<CMDProviderArray> pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
 	pdrgpmdp->Append(pmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)

@@ -66,7 +66,7 @@ private:
 		gpos::Ref<CConstraint> pcnstrDistrCol);
 
 	// compute an array of DXL datum arrays from a disjunction of point constraints
-	static CDXLDatum2dArray *PdrgpdrgpdxldatumFromDisjPointConstraint(
+	static gpos::Ref<CDXLDatum2dArray> PdrgpdrgpdxldatumFromDisjPointConstraint(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		const gpos::Ref<CColRef> pcrDistrCol,
 		gpos::Ref<CConstraint> pcnstrDistrCol);
@@ -118,32 +118,32 @@ public:
 	// project list of the child node
 	static gpos::Ref<CDXLNode> PdxlnProjListFromChildProjList(
 		CMemoryPool *mp, CColumnFactory *col_factory,
-		ColRefToDXLNodeMap *phmcrdxln,
+		gpos::Ref<ColRefToDXLNodeMap> phmcrdxln,
 		const gpos::Ref<CDXLNode> pdxlnProjListChild);
 
 	// create a DXL project elem node from as a scalar identifier for the
 	// child project element node
 	static gpos::Ref<CDXLNode> PdxlnProjElem(
 		CMemoryPool *mp, CColumnFactory *col_factory,
-		ColRefToDXLNodeMap *phmcrdxln,
+		gpos::Ref<ColRefToDXLNodeMap> phmcrdxln,
 		const gpos::Ref<CDXLNode> pdxlnProjElemChild);
 
 	// create a scalar identifier node for the given column reference
 	static gpos::Ref<CDXLNode> PdxlnIdent(
-		CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
-		ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
+		CMemoryPool *mp, gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnSubplans,
+		gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnIndexLookup,
 		gpos::Ref<ColRefToUlongMap> phmcrulPartColId,
 		const gpos::Ref<CColRef> colref);
 
 	// replace subplan entry in the given map with a dxl column reference
 	static void ReplaceSubplan(CMemoryPool *mp,
-							   ColRefToDXLNodeMap *phmcrdxlnSubplans,
+							   gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnSubplans,
 							   const gpos::Ref<CColRef> colref,
 							   gpos::Ref<CDXLScalarProjElem> pdxlopPrEl);
 
 	// create a project elem from a given col ref
 	static gpos::Ref<CDXLNode> PdxlnProjElem(
-		CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
+		CMemoryPool *mp, gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnSubplans,
 		const gpos::Ref<CColRef> colref);
 
 	// construct an array of NULL datums for a given array of columns

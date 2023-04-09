@@ -213,7 +213,8 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList(
-	CMemoryPool *mp, CColumnFactory *col_factory, ColRefToDXLNodeMap *phmcrdxln,
+	CMemoryPool *mp, CColumnFactory *col_factory,
+	gpos::Ref<ColRefToDXLNodeMap> phmcrdxln,
 	const gpos::Ref<CDXLNode> pdxlnProjListChild)
 {
 	GPOS_ASSERT(nullptr != pdxlnProjListChild);
@@ -249,7 +250,8 @@ CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnProjElem(
-	CMemoryPool *mp, CColumnFactory *col_factory, ColRefToDXLNodeMap *phmcrdxln,
+	CMemoryPool *mp, CColumnFactory *col_factory,
+	gpos::Ref<ColRefToDXLNodeMap> phmcrdxln,
 	const gpos::Ref<CDXLNode> pdxlnChildProjElem)
 {
 	GPOS_ASSERT(nullptr != pdxlnChildProjElem &&
@@ -284,8 +286,9 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 void
 CTranslatorExprToDXLUtils::ReplaceSubplan(
 	CMemoryPool *mp,
-	ColRefToDXLNodeMap *phmcrdxlnSubplans,	// map of col ref to subplan
-	const gpos::Ref<CColRef> colref,		// key of entry in the passed map
+	gpos::Ref<ColRefToDXLNodeMap>
+		phmcrdxlnSubplans,			  // map of col ref to subplan
+	const gpos::Ref<CColRef> colref,  // key of entry in the passed map
 	gpos::Ref<CDXLScalarProjElem>
 		pdxlopPrEl	// project element to use for creating DXL col ref to replace subplan
 )
@@ -326,7 +329,7 @@ CTranslatorExprToDXLUtils::ReplaceSubplan(
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnProjElem(
 	CMemoryPool *mp,
-	ColRefToDXLNodeMap *
+	gpos::Ref<ColRefToDXLNodeMap>
 		phmcrdxlnSubplans,	// map of col ref -> subplan: can be modified by this function
 	const gpos::Ref<CColRef> colref)
 {
@@ -368,8 +371,8 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnIdent(
-	CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
-	ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
+	CMemoryPool *mp, gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnSubplans,
+	gpos::Ref<ColRefToDXLNodeMap> phmcrdxlnIndexLookup,
 	gpos::Ref<ColRefToUlongMap> phmcrulPartColId,
 	const gpos::Ref<CColRef> colref)
 {
@@ -855,7 +858,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfoRandDist(
 	// value in the expression, so we use it as is.
 	const BOOL useRawValues = true;
 
-	CDXLDatum2dArray *pdrgpdrgpdxldatum = nullptr;
+	gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum = nullptr;
 
 	if (CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
@@ -956,7 +959,8 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 		return nullptr;
 	}
 
-	CDXLDatum2dArray *pdrgpdrgpdxldatum = GPOS_NEW(mp) CDXLDatum2dArray(mp);
+	gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum =
+		GPOS_NEW(mp) CDXLDatum2dArray(mp);
 	pdrgpdrgpdxldatum->Append(pdrgpdxldatum);
 	return GPOS_NEW(mp) CDXLDirectDispatchInfo(pdrgpdrgpdxldatum, false);
 }
@@ -1003,7 +1007,7 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(
 		useRawValues = true;
 	}
 
-	CDXLDatum2dArray *pdrgpdrgpdxldatum = nullptr;
+	gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum = nullptr;
 
 	if (CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
@@ -1182,7 +1186,7 @@ CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint(
 //		Returns NULL if this is not possible
 //
 //---------------------------------------------------------------------------
-CDXLDatum2dArray *
+gpos::Ref<CDXLDatum2dArray>
 CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	const gpos::Ref<CColRef> pcrDistrCol, gpos::Ref<CConstraint> pcnstrDistrCol)
@@ -1190,7 +1194,7 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 	GPOS_ASSERT(nullptr != pcnstrDistrCol);
 	if (CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
-		CDXLDatum2dArray *pdrgpdrgpdxldatum = nullptr;
+		gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum = nullptr;
 
 		gpos::Ref<CDXLDatum> dxl_datum = PdxldatumFromPointConstraint(
 			mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
@@ -1221,7 +1225,8 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 	gpos::Ref<CRangeArray> pdrgprng = pcnstrInterval->Pdrgprng();
 
 	const ULONG ulRanges = pdrgprng->Size();
-	CDXLDatum2dArray *pdrgpdrgpdxdatum = GPOS_NEW(mp) CDXLDatum2dArray(mp);
+	gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxdatum =
+		GPOS_NEW(mp) CDXLDatum2dArray(mp);
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
