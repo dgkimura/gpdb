@@ -621,7 +621,6 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != poc);
 	gpos::Ref<CCostContextArray> pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
 
-	gpos::Ref<CCostContext> pccFound = nullptr;
 	BOOL fValid = false;
 
 	ShtIter shtit(Sht());
@@ -631,7 +630,8 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 			gpos::dyn_cast<CCostContext>(shtit.Value());
 		fValid =
 			(nullptr != pccFound && pccFound->Cost() != GPOPT_INVALID_COST &&
-			 !pccFound->FPruned());
+			 !pccFound->FPruned() &&
+			 COptimizationContext::Equals(shtit.Key(), poc));
 		if (fValid)
 		{
 			pdrgpcc->Append(pccFound);
