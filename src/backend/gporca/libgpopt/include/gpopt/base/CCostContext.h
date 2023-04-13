@@ -117,7 +117,7 @@ public:
 	CCostContext(const CCostContext &) = delete;
 
 	// main optimization context
-	gpos::WeakRef<COptimizationContext> m_poc;
+	gpos::Ref<COptimizationContext> m_poc;
 
 	// link for cost context hash table in CGroupExpression
 	SLink m_link;
@@ -133,7 +133,7 @@ public:
 	gpos::Ref<COptimizationContext>
 	Poc() const
 	{
-		return m_poc.Lock();
+		return m_poc;
 	}
 
 	// accessor of optimization request number
