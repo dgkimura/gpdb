@@ -265,6 +265,18 @@
       </dxl:Relation>
       <dxl:ColumnStatistics Mdid="1.112424.1.0.1" Name="b" Width="1.000000" NullFreq="0.000000" NdvRemain="0.000000" FreqRemain="0.000000" ColStatsMissing="true"/>
       <dxl:ColumnStatistics Mdid="1.112424.1.0.0" Name="a" Width="4.000000" NullFreq="0.000000" NdvRemain="0.000000" FreqRemain="0.000000" ColStatsMissing="true"/>
+      <dxl:GPDBScalarOp Mdid="0.1695.1.0" Name="&gt;=" ComparisonType="GEq" ReturnsNullOnNullInput="true" IsNDVPreserving="false">
+        <dxl:LeftType Mdid="0.16.1.0"/>
+        <dxl:RightType Mdid="0.16.1.0"/>
+        <dxl:ResultType Mdid="0.16.1.0"/>
+        <dxl:OpFunc Mdid="0.1692.1.0"/>
+        <dxl:Commutator Mdid="0.1694.1.0"/>
+        <dxl:InverseOp Mdid="0.58.1.0"/>
+        <dxl:Opfamilies>
+          <dxl:Opfamily Mdid="0.424.1.0"/>
+          <dxl:Opfamily Mdid="0.10002.1.0"/>
+        </dxl:Opfamilies>
+      </dxl:GPDBScalarOp>
       <dxl:GPDBScalarOp Mdid="0.91.1.0" Name="=" ComparisonType="Eq" ReturnsNullOnNullInput="true" IsNDVPreserving="false">
         <dxl:LeftType Mdid="0.16.1.0"/>
         <dxl:RightType Mdid="0.16.1.0"/>

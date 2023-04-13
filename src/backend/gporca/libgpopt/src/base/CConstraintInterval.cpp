@@ -17,7 +17,6 @@
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CConstraintDisjunction.h"
-#include "gpopt/base/CDatumSortedSet.h"
 #include "gpopt/base/CDefaultComparator.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -185,6 +184,9 @@ CConstraintInterval::PciIntervalFromScalarExpr(CMemoryPool *mp,
 			pci =
 				PciIntervalFromScalarBoolOp(mp, pexpr, colref, infer_nulls_as);
 			break;
+		case COperator::EopScalarIdent:
+			pci = PciIntervalFromScalarIdent(mp, colref, infer_nulls_as);
+			break;
 		case COperator::EopScalarCmp:
 			pci = PciIntervalFromScalarCmp(mp, pexpr, colref, infer_nulls_as);
 			break;
@@ -219,6 +221,47 @@ CConstraintInterval::PciIntervalFromScalarExpr(CMemoryPool *mp,
 
 	return pci;
 }
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CConstraint::PcnstrIntervalRangeFromScalarBooleanArrayCmp
+//
+//	@doc:
+//		Create constraint range from a sorted boolean datum set. Returns NULL
+//		if a range cannot be created.
+//
+//---------------------------------------------------------------------------
+CRange *
+CConstraintInterval::PcnstrIntervalRangeFromScalarBooleanArrayCmp(
+	CMemoryPool *mp, const CDatumSortedSet *apdatumsortedset)
+{
+	IDatum *left = (*apdatumsortedset)[0];
+	IDatum *right = (*apdatumsortedset)[apdatumsortedset->Size() - 1];
+
+	BOOL containsFalse = !dynamic_cast<IDatumBool *>(left)->GetValue();
+	BOOL containsTrue = dynamic_cast<IDatumBool *>(right)->GetValue();
+
+	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
+
+	if (containsFalse && containsTrue)
+	{
+		// [FALSE, TRUE] => range (-inf, inf)
+		return GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptOther, left);
+	}
+	else if (false == containsFalse)
+	{
+		// [FALSE] => range (-inf, 0]
+		return GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptLEq, left);
+	}
+	else if (containsTrue)
+	{
+		// [TRUE] => range [1, inf)
+		return GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptGEq, right);
+	}
+
+	return nullptr;
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -271,7 +314,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 	}
 
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
-	gpos::CAutoRef<CDatumSortedSet> apdatumsortedset(
+	CDatumSortedSet *apdatumsortedset(
 		GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp));
 	// construct ranges representing IN or NOT IN
 	CRangeArray *prgrng = GPOS_NEW(mp) CRangeArray(mp);
@@ -280,6 +323,14 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 	{
 		case IMDType::EcmptEq:
 		{
+			// IN case of bool,  [false, true] translate as (-inf, inf)
+			if (colref->RetrieveType()->GetDatumType() == IMDType::EtiBool)
+			{
+				prgrng->Append(CConstraintInterval::
+								   PcnstrIntervalRangeFromScalarBooleanArrayCmp(
+									   mp, apdatumsortedset));
+				break;
+			}
 			// IN case, create ranges [X, X] [Y, Y] [Z, Z]
 			for (ULONG ul = 0; ul < apdatumsortedset->Size(); ul++)
 			{
@@ -331,10 +382,12 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 		{
 			// does not handle IS DISTINCT FROM
 			prgrng->Release();
+			apdatumsortedset->Release();
 			return nullptr;
 		}
 	}
 
+	apdatumsortedset->Release();
 	return GPOS_NEW(mp) CConstraintInterval(mp, colref, prgrng, infer_nulls_as);
 }
 
@@ -448,7 +501,7 @@ CConstraintInterval::PciIntervalFromScalarBooleanTest(CMemoryPool *mp,
 			IDatumBool *datum =
 				pmdtypebool->CreateBoolDatum(mp, true, false /*is_null*/);
 			CRange *prange =
-				GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptEq, datum);
+				GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptGEq, datum);
 			pdrngprng->Append(prange);
 			break;
 		}
@@ -463,7 +516,7 @@ CConstraintInterval::PciIntervalFromScalarBooleanTest(CMemoryPool *mp,
 			IDatumBool *datum =
 				pmdtypebool->CreateBoolDatum(mp, false, false /*is_null*/);
 			CRange *prange =
-				GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptEq, datum);
+				GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptLEq, datum);
 			pdrngprng->Append(prange);
 			break;
 		}
@@ -487,8 +540,6 @@ CConstraintInterval::PciIntervalFromScalarBooleanTest(CMemoryPool *mp,
 
 	return GPOS_NEW(mp)
 		CConstraintInterval(mp, colref, pdrngprng, fIncludesNull);
-
-	return nullptr;
 }
 
 
@@ -664,6 +715,33 @@ CConstraintInterval::PciIntervalFromScalarBoolOp(CMemoryPool *mp,
 		default:
 			return nullptr;
 	}
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CConstraintInterval::PciIntervalFromScalarIdent
+//
+//	@doc:
+//		Create interval from boolean scalar ident
+//
+//---------------------------------------------------------------------------
+CConstraintInterval *
+CConstraintInterval::PciIntervalFromScalarIdent(CMemoryPool *mp,
+												CColRef *colref,
+												BOOL infer_nulls_as)
+{
+	GPOS_ASSERT(colref->RetrieveType()->GetDatumType() == IMDType::EtiBool);
+
+	CRangeArray *pdrngprng = GPOS_NEW(mp) CRangeArray(mp);
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
+	IDatumBool *datum =
+		pmdtypebool->CreateBoolDatum(mp, true, false /*is_null*/);
+	pdrngprng->Append(GPOS_NEW(mp) CRange(COptCtxt::PoctxtFromTLS()->Pcomp(),
+										  IMDType::EcmptGEq, datum));
+
+	return GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrngprng,
+											infer_nulls_as /*fIncludesNull*/);
 }
 
 //---------------------------------------------------------------------------

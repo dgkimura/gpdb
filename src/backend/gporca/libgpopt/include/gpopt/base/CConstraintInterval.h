@@ -18,6 +18,7 @@
 #include "gpos/task/CAutoTraceFlag.h"
 
 #include "gpopt/base/CConstraint.h"
+#include "gpopt/base/CDatumSortedSet.h"
 #include "gpopt/base/CRange.h"
 #include "gpopt/operators/CScalarArrayCmp.h"
 #include "gpopt/operators/CScalarConst.h"
@@ -112,6 +113,11 @@ private:
 	static CConstraintInterval *PciIntervalFromScalarBooleanTest(
 		CMemoryPool *mp, CExpression *pexpr, CColRef *colref);
 
+	// create interval from bool scalar ident
+	static CConstraintInterval *PciIntervalFromScalarIdent(CMemoryPool *mp,
+														   CColRef *colref,
+														   BOOL infer_nulls_as);
+
 	// creates a range like [x,x] where x is a constant
 	static CRangeArray *PciRangeFromColConstCmp(CMemoryPool *mp,
 												IMDType::ECmpType cmp_type,
@@ -119,6 +125,9 @@ private:
 
 	// create an array IN or NOT IN expression
 	CExpression *PexprConstructArrayScalar(CMemoryPool *mp, bool isIn) const;
+
+	static CRange *PcnstrIntervalRangeFromScalarBooleanArrayCmp(
+		CMemoryPool *mp, const CDatumSortedSet *apdatumsortedset);
 
 public:
 	CConstraintInterval(const CConstraintInterval &) = delete;
