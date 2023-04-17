@@ -86,7 +86,7 @@ private:
 	gpos::Ref<CDrvdPropScalar> m_pdpscalar;
 
 	// group reference to Memo
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// cost of physical expression node when copied out of the memo
 	CCost m_cost;
@@ -188,7 +188,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// accessor for computed required plan props

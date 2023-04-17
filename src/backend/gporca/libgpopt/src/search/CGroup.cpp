@@ -194,22 +194,6 @@ CGroup::CGroup(CMemoryPool *mp, BOOL fScalar)
 //---------------------------------------------------------------------------
 CGroup::~CGroup()
 {
-	// cleaning-up group expressions
-	for (ULONG ul = 0; ul < m_listGExprs.Size(); ul++)
-	{
-		gpos::Ref<CGroupExpression> pgexpr = m_listGExprs[ul];
-		pgexpr->CleanupContexts();
-	}
-
-	// cleaning-up duplicate expressions
-	for (ULONG ul = 0; ul < m_listDupGExprs.Size(); ul++)
-	{
-		gpos::Ref<CGroupExpression> pgexpr = m_listDupGExprs[ul];
-		pgexpr->CleanupContexts();
-	}
-
-	// cleanup optimization contexts
-	CleanupContexts();
 }
 
 
@@ -224,13 +208,6 @@ CGroup::~CGroup()
 void
 CGroup::CleanupContexts()
 {
-	// need to suspend cancellation while cleaning up
-	{
-		CAutoSuspendAbort asa;
-
-		gpos::Ref<COptimizationContext> poc = nullptr;
-		m_sht->Clear();
-	}
 }
 
 
@@ -863,7 +840,7 @@ CGroup::AddDuplicateGrp(gpos::Ref<CGroup> pgroup)
 		}
 		else
 		{
-			pgroupSrc = pgroupSrc->m_pgroupDuplicate;
+			pgroupSrc = pgroupSrc->m_pgroupDuplicate.Lock();
 			if (pgroupSrc->Id() > pgroupDest->Id())
 			{
 				std::swap(pgroupSrc, pgroupDest);
@@ -888,11 +865,11 @@ CGroup::ResolveDuplicateMaster()
 	{
 		return;
 	}
-	gpos::Ref<CGroup> pgroupTarget = m_pgroupDuplicate;
+	gpos::Ref<CGroup> pgroupTarget = m_pgroupDuplicate.Lock();
 	while (nullptr != pgroupTarget->m_pgroupDuplicate)
 	{
 		GPOS_ASSERT(pgroupTarget->Id() < pgroupTarget->m_pgroupDuplicate->Id());
-		pgroupTarget = pgroupTarget->m_pgroupDuplicate;
+		pgroupTarget = pgroupTarget->m_pgroupDuplicate.Lock();
 	}
 
 	// update reference to target group
@@ -920,7 +897,7 @@ CGroup::MergeGroup()
 
 	// resolve target group
 	ResolveDuplicateMaster();
-	gpos::Ref<CGroup> pgroupTarget = m_pgroupDuplicate;
+	gpos::Ref<CGroup> pgroupTarget = m_pgroupDuplicate.Lock();
 
 	// move group expressions from this group to target
 	for (ULONG ul = 0; ul < m_listGExprs.Size(); ul++)

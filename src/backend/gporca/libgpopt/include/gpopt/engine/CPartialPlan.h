@@ -49,7 +49,7 @@ private:
 	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// cost context of known child plan -- can be null if no child plans are known
-	gpos::WeakRef<CCostContext> m_pccChild;
+	gpos::Ref<CCostContext> m_pccChild;
 
 	// index of known child plan
 	ULONG m_ulChildIndex;
@@ -89,7 +89,7 @@ public:
 	gpos::Ref<CCostContext>
 	PccChild() const
 	{
-		return m_pccChild.Lock();
+		return m_pccChild;
 	}
 
 	// child index accessor

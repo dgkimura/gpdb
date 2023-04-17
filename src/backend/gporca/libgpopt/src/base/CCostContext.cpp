@@ -69,7 +69,7 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
 	{
 		gpos::Ref<CGroupExpression> pgexprForStats =
-			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr.Lock());
+			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
 		if (nullptr != pgexprForStats)
 		{
 			m_pgexprForStats = pgexprForStats;

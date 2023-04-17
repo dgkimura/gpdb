@@ -124,7 +124,7 @@ private:
 	{
 	private:
 		// cost context in a parent group
-		gpos::WeakRef<CCostContext> m_pccParent;
+		gpos::Ref<CCostContext> m_pccParent;
 
 		// index used when treating current group as a child of group expression
 		ULONG m_ulChildIndex;
@@ -201,7 +201,7 @@ private:
 
 	// pointer to group containing the group expressions
 	// of all duplicate groups
-	gpos::Ref<CGroup> m_pgroupDuplicate;
+	gpos::WeakRef<CGroup> m_pgroupDuplicate;
 
 	// map of processed links
 	gpos::Ref<LinkMap> m_plinkmap;
@@ -504,7 +504,7 @@ public:
 	gpos::Ref<CGroup>
 	PgroupDuplicate() const
 	{
-		return m_pgroupDuplicate;
+		return m_pgroupDuplicate.Lock();
 	}
 
 	// resolve master duplicate group;

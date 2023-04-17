@@ -62,7 +62,7 @@ private:
 	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// attached cost context
-	gpos::Ref<CCostContext> m_pcc;
+	gpos::WeakRef<CCostContext> m_pcc;
 
 	// derived plan properties of the gexpr attached by a CostContext under
 	// the default CDrvdPropCtxtPlan. See DerivePlanPropsForCostContext()

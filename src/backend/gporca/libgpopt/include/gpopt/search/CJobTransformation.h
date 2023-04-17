@@ -57,10 +57,10 @@ private:
 	using JSM = CJobStateMachine<EState, estSentinel, EEvent, eevSentinel>;
 
 	// target group expression
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// xform to apply to group expression
-	gpos::Ref<CXform> m_xform;
+	gpos::WeakRef<CXform> m_xform;
 
 	// job state machine
 	JSM m_jsm;

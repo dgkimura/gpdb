@@ -60,7 +60,7 @@ CJobGroup::PgexprFirstUnschedNonLogical()
 		else
 		{
 			// get group expression next to last scheduled one
-			pgexpr = gp.PgexprSkipLogical(m_pgexprLastScheduled);
+			pgexpr = gp.PgexprSkipLogical(m_pgexprLastScheduled.Lock());
 		}
 	}
 
@@ -90,7 +90,7 @@ CJobGroup::PgexprFirstUnschedLogical()
 		else
 		{
 			// get group expression next to last scheduled one
-			pgexpr = gp.PgexprNext(m_pgexprLastScheduled);
+			pgexpr = gp.PgexprNext(m_pgexprLastScheduled.Lock());
 		}
 	}
 

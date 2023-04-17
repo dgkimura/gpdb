@@ -71,7 +71,7 @@ private:
 	JSM m_jsm;
 
 	// group expression that triggered group optimization
-	gpos::Ref<CGroupExpression> m_pgexprOrigin;
+	gpos::WeakRef<CGroupExpression> m_pgexprOrigin;
 
 	// optimization context of the job
 	gpos::WeakRef<COptimizationContext> m_poc;

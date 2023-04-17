@@ -185,7 +185,7 @@ CJobGroupOptimization::Init(
 BOOL
 CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 {
-	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled.Lock();
 
 	// iterate on expressions and schedule them as needed
 	gpos::Ref<CGroupExpression> pgexpr = PgexprFirstUnsched();
@@ -194,8 +194,8 @@ CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 		// we consider only group expressions matching current optimization level,
 		// other group expressions will be optimized when damping current
 		// optimization level
-		if (psc->Peng()->FOptimizeChild(m_pgexprOrigin, pgexpr, m_poc.Lock(),
-										EolCurrent()))
+		if (psc->Peng()->FOptimizeChild(m_pgexprOrigin.Lock(), pgexpr,
+										m_poc.Lock(), EolCurrent()))
 		{
 			const ULONG ulOptRequests =
 				CPhysical::PopConvert(pgexpr->Pop())->UlOptRequests();

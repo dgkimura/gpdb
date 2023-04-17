@@ -123,12 +123,6 @@ CGroupExpression::~CGroupExpression()
 void
 CGroupExpression::CleanupContexts()
 {
-	// need to suspend cancellation while cleaning up
-	{
-		CAutoSuspendAbort asa;
-
-		m_sht->Clear();
-	}
 }
 
 

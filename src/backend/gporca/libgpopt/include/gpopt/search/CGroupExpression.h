@@ -90,7 +90,7 @@ private:
 	ULONG m_id{GPOPT_INVALID_GEXPR_ID};
 
 	// duplicate group expression
-	gpos::Ref<CGroupExpression> m_pgexprDuplicate;
+	gpos::WeakRef<CGroupExpression> m_pgexprDuplicate;
 
 	// operator class
 	gpos::Ref<COperator> m_pop{nullptr};
@@ -109,7 +109,7 @@ private:
 	CXform::EXformId m_exfidOrigin{CXform::ExfInvalid};
 
 	// group expression that generated current group expression via xform
-	gpos::Ref<CGroupExpression> m_pgexprOrigin{nullptr};
+	gpos::WeakRef<CGroupExpression> m_pgexprOrigin{nullptr};
 
 	// flag to indicate if group expression was created as a node at some
 	// intermediate level when origin expression was inserted to memo
@@ -190,7 +190,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	PgexprDuplicate() const
 	{
-		return m_pgexprDuplicate;
+		return m_pgexprDuplicate.Lock();
 	}
 
 	// set duplicate group expression
@@ -295,7 +295,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	PgexprOrigin() const
 	{
-		return m_pgexprOrigin;
+		return m_pgexprOrigin.Lock();
 	}
 
 	// cost contexts hash table accessor

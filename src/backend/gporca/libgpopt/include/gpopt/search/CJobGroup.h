@@ -40,7 +40,7 @@ protected:
 	gpos::WeakRef<CGroup> m_pgroup{nullptr};
 
 	// last scheduled group expression
-	gpos::Ref<CGroupExpression> m_pgexprLastScheduled;
+	gpos::WeakRef<CGroupExpression> m_pgexprLastScheduled;
 
 	// ctor
 	CJobGroup() = default;

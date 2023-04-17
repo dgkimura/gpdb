@@ -89,7 +89,7 @@ private:
 	ULONG m_ulSearchStageIndex{0};
 
 	// best cost context under the optimization context
-	gpos::Ref<CCostContext> m_pccBest{nullptr};
+	gpos::WeakRef<CCostContext> m_pccBest{nullptr};
 
 	// optimization context state
 	EState m_estate{estUnoptimized};
@@ -212,7 +212,7 @@ public:
 	gpos::Ref<CCostContext>
 	PccBest() const
 	{
-		return m_pccBest;
+		return m_pccBest.Lock();
 	}
 
 	// optimization job queue accessor
