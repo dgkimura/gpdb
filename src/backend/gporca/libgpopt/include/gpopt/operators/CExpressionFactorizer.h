@@ -43,7 +43,8 @@ class CExpressionFactorizer
 {
 private:
 	// map expression to a count, used in factorization
-	using ExprMap = gpos::UnorderedMap<gpos::Ref<CExpression>, ULONG *>;
+	using ExprMap =
+		gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<UlongRef>>;
 
 	// map operators to an array of expression arrays, corresponding to
 	// a disjunction of expressions on columns created by that operator

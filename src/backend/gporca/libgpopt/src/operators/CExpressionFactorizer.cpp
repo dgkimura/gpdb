@@ -102,8 +102,8 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 #endif	// GPOS_DEBUG
 )
 {
-	ULONG *pul = pexprmapFactors->Find(pexpr);
-	GPOS_ASSERT_IMP(nullptr != pul, ulDisjuncts == *pul);
+	gpos::Ref<UlongRef> pul = pexprmapFactors->Find(pexpr);
+	GPOS_ASSERT_IMP(nullptr != pul, ulDisjuncts == pul->value());
 
 	if (nullptr != pul)
 	{
@@ -177,23 +177,24 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 		for (ULONG ulInner = 0; ulInner < size; ulInner++)
 		{
 			gpos::Ref<CExpression> pexprConj = (*pdrgpexpr)[ulInner];
-			ULONG *pul = pexprmapGlobal->Find(pexprConj);
+			gpos::Ref<UlongRef> pul = pexprmapGlobal->Find(pexprConj);
 			if (nullptr == pul)
 			{
-				(void) pexprmapGlobal->Insert(pexprConj, GPOS_NEW(mp) ULONG(1));
+				(void) pexprmapGlobal->Insert(pexprConj,
+											  GPOS_NEW(mp) UlongRef(1));
 			}
 			else
 			{
-				(*pul)++;
+				(pul->value())++;
 			}
 
 			pul = pexprmapGlobal->Find(pexprConj);
-			if (*pul == ulDisjuncts)
+			if (pul->value() == ulDisjuncts)
 			{
 				// reached the count of initial disjuncts, add expression to factors map
 
-				(void) pexprmapFactors->Insert(pexprConj,
-											   GPOS_NEW(mp) ULONG(ulDisjuncts));
+				(void) pexprmapFactors->Insert(
+					pexprConj, GPOS_NEW(mp) UlongRef(ulDisjuncts));
 			}
 		}
 	}

@@ -25,7 +25,7 @@ public:
 	}
 	~UlongRef() = default;
 
-	ULONG
+	ULONG &
 	value()
 	{
 		return m_ul;
