@@ -62,7 +62,8 @@ CGroupExpression::CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
 	  m_fIntermediate(fIntermediate),
 
 	  m_ecirculardependency(ecdDefault),
-	  m_sht(GPOS_NEW(mp) ShtCC(mp))
+	  m_sht(GPOS_NEW(mp) ShtCC(mp)),
+	  m_mp(mp)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(nullptr != pdrgpgroup);
@@ -280,11 +281,15 @@ CGroupExpression::FCostContextExists(
 	GPOS_ASSERT(nullptr != poc);
 
 	// lookup context based on required properties
-	ShtIter shtit(Sht());
-	while (shtit.Advance())
+	gpos::Ref<CCostContextArray> pvccFound = m_sht->Find(poc);
+	if (nullptr == pvccFound)
 	{
-		gpos::Ref<CCostContext> pccFound =
-			gpos::dyn_cast<CCostContext>(shtit.Value());
+		return false;
+	}
+
+	for (ULONG ul = 0; ul < pvccFound->Size(); ul++)
+	{
+		gpos::Ref<CCostContext> pccFound = (*pvccFound)[ul];
 
 		if (COptimizationContext::FEqualContextIds(pdrgpoc,
 												   pccFound->Pdrgpoc()))
@@ -311,14 +316,24 @@ CGroupExpression::PccRemove(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != poc);
 
-	gpos::Ref<CCostContext> pccFound = m_sht->Find(poc);
-	if (nullptr != pccFound)
+	gpos::Ref<CCostContextArray> pvccFound = m_sht->Find(poc);
+
+	if (pvccFound != nullptr)
 	{
-		if (ulOptReq == pccFound->UlOptReq())
+		gpos::Ref<CCostContext> pccFound = nullptr;
+		for (ULONG ul = 0; ul < pvccFound->Size(); ul++)
 		{
-			m_sht->Delete(poc);
-			return pccFound;
+			pccFound = (*pvccFound)[ul];
+			if (ulOptReq == pccFound->UlOptReq())
+			{
+				break;
+			}
 		}
+		if (pccFound != nullptr)
+		{
+			pvccFound->Remove(pccFound);
+		}
+		return pccFound;
 	}
 
 	return nullptr;
@@ -651,15 +666,30 @@ CGroupExpression::PccInsert(gpos::Ref<CCostContext> pcc)
 	// See comment in CCache::InsertEntry
 	gpos::Ref<COptimizationContext> const poc = pcc->Poc();
 
-	gpos::Ref<CCostContext> pccFound = m_sht->Find(poc);
-	if (nullptr != pccFound && CCostContext::Equals(*pcc, *pccFound))
+	gpos::Ref<gpos::Vector<gpos::Ref<CCostContext>>> pvccFound =
+		m_sht->Find(poc);
+	if (nullptr != pvccFound)
 	{
-		return pccFound;
+		for (ULONG ul = 0; ul < pvccFound->Size(); ul++)
+		{
+			gpos::Ref<CCostContext> pccFound = (*pvccFound)[ul];
+			if (CCostContext::Equals(*pcc, *pccFound))
+			{
+				return pccFound;
+			}
+		}
+		pvccFound->Append(pcc);
+	}
+	else
+	{
+		gpos::Ref<CCostContextArray> pvcc =
+			GPOS_NEW(m_mp) CCostContextArray(m_mp);
+		pvcc->Append(pcc);
+		m_sht->Insert(poc, pvcc);
 	}
 	// KIMURA: Dead assert.  Used too iterate until == nullptr
 	//GPOS_ASSERT(nullptr == pccFound);
 
-	m_sht->Insert(poc, pcc);
 	return pcc;
 }
 

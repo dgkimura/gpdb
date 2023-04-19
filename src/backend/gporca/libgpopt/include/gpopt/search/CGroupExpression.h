@@ -68,15 +68,16 @@ public:
 	};
 
 	// type definition of cost context hash table
-	using ShtCC = gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContext>>;
+	using ShtCC = gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContextArray>>;
 
 private:
 	// definition of context hash table accessor
 	using ShtAcc = CSyncHashtableAccessByKey<CCostContext, OPTCTXT_PTR>;
 
 	// definition of context hash table iter
-	using ShtIter = gpos::UnorderedMap<OPTCTXT_PTR,
-									   gpos::Ref<CCostContext>>::LegacyIterator;
+	using ShtIter =
+		gpos::UnorderedMap<OPTCTXT_PTR,
+						   gpos::Ref<CCostContextArray>>::LegacyIterator;
 
 	// definition of context hash table iter accessor
 	using ShtAccIter = CSyncHashtableAccessByIter<CCostContext, OPTCTXT_PTR>;
@@ -129,6 +130,8 @@ private:
 
 	// hashtable of cost contexts
 	mutable gpos::Ref<ShtCC> m_sht;
+
+	CMemoryPool *m_mp;
 
 	// set group back pointer
 	void SetGroup(gpos::Ref<CGroup> pgroup);
