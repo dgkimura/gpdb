@@ -28,7 +28,7 @@ using namespace gpmd;
 class IDatum;
 
 // hash map mapping ULONG -> Datum
-using UlongToIDatumMap = gpos::UnorderedMap<ULONG *, gpos::Ref<IDatum>>;
+using UlongToIDatumMap = gpos::UnorderedMap<ULONG, gpos::Ref<IDatum>>;
 
 //---------------------------------------------------------------------------
 //	@class:

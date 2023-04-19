@@ -365,7 +365,7 @@ CLogicalProject::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			if (datum->StatsMappable())
 			{
 				BOOL fInserted GPOS_ASSERTS_ONLY =
-					phmuldatum->Insert(GPOS_NEW(mp) ULONG(colref->Id()), datum);
+					phmuldatum->Insert(colref->Id(), datum);
 				GPOS_ASSERT(fInserted);
 			}
 		}
