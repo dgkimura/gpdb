@@ -113,7 +113,7 @@ CPartitionPropagationSpec::FindPartPropSpecInfo(ULONG scan_id) const
 		return nullptr;
 	}
 
-	gpos::Ref<SPartPropSpecInfo> info = m_part_prop_spec_infos->Find(&scan_id);
+	gpos::Ref<SPartPropSpecInfo> info = m_part_prop_spec_infos->Find(scan_id);
 	GPOS_RTL_ASSERT(info != nullptr);
 
 	return info;
@@ -172,7 +172,7 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 	// a case of consecutive propagator, consumer request
 	// cannot happen, as the PPSRequired() is called for a given child index
 	// and the child index decide if we will add propagator/consumer
-	m_part_prop_spec_infos->Insert(GPOS_NEW(mp) ULONG(scan_id), info);
+	m_part_prop_spec_infos->Insert(scan_id, info);
 }
 
 void

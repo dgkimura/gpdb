@@ -30,7 +30,7 @@ namespace gpopt
 using namespace gpos;
 
 // hash maps ULONG -> array of ULONGs
-using UlongToBitSetMap = gpos::UnorderedMap<ULONG *, gpos::Ref<CBitSet>>;
+using UlongToBitSetMap = gpos::UnorderedMap<ULONG, gpos::Ref<CBitSet>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -286,7 +286,7 @@ public:
 	gpos::Ref<CBitSet>
 	GetPartitionsForScanId(ULONG scanid)
 	{
-		return m_scanid_to_part_map->Find(&scanid);
+		return m_scanid_to_part_map->Find(scanid);
 	}
 
 	BOOL AddPartSelectorInfo(ULONG selector_id, SPartSelectorInfoEntry *entry);

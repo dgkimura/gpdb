@@ -7071,9 +7071,9 @@ CTranslatorExprToDXL::PdxlnProjList(const gpos::Ref<CExpression> pexprProjList,
 	}
 
 	// translate computed column expressions into DXL and index them on their col ids
-	gpos::Ref<gpos::UnorderedMap<ULONG *, gpos::Ref<CDXLNode>>>
-		phmComputedColumns = GPOS_NEW(m_mp)
-			gpos::UnorderedMap<ULONG *, gpos::Ref<CDXLNode>>(m_mp);
+	gpos::Ref<gpos::UnorderedMap<ULONG, gpos::Ref<CDXLNode>>>
+		phmComputedColumns =
+			GPOS_NEW(m_mp) gpos::UnorderedMap<ULONG, gpos::Ref<CDXLNode>>(m_mp);
 
 	for (ULONG ul = 0; nullptr != pexprProjList && ul < pexprProjList->Arity();
 		 ul++)
@@ -7086,9 +7086,8 @@ CTranslatorExprToDXL::PdxlnProjList(const gpos::Ref<CExpression> pexprProjList,
 		const gpos::Ref<CScalarProjectElement> popScPrEl =
 			CScalarProjectElement::PopConvert(pexprProjElem->Pop());
 
-		ULONG *pulKey = GPOS_NEW(m_mp) ULONG(popScPrEl->Pcr()->Id());
 		BOOL fInserted GPOS_ASSERTS_ONLY =
-			phmComputedColumns->Insert(pulKey, pdxlnProjElem);
+			phmComputedColumns->Insert(popScPrEl->Pcr()->Id(), pdxlnProjElem);
 
 		GPOS_ASSERT(fInserted);
 	}
@@ -7119,7 +7118,7 @@ CTranslatorExprToDXL::PdxlnProjList(const gpos::Ref<CExpression> pexprProjList,
 	{
 		gpos::Ref<CColRef> colref = (*pdrgpcrCopy)[ul];
 		ULONG ulKey = colref->Id();
-		gpos::Ref<CDXLNode> pdxlnProjElem = phmComputedColumns->Find(&ulKey);
+		gpos::Ref<CDXLNode> pdxlnProjElem = phmComputedColumns->Find(ulKey);
 
 		if (nullptr == pdxlnProjElem)
 		{

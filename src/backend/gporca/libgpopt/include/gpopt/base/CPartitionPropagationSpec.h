@@ -107,11 +107,10 @@ private:
 
 	// partition required/derived info, sorted by scanid
 	using UlongToSPartPropSpecInfoMap =
-		gpos::UnorderedMap<ULONG *, gpos::Ref<SPartPropSpecInfo>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<SPartPropSpecInfo>>;
 
 	using UlongToSPartPropSpecInfoMapIter =
-		gpos::UnorderedMap<ULONG *,
-						   gpos::Ref<SPartPropSpecInfo>>::LegacyIterator;
+		gpos::UnorderedMap<ULONG, gpos::Ref<SPartPropSpecInfo>>::LegacyIterator;
 
 	gpos::Ref<UlongToSPartPropSpecInfoMap> m_part_prop_spec_infos = nullptr;
 

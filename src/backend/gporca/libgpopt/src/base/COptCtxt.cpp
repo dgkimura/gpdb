@@ -152,11 +152,11 @@ COptCtxt::FAllEnforcersEnabled()
 void
 COptCtxt::AddPartForScanId(ULONG scanid, ULONG index)
 {
-	gpos::Ref<CBitSet> parts = m_scanid_to_part_map->Find(&scanid);
+	gpos::Ref<CBitSet> parts = m_scanid_to_part_map->Find(scanid);
 	if (nullptr == parts)
 	{
 		parts = GPOS_NEW(m_mp) CBitSet(m_mp);
-		m_scanid_to_part_map->Insert(GPOS_NEW(m_mp) ULONG(scanid), parts);
+		m_scanid_to_part_map->Insert(scanid, parts);
 	}
 	parts->ExchangeSet(index);
 }
