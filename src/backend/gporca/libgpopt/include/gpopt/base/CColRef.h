@@ -74,7 +74,7 @@ private:
 	EUsedStatus m_used;
 
 	// table info
-	gpos::Ref<IMDId> m_mdid_table;
+	gpos::WeakRef<IMDId> m_mdid_table;
 
 public:
 	CColRef(const CColRef &) = delete;
@@ -218,7 +218,7 @@ public:
 	gpos::Ref<IMDId>
 	GetMdidTable() const
 	{
-		return m_mdid_table;
+		return m_mdid_table.Lock();
 	};
 
 	void

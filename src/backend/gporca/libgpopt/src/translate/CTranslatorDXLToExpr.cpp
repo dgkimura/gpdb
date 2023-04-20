@@ -237,8 +237,8 @@ CTranslatorDXLToExpr::Pexpr(
 			CDXLLogicalCTEProducer::Cast(pdxlnCTE->GetOperator());
 
 
-		BOOL fres GPOS_ASSERTS_ONLY = m_phmulpdxlnCTEProducer->Insert(
-			GPOS_NEW(m_mp) ULONG(pdxlopCTEProducer->Id()), pdxlnCTE);
+		BOOL fres GPOS_ASSERTS_ONLY =
+			m_phmulpdxlnCTEProducer->Insert(pdxlopCTEProducer->Id(), pdxlnCTE);
 		GPOS_ASSERT(fres);
 	}
 
@@ -1024,8 +1024,8 @@ BOOL
 CTranslatorDXLToExpr::FCastingUnknownType(gpos::Ref<IMDId> pmdidSource,
 										  gpos::Ref<IMDId> mdid_dest)
 {
-	return ((pmdidSource->Equals(&CMDIdGPDB::m_mdid_unknown) ||
-			 mdid_dest->Equals(&CMDIdGPDB::m_mdid_unknown)));
+	return ((pmdidSource->Equals(CMDIdGPDB::m_mdid_unknown) ||
+			 mdid_dest->Equals(CMDIdGPDB::m_mdid_unknown)));
 }
 
 
@@ -1227,7 +1227,7 @@ CTranslatorDXLToExpr::PexprLogicalCTEAnchor(const gpos::Ref<CDXLNode> dxlnode)
 	ULONG ulCTEId = pdxlopCTEAnchor->Id();
 
 	gpos::Ref<CDXLNode> pdxlnCTEProducer =
-		m_phmulpdxlnCTEProducer->Find(&ulCTEId);
+		m_phmulpdxlnCTEProducer->Find(ulCTEId);
 	GPOS_ASSERT(nullptr != pdxlnCTEProducer);
 
 	ULONG id = UlMapCTEId(ulCTEId);

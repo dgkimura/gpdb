@@ -219,7 +219,8 @@ public:
 	gpos::Ref<gpos::Vector<T>>
 	CreateReducedArray(gpos::Ref<ULongVector> indexes_to_choose)
 	{
-		gpos::Ref<gpos::Vector<T>> result;
+		gpos::Ref<gpos::Vector<T>> result =
+			GPOS_NEW(m_mp) gpos::Vector<T>(m_mp);
 		ULONG list_size = indexes_to_choose->Size();
 
 		for (ULONG i = 0; i < list_size; i++)

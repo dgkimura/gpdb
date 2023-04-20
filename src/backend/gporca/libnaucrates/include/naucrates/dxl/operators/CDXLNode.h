@@ -33,7 +33,7 @@ using CDXLNodeArray = gpos::Vector<gpos::Ref<CDXLNode>>;
 // arrays of OID
 using OidArray = CDynamicPtrArray<OID, CleanupDelete>;
 
-using IdToCDXLNodeMap = gpos::UnorderedMap<ULONG *, gpos::Ref<CDXLNode>>;
+using IdToCDXLNodeMap = gpos::UnorderedMap<ULONG, gpos::Ref<CDXLNode>>;
 
 //---------------------------------------------------------------------------
 //	@class:
