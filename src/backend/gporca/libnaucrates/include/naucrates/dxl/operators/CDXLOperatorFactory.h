@@ -582,7 +582,7 @@ public:
 
 	// parse a comma-separated list of CHAR partition types into a dynamic array.
 	// will raise an exception if list is not well-formed
-	static CharPtrArray *ExtractConvertPartitionTypeToArray(
+	static gpos::Ref<CharPtrArray> ExtractConvertPartitionTypeToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 		Edxltoken target_attr, Edxltoken target_elem);
 

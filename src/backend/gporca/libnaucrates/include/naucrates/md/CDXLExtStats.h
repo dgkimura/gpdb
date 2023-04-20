@@ -54,16 +54,17 @@ private:
 	// DXL string for object
 	CWStringDynamic *m_dxl_str;
 
-	CMDDependencyArray *m_dependency_array;
+	gpos::Ref<CMDDependencyArray> m_dependency_array;
 
-	CMDNDistinctArray *m_ndistinct_array;
+	gpos::Ref<CMDNDistinctArray> m_ndistinct_array;
 
 public:
 	CDXLExtStats(const CDXLExtStats &) = delete;
 
 	CDXLExtStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_stats_mdid,
-				 CMDName *mdname, CMDDependencyArray *extstats_dependency_array,
-				 CMDNDistinctArray *ndistinct_array);
+				 CMDName *mdname,
+				 gpos::Ref<CMDDependencyArray> extstats_dependency_array,
+				 gpos::Ref<CMDNDistinctArray> ndistinct_array);
 
 	~CDXLExtStats() override;
 
@@ -79,13 +80,13 @@ public:
 	// serialize relation stats in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
-	CMDDependencyArray *
+	gpos::Ref<CMDDependencyArray>
 	GetDependencies() const override
 	{
 		return m_dependency_array;
 	}
 
-	CMDNDistinctArray *
+	gpos::Ref<CMDNDistinctArray>
 	GetNDistinctList() const override
 	{
 		return m_ndistinct_array;

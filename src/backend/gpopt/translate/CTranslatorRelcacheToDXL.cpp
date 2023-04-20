@@ -344,7 +344,7 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 	OID stat_oid = CMDIdGPDB::CastMdid(mdid)->Oid();
 	List *kinds = gpdb::GetExtStatsKinds(stat_oid);
 
-	CMDDependencyArray *deps = GPOS_NEW(mp) CMDDependencyArray(mp);
+	gpos::Ref<CMDDependencyArray> deps = GPOS_NEW(mp) CMDDependencyArray(mp);
 	if (list_member_int(kinds, STATS_EXT_DEPENDENCIES))
 	{
 		MVDependencies *dependencies = gpdb::GetMVDependencies(stat_oid);
@@ -366,7 +366,8 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 		}
 	}
 
-	CMDNDistinctArray *md_ndistincts = GPOS_NEW(mp) CMDNDistinctArray(mp);
+	gpos::Ref<CMDNDistinctArray> md_ndistincts =
+		GPOS_NEW(mp) CMDNDistinctArray(mp);
 	if (list_member_int(kinds, STATS_EXT_NDISTINCT))
 	{
 		MVNDistinct *ndistinct = gpdb::GetMVNDistinct(stat_oid);
@@ -510,7 +511,7 @@ CTranslatorRelcacheToDXL::RetrieveRel(CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<IMdIdArray> distr_op_families = nullptr;
 	gpos::Ref<CMDIndexInfoArray> md_index_info_array = nullptr;
 	gpos::Ref<ULongPtrArray> part_keys = nullptr;
-	CharPtrArray *part_types = nullptr;
+	gpos::Ref<CharPtrArray> part_types = nullptr;
 	BOOL convert_hash_to_random = false;
 	gpos::Ref<ULongPtr2dArray> keyset_array = nullptr;
 	gpos::Ref<IMdIdArray> check_constraint_mdids = nullptr;
@@ -2495,7 +2496,7 @@ CTranslatorRelcacheToDXL::RetrieveRelStorageType(Relation rel)
 void
 CTranslatorRelcacheToDXL::RetrievePartKeysAndTypes(
 	CMemoryPool *mp, Relation rel, OID oid, gpos::Ref<ULongPtrArray> *part_keys,
-	CharPtrArray **part_types)
+	gpos::Ref<CharPtrArray> *part_types)
 {
 	GPOS_ASSERT(nullptr != rel);
 

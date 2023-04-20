@@ -152,7 +152,7 @@ public:
 	virtual const gpos::Ref<IMDColumn> PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
-	virtual CharPtrArray *GetPartitionTypes() const = 0;
+	virtual gpos::Ref<CharPtrArray> GetPartitionTypes() const = 0;
 
 	// retrieve the partition type of the given partition level
 	virtual CHAR PartTypeAtLevel(ULONG pos) const = 0;

@@ -45,7 +45,7 @@ CParseHandlerExtStatsNDistinctList::~CParseHandlerExtStatsNDistinctList()
 //		The ndinstincts constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDNDistinctArray *
+gpos::Ref<CMDNDistinctArray>
 CParseHandlerExtStatsNDistinctList::GetNDistinctList() const
 {
 	return m_ndistincts;

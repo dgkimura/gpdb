@@ -65,7 +65,7 @@ protected:
 	gpos::Ref<ULongPtrArray> m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::Ref<CharPtrArray> m_str_part_types_array;
 
 	// key sets
 	gpos::Ref<ULongPtr2dArray> m_key_sets_arrays;

@@ -85,7 +85,7 @@ private:
 	gpos::Ref<ULongPtrArray> m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::Ref<CharPtrArray> m_str_part_types_array;
 
 	// Child partition oids
 	gpos::Ref<IMdIdArray> m_partition_oids;
@@ -132,7 +132,7 @@ public:
 					gpos::Ref<ULongPtrArray> distr_col_array,
 					gpos::Ref<IMdIdArray> distr_opfamilies,
 					gpos::Ref<ULongPtrArray> partition_cols_array,
-					CharPtrArray *str_part_types_array,
+					gpos::Ref<CharPtrArray> str_part_types_array,
 					gpos::Ref<IMdIdArray> partition_oids,
 					BOOL convert_hash_to_random,
 					gpos::Ref<ULongPtr2dArray> keyset_array,
@@ -226,7 +226,7 @@ public:
 	const gpos::Ref<IMDColumn> PartColAt(ULONG pos) const override;
 
 	// retrieve list of partition types
-	CharPtrArray *GetPartitionTypes() const override;
+	gpos::Ref<CharPtrArray> GetPartitionTypes() const override;
 
 	// retrieve the partition type of the given level
 	CHAR PartTypeAtLevel(ULONG ulLevel) const override;

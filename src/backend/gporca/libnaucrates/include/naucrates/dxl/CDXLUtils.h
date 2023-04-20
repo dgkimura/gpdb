@@ -257,7 +257,7 @@ public:
 
 	// serialize a list of chars into a comma-separate string
 	static CWStringDynamic *SerializeToCommaSeparatedString(
-		CMemoryPool *mp, const CharPtrArray *pdrgpsz);
+		CMemoryPool *mp, const gpos::Ref<CharPtrArray> pdrgpsz);
 
 	// decode a byte array from a string
 	static BYTE *DecodeByteArrayFromString(CMemoryPool *mp,

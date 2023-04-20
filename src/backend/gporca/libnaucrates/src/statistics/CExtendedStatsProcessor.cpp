@@ -174,7 +174,7 @@ dependency_is_fully_matched(gpos::Ref<CMDDependency> dependency,
  *     dependencies.c.
  */
 static gpos::Ref<CMDDependency>
-find_strongest_dependency(CMDDependencyArray *dependencies,
+find_strongest_dependency(gpos::Ref<CMDDependencyArray> dependencies,
 						  gpos::Ref<CBitSet> attnums)
 {
 	ULONG i;
@@ -259,7 +259,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToScaleFactorFilterCalculation(
 
 	DOUBLE s1 = 1.0;
 	gpos::Ref<CMDExtStatsInfo> stat;
-	CMDDependencyArray *dependencies;
+	gpos::Ref<CMDDependencyArray> dependencies;
 
 	gpos::Ref<CBitSet> clauses_attnums = GPOS_NEW(mp) CBitSet(mp);
 

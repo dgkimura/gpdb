@@ -46,9 +46,9 @@ public:
 		return EmdtExtStats;
 	}
 
-	virtual CMDDependencyArray *GetDependencies() const = 0;
+	virtual gpos::Ref<CMDDependencyArray> GetDependencies() const = 0;
 
-	virtual CMDNDistinctArray *GetNDistinctList() const = 0;
+	virtual gpos::Ref<CMDNDistinctArray> GetNDistinctList() const = 0;
 };
 
 }  // namespace gpmd

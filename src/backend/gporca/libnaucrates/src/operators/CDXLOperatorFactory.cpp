@@ -3000,7 +3000,7 @@ CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 
 // Parse a comma-separated list of CHAR partition types into a dynamic array.
 // Will raise an exception if list is not well-formed
-CharPtrArray *
+gpos::Ref<CharPtrArray>
 CDXLOperatorFactory::ExtractConvertPartitionTypeToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 	Edxltoken target_attr, Edxltoken target_elem)

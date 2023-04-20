@@ -22,10 +22,10 @@
 using namespace gpdxl;
 using namespace gpmd;
 
-CDXLExtStats::CDXLExtStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_stats_mdid,
-						   CMDName *mdname,
-						   CMDDependencyArray *extstats_dependency_array,
-						   CMDNDistinctArray *ndistinct_array)
+CDXLExtStats::CDXLExtStats(
+	CMemoryPool *mp, gpos::Ref<IMDId> rel_stats_mdid, CMDName *mdname,
+	gpos::Ref<CMDDependencyArray> extstats_dependency_array,
+	gpos::Ref<CMDNDistinctArray> ndistinct_array)
 	: m_mp(mp),
 	  m_rel_stats_mdid(rel_stats_mdid),
 	  m_mdname(mdname),
@@ -153,10 +153,10 @@ CDXLExtStats::CreateDXLDummyExtStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
 	CAutoRef<CDXLExtStats> ext_stats_dxl;
 
-	CMDDependencyArray *extstats_dependency_array =
+	gpos::Ref<CMDDependencyArray> extstats_dependency_array =
 		GPOS_NEW(mp) CMDDependencyArray(mp);
 
-	CMDNDistinctArray *extstats_ndistinct_array =
+	gpos::Ref<CMDNDistinctArray> extstats_ndistinct_array =
 		GPOS_NEW(mp) CMDNDistinctArray(mp);
 
 	ext_stats_dxl = GPOS_NEW(mp)

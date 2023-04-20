@@ -1689,8 +1689,8 @@ CDXLUtils::Serialize(CMemoryPool *mp, const gpos::Ref<ULongPtr2dArray> array_2D)
 
 // Serialize a list of chars into a comma-separated string
 CWStringDynamic *
-CDXLUtils::SerializeToCommaSeparatedString(CMemoryPool *mp,
-										   const CharPtrArray *char_ptr_array)
+CDXLUtils::SerializeToCommaSeparatedString(
+	CMemoryPool *mp, const gpos::Ref<CharPtrArray> char_ptr_array)
 {
 	CWStringDynamic *dxl_string = GPOS_NEW(mp) CWStringDynamic(mp);
 

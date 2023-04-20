@@ -30,7 +30,7 @@ class CParseHandlerExtStatsNDistinctList : public CParseHandlerBase
 {
 private:
 	// dependency list values
-	CMDNDistinctArray *m_ndistincts;
+	gpos::Ref<CMDNDistinctArray> m_ndistincts;
 
 	// process the start of an element
 	void StartElement(
@@ -60,7 +60,7 @@ public:
 	~CParseHandlerExtStatsNDistinctList() override;
 
 	// returns the constructed list
-	CMDNDistinctArray *GetNDistinctList() const;
+	gpos::Ref<CMDNDistinctArray> GetNDistinctList() const;
 };
 }  // namespace gpdxl
 

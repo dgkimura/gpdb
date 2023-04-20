@@ -36,8 +36,9 @@ CMDRelationGPDB::CMDRelationGPDB(
 	gpos::Ref<ULongPtrArray> distr_col_array,
 	gpos::Ref<IMdIdArray> distr_opfamilies,
 	gpos::Ref<ULongPtrArray> partition_cols_array,
-	CharPtrArray *str_part_types_array, gpos::Ref<IMdIdArray> partition_oids,
-	BOOL convert_hash_to_random, gpos::Ref<ULongPtr2dArray> keyset_array,
+	gpos::Ref<CharPtrArray> str_part_types_array,
+	gpos::Ref<IMdIdArray> partition_oids, BOOL convert_hash_to_random,
+	gpos::Ref<ULongPtr2dArray> keyset_array,
 	gpos::Ref<CMDIndexInfoArray> md_index_info_array,
 	gpos::Ref<IMdIdArray> mdid_check_constraint_array,
 	gpos::Ref<CDXLNode> mdpart_constraint, gpos::Ref<IMDId> foreign_server)
@@ -397,7 +398,7 @@ CMDRelationGPDB::PartColumnCount() const
 }
 
 // Retrieve list of partition types
-CharPtrArray *
+gpos::Ref<CharPtrArray>
 CMDRelationGPDB::GetPartitionTypes() const
 {
 	return m_str_part_types_array;

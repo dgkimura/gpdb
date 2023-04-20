@@ -63,7 +63,7 @@ public:
 	}
 
 	// retrieve list of partition types
-	CharPtrArray *
+	gpos::Ref<CharPtrArray>
 	GetPartitionTypes() const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition types");

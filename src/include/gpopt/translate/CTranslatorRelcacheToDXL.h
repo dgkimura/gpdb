@@ -227,7 +227,7 @@ private:
 	// get partition keys and types for a relation
 	static void RetrievePartKeysAndTypes(CMemoryPool *mp, Relation rel, OID oid,
 										 gpos::Ref<ULongPtrArray> *part_keys,
-										 CharPtrArray **part_types);
+										 gpos::Ref<CharPtrArray> *part_types);
 
 	// get keysets for relation
 	static gpos::Ref<ULongPtr2dArray> RetrieveRelKeysets(
