@@ -163,6 +163,7 @@ git grep -l 'ExprMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*
 git grep -l 'CTreeNode2dArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CTreeNode2dArray \*/gpos::Ref<\1CTreeNode2dArray> /g'
 git grep -l 'TMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?TMap \*/gpos::Ref<\1TMap> /g'
 git grep -l 'CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*/gpos::Ref<\1CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>> /g'
+git grep -l 'CharPtrArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CharPtrArray \*/gpos::Ref<\1CharPtrArray> /g'
 
 ls src/backend/gporca/libgpopt/src/search/CGroup.cpp | xargs sed -ie 's/CGroupProxy gp(this)/CGroupProxy gp(SharedFromThis())/'
 
