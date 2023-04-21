@@ -47,7 +47,7 @@ class CPartConstraint : public CRefCount<CPartConstraint>,
 {
 private:
 	// constraints for different levels
-	UlongToConstraintMap *m_phmulcnstr;
+	gpos::Ref<UlongToConstraintMap> m_phmulcnstr;
 
 	// levels at which the default partitions are included
 	gpos::Ref<CBitSet> m_pbsDefaultParts;
@@ -92,8 +92,8 @@ private:
 		gpos::Ref<CConstraint> pcnstrSnd);
 
 	// check if two constaint maps have the same constraints
-	static BOOL FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst,
-								 UlongToConstraintMap *phmulcnstrSnd,
+	static BOOL FEqualConstrMaps(gpos::Ref<UlongToConstraintMap> phmulcnstrFst,
+								 gpos::Ref<UlongToConstraintMap> phmulcnstrSnd,
 								 ULONG ulLevels);
 
 	// check if it is possible to produce a disjunction of the two given part
@@ -106,7 +106,7 @@ public:
 	CPartConstraint(const CPartConstraint &) = delete;
 
 	// ctors
-	CPartConstraint(CMemoryPool *mp, UlongToConstraintMap *phmulcnstr,
+	CPartConstraint(CMemoryPool *mp, gpos::Ref<UlongToConstraintMap> phmulcnstr,
 					gpos::Ref<CBitSet> pbsDefaultParts, BOOL is_unbounded,
 					gpos::Ref<CColRef2dArray> pdrgpdrgpcr);
 	CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,

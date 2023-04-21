@@ -32,7 +32,7 @@ FORCE_GENERATE_DBGSTR(CPartConstraint);
 //
 //---------------------------------------------------------------------------
 CPartConstraint::CPartConstraint(CMemoryPool *mp,
-								 UlongToConstraintMap *phmulcnstr,
+								 gpos::Ref<UlongToConstraintMap> phmulcnstr,
 								 gpos::Ref<CBitSet> pbsDefaultParts,
 								 BOOL is_unbounded,
 								 gpos::Ref<CColRef2dArray> pdrgpdrgpcr)
@@ -227,8 +227,8 @@ CPartConstraint::FEquivalent(const gpos::Ref<CPartConstraint> ppartcnstr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst,
-								  UlongToConstraintMap *phmulcnstrSnd,
+CPartConstraint::FEqualConstrMaps(gpos::Ref<UlongToConstraintMap> phmulcnstrFst,
+								  gpos::Ref<UlongToConstraintMap> phmulcnstrSnd,
 								  ULONG ulLevels)
 {
 	if (phmulcnstrFst->Size() != phmulcnstrSnd->Size())
@@ -439,7 +439,8 @@ CPartConstraint::PpartcnstrRemaining(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
+		GPOS_NEW(mp) UlongToConstraintMap(mp);
 	gpos::Ref<CBitSet> pbsDefaultParts = GPOS_NEW(mp) CBitSet(mp);
 
 	// constraint on first level
@@ -532,7 +533,8 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 		return GPOS_NEW(mp) CPartConstraint(true /*m_fUninterpreted*/);
 	}
 
-	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
+		GPOS_NEW(mp) UlongToConstraintMap(mp);
 	gpos::Ref<CColRef2dArray> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
@@ -671,7 +673,8 @@ CPartConstraint::PpartcnstrDisjunction(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
+		GPOS_NEW(mp) UlongToConstraintMap(mp);
 	gpos::Ref<CBitSet> pbsCombined = GPOS_NEW(mp) CBitSet(mp);
 
 	const ULONG ulLevels = ppartcnstrFst->m_num_of_part_levels;
