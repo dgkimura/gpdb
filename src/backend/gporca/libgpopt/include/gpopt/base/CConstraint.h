@@ -42,8 +42,7 @@ using ConstraintContainmentMap =
 	gpos::UnorderedMap<gpos::Ref<CConstraint>, BOOL *>;
 
 // hash map mapping ULONG -> CConstraint
-using UlongToConstraintMap =
-	gpos::UnorderedMap<ULONG *, gpos::Ref<CConstraint>>;
+using UlongToConstraintMap = gpos::UnorderedMap<ULONG, gpos::Ref<CConstraint>>;
 
 //---------------------------------------------------------------------------
 //	@class:
