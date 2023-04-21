@@ -168,6 +168,9 @@ ls src/backend/gporca/libgpopt/src/search/CGroup.cpp | xargs sed -ie 's/CGroupPr
 git grep -l 'CMDNDistinctArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDNDistinctArray \*/gpos::Ref<\1CMDNDistinctArray> /g'
 git grep -l 'CMDDependencyArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDDependencyArray \*/gpos::Ref<\1CMDDependencyArray> /g'
 git grep -l 'CMDExtStatsInfoArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDExtStatsInfoArray \*/gpos::Ref<\1CMDExtStatsInfoArray> /g'
+git grep -l 'CTreeNodeArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CTreeNodeArray \*/gpos::Ref<\1CTreeNodeArray> /g'
+git grep -l 'CDXLStatsDerivedRelationArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLStatsDerivedRelationArray \*/gpos::Ref<\1CDXLStatsDerivedRelationArray> /g'
+git grep -l 'CDXLStatsDerivedColumnArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLStatsDerivedColumnArray \*/gpos::Ref<\1CDXLStatsDerivedColumnArray> /g'
 
 # Look at destructor release's CJoinOrderDPv2 in main branch
 
