@@ -172,6 +172,7 @@ git grep -l 'CTreeNodeArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:al
 git grep -l 'CDXLStatsDerivedRelationArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLStatsDerivedRelationArray \*/gpos::Ref<\1CDXLStatsDerivedRelationArray> /g'
 git grep -l 'CDXLStatsDerivedColumnArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLStatsDerivedColumnArray \*/gpos::Ref<\1CDXLStatsDerivedColumnArray> /g'
 git grep -l 'CStatisticsArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CStatisticsArray \*/gpos::Ref<\1CStatisticsArray> /g'
+git grep -l 'UlongToConstraintMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?UlongToConstraintMap \*/gpos::Ref<\1UlongToConstraintMap> /g'
 
 # Look at destructor release's CJoinOrderDPv2 in main branch
 
