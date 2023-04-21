@@ -62,7 +62,7 @@ private:
 
 	// arrays of internal nodes
 	using CTreeNodeArray = CDynamicPtrArray<CTreeNode, CleanupNULL>;
-	using CTreeNode2dArray = CDynamicPtrArray<CTreeNodeArray, CleanupRelease>;
+	using CTreeNode2dArray = gpos::Vector<gpos::Ref<CTreeNodeArray>>;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -191,7 +191,7 @@ private:
 			GPOS_CHECK_STACK_SIZE;
 			GPOS_ASSERT(ullRank < UllCount(ulChild));
 
-			CTreeNodeArray *pdrgptn = (*m_pdrgdrgptn)[ulChild];
+			gpos::Ref<CTreeNodeArray> pdrgptn = (*m_pdrgdrgptn)[ulChild];
 			ULONG ulCandidates = pdrgptn->Size();
 
 			CTreeNode *ptn = nullptr;
@@ -245,7 +245,8 @@ private:
 			ULONG length = m_pdrgdrgptn->Size();
 			for (ULONG ul = length; ul <= ulPos; ul++)
 			{
-				CTreeNodeArray *pdrg = GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
+				gpos::Ref<CTreeNodeArray> pdrg =
+					GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
 				m_pdrgdrgptn->Append(pdrg);
 			}
 
@@ -253,7 +254,7 @@ private:
 			ptn->m_ulIncoming++;
 
 			// insert to appropriate array
-			CTreeNodeArray *pdrg = (*m_pdrgdrgptn)[ulPos];
+			gpos::Ref<CTreeNodeArray> pdrg = (*m_pdrgdrgptn)[ulPos];
 			GPOS_ASSERT(nullptr != pdrg);
 			pdrg->Append(ptn);
 		}

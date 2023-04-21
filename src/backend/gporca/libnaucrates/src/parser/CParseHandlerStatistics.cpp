@@ -73,7 +73,7 @@ CParseHandlerStatistics::GetParseHandlerType() const
 //		Returns the list of statistics objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CParseHandlerStatistics::GetStatsDerivedRelDXLArray() const
 {
 	return m_dxl_stats_derived_rel_array;

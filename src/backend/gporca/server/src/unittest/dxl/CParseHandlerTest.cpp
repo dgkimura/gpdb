@@ -668,7 +668,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 	}
 
 	// parse the statistics objects
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, dxl_string,
 												  szValidationPath);
 	CStatisticsArray *statistics_array =

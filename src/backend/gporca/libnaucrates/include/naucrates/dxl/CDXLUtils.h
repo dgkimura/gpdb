@@ -128,18 +128,20 @@ public:
 		const CHAR *xsd_file_path);
 
 	// parse statistics object from the statistics document
-	static CDXLStatsDerivedRelationArray *ParseDXLToStatsDerivedRelArray(
-		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
+	static gpos::Ref<CDXLStatsDerivedRelationArray>
+	ParseDXLToStatsDerivedRelArray(CMemoryPool *, const CHAR *dxl_string,
+								   const CHAR *xsd_file_path);
 
 	// parse statistics object from the statistics document
-	static CDXLStatsDerivedRelationArray *ParseDXLToStatsDerivedRelArray(
-		CMemoryPool *, const CWStringBase *dxl_string,
-		const CHAR *xsd_file_path);
+	static gpos::Ref<CDXLStatsDerivedRelationArray>
+	ParseDXLToStatsDerivedRelArray(CMemoryPool *,
+								   const CWStringBase *dxl_string,
+								   const CHAR *xsd_file_path);
 
 	// translate the dxl statistics object to optimizer statistics object
 	static CStatisticsArray *ParseDXLToOptimizerStatisticObjArray(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array);
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array);
 
 	// extract the array of optimizer buckets from the dxl representation of
 	// dxl buckets in the dxl derived column statistics object

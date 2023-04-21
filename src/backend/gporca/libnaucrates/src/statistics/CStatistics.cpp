@@ -787,7 +787,7 @@ gpos::Ref<CDXLStatsDerivedRelation>
 CStatistics::GetDxlStatsDrvdRelation(CMemoryPool *mp,
 									 CMDAccessor *md_accessor) const
 {
-	CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array =
+	gpos::Ref<CDXLStatsDerivedColumnArray> dxl_stats_derived_col_array =
 		GPOS_NEW(mp) CDXLStatsDerivedColumnArray(mp);
 
 	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping.get());

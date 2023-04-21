@@ -140,7 +140,7 @@ CFilterCardinalityTest::EresUnittest_CStatistics(
 		GPOS_CHECK_ABORT;
 
 		// parse the statistics objects
-		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
 		CStatisticsArray *pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
@@ -973,7 +973,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXLNumeric()
 
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 		// parse the statistics objects
-		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
 		CStatisticsArray *pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
@@ -1073,7 +1073,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// parse the statistics objects
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
 	CStatisticsArray *pdrgpstatsBefore =
 		CDXLUtils::ParseDXLToOptimizerStatisticObjArray(

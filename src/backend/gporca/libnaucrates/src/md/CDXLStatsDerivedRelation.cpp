@@ -29,7 +29,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
 	CDouble rows, BOOL is_empty,
-	CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array)
+	gpos::Ref<CDXLStatsDerivedColumnArray> dxl_stats_derived_col_array)
 	: m_rows(rows),
 	  m_empty(is_empty),
 	  m_dxl_stats_derived_col_array(dxl_stats_derived_col_array)
@@ -57,7 +57,7 @@ CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 //		Returns the array of derived columns stats
 //
 //---------------------------------------------------------------------------
-const CDXLStatsDerivedColumnArray *
+const gpos::Ref<CDXLStatsDerivedColumnArray>
 CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray() const
 {
 	return m_dxl_stats_derived_col_array;

@@ -182,10 +182,10 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 		// parse the stats objects
-		CDXLStatsDerivedRelationArray *pdrgpdxlstatsderrelMCV =
+		gpos::Ref<CDXLStatsDerivedRelationArray> pdrgpdxlstatsderrelMCV =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInputMCV,
 													  nullptr);
-		CDXLStatsDerivedRelationArray *pdrgpdxlstatsderrelHist =
+		gpos::Ref<CDXLStatsDerivedRelationArray> pdrgpdxlstatsderrelHist =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInputHist,
 													  nullptr);
 
@@ -193,7 +193,7 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelMCV =
 			(*pdrgpdxlstatsderrelMCV)[0];
-		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolMCV =
+		const gpos::Ref<CDXLStatsDerivedColumnArray> pdrgpdxlstatsdercolMCV =
 			pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
 		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolMCV =
 			(*pdrgpdxlstatsdercolMCV)[0];
@@ -204,7 +204,7 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0];
-		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolHist =
+		const gpos::Ref<CDXLStatsDerivedColumnArray> pdrgpdxlstatsdercolHist =
 			pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
 		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolHist =
 			(*pdrgpdxlstatsdercolHist)[0];

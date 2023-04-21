@@ -240,7 +240,7 @@ CParseHandlerDXL::GetSysidPtrArray() const
 //		Returns the list of statistics objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CParseHandlerDXL::GetStatsDerivedRelDXLArray() const
 {
 	return m_dxl_stats_derived_rel_array;
@@ -574,7 +574,7 @@ CParseHandlerDXL::ExtractStats(CParseHandlerBase *parse_handler_base)
 		dynamic_cast<CParseHandlerStatistics *>(parse_handler_base);
 	GPOS_ASSERT(nullptr != parse_handler_stats);
 
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		parse_handler_stats->GetStatsDerivedRelDXLArray();
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 

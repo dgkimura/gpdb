@@ -529,7 +529,7 @@ CDXLUtils::ParseDXLToOptimizerConfig(CMemoryPool *mp, const CHAR *dxl_string,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 										  const CWStringBase *dxl_string,
 										  const CHAR *xsd_file_path)
@@ -542,7 +542,7 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect statistics objects from dxl parse handler
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		parse_handler_dxl->GetStatsDerivedRelDXLArray();
 
 
@@ -559,7 +559,7 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 										  const CHAR *dxl_string,
 										  const CHAR *xsd_file_path)
@@ -572,7 +572,7 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect statistics objects from dxl parse handler
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		parse_handler_dxl->GetStatsDerivedRelDXLArray();
 
 
@@ -590,7 +590,7 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 CStatisticsArray *
 CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array)
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array)
 {
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 
@@ -608,8 +608,9 @@ CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 
 		gpos::Ref<CDXLStatsDerivedRelation> stats_derived_relation_dxl =
 			(*dxl_derived_rel_stats_array)[ulIdxRelStat];
-		const CDXLStatsDerivedColumnArray *derived_column_stats_array =
-			stats_derived_relation_dxl->GetDXLStatsDerivedColArray();
+		const gpos::Ref<CDXLStatsDerivedColumnArray>
+			derived_column_stats_array =
+				stats_derived_relation_dxl->GetDXLStatsDerivedColArray();
 
 		const ULONG num_of_columns = derived_column_stats_array->Size();
 		for (ULONG column_id_idx = 0; column_id_idx < num_of_columns;

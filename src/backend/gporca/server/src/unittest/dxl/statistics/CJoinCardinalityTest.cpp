@@ -255,7 +255,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		GPOS_CHECK_ABORT;
 
 		// parse the input statistics objects
-		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
 		CStatisticsArray *pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(

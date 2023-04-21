@@ -73,7 +73,7 @@ private:
 	gpos::Ref<CSystemIdArray> m_system_id_array;
 
 	// list of parsed statistics objects
-	CDXLStatsDerivedRelationArray *m_dxl_stats_derived_rel_array;
+	gpos::Ref<CDXLStatsDerivedRelationArray> m_dxl_stats_derived_rel_array;
 
 	// search strategy
 	gpos::Ref<CSearchStageArray> m_search_stage_array;
@@ -178,7 +178,7 @@ public:
 	gpos::Ref<CSystemIdArray> GetSysidPtrArray() const;
 
 	// return the list of statistics objects
-	CDXLStatsDerivedRelationArray *GetStatsDerivedRelDXLArray() const;
+	gpos::Ref<CDXLStatsDerivedRelationArray> GetStatsDerivedRelDXLArray() const;
 
 	// return search strategy
 	gpos::Ref<CSearchStageArray> GetSearchStageArray() const;
