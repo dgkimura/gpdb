@@ -164,8 +164,10 @@ git grep -l 'CTreeNode2dArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:
 git grep -l 'TMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?TMap \*/gpos::Ref<\1TMap> /g'
 git grep -l 'CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary> \*/gpos::Ref<\1CKHeap<SAdjBucketBoundaryArray, SAdjBucketBoundary>> /g'
 git grep -l 'CharPtrArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CharPtrArray \*/gpos::Ref<\1CharPtrArray> /g'
-
 ls src/backend/gporca/libgpopt/src/search/CGroup.cpp | xargs sed -ie 's/CGroupProxy gp(this)/CGroupProxy gp(SharedFromThis())/'
+git grep -l 'CMDNDistinctArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDNDistinctArray \*/gpos::Ref<\1CMDNDistinctArray> /g'
+git grep -l 'CMDDependencyArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDDependencyArray \*/gpos::Ref<\1CMDDependencyArray> /g'
+git grep -l 'CMDExtStatsInfoArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDExtStatsInfoArray \*/gpos::Ref<\1CMDExtStatsInfoArray> /g'
 
 # Look at destructor release's CJoinOrderDPv2 in main branch
 
