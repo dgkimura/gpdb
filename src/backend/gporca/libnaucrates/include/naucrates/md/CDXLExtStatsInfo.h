@@ -54,14 +54,14 @@ private:
 	// DXL string for object
 	mutable CWStringDynamic *m_dxl_str{nullptr};
 
-	CMDExtStatsInfoArray *m_extstats_info_array;
+	gpos::Ref<CMDExtStatsInfoArray> m_extstats_info_array;
 
 public:
 	CDXLExtStatsInfo(const CDXLExtStatsInfo &) = delete;
 
 	CDXLExtStatsInfo(CMemoryPool *mp, gpos::Ref<IMDId> rel_stats_mdid,
 					 CMDName *mdname,
-					 CMDExtStatsInfoArray *extstats_info_array);
+					 gpos::Ref<CMDExtStatsInfoArray> extstats_info_array);
 
 	~CDXLExtStatsInfo() override;
 
@@ -77,7 +77,7 @@ public:
 	// serialize relation stats in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
-	CMDExtStatsInfoArray *
+	gpos::Ref<CMDExtStatsInfoArray>
 	GetExtStatInfoArray() const override
 	{
 		return m_extstats_info_array;

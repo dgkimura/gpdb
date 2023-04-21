@@ -411,7 +411,7 @@ CTranslatorRelcacheToDXL::RetrieveExtStatsInfo(CMemoryPool *mp,
 {
 	OID rel_oid = CMDIdGPDB::CastMdid(mdid)->Oid();
 
-	CMDExtStatsInfoArray *extstats_info_array =
+	gpos::Ref<CMDExtStatsInfoArray> extstats_info_array =
 		GPOS_NEW(mp) CMDExtStatsInfoArray(mp);
 
 	gpdb::RelationWrapper rel = gpdb::GetRelation(rel_oid);

@@ -29,7 +29,7 @@ class CParseHandlerRelationExtendedStats : public CParseHandlerMetadataObject
 {
 private:
 	// dependency list values
-	CMDExtStatsInfoArray *m_extinfos;
+	gpos::Ref<CMDExtStatsInfoArray> m_extinfos;
 
 	gpos::Ref<IMDId> m_mdid;
 	CMDName *m_mdname;
@@ -62,7 +62,7 @@ public:
 	~CParseHandlerRelationExtendedStats() override = default;
 
 	// returns the constructed bucket
-	CMDExtStatsInfoArray *GetInfos() const;
+	gpos::Ref<CMDExtStatsInfoArray> GetInfos() const;
 };
 }  // namespace gpdxl
 

@@ -57,7 +57,7 @@ IsDependencyCapablePredicate(gpos::Ref<CStatsPred> child_pred GPOS_UNUSED)
  */
 gpos::Ref<CMDExtStatsInfo>
 choose_best_statistics(CMemoryPool *mp,
-					   CMDExtStatsInfoArray *md_statsinfo_array,
+					   gpos::Ref<CMDExtStatsInfoArray> md_statsinfo_array,
 					   gpos::Ref<CBitSet> attnums,
 					   CMDExtStatsInfo::Estattype requiredkind)
 {
@@ -442,7 +442,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 	/* look for the ndistinct statistics matching the most vars */
 	nmatches = 1; /* we require at least two matches */
 
-	CMDExtStatsInfoArray *md_statsinfo_array =
+	gpos::Ref<CMDExtStatsInfoArray> md_statsinfo_array =
 		md_statsinfo->GetExtStatInfoArray();
 	for (ULONG ul = 0; ul < md_statsinfo_array->Size(); ul++)
 	{

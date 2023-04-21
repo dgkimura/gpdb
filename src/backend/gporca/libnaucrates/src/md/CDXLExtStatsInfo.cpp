@@ -23,9 +23,9 @@
 using namespace gpdxl;
 using namespace gpmd;
 
-CDXLExtStatsInfo::CDXLExtStatsInfo(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
-								   CMDName *mdname,
-								   CMDExtStatsInfoArray *extstats_info_array)
+CDXLExtStatsInfo::CDXLExtStatsInfo(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	gpos::Ref<CMDExtStatsInfoArray> extstats_info_array)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -142,7 +142,7 @@ CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(CMemoryPool *mp,
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
 	gpos::Ref<CDXLExtStatsInfo> ext_stats_info_dxl;
 
-	CMDExtStatsInfoArray *extstats_info_array =
+	gpos::Ref<CMDExtStatsInfoArray> extstats_info_array =
 		GPOS_NEW(mp) CMDExtStatsInfoArray(mp);
 
 	ext_stats_info_dxl = GPOS_NEW(mp)

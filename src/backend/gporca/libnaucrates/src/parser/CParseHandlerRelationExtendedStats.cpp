@@ -126,7 +126,7 @@ CParseHandlerRelationExtendedStats::EndElement(
 				   str->GetBuffer());
 	}
 
-	CMDExtStatsInfoArray *extstatsinfo_array =
+	gpos::Ref<CMDExtStatsInfoArray> extstatsinfo_array =
 		GPOS_NEW(m_mp) CMDExtStatsInfoArray(m_mp);
 
 
