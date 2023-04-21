@@ -139,7 +139,7 @@ public:
 								   const CHAR *xsd_file_path);
 
 	// translate the dxl statistics object to optimizer statistics object
-	static CStatisticsArray *ParseDXLToOptimizerStatisticObjArray(
+	static gpos::Ref<CStatisticsArray> ParseDXLToOptimizerStatisticObjArray(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array);
 
@@ -168,15 +168,14 @@ public:
 
 	static CWStringDynamic *SerializeStatistics(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		const CStatisticsArray *statistics_array, BOOL serialize_header_footer,
-		BOOL indentation);
+		const gpos::Ref<CStatisticsArray> statistics_array,
+		BOOL serialize_header_footer, BOOL indentation);
 
 	// serialize statistics objects into DXL and write to stream
-	static void SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
-									const CStatisticsArray *statistics_array,
-									IOstream &os,
-									BOOL serialize_document_header_footer,
-									BOOL indentation);
+	static void SerializeStatistics(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CStatisticsArray> statistics_array, IOstream &os,
+		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize metadata objects into DXL and write to stream
 	static void SerializeMetadata(

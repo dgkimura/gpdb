@@ -587,14 +587,15 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 //		Translate the array of dxl statistics objects to an array of
 //		optimizer statistics object.
 //---------------------------------------------------------------------------
-CStatisticsArray *
+gpos::Ref<CStatisticsArray>
 CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array)
 {
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 
-	CStatisticsArray *statistics_array = GPOS_NEW(mp) CStatisticsArray(mp);
+	gpos::Ref<CStatisticsArray> statistics_array =
+		GPOS_NEW(mp) CStatisticsArray(mp);
 	const ULONG ulRelStat = dxl_derived_rel_stats_array->Size();
 	for (ULONG ulIdxRelStat = 0; ulIdxRelStat < ulRelStat; ulIdxRelStat++)
 	{
@@ -1180,9 +1181,10 @@ CDXLUtils::SerializeMDRequest(CMemoryPool *mp, gpos::Ref<CMDRequest> md_request,
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const CStatisticsArray *statistics_array,
-							   BOOL serialize_header_footer, BOOL indentation)
+CDXLUtils::SerializeStatistics(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CStatisticsArray> statistics_array,
+	BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -1207,10 +1209,10 @@ CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 void
-CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const CStatisticsArray *statistics_array,
-							   IOstream &os, BOOL serialize_header_footer,
-							   BOOL indentation)
+CDXLUtils::SerializeStatistics(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CStatisticsArray> statistics_array, IOstream &os,
+	BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != statistics_array);

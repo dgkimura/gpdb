@@ -120,7 +120,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 		);
 
 	// put stats object in an array in order to serialize
-	CStatisticsArray *pdrgpstats = GPOS_NEW(mp) CStatisticsArray(mp);
+	gpos::Ref<CStatisticsArray> pdrgpstats = GPOS_NEW(mp) CStatisticsArray(mp);
 	pdrgpstats->Append(stats);
 
 	// serialize stats object
@@ -239,7 +239,8 @@ CMCVTest::EresUnittest_MergeHistMCV()
 			pdxlstatsderrelMCV->Rows(), pdxlstatsderrelMCV->IsEmpty());
 
 		// put stats object in an array in order to serialize
-		CStatisticsArray *pdrgpstats = GPOS_NEW(mp) CStatisticsArray(mp);
+		gpos::Ref<CStatisticsArray> pdrgpstats =
+			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstats->Append(stats);
 
 		// serialize stats object

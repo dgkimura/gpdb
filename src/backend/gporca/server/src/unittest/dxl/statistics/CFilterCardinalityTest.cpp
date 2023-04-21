@@ -142,7 +142,7 @@ CFilterCardinalityTest::EresUnittest_CStatistics(
 		// parse the statistics objects
 		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
-		CStatisticsArray *pdrgpstatBefore =
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				mp, md_accessor, dxl_derived_rel_stats_array);
 
@@ -975,7 +975,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXLNumeric()
 		// parse the statistics objects
 		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
-		CStatisticsArray *pdrgpstatBefore =
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				mp, md_accessor, dxl_derived_rel_stats_array);
 
@@ -1075,7 +1075,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 	// parse the statistics objects
 	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
-	CStatisticsArray *pdrgpstatsBefore =
+	gpos::Ref<CStatisticsArray> pdrgpstatsBefore =
 		CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 			mp, md_accessor, dxl_derived_rel_stats_array);
 
@@ -1103,8 +1103,8 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 GPOS_RESULT
 CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CStatisticsArray *pdrgpstatBefore, gpos::Ref<CStatsPred> pred_stats,
-	const CHAR *szDXLOutput, BOOL fApplyTwice)
+	gpos::Ref<CStatisticsArray> pdrgpstatBefore,
+	gpos::Ref<CStatsPred> pred_stats, const CHAR *szDXLOutput, BOOL fApplyTwice)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
@@ -1122,7 +1122,8 @@ CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CCardinalityTestUtils::PrintStats(mp, pstatsOutput);
 
 	// output array of stats objects
-	CStatisticsArray *pdrgpstatOutput = GPOS_NEW(mp) CStatisticsArray(mp);
+	gpos::Ref<CStatisticsArray> pdrgpstatOutput =
+		GPOS_NEW(mp) CStatisticsArray(mp);
 	pdrgpstatOutput->Append(pstatsOutput);
 
 	oss << "Serializing Input Statistics Objects (Before Filter)" << std::endl;
@@ -1163,7 +1164,8 @@ CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 		CCardinalityTestUtils::PrintStats(mp, pstatsOutput2);
 
 		// output array of stats objects
-		CStatisticsArray *pdrgpstatOutput2 = GPOS_NEW(mp) CStatisticsArray(mp);
+		gpos::Ref<CStatisticsArray> pdrgpstatOutput2 =
+			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput2->Append(pstatsOutput2);
 
 		CWStringDynamic *pstrOutput2 = CDXLUtils::SerializeStatistics(

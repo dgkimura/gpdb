@@ -257,7 +257,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		// parse the input statistics objects
 		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
-		CStatisticsArray *pdrgpstatBefore =
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				mp, md_accessor, dxl_derived_rel_stats_array);
 
@@ -288,7 +288,8 @@ CJoinCardinalityTest::EresUnittest_Join()
 		}
 		GPOS_ASSERT(nullptr != pstatsOutput);
 
-		CStatisticsArray *pdrgpstatOutput = GPOS_NEW(mp) CStatisticsArray(mp);
+		gpos::Ref<CStatisticsArray> pdrgpstatOutput =
+			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput->Append(CStatistics::CastStats(pstatsOutput));
 
 		// serialize and compare against expected stats
