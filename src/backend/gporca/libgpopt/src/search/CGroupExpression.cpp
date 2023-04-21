@@ -601,14 +601,17 @@ CGroupExpression::PccLookup(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != poc);
 
-	ShtIter shtit(Sht());
-	while (shtit.Advance())
+	gpos::Ref<gpos::Vector<gpos::Ref<CCostContext>>> pvccFound =
+		m_sht->Find(poc);
+	if (nullptr != pvccFound)
 	{
-		gpos::Ref<CCostContext> pccFound =
-			gpos::dyn_cast<CCostContext>(shtit.Value());
-		if (ulOptReq == pccFound->UlOptReq())
+		for (ULONG ul = 0; ul < pvccFound->Size(); ul++)
 		{
-			return pccFound;
+			gpos::Ref<CCostContext> pccFound = (*pvccFound)[ul];
+			if (ulOptReq == pccFound->UlOptReq())
+			{
+				return pccFound;
+			}
 		}
 	}
 	return nullptr;
@@ -632,18 +635,20 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 
 	BOOL fValid = false;
 
-	ShtIter shtit(Sht());
-	while (shtit.Advance())
+	gpos::Ref<gpos::Vector<gpos::Ref<CCostContext>>> pvccFound =
+		m_sht->Find(poc);
+	if (nullptr != pvccFound)
 	{
-		gpos::Ref<CCostContext> pccFound =
-			gpos::dyn_cast<CCostContext>(shtit.Value());
-		fValid =
-			(nullptr != pccFound && pccFound->Cost() != GPOPT_INVALID_COST &&
-			 !pccFound->FPruned() &&
-			 COptimizationContext::Equals(shtit.Key(), poc));
-		if (fValid)
+		for (ULONG ul = 0; ul < pvccFound->Size(); ul++)
 		{
-			pdrgpcc->Append(pccFound);
+			gpos::Ref<CCostContext> pccFound = (*pvccFound)[ul];
+			fValid = (nullptr != pccFound &&
+					  pccFound->Cost() != GPOPT_INVALID_COST &&
+					  !pccFound->FPruned());
+			if (fValid)
+			{
+				pdrgpcc->Append(pccFound);
+			}
 		}
 	}
 

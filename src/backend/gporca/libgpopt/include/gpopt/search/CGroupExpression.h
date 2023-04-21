@@ -68,7 +68,9 @@ public:
 	};
 
 	// type definition of cost context hash table
-	using ShtCC = gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContextArray>>;
+	using ShtCC = gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContextArray>,
+									 coptimizationcontext_hash,
+									 coptimizationcontext_equal_to>;
 
 private:
 	// definition of context hash table accessor
@@ -76,8 +78,9 @@ private:
 
 	// definition of context hash table iter
 	using ShtIter =
-		gpos::UnorderedMap<OPTCTXT_PTR,
-						   gpos::Ref<CCostContextArray>>::LegacyIterator;
+		gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContextArray>,
+						   coptimizationcontext_hash,
+						   coptimizationcontext_equal_to>::LegacyIterator;
 
 	// definition of context hash table iter accessor
 	using ShtAccIter = CSyncHashtableAccessByIter<CCostContext, OPTCTXT_PTR>;
