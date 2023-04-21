@@ -989,7 +989,7 @@ CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
 {
 	if (m_pcr == colref)
 	{
-		return this;
+		return SharedFromThis();
 	}
 
 	return nullptr;
@@ -1009,7 +1009,7 @@ CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
 {
 	if (pcrs->FMember(m_pcr))
 	{
-		return this;
+		return SharedFromThis();
 	}
 
 	return nullptr;
@@ -1222,7 +1222,8 @@ CConstraintInterval::FContainsInterval(CMemoryPool *mp,
 		return false;
 	}
 
-	gpos::Ref<CConstraintInterval> pciDiff = pci->PciDifference(mp, this);
+	gpos::Ref<CConstraintInterval> pciDiff = pci->PciDifference(
+		mp, gpos::dyn_cast<CConstraintInterval>(SharedFromThis()));
 
 	// if the difference is empty, then this interval contains the given one
 	BOOL fContains = pciDiff->FContradiction();

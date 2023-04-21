@@ -246,7 +246,7 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
 	gpos::Ref<CConstraintInterval> pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref, &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
 		CRange::EriExcluded);
@@ -255,7 +255,7 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
 	gpos::Ref<CConstraintInterval> pciSecond = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate2,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref, &pstrLowerDate2,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);
