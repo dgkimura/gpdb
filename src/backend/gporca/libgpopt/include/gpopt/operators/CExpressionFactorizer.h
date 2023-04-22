@@ -49,12 +49,11 @@ private:
 	// map operators to an array of expression arrays, corresponding to
 	// a disjunction of expressions on columns created by that operator
 	using SourceToArrayPosMap =
-		gpos::UnorderedMap<ULONG *, gpos::Ref<CExpressionArrays>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CExpressionArrays>>;
 
 	// iterator for map of operator to disjunctive form representation
 	using SourceToArrayPosMapIter =
-		gpos::UnorderedMap<ULONG *,
-						   gpos::Ref<CExpressionArrays>>::LegacyIterator;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CExpressionArrays>>::LegacyIterator;
 
 	// map columns to an array of expression arrays, corresponding to
 	// a disjunction of expressions using that column

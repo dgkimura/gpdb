@@ -447,8 +447,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 	BOOL fAllowNewSources, ULONG ulOpSourceId)
 {
 	GPOS_ASSERT(nullptr != psrc2array);
-	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr =
-		psrc2array->Find(&ulOpSourceId);
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = psrc2array->Find(ulOpSourceId);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the source operator we are considering
@@ -465,7 +464,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif	// GPOS_DEBUG
-			psrc2array->Insert(GPOS_NEW(mp) ULONG(ulOpSourceId), pdrgpdrgpexpr);
+			psrc2array->Insert(ulOpSourceId, pdrgpdrgpexpr);
 		GPOS_ASSERT(fInserted);
 	}
 
