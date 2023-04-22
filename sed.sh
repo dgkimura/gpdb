@@ -176,6 +176,7 @@ git grep -l 'UlongToConstraintMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\
 git grep -l 'CDXLColRefArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLColRefArray \*/gpos::Ref<\1CDXLColRefArray> /g'
 git grep -l 'CDXLWindowKeyArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDXLWindowKeyArray \*/gpos::Ref<\1CDXLWindowKeyArray> /g'
 git grep -l 'ExprToColRefMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ExprToColRefMap \*/gpos::Ref<\1ExprToColRefMap> /g'
+git grep -l 'ExprToExprArrayMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ExprToExprArrayMap \*/gpos::Ref<\1ExprToExprArrayMap> /g'
 
 # Look at destructor release's CJoinOrderDPv2 in main branch
 
