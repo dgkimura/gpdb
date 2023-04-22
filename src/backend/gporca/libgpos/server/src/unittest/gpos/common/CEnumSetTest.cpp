@@ -55,7 +55,7 @@ CEnumSetTest::EresUnittest_Basics()
 	using CETestSet = CEnumSet<eTest, eTestSentinel>;
 	using CETestIter = CEnumSetIter<eTest, eTestSentinel>;
 
-	CETestSet *enum_set = GPOS_NEW(mp) CETestSet(mp);
+	gpos::Ref<CETestSet> enum_set = GPOS_NEW(mp) CETestSet(mp);
 
 	(void) enum_set->ExchangeSet(eTestOne);
 	(void) enum_set->ExchangeSet(eTestTwo);
