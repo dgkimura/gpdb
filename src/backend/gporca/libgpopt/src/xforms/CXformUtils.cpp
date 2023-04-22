@@ -3692,7 +3692,7 @@ CXformUtils::PexprWinFuncAgg2ScalarAgg(CMemoryPool *mp,
 void
 CXformUtils::MapPrjElemsWithDistinctAggs(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprPrjList,
-	ExprToExprArrayMap **pphmexprdrgpexpr,	// output: created map
+	gpos::Ref<ExprToExprArrayMap> *pphmexprdrgpexpr,  // output: created map
 	ULONG *pulDifferentDQAs	 // output: number of DQAs with different arguments
 )
 {
@@ -3700,7 +3700,8 @@ CXformUtils::MapPrjElemsWithDistinctAggs(
 	GPOS_ASSERT(nullptr != pphmexprdrgpexpr);
 	GPOS_ASSERT(nullptr != pulDifferentDQAs);
 
-	ExprToExprArrayMap *phmexprdrgpexpr = GPOS_NEW(mp) ExprToExprArrayMap(mp);
+	gpos::Ref<ExprToExprArrayMap> phmexprdrgpexpr =
+		GPOS_NEW(mp) ExprToExprArrayMap(mp);
 	ULONG ulDifferentDQAs = 0;
 	gpos::Ref<CExpression> pexprTrue =
 		CUtils::PexprScalarConstBool(mp, true /*value*/);
@@ -3824,7 +3825,7 @@ CXformUtils::ICmpPrjElemsArr(const void *pvFst, const void *pvSnd)
 //---------------------------------------------------------------------------
 gpos::Ref<CExpressionArrays>
 CXformUtils::PdrgpdrgpexprSortedPrjElemsArray(
-	CMemoryPool *mp, ExprToExprArrayMap *phmexprdrgpexpr)
+	CMemoryPool *mp, gpos::Ref<ExprToExprArrayMap> phmexprdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != phmexprdrgpexpr);
 
@@ -3923,7 +3924,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join(CMemoryPool *mp,
 		return pexprGbAgg;
 	}
 
-	ExprToExprArrayMap *phmexprdrgpexpr = nullptr;
+	gpos::Ref<ExprToExprArrayMap> phmexprdrgpexpr = nullptr;
 	ULONG ulDifferentDQAs = 0;
 	MapPrjElemsWithDistinctAggs(mp, pexprPrjList, &phmexprdrgpexpr,
 								&ulDifferentDQAs);

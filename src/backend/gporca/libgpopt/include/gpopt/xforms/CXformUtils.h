@@ -259,7 +259,7 @@ private:
 
 	// iterate over given hash map and return array of arrays of project elements sorted by the column id of the first entries
 	static gpos::Ref<CExpressionArrays> PdrgpdrgpexprSortedPrjElemsArray(
-		CMemoryPool *mp, ExprToExprArrayMap *phmexprdrgpexpr);
+		CMemoryPool *mp, gpos::Ref<ExprToExprArrayMap> phmexprdrgpexpr);
 
 	// comparator used in sorting arrays of project elements based on the column id of the first entry
 	static INT ICmpPrjElemsArr(const void *pvFst, const void *pvSnd);
@@ -581,7 +581,8 @@ public:
 	// create a map from the argument of each Distinct Agg to the array of project elements that define Distinct Aggs on the same argument
 	static void MapPrjElemsWithDistinctAggs(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrjList,
-		ExprToExprArrayMap **pphmexprdrgpexpr, ULONG *pulDifferentDQAs);
+		gpos::Ref<ExprToExprArrayMap> *pphmexprdrgpexpr,
+		ULONG *pulDifferentDQAs);
 
 	// convert GbAgg with distinct aggregates to a join
 	static gpos::Ref<CExpression> PexprGbAggOnCTEConsumer2Join(
