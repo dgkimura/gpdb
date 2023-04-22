@@ -44,7 +44,7 @@ private:
 	gpos::Ref<ULongPtrArray> m_part_by_colid_array;
 
 	// window keys
-	CDXLWindowKeyArray *m_dxl_window_key_array;
+	gpos::Ref<CDXLWindowKeyArray> m_dxl_window_key_array;
 
 public:
 	CDXLPhysicalWindow(CDXLPhysicalWindow &) = delete;
@@ -52,7 +52,7 @@ public:
 	//ctor
 	CDXLPhysicalWindow(CMemoryPool *mp,
 					   gpos::Ref<ULongPtrArray> part_by_colid_array,
-					   CDXLWindowKeyArray *window_key_array);
+					   gpos::Ref<CDXLWindowKeyArray> window_key_array);
 
 	//dtor
 	~CDXLPhysicalWindow() override;

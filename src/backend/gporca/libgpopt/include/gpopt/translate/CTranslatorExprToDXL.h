@@ -310,11 +310,12 @@ private:
 	// build a scalar DXL subplan node
 	void BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
 						  const gpos::Ref<CColRef> colref,
-						  CDXLColRefArray *dxl_colref_array);
+						  gpos::Ref<CDXLColRefArray> dxl_colref_array);
 
 	// build a boolean scalar dxl node with a subplan as its child
 	gpos::Ref<CDXLNode> PdxlnBooleanScalarWithSubPlan(
-		gpos::Ref<CDXLNode> pdxlnRelChild, CDXLColRefArray *dxl_colref_array);
+		gpos::Ref<CDXLNode> pdxlnRelChild,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array);
 
 	gpos::Ref<CDXLNode> PdxlnScBoolExpr(EdxlBoolExprType boolexptype,
 										gpos::Ref<CDXLNode> dxlnode_left,
@@ -707,7 +708,7 @@ private:
 	//	helper to build subplans from correlated LOJ
 	void BuildSubplansForCorrelatedLOJ(
 		gpos::Ref<CExpression> pexprCorrelatedLOJ,
-		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
 		gpos::Ref<CDXLNode> *
 			ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
@@ -716,7 +717,7 @@ private:
 	// helper to build subplans of different types
 	void BuildSubplans(
 		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
 		gpos::Ref<CDXLNode> *
 			ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
@@ -726,7 +727,7 @@ private:
 	// in subplan map
 	void BuildScalarSubplans(
 		gpos::Ref<CColRefArray> pdrgpcrInner, gpos::Ref<CExpression> pexprInner,
-		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
 		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, BOOL *pfDML);
 
@@ -734,7 +735,7 @@ private:
 	gpos::Ref<CDXLNode> PdxlnQuantifiedSubplan(
 		gpos::Ref<CColRefArray> pdrgpcrInner,
 		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
 		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, BOOL *pfDML);
 
@@ -742,7 +743,7 @@ private:
 	gpos::Ref<CDXLNode> PdxlnExistentialSubplan(
 		gpos::Ref<CColRefArray> pdrgpcrInner,
 		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
 		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, BOOL *pfDML);
 

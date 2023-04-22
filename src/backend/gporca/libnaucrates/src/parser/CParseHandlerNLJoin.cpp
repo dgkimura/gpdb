@@ -182,7 +182,7 @@ CParseHandlerNLJoin::EndElement(const XMLCh *const,	 // element_uri,
 			dynamic_cast<CParseHandlerNLJIndexParamList *>(
 				(*this)[EdxlParseHandlerNLJIndexNestLoopParams]);
 		GPOS_ASSERT(nest_params_parse_handler);
-		CDXLColRefArray *nest_params_colrefs =
+		gpos::Ref<CDXLColRefArray> nest_params_colrefs =
 			nest_params_parse_handler->GetNLParamsColRefs();
 
 		m_dxl_op->SetNestLoopParamsColRefs(nest_params_colrefs);

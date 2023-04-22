@@ -38,7 +38,7 @@ private:
 	BOOL m_is_param_list;
 
 	// array of outer column references
-	CDXLColRefArray *m_nest_params_colrefs_array;
+	gpos::Ref<CDXLColRefArray> m_nest_params_colrefs_array;
 
 	// process the start of an element
 	void StartElement(
@@ -68,7 +68,7 @@ public:
 	~CParseHandlerNLJIndexParamList() override;
 
 	// return param column references
-	CDXLColRefArray *
+	gpos::Ref<CDXLColRefArray>
 	GetNLParamsColRefs() const
 	{
 		return m_nest_params_colrefs_array;

@@ -617,7 +617,8 @@ private:
 
 	// translate nest loop colrefs to GPDB nestparams
 	static List *TranslateNestLoopParamList(
-		CDXLColRefArray *pdrgdxlcrOuterRefs, CDXLTranslateContext *dxltrctxLeft,
+		gpos::Ref<CDXLColRefArray> pdrgdxlcrOuterRefs,
+		CDXLTranslateContext *dxltrctxLeft,
 		CDXLTranslateContext *dxltrctxRight);
 };
 }  // namespace gpdxl

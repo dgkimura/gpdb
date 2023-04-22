@@ -169,7 +169,7 @@ private:
 	// translate subplan parameters
 	void TranslateSubplanParams(SubPlan *sub_plan,
 								CDXLTranslateContext *dxl_translator_ctxt,
-								const CDXLColRefArray *outer_refs,
+								const gpos::Ref<CDXLColRefArray> outer_refs,
 								CMappingColIdVar *colid_var);
 
 	// translate subplan test expression parameters

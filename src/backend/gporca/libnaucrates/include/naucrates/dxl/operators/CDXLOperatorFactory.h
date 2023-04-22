@@ -222,7 +222,8 @@ public:
 	// create a subplan operator
 	static gpos::Ref<CDXLScalar> MakeDXLSubPlan(
 		CDXLMemoryManager *dxl_memory_manager, gpos::Ref<IMDId> mdid,
-		CDXLColRefArray *dxl_colref_array, EdxlSubPlanType dxl_subplan_type,
+		gpos::Ref<CDXLColRefArray> dxl_colref_array,
+		EdxlSubPlanType dxl_subplan_type,
 		gpos::Ref<CDXLNode> dxlnode_test_expr);
 
 	// create a NullTest

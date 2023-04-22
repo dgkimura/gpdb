@@ -38,7 +38,7 @@ private:
 	BOOL m_has_param_list;
 
 	// array of outer column references
-	CDXLColRefArray *m_dxl_colref_array;
+	gpos::Ref<CDXLColRefArray> m_dxl_colref_array;
 
 	// process the start of an element
 	void StartElement(
@@ -68,7 +68,7 @@ public:
 	~CParseHandlerScalarSubPlanParamList() override;
 
 	// return param column references
-	CDXLColRefArray *
+	gpos::Ref<CDXLColRefArray>
 	GetDXLColRefArray() const
 	{
 		return m_dxl_colref_array;

@@ -197,7 +197,7 @@ CDXLPhysicalNLJoin::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 
 void
 CDXLPhysicalNLJoin::SetNestLoopParamsColRefs(
-	CDXLColRefArray *nest_params_col_refs)
+	gpos::Ref<CDXLColRefArray> nest_params_col_refs)
 {
 	m_nest_params_col_refs = nest_params_col_refs;
 }
@@ -208,7 +208,7 @@ CDXLPhysicalNLJoin::NestParamsExists() const
 	return m_nest_params_exists;
 }
 
-CDXLColRefArray *
+gpos::Ref<CDXLColRefArray>
 CDXLPhysicalNLJoin::GetNestLoopParamsColRefs() const
 {
 	return m_nest_params_col_refs;

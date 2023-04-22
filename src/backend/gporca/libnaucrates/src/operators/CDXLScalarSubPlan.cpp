@@ -30,12 +30,11 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
-									 gpos::Ref<IMDId> first_col_type_mdid,
-									 CDXLColRefArray *dxl_colref_array,
-									 EdxlSubPlanType dxl_subplan_type,
-									 gpos::Ref<CDXLNode> dxlnode_test_expr,
-									 BOOL outer_param)
+CDXLScalarSubPlan::CDXLScalarSubPlan(
+	CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
+	EdxlSubPlanType dxl_subplan_type, gpos::Ref<CDXLNode> dxlnode_test_expr,
+	BOOL outer_param)
 	: CDXLScalar(mp),
 	  m_first_col_type_mdid(first_col_type_mdid),
 	  m_dxl_colref_array(dxl_colref_array),

@@ -1904,7 +1904,7 @@ CTranslatorDXLToPlStmt::TranslateDXLNLJoin(
 	Plan *right_plan = nullptr;
 	if (dxl_nlj->IsIndexNLJ())
 	{
-		const CDXLColRefArray *pdrgdxlcrOuterRefs =
+		const gpos::Ref<CDXLColRefArray> pdrgdxlcrOuterRefs =
 			dxl_nlj->GetNestLoopParamsColRefs();
 		const ULONG ulLen = pdrgdxlcrOuterRefs->Size();
 		for (ULONG ul = 0; ul < ulLen; ul++)
@@ -6380,8 +6380,8 @@ CTranslatorDXLToPlStmt::TranslateDXLValueScan(
 
 List *
 CTranslatorDXLToPlStmt::TranslateNestLoopParamList(
-	CDXLColRefArray *pdrgdxlcrOuterRefs, CDXLTranslateContext *dxltrctxLeft,
-	CDXLTranslateContext *dxltrctxRight)
+	gpos::Ref<CDXLColRefArray> pdrgdxlcrOuterRefs,
+	CDXLTranslateContext *dxltrctxLeft, CDXLTranslateContext *dxltrctxRight)
 {
 	List *nest_params_list = NIL;
 	for (ULONG ul = 0; ul < pdrgdxlcrOuterRefs->Size(); ul++)

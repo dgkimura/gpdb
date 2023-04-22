@@ -3184,7 +3184,7 @@ CTranslatorExprToDXL::PdxlnLimit(
 void
 CTranslatorExprToDXL::BuildSubplansForCorrelatedLOJ(
 	gpos::Ref<CExpression> pexprCorrelatedLOJ,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
 	gpos::Ref<CDXLNode> *
 		ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
@@ -3256,7 +3256,7 @@ CTranslatorExprToDXL::BuildSubplansForCorrelatedLOJ(
 void
 CTranslatorExprToDXL::BuildSubplans(
 	gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
 	gpos::Ref<CDXLNode> *
 		ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
@@ -3429,7 +3429,7 @@ gpos::Ref<CDXLNode>
 CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	gpos::Ref<CColRefArray> pdrgpcrInner,
 	gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
 	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 	ULONG *pulNonGatherMotions, BOOL *pfDML)
 {
@@ -3668,7 +3668,7 @@ gpos::Ref<CDXLNode>
 CTranslatorExprToDXL::PdxlnExistentialSubplan(
 	gpos::Ref<CColRefArray> pdrgpcrInner,
 	gpos::Ref<CExpression> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
 	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 	ULONG *pulNonGatherMotions, BOOL *pfDML)
 {
@@ -3745,7 +3745,7 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan(
 void
 CTranslatorExprToDXL::BuildScalarSubplans(
 	gpos::Ref<CColRefArray> pdrgpcrInner, gpos::Ref<CExpression> pexprInner,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
 	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables,
 	ULONG *pulNonGatherMotions, BOOL *pfDML)
 {
@@ -3827,7 +3827,8 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin(
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	// outer references in the inner child
-	CDXLColRefArray *dxl_colref_array = GPOS_NEW(m_mp) CDXLColRefArray(m_mp);
+	gpos::Ref<CDXLColRefArray> dxl_colref_array =
+		GPOS_NEW(m_mp) CDXLColRefArray(m_mp);
 
 	gpos::Ref<CColRefSet> outer_refs = PcrsOuterRefsForCorrelatedNLJoin(pexpr);
 	CColRefSetIter crsi(*outer_refs);
@@ -3924,9 +3925,9 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin(
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorExprToDXL::BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
-									   const gpos::Ref<CColRef> colref,
-									   CDXLColRefArray *dxl_colref_array)
+CTranslatorExprToDXL::BuildDxlnSubPlan(
+	gpos::Ref<CDXLNode> pdxlnRelChild, const gpos::Ref<CColRef> colref,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array)
 {
 	GPOS_ASSERT(nullptr != colref);
 	gpos::Ref<IMDId> mdid = colref->RetrieveType()->MDId();
@@ -3956,7 +3957,8 @@ CTranslatorExprToDXL::BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan(
-	gpos::Ref<CDXLNode> pdxlnRelChild, CDXLColRefArray *dxl_colref_array)
+	gpos::Ref<CDXLNode> pdxlnRelChild,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array)
 {
 	// create a new project element (const:true), and replace the first child with it
 	const gpos::Ref<IMDTypeBool> pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
@@ -4325,7 +4327,7 @@ CTranslatorExprToDXL::PdxlnNLJoin(
 	}
 
 	BOOL nest_params_exists = false;
-	CDXLColRefArray *col_refs = nullptr;
+	gpos::Ref<CDXLColRefArray> col_refs = nullptr;
 	if (is_index_nlj && GPOS_FTRACE(EopttraceIndexedNLJOuterRefAsParams))
 	{
 		nest_params_exists = true;
@@ -6358,7 +6360,8 @@ CTranslatorExprToDXL::PdxlnWindow(
 	}
 
 	// translate order specification and window frames into window keys
-	CDXLWindowKeyArray *pdrgpdxlwk = GPOS_NEW(m_mp) CDXLWindowKeyArray(m_mp);
+	gpos::Ref<CDXLWindowKeyArray> pdrgpdxlwk =
+		GPOS_NEW(m_mp) CDXLWindowKeyArray(m_mp);
 	gpos::Ref<COrderSpecArray> pdrgpos = popSeqPrj->Pdrgpos();
 	GPOS_ASSERT(nullptr != pdrgpos);
 	const ULONG ulOsSize = pdrgpos->Size();

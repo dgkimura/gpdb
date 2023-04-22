@@ -811,7 +811,7 @@ CDXLOperatorFactory::MakeDXLBooleanTest(
 gpos::Ref<CDXLScalar>
 CDXLOperatorFactory::MakeDXLSubPlan(CDXLMemoryManager *dxl_memory_manager,
 									gpos::Ref<IMDId> mdid,
-									CDXLColRefArray *dxl_colref_array,
+									gpos::Ref<CDXLColRefArray> dxl_colref_array,
 									EdxlSubPlanType dxl_subplan_type,
 									gpos::Ref<CDXLNode> dxlnode_test_expr)
 {
