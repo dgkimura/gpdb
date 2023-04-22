@@ -48,7 +48,7 @@ private:
 	// replace subqueries with scalar identifier based on given map
 	static gpos::Ref<CExpression> PexprReplaceSubqueries(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-		ExprToColRefMap *phmexprcr);
+		gpos::Ref<ExprToColRefMap> phmexprcr);
 
 	// push down subquery below join
 	static gpos::Ref<CExpression> PexprSubqueryPushDown(

@@ -106,7 +106,7 @@ CXformSplitDQA::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
-	ExprToColRefMap *phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
+	gpos::Ref<ExprToColRefMap> phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
 	gpos::Ref<CExpressionArray> pdrgpexprChildPrEl =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CColRefArray> pdrgpcrArgDQA = nullptr;
@@ -221,7 +221,7 @@ gpos::Ref<CExpression>
 CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 	CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-	ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+	gpos::Ref<ExprToColRefMap> phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 	CLogicalGbAgg::EAggStage aggStage)
 {
 	gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
@@ -379,7 +379,7 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 								 CMDAccessor *md_accessor,
 								 gpos::Ref<CExpression> pexpr,
 								 gpos::Ref<CExpression> pexprRelational,
-								 ExprToColRefMap *phmexprcr,
+								 gpos::Ref<ExprToColRefMap> phmexprcr,
 								 gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 								 CLogicalGbAgg::EAggStage aggStage)
 {
@@ -809,7 +809,8 @@ void
 CXformSplitDQA::ExtractDistinctCols(
 	CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexpr,
-	gpos::Ref<CExpressionArray> pdrgpexprChildPrEl, ExprToColRefMap *phmexprcr,
+	gpos::Ref<CExpressionArray> pdrgpexprChildPrEl,
+	gpos::Ref<ExprToColRefMap> phmexprcr,
 	gpos::Ref<CColRefArray>
 		*ppdrgpcrArgDQA	 // output: array of distinct aggs arguments
 )

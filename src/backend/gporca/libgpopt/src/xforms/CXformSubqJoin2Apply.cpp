@@ -143,9 +143,9 @@ CXformSubqJoin2Apply::CollectSubqueries(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformSubqJoin2Apply::PexprReplaceSubqueries(CMemoryPool *mp,
-											 gpos::Ref<CExpression> pexprScalar,
-											 ExprToColRefMap *phmexprcr)
+CXformSubqJoin2Apply::PexprReplaceSubqueries(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
+	gpos::Ref<ExprToColRefMap> phmexprcr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -233,7 +233,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp,
 	// of corresponding join children
 	gpos::Ref<CExpressionArray> pdrgpexprNewChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	ExprToColRefMap *phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
+	gpos::Ref<ExprToColRefMap> phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
 	for (ULONG ulChild = 0; ulChild < arity - 1; ulChild++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexprJoin)[ulChild];
