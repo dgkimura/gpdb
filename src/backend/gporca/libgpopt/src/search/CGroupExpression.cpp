@@ -329,11 +329,11 @@ CGroupExpression::PccRemove(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 				break;
 			}
 		}
-		if (pccFound != nullptr)
+		if (pccFound != nullptr && ulOptReq == pccFound->UlOptReq())
 		{
 			pvccFound->Remove(pccFound);
+			return pccFound;
 		}
-		return pccFound;
 	}
 
 	return nullptr;
@@ -684,6 +684,7 @@ CGroupExpression::PccInsert(gpos::Ref<CCostContext> pcc)
 			}
 		}
 		pvccFound->Append(pcc);
+		m_sht->Replace(poc, pvccFound);
 	}
 	else
 	{
