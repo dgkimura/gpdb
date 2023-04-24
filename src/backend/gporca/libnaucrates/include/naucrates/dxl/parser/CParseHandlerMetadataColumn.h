@@ -36,7 +36,7 @@ class CParseHandlerMetadataColumn : public CParseHandlerBase
 {
 private:
 	// the metadata column
-	CMDColumn *m_mdcol;
+	gpos::Ref<CMDColumn> m_mdcol;
 
 	// column name
 	CMDName *m_mdname;
@@ -45,7 +45,7 @@ private:
 	INT m_attno;
 
 	// attribute type oid
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	INT m_type_modifier;
 
@@ -56,7 +56,7 @@ private:
 	BOOL m_is_dropped;
 
 	// default value expression if one exists
-	CDXLNode *m_dxl_default_val;
+	gpos::Ref<CDXLNode> m_dxl_default_val;
 
 	// width of the column
 	ULONG m_width;
@@ -86,7 +86,7 @@ public:
 
 	~CParseHandlerMetadataColumn() override;
 
-	CMDColumn *GetMdCol();
+	gpos::Ref<CMDColumn> GetMdCol();
 };
 }  // namespace gpdxl
 

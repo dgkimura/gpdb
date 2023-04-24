@@ -65,8 +65,8 @@ CParseHandlerSubqueryScan::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	m_dxl_op =
-		(CDXLPhysicalSubqueryScan *) CDXLOperatorFactory::MakeDXLSubqScan(
+	m_dxl_op = (gpos::Ref<CDXLPhysicalSubqueryScan>)
+		CDXLOperatorFactory::MakeDXLSubqScan(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 	// create child node parsers in reverse order of their expected occurrence

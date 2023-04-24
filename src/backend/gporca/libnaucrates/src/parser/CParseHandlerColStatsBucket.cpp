@@ -66,7 +66,7 @@ CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 //		The bucket constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLBucket *
+gpos::Ref<CDXLBucket>
 CParseHandlerColStatsBucket::GetDXLBucketAt() const
 {
 	return m_dxl_bucket;

@@ -38,7 +38,7 @@ class CDXLLogicalCTAS : public CDXLLogical
 {
 private:
 	// mdid of table to create
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -50,7 +50,7 @@ private:
 	CDXLColDescrArray *m_col_descr_array;
 
 	// storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
@@ -81,9 +81,10 @@ public:
 	CDXLLogicalCTAS(const CDXLLogicalCTAS &) = delete;
 
 	// ctor
-	CDXLLogicalCTAS(CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema,
-					CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
-					CDXLCtasStorageOptions *dxl_ctas_storage_option,
+	CDXLLogicalCTAS(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+					CMDName *mdname_schema, CMDName *mdname_rel,
+					CDXLColDescrArray *dxl_col_descr_array,
+					gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_option,
 					IMDRelation::Ereldistrpolicy rel_distr_policy,
 					ULongPtrArray *distr_column_pos_array,
 					IMdIdArray *distr_opfamilies, IMdIdArray *distr_opclasses,
@@ -102,7 +103,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// mdid of table to create
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid;
@@ -186,7 +187,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::Ref<CDXLCtasStorageOptions>
 	GetDxlCtasStorageOption() const
 	{
 		return m_dxl_ctas_storage_option;
@@ -195,7 +196,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
@@ -204,16 +205,16 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalCTAS *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLLogicalCTAS>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTAS == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalCTAS *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLLogicalCTAS> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

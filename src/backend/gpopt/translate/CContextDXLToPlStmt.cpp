@@ -503,8 +503,8 @@ CContextDXLToPlStmt::GetRTEByIndex(Index index)
 //		`assigned_query_id_for_target_rel` of table descriptor is used.
 //---------------------------------------------------------------------------
 Index
-CContextDXLToPlStmt::GetRTEIndexByTableDescr(const CDXLTableDescr *table_descr,
-											 BOOL *is_rte_exists)
+CContextDXLToPlStmt::GetRTEIndexByTableDescr(
+	const gpos::Ref<CDXLTableDescr> table_descr, BOOL *is_rte_exists)
 {
 	*is_rte_exists = false;
 

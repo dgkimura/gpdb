@@ -31,7 +31,8 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarOp::CScalarOp(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
+CScalarOp::CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> return_type_mdid,
 					 const CWStringConst *pstrOp)
 	: CScalar(mp),
 	  m_mdid_op(mdid_op),
@@ -77,7 +78,7 @@ CScalarOp::Pstr() const
 //		Scalar operator metadata id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::MdIdOp() const
 {
 	return m_mdid_op;
@@ -108,11 +109,11 @@ CScalarOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarOp::Matches(COperator *pop) const
+CScalarOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarOp *pscop = CScalarOp::PopConvert(pop);
+		gpos::Ref<CScalarOp> pscop = CScalarOp::PopConvert(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());
@@ -129,7 +130,7 @@ CScalarOp::Matches(COperator *pop) const
 //		Accessor to the return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::GetReturnTypeMdId() const
 {
 	return m_return_type_mdid;
@@ -143,7 +144,7 @@ CScalarOp::GetReturnTypeMdId() const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::MdidType() const
 {
 	if (nullptr != m_return_type_mdid)

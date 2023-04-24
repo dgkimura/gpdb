@@ -60,8 +60,8 @@ private:
 	static ULONG m_ulTestCounter;
 
 	// factory function for result object
-	static CNode *Pnd(CMemoryPool *mp, ULONG *pul, CNodeArray *pdrgpnd,
-					  BOOL *fTestTrue);
+	static gpos::Ref<CNode> Pnd(CMemoryPool *mp, ULONG *pul,
+								CNodeArray *pdrgpnd, BOOL *fTestTrue);
 
 	// shorthand for tests
 	using TestMap =

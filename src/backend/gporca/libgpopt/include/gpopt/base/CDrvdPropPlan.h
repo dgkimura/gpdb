@@ -46,23 +46,24 @@ class CDrvdPropPlan : public CDrvdProp
 {
 private:
 	// derived sort order
-	COrderSpec *m_pos{nullptr};
+	gpos::Ref<COrderSpec> m_pos{nullptr};
 
 	// derived distribution
-	CDistributionSpec *m_pds{nullptr};
+	gpos::Ref<CDistributionSpec> m_pds{nullptr};
 
 	// derived rewindability
-	CRewindabilitySpec *m_prs{nullptr};
+	gpos::Ref<CRewindabilitySpec> m_prs{nullptr};
 
 	// derived partition propagation spec
-	CPartitionPropagationSpec *m_ppps{nullptr};
+	gpos::Ref<CPartitionPropagationSpec> m_ppps{nullptr};
 
 	// derived cte map
-	CCTEMap *m_pcm{nullptr};
+	gpos::Ref<CCTEMap> m_pcm{nullptr};
 
 	// copy CTE producer plan properties from given context to current object
-	void CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-								  COperator *pop);
+	void CopyCTEProducerPlanProps(CMemoryPool *mp,
+								  gpos::Ref<CDrvdPropCtxt> pdpctxt,
+								  gpos::Ref<COperator> pop);
 
 public:
 	CDrvdPropPlan(const CDrvdPropPlan &) = delete;
@@ -82,40 +83,40 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// short hand for conversion
-	static CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
+	static gpos::Ref<CDrvdPropPlan> Pdpplan(gpos::Ref<CDrvdProp> pdp);
 
 	// sort order accessor
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	Pos() const
 	{
 		return m_pos;
 	}
 
 	// distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const
 	{
 		return m_pds;
 	}
 
 	// rewindability accessor
-	CRewindabilitySpec *
+	gpos::Ref<CRewindabilitySpec>
 	Prs() const
 	{
 		return m_prs;
 	}
 
-	CPartitionPropagationSpec *
+	gpos::Ref<CPartitionPropagationSpec>
 	Ppps() const
 	{
 		return m_ppps;
 	}
 
 	// cte map
-	CCTEMap *
+	gpos::Ref<CCTEMap>
 	GetCostModel() const
 	{
 		return m_pcm;
@@ -125,10 +126,10 @@ public:
 	virtual ULONG HashValue() const;
 
 	// equality function
-	virtual ULONG Equals(const CDrvdPropPlan *pdpplan) const;
+	virtual ULONG Equals(const gpos::Ref<CDrvdPropPlan> pdpplan) const;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

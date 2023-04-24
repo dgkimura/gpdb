@@ -59,16 +59,16 @@ class CScalarAggFunc : public CScalar
 {
 private:
 	// aggregate func id
-	IMDId *m_pmdidAggFunc;
+	gpos::Ref<IMDId> m_pmdidAggFunc;
 
 	// resolved return type refers to a non-ambiguous type that was resolved during query
 	// parsing if the actual return type of Agg is ambiguous (e.g., AnyElement in GPDB)
 	// if resolved return type is NULL, then we can get Agg return type by looking up MD cache
 	// using Agg MDId
-	IMDId *m_pmdidResolvedRetType;
+	gpos::Ref<IMDId> m_pmdidResolvedRetType;
 
 	// return type obtained by looking up MD cache
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// aggregate function name
 	const CWStringConst *m_pstrAggFunc;
@@ -93,9 +93,10 @@ public:
 	CScalarAggFunc(const CScalarAggFunc &) = delete;
 
 	// ctor
-	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
-				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
+	CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
+				   gpos::Ref<IMDId> resolved_rettype,
+				   const CWStringConst *pstrAggFunc, BOOL is_distinct,
+				   EAggfuncStage eaggfuncstage, BOOL fSplit,
 				   EAggfuncKind aggkind, ULongPtrArray *argtypes,
 				   BOOL fRepSafe);
 
@@ -129,7 +130,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -139,7 +140,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -149,13 +150,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarAggFunc *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarAggFunc>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAggFunc == pop->Eopid());
 
-		return dynamic_cast<CScalarAggFunc *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarAggFunc> >(pop);
 	}
 
 
@@ -163,7 +164,7 @@ public:
 	const CWStringConst *PstrAggFunc() const;
 
 	// aggregate func id
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// ident accessors
 	BOOL
@@ -219,7 +220,7 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		if (nullptr == m_pmdidResolvedRetType)
@@ -244,14 +245,15 @@ public:
 	BOOL FCountAny() const;
 
 	// is function either min() or max()?
-	BOOL IsMinMax(const IMDType *mdtype) const;
+	BOOL IsMinMax(const gpos::Ref<IMDType> mdtype) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// lookup mdid of return type for given Agg function
-	static IMDId *PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
-										CMDAccessor *pmdaInput = nullptr);
+	static gpos::Ref<IMDId> PmdidLookupReturnType(
+		gpos::Ref<IMDId> pmdidAggFunc, BOOL fGlobal,
+		CMDAccessor *pmdaInput = nullptr);
 
 };	// class CScalarAggFunc
 

@@ -58,8 +58,9 @@ CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
-								   CTableDescriptor *ptabdesc,
+CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp,
+								   const gpos::Ref<IMDIndex> pmdindex,
+								   gpos::Ref<CTableDescriptor> ptabdesc,
 								   ULONG ulOriginOpId, const CName *pnameAlias,
 								   CColRefArray *pdrgpcrOutput)
 	: CLogical(mp),
@@ -136,7 +137,7 @@ CLogicalIndexGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalIndexGet::Matches(COperator *pop) const
+CLogicalIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchIndex(this, pop);
 }
@@ -149,13 +150,14 @@ CLogicalIndexGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalIndexGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											 UlongToColRefMap *colref_mapping,
 											 BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());
+	const gpos::Ref<IMDIndex> pmdindex =
+		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 
 	CColRefArray *pdrgpcrOutput = nullptr;
 	if (must_exist)
@@ -184,12 +186,12 @@ CLogicalIndexGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalIndexGet::DeriveOutputColumns(CMemoryPool *mp,
 									  CExpressionHandle &  // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -203,14 +205,14 @@ CLogicalIndexGet::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 										CExpressionHandle &exprhdl)
 {
 	return PcrsDeriveOuterIndexGet(mp, exprhdl);
 }
 
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalIndexGet::DeriveKeyCollection(CMemoryPool *mp,
 									  CExpressionHandle &  // exprhdl
 ) const
@@ -262,7 +264,7 @@ CLogicalIndexGet::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalIndexGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   IStatisticsArray *stats_ctxt) const
 {

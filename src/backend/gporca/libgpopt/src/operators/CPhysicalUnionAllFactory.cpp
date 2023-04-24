@@ -14,12 +14,12 @@
 namespace gpopt
 {
 CPhysicalUnionAllFactory::CPhysicalUnionAllFactory(
-	CLogicalUnionAll *popLogicalUnionAll)
+	gpos::Ref<CLogicalUnionAll> popLogicalUnionAll)
 	: m_popLogicalUnionAll(popLogicalUnionAll)
 {
 }
 
-CPhysicalUnionAll *
+gpos::Ref<CPhysicalUnionAll>
 CPhysicalUnionAllFactory::PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel)
 {
 	CColRefArray *pdrgpcrOutput = m_popLogicalUnionAll->PdrgpcrOutput();

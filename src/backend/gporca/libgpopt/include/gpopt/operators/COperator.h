@@ -58,14 +58,14 @@ protected:
 	BOOL m_fPattern;
 
 	// return an addref'ed copy of the operator
-	virtual COperator *PopCopyDefault();
+	virtual gpos::Ref<COperator> PopCopyDefault();
 
 	// derive stability function property from children
 	static IMDFunction::EFuncStbl EfsDeriveFromChildren(
 		CExpressionHandle &exprhdl, IMDFunction::EFuncStbl efsDefault);
 
 	// derive function properties from children
-	static CFunctionProp *PfpDeriveFromChildren(
+	static gpos::Ref<CFunctionProp> PfpDeriveFromChildren(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		IMDFunction::EFuncStbl efsDefault, BOOL fHasVolatileFunctionScan,
 		BOOL fScan);
@@ -334,16 +334,16 @@ public:
 
 	// match function;
 	// abstract to enforce an implementation for each new operator
-	virtual BOOL Matches(COperator *pop) const = 0;
+	virtual BOOL Matches(gpos::Ref<COperator> pop) const = 0;
 
 	// create container for derived properties
-	virtual CDrvdProp *PdpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const = 0;
 
 	// create container for required properties
-	virtual CReqdProp *PrpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const = 0;
 
 	// return a copy of the operator with remapped columns
-	virtual COperator *PopCopyWithRemappedColumns(
+	virtual gpos::Ref<COperator> PopCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
 
 	// print

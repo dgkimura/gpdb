@@ -26,7 +26,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr::CDXLIndexDescr(IMDId *mdid, CMDName *mdname)
+CDXLIndexDescr::CDXLIndexDescr(gpos::Ref<IMDId> mdid, CMDName *mdname)
 	: m_mdid(mdid), m_mdname(mdname)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -58,7 +58,7 @@ CDXLIndexDescr::~CDXLIndexDescr()
 //		Return the metadata id for the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLIndexDescr::MDId() const
 {
 	return m_mdid;

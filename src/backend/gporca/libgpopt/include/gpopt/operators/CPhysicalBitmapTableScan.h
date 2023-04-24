@@ -46,7 +46,8 @@ public:
 	CPhysicalBitmapTableScan(const CPhysicalBitmapTableScan &) = delete;
 
 	// ctor
-	CPhysicalBitmapTableScan(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	CPhysicalBitmapTableScan(CMemoryPool *mp,
+							 gpos::Ref<CTableDescriptor> ptabdesc,
 							 ULONG ulOriginOpId, const CName *pnameTableAlias,
 							 CColRefArray *pdrgpcrOutput);
 
@@ -85,14 +86,14 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// statistics derivation during costing
-	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	gpos::Ref<IStatistics>
+	PstatsDerive(CMemoryPool *,				// mp
+				 CExpressionHandle &,		// exprhdl
+				 gpos::Ref<CReqdPropPlan>,	// prpplan
+				 IStatisticsArray *			//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -105,13 +106,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalBitmapTableScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalBitmapTableScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalBitmapTableScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalBitmapTableScan *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalBitmapTableScan> >(pop);
 	}
 };
 }  // namespace gpopt

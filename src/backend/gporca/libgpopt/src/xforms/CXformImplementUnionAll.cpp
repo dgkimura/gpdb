@@ -48,8 +48,9 @@ CXformImplementUnionAll::CXformImplementUnionAll(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformImplementUnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
+								   gpos::Ref<CXformResult> pxfres,
+								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -58,7 +59,8 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnionAll *popUnionAll = CLogicalUnionAll::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalUnionAll> popUnionAll =
+		CLogicalUnionAll::PopConvert(pexpr->Pop());
 	CPhysicalUnionAllFactory factory(popUnionAll);
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -66,16 +68,16 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CPhysicalUnionAll *popPhysicalSerialUnionAll =
+	gpos::Ref<CPhysicalUnionAll> popPhysicalSerialUnionAll =
 		factory.PopPhysicalUnionAll(mp, false);
 
 	// assemble serial union physical operator
-	CExpression *pexprSerialUnionAll =
+	gpos::Ref<CExpression> pexprSerialUnionAll =
 		GPOS_NEW(mp) CExpression(mp, popPhysicalSerialUnionAll, pdrgpexpr);
 
 	// add serial union alternative to results
@@ -86,13 +88,13 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	if (fParallel)
 	{
-		CPhysicalUnionAll *popPhysicalParallelUnionAll =
+		gpos::Ref<CPhysicalUnionAll> popPhysicalParallelUnionAll =
 			factory.PopPhysicalUnionAll(mp, true);
 
 		pdrgpexpr->AddRef();
 
 		// assemble physical parallel operator
-		CExpression *pexprParallelUnionAll = GPOS_NEW(mp)
+		gpos::Ref<CExpression> pexprParallelUnionAll = GPOS_NEW(mp)
 			CExpression(mp, popPhysicalParallelUnionAll, pdrgpexpr);
 
 		// add parallel union alternative to results

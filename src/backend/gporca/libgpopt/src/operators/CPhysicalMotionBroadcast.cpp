@@ -60,7 +60,7 @@ CPhysicalMotionBroadcast::~CPhysicalMotionBroadcast()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionBroadcast::Matches(COperator *pop) const
+CPhysicalMotionBroadcast::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -73,10 +73,10 @@ CPhysicalMotionBroadcast::Matches(COperator *pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *,  // pdrgpdpCtxt
 									   ULONG			  // ulOptReq
@@ -84,9 +84,9 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
 
-	CColRefSet *pcrsChildReqd =
+	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
@@ -103,7 +103,7 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalMotionBroadcast::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											CColRefSet *pcrsRequired,
+											gpos::Ref<CColRefSet> pcrsRequired,
 											ULONG  // ulOptReq
 ) const
 {
@@ -119,8 +119,8 @@ CPhysicalMotionBroadcast::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,  // exprhdl
-									const CEnfdOrder *	  // peo
+CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,		 // exprhdl
+									const gpos::Ref<CEnfdOrder>	 // peo
 ) const
 {
 	// broadcast motion is not order-preserving
@@ -136,10 +136,10 @@ CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
-									  CExpressionHandle &,	// exprhdl
-									  COrderSpec *,			//posInput
+									  CExpressionHandle &,	  // exprhdl
+									  gpos::Ref<COrderSpec>,  //posInput
 									  ULONG
 #ifdef GPOS_DEBUG
 										  child_index
@@ -163,7 +163,7 @@ CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalMotionBroadcast::PosDerive(CMemoryPool *mp,
 									CExpressionHandle &	 // exprhdl
 ) const
@@ -197,13 +197,13 @@ CPhysicalMotionBroadcast::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionBroadcast *
-CPhysicalMotionBroadcast::PopConvert(COperator *pop)
+gpos::Ref<CPhysicalMotionBroadcast>
+CPhysicalMotionBroadcast::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionBroadcast == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionBroadcast *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalMotionBroadcast> >(pop);
 }
 
 // EOF

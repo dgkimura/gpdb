@@ -45,7 +45,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	EScalarMinMaxType m_esmmt;
@@ -57,7 +57,8 @@ public:
 	CScalarMinMax(const CScalarMinMax &) = delete;
 
 	// ctor
-	CScalarMinMax(CMemoryPool *mp, IMDId *mdid_type, EScalarMinMaxType esmmt);
+	CScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+				  EScalarMinMaxType esmmt);
 
 	// dtor
 	~CScalarMinMax() override;
@@ -77,7 +78,7 @@ public:
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -94,7 +95,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -104,7 +105,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -125,13 +126,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarMinMax *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarMinMax>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarMinMax == pop->Eopid());
 
-		return dynamic_cast<CScalarMinMax *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarMinMax> >(pop);
 	}
 
 };	// class CScalarMinMax

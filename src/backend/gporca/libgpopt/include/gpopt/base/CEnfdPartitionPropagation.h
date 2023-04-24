@@ -42,7 +42,7 @@ public:
 
 private:
 	// partition propagation spec
-	CPartitionPropagationSpec *m_ppps;
+	gpos::Ref<CPartitionPropagationSpec> m_ppps;
 
 	// partition propagation matching type
 	EPartitionPropagationMatching m_eppm;
@@ -52,14 +52,14 @@ public:
 	CEnfdPartitionPropagation(const CEnfdPartitionPropagation &) = delete;
 
 	// ctor
-	CEnfdPartitionPropagation(CPartitionPropagationSpec *ppps,
+	CEnfdPartitionPropagation(gpos::Ref<CPartitionPropagationSpec> ppps,
 							  EPartitionPropagationMatching eppm);
 
 	// dtor
 	~CEnfdPartitionPropagation() override;
 
 	// partition spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_ppps;
@@ -69,14 +69,15 @@ public:
 	ULONG HashValue() const override;
 
 	// required propagation accessor
-	CPartitionPropagationSpec *
+	gpos::Ref<CPartitionPropagationSpec>
 	PppsRequired() const
 	{
 		return m_ppps;
 	}
 
 	// get distribution enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::Ref<CPhysical> popPhysical,
 							BOOL fPropagationReqd) const;
 
 	// return matching type
@@ -87,9 +88,9 @@ public:
 	}
 
 	// matching function
-	BOOL Matches(CEnfdPartitionPropagation *pepp);
+	BOOL Matches(gpos::Ref<CEnfdPartitionPropagation> pepp);
 
-	BOOL FCompatible(CPartitionPropagationSpec *pps_drvd) const;
+	BOOL FCompatible(gpos::Ref<CPartitionPropagationSpec> pps_drvd) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

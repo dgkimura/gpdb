@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CIndexDescriptor);
 //
 //---------------------------------------------------------------------------
 CIndexDescriptor::CIndexDescriptor(
-	CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
+	CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex, const CName &name,
 	CColumnDescriptorArray *pdrgcoldescKeyCols,
 	CColumnDescriptorArray *pdrgcoldescIncludedCols, BOOL is_clustered,
 	IMDIndex::EmdindexType index_type)
@@ -103,9 +103,10 @@ CIndexDescriptor::UlIncludedColumns() const
 //		information from the catalog
 //
 //---------------------------------------------------------------------------
-CIndexDescriptor *
-CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
-							 const IMDIndex *pmdindex)
+gpos::Ref<CIndexDescriptor>
+CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
+							 const gpos::Ref<CTableDescriptor> ptabdesc,
+							 const gpos::Ref<IMDIndex> pmdindex)
 {
 	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());
 
@@ -119,7 +120,7 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldesc)[ul];
 		pcoldesc->AddRef();
 		pdrgcoldescKey->Append(pcoldesc);
 	}
@@ -129,14 +130,14 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldesc)[ul];
 		pcoldesc->AddRef();
 		pdrgcoldescIncluded->Append(pcoldesc);
 	}
 
 
 	// create the index descriptors
-	CIndexDescriptor *pindexdesc = GPOS_NEW(mp) CIndexDescriptor(
+	gpos::Ref<CIndexDescriptor> pindexdesc = GPOS_NEW(mp) CIndexDescriptor(
 		mp, pmdindex->MDId(), CName(&strIndexName), pdrgcoldescKey,
 		pdrgcoldescIncluded, pmdindex->IsClustered(), pmdindex->IndexType());
 	return pindexdesc;

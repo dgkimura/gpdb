@@ -49,8 +49,8 @@ public:
 	CDXLDatumGeneric(const CDXLDatumGeneric &) = delete;
 
 	// ctor
-	CDXLDatumGeneric(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-					 BOOL is_null, BYTE *data, ULONG length);
+	CDXLDatumGeneric(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+					 INT type_modifier, BOOL is_null, BYTE *data, ULONG length);
 
 	// dtor
 	~CDXLDatumGeneric() override;
@@ -69,8 +69,8 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumGeneric *
-	Cast(CDXLDatum *dxl_datum)
+	static gpos::Ref<CDXLDatumGeneric>
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumGeneric == dxl_datum->GetDatumType() ||
@@ -79,7 +79,7 @@ public:
 					CDXLDatum::EdxldatumStatsLintMappable ==
 						dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumGeneric *>(dxl_datum);
+		return dynamic_cast<gpos::Ref<CDXLDatumGeneric> >(dxl_datum);
 	}
 
 	// statistics related APIs

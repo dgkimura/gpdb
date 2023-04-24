@@ -43,24 +43,27 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  gpos::Ref<COrderSpec> posInput,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CRewindabilitySpec *prsRequired,
-									ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
-									ULONG ulOptReq) const override;
+	gpos::Ref<CRewindabilitySpec> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
-							 ) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::Ref<CColRefSet> pcrsRequired,
+									   ULONG child_index,
+									   CDrvdPropArray *,  // pdrgpdpCtxt
+									   ULONG			  // ulOptReq
+									   ) override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -68,7 +71,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		const gpos::Ref<CEnfdOrder> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -89,12 +93,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalNLJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalNLJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FNLJoin(pop));
 
-		return dynamic_cast<CPhysicalNLJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalNLJoin> >(pop);
 	}
 
 

@@ -64,16 +64,16 @@ public:
 
 	// returns the DXL string of the requested metadata object
 	CWStringBase *GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 IMDId *mdid) const override;
+								 gpos::Ref<IMDId> mdid) const override;
 
 	// returns the requested metadata object
-	IMDCacheObject *GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							 IMDId *mdid,
-							 IMDCacheObject::Emdtype mdtype) const override;
+	gpos::Ref<IMDCacheObject> GetMDObj(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid,
+		IMDCacheObject::Emdtype mdtype) const override;
 
 	// return the mdid for the specified system id and type
-	IMDId *MDId(CMemoryPool *mp, CSystemId sysid,
-				IMDType::ETypeInfo type_info) const override;
+	gpos::Ref<IMDId> MDId(CMemoryPool *mp, CSystemId sysid,
+						  IMDType::ETypeInfo type_info) const override;
 };
 }  // namespace gpmd
 

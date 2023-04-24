@@ -24,8 +24,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalForeignGet::CDXLLogicalForeignGet(CMemoryPool *mp,
-											 CDXLTableDescr *table_descr)
+CDXLLogicalForeignGet::CDXLLogicalForeignGet(
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLLogicalGet(mp, table_descr)
 {
 }

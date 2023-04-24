@@ -43,7 +43,8 @@ CXform::EXformPromise
 CXformExpandDynamicGetWithForeignPartitions::Exfp(
 	CExpressionHandle &exprhdl) const
 {
-	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalDynamicGet> popGet =
+		CLogicalDynamicGet::PopConvert(exprhdl.Pop());
 	if (popGet->ContainsForeignParts())
 	{
 		return CXform::ExfpHigh;
@@ -69,9 +70,9 @@ CXformExpandDynamicGetWithForeignPartitions::Exfp(
 //       +--CPhysicalDynamicForeignScan "part" ("part"), Columns: ["a" (18), "b" (19)] Scan Id: 1 Parts to scan: 3]
 
 void
-CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
-													   CXformResult *pxfres,
-													   CExpression *pexpr) const
+CXformExpandDynamicGetWithForeignPartitions::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -79,7 +80,8 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(nullptr != pxfres);
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalDynamicGet> popGet =
+		CLogicalDynamicGet::PopConvert(pexpr->Pop());
 	// only run this xform if it contains foreign partitions
 	GPOS_ASSERT(popGet->ContainsForeignParts());
 
@@ -96,9 +98,9 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	for (ULONG ul = 0; ul < all_part_mdids->Size(); ++ul)
 	{
-		IMDId *foreign_server_mdid = (*foreign_server_mdids)[ul];
+		gpos::Ref<IMDId> foreign_server_mdid = (*foreign_server_mdids)[ul];
 
-		IMDId *partMdid = (*all_part_mdids)[ul];
+		gpos::Ref<IMDId> partMdid = (*all_part_mdids)[ul];
 		partMdid->AddRef();
 		// if partition is not foreign, add to non foreign array
 		if (!foreign_server_mdid->IsValid())
@@ -111,7 +113,8 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 			// as each server can have a different distribution derivation
 			// (some foreign tables can only be executed on segments, others only the coordinator)
 			// place these in a map from server->array of foreign partitions
-			const IMDRelation *pmdrel = md_accessor->RetrieveRel(partMdid);
+			const gpos::Ref<IMDRelation> pmdrel =
+				md_accessor->RetrieveRel(partMdid);
 			BOOL is_coordinator_only =
 				(gpmd::CMDRelationGPDB::EreldistrCoordinatorOnly ==
 				 pmdrel->GetRelDistribution());
@@ -163,13 +166,13 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 		}
 		CColRefArray *pdrgpcrNew =
 			CUtils::PdrgpcrCopy(mp, popGet->PdrgpcrOutput());
-		CLogicalDynamicGet *nonForeignDynamicGet =
+		gpos::Ref<CLogicalDynamicGet> nonForeignDynamicGet =
 			GPOS_NEW(mp) CLogicalDynamicGet(
 				mp, new_alias, popGet->Ptabdesc(), popGet->ScanId(), pdrgpcrNew,
 				popGet->PdrgpdrgpcrPart(), non_foreign_parts,
 				popGet->GetPartitionConstraintsDisj(), popGet->FStaticPruned(),
 				GPOS_NEW(mp) IMdIdArray(mp) /* foreign_server_mdids */);
-		CExpression *pexprNonForeignDynamicGet =
+		gpos::Ref<CExpression> pexprNonForeignDynamicGet =
 			GPOS_NEW(mp) CExpression(mp, nonForeignDynamicGet);
 
 		// addref for use in union all
@@ -210,13 +213,13 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 		{
 			pdrgpcrNew = CUtils::PdrgpcrCopy(mp, popGet->PdrgpcrOutput());
 		}
-		CLogicalDynamicForeignGet *dynamicForeignGet = GPOS_NEW(mp)
+		gpos::Ref<CLogicalDynamicForeignGet> dynamicForeignGet = GPOS_NEW(mp)
 			CLogicalDynamicForeignGet(mp, new_alias, popGet->Ptabdesc(),
 									  popGet->ScanId(), pdrgpcrNew,
 									  popGet->PdrgpdrgpcrPart(), part_oid_array,
 									  foreign_server.m_foreign_server_oid,
 									  foreign_server.m_is_coordinator_only);
-		CExpression *pexprDynamicForeignGet =
+		gpos::Ref<CExpression> pexprDynamicForeignGet =
 			GPOS_NEW(mp) CExpression(mp, dynamicForeignGet);
 
 		if (no_union_all)
@@ -240,7 +243,7 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(CXformContext *pxfctxt,
 
 	// Create a UNION ALL node above the gets
 	popGet->PdrgpcrOutput()->AddRef();
-	CExpression *pexprResult = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprResult = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalUnionAll(mp, popGet->PdrgpcrOutput(),
 												  inputColArrayForUnion),

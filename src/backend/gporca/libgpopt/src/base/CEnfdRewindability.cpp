@@ -33,7 +33,7 @@ const CHAR *CEnfdRewindability::m_szRewindabilityMatching[ErmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdRewindability::CEnfdRewindability(CRewindabilitySpec *prs,
+CEnfdRewindability::CEnfdRewindability(gpos::Ref<CRewindabilitySpec> prs,
 									   ERewindabilityMatching erm)
 	: m_prs(prs), m_erm(erm)
 {
@@ -67,7 +67,7 @@ CEnfdRewindability::~CEnfdRewindability()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdRewindability::FCompatible(CRewindabilitySpec *prs) const
+CEnfdRewindability::FCompatible(gpos::Ref<CRewindabilitySpec> prs) const
 {
 	GPOS_ASSERT(nullptr != prs);
 
@@ -108,7 +108,8 @@ CEnfdRewindability::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdRewindability::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdRewindability::Epet(CExpressionHandle &exprhdl,
+						 gpos::Ref<CPhysical> popPhysical,
 						 BOOL fRewindabilityReqd) const
 {
 	if (fRewindabilityReqd)

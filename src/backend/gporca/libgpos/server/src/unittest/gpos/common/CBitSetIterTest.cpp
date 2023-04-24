@@ -58,7 +58,7 @@ CBitSetIterTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	ULONG vector_size = 32;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	ULONG cInserts = 10;
 	for (ULONG i = 0; i < cInserts; i++)
@@ -105,7 +105,7 @@ CBitSetIterTest::EresUnittest_Uninitialized()
 	ULONG vector_size = 32;
 
 	CAutoRef<CBitSet> a_pbs;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	a_pbs = pbs;
 
 	CBitSetIter bsi(*pbs);
@@ -135,7 +135,7 @@ CBitSetIterTest::EresUnittest_Overrun()
 	ULONG vector_size = 32;
 
 	CAutoRef<CBitSet> a_pbs;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	a_pbs = pbs;
 
 	CBitSetIter bsi(*pbs);

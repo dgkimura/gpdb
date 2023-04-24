@@ -63,39 +63,40 @@ CXformImplementDML::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							  CExpression *pexpr) const
+CXformImplementDML::Transform(gpos::Ref<CXformContext> pxfctxt,
+							  gpos::Ref<CXformResult> pxfres,
+							  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDML *popDML = CLogicalDML::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalDML> popDML = CLogicalDML::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
 	CLogicalDML::EDMLOperator edmlop = popDML->Edmlop();
 
-	CTableDescriptor *ptabdesc = popDML->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popDML->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrSource = popDML->PdrgpcrSource();
 	pdrgpcrSource->AddRef();
-	CBitSet *pbsModified = popDML->PbsModified();
+	gpos::Ref<CBitSet> pbsModified = popDML->PbsModified();
 	pbsModified->AddRef();
 
-	CColRef *pcrAction = popDML->PcrAction();
-	CColRef *pcrCtid = popDML->PcrCtid();
-	CColRef *pcrSegmentId = popDML->PcrSegmentId();
+	gpos::Ref<CColRef> pcrAction = popDML->PcrAction();
+	gpos::Ref<CColRef> pcrCtid = popDML->PcrCtid();
+	gpos::Ref<CColRef> pcrSegmentId = popDML->PcrSegmentId();
 	BOOL fSplit = popDML->FSplit();
 
 	// child of DML operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create physical DML
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CPhysicalDML(mp, edmlop, ptabdesc, pdrgpcrSource, pbsModified,

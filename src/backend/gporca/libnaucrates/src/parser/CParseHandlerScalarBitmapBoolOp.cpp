@@ -77,7 +77,7 @@ CParseHandlerScalarBitmapBoolOp::StartElement(
 				->GetBuffer());
 	}
 
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
 		token_type);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(

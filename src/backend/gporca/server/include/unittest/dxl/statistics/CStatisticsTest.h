@@ -91,9 +91,10 @@ private:
 	}
 
 	// create a table descriptor with two columns having the given names
-	static CTableDescriptor *PtabdescTwoColumnSource(
-		CMemoryPool *mp, const CName &nameTable, const IMDTypeInt4 *pmdtype,
-		const CWStringConst &strColA, const CWStringConst &strColB);
+	static gpos::Ref<CTableDescriptor> PtabdescTwoColumnSource(
+		CMemoryPool *mp, const CName &nameTable,
+		const gpos::Ref<IMDTypeInt4> pmdtype, const CWStringConst &strColA,
+		const CWStringConst &strColB);
 
 public:
 	// example filter

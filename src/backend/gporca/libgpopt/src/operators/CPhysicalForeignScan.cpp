@@ -31,7 +31,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalForeignScan::CPhysicalForeignScan(CMemoryPool *mp,
 										   const CName *pnameAlias,
-										   CTableDescriptor *ptabdesc,
+										   gpos::Ref<CTableDescriptor> ptabdesc,
 										   CColRefArray *pdrgpcrOutput)
 	: CPhysicalTableScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
@@ -59,14 +59,14 @@ CPhysicalForeignScan::CPhysicalForeignScan(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalForeignScan::Matches(COperator *pop) const
+CPhysicalForeignScan::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalForeignScan *popForeignScan =
+	gpos::Ref<CPhysicalForeignScan> popForeignScan =
 		CPhysicalForeignScan::PopConvert(pop);
 	return m_ptabdesc->MDId()->Equals(popForeignScan->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popForeignScan->PdrgpcrOutput());
@@ -81,10 +81,11 @@ CPhysicalForeignScan::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalForeignScan::EpetRewindability(CExpressionHandle &exprhdl,
-										const CEnfdRewindability *per) const
+CPhysicalForeignScan::EpetRewindability(
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdRewindability> per) const
 {
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::Ref<CRewindabilitySpec> prs =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		return CEnfdProp::EpetUnnecessary;

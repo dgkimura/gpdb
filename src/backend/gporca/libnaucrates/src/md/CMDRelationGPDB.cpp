@@ -30,15 +30,15 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationGPDB::CMDRelationGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL fTemporary,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname, BOOL fTemporary,
 	Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
 	CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
 	IMdIdArray *distr_opfamilies, ULongPtrArray *partition_cols_array,
 	CharPtrArray *str_part_types_array, IMdIdArray *partition_oids,
 	BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
 	CMDIndexInfoArray *md_index_info_array,
-	IMdIdArray *mdid_check_constraint_array, CDXLNode *mdpart_constraint,
-	IMDId *foreign_server)
+	IMdIdArray *mdid_check_constraint_array,
+	gpos::Ref<CDXLNode> mdpart_constraint, gpos::Ref<IMDId> foreign_server)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -83,7 +83,7 @@ CMDRelationGPDB::CMDRelationGPDB(
 	ULONG non_dropped_col_pos = 0;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *mdcol = (*mdcol_array)[ul];
+		gpos::Ref<IMDColumn> mdcol = (*mdcol_array)[ul];
 		BOOL is_system_col = mdcol->IsSystemColumn();
 		if (is_system_col)
 		{
@@ -153,7 +153,7 @@ CMDRelationGPDB::~CMDRelationGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::MDId() const
 {
 	return m_mdid;
@@ -433,7 +433,7 @@ CMDRelationGPDB::PartTypeAtLevel(ULONG ulLevel) const
 //		partition key list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+const gpos::Ref<IMDColumn>
 CMDRelationGPDB::PartColAt(ULONG pos) const
 {
 	ULONG partition_key_pos = (*(*m_partition_cols_array)[pos]);
@@ -462,7 +462,7 @@ CMDRelationGPDB::IndexCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+const gpos::Ref<IMDColumn>
 CMDRelationGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
@@ -478,7 +478,7 @@ CMDRelationGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+const gpos::Ref<IMDColumn>
 CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
@@ -487,7 +487,7 @@ CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 	return GetMdCol(distr_key_pos);
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)
@@ -521,7 +521,7 @@ CMDRelationGPDB::ConvertHashToRandom() const
 //		Returns the id of the index at the specified position of the index array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::IndexMDidAt(ULONG pos) const
 {
 	return (*m_mdindex_info_array)[pos]->MDId();
@@ -550,7 +550,7 @@ CMDRelationGPDB::CheckConstraintCount() const
 //		the check constraint array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
 	return (*m_mdid_check_constraint_array)[pos];
@@ -564,13 +564,13 @@ CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CMDRelationGPDB::MDPartConstraint() const
 {
 	return m_mdpart_constraint;
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::ForeignServer() const
 {
 	return m_foreign_server;
@@ -675,7 +675,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 	for (ULONG ul = 0; ul < m_md_col_array->Size(); ul++)
 	{
-		CMDColumn *mdcol = (*m_md_col_array)[ul];
+		gpos::Ref<CMDColumn> mdcol = (*m_md_col_array)[ul];
 		mdcol->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -692,7 +692,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG indexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < indexes; ul++)
 	{
-		CMDIndexInfo *index_info = (*m_mdindex_info_array)[ul];
+		gpos::Ref<CMDIndexInfo> index_info = (*m_mdindex_info_array)[ul];
 		index_info->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -786,7 +786,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 	const ULONG num_of_columns = ColumnCount();
 	for (ULONG ul = 0; ul < num_of_columns; ul++)
 	{
-		const IMDColumn *mdcol = GetMdCol(ul);
+		const gpos::Ref<IMDColumn> mdcol = GetMdCol(ul);
 		mdcol->DebugPrint(os);
 	}
 	os << std::endl;
@@ -800,7 +800,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		const IMDColumn *mdcol_distr_key = GetDistrColAt(ul);
+		const gpos::Ref<IMDColumn> mdcol_distr_key = GetDistrColAt(ul);
 		os << (mdcol_distr_key->Mdname()).GetMDName()->GetBuffer();
 	}
 
@@ -815,7 +815,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		const IMDColumn *mdcol_part_key = PartColAt(ul);
+		const gpos::Ref<IMDColumn> mdcol_part_key = PartColAt(ul);
 		os << (mdcol_part_key->Mdname()).GetMDName()->GetBuffer();
 	}
 
@@ -825,7 +825,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 	const ULONG indexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < indexes; ul++)
 	{
-		CMDIndexInfo *mdindex_info = (*m_mdindex_info_array)[ul];
+		gpos::Ref<CMDIndexInfo> mdindex_info = (*m_mdindex_info_array)[ul];
 		mdindex_info->DebugPrint(os);
 	}
 

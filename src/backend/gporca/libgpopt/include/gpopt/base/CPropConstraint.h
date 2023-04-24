@@ -44,7 +44,7 @@ private:
 	ColRefToColRefSetMap *m_phmcrcrs;
 
 	// constraint
-	CConstraint *m_pcnstr;
+	gpos::Ref<CConstraint> m_pcnstr;
 
 	// initialize mapping from columns to equivalence classes
 	void InitHashMap(CMemoryPool *mp);
@@ -54,7 +54,7 @@ public:
 
 	// ctor
 	CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
-					CConstraint *pcnstr);
+					gpos::Ref<CConstraint> pcnstr);
 
 	// dtor
 	~CPropConstraint() override;
@@ -67,8 +67,8 @@ public:
 	}
 
 	// mapping
-	CColRefSet *
-	PcrsEquivClass(const CColRef *colref) const
+	gpos::Ref<CColRefSet>
+	PcrsEquivClass(const gpos::Ref<CColRef> colref) const
 	{
 		if (nullptr == m_phmcrcrs)
 		{
@@ -78,7 +78,7 @@ public:
 	}
 
 	// constraint
-	CConstraint *
+	gpos::Ref<CConstraint>
 	Pcnstr() const
 	{
 		return m_pcnstr;
@@ -89,9 +89,9 @@ public:
 
 	// scalar expression on given column mapped from all constraints
 	// on its equivalent columns
-	CExpression *PexprScalarMappedFromEquivCols(
-		CMemoryPool *mp, CColRef *colref,
-		CPropConstraint *constraintsForOuterRefs) const;
+	gpos::Ref<CExpression> PexprScalarMappedFromEquivCols(
+		CMemoryPool *mp, gpos::Ref<CColRef> colref,
+		gpos::Ref<CPropConstraint> constraintsForOuterRefs) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

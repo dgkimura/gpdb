@@ -31,7 +31,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoalesce::CScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type)
+CScalarCoalesce::CScalarCoalesce(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp), m_mdid_type(mdid_type), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(mdid_type->IsValid());
@@ -78,11 +78,12 @@ CScalarCoalesce::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoalesce::Matches(COperator *pop) const
+CScalarCoalesce::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoalesce *popScCoalesce = CScalarCoalesce::PopConvert(pop);
+		gpos::Ref<CScalarCoalesce> popScCoalesce =
+			CScalarCoalesce::PopConvert(pop);
 
 		// match if return types are identical
 		return popScCoalesce->MdidType()->Equals(m_mdid_type);

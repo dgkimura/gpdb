@@ -35,10 +35,10 @@ class CScalarOp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type id or NULL if it can be inferred from the metadata
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// scalar operator name
 	const CWStringConst *m_pstrOp;
@@ -57,8 +57,8 @@ private:
 
 public:
 	// ctor
-	CScalarOp(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
-			  const CWStringConst *pstrOp);
+	CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+			  gpos::Ref<IMDId> return_type_mdid, const CWStringConst *pstrOp);
 
 	// dtor
 	~CScalarOp() override
@@ -84,22 +84,22 @@ public:
 	}
 
 	// accessor to the return type field
-	IMDId *GetReturnTypeMdId() const;
+	gpos::Ref<IMDId> GetReturnTypeMdId() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -109,17 +109,17 @@ public:
 	}
 
 	// conversion function
-	static CScalarOp *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarOp>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarOp == pop->Eopid());
 
-		return dynamic_cast<CScalarOp *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarOp> >(pop);
 	}
 
 	// helper function
-	static BOOL FCommutative(const IMDId *pcmdidOtherOp);
+	static BOOL FCommutative(const gpos::Ref<IMDId> pcmdidOtherOp);
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
@@ -128,7 +128,7 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

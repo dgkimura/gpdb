@@ -28,7 +28,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarSwitch::CScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
+CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp), m_mdid_type(mdid_type), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(mdid_type->IsValid());
@@ -75,11 +75,11 @@ CScalarSwitch::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitch::Matches(COperator *pop) const
+CScalarSwitch::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarSwitch *popScSwitch = CScalarSwitch::PopConvert(pop);
+		gpos::Ref<CScalarSwitch> popScSwitch = CScalarSwitch::PopConvert(pop);
 
 		// match if return types are identical
 		return popScSwitch->MdidType()->Equals(m_mdid_type);

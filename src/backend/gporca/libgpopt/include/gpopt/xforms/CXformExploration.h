@@ -34,7 +34,7 @@ public:
 	CXformExploration(const CXformExploration &) = delete;
 
 	// ctor
-	explicit CXformExploration(CExpression *pexpr);
+	explicit CXformExploration(gpos::Ref<CExpression> pexpr);
 
 	// dtor
 	~CXformExploration() override;
@@ -69,13 +69,13 @@ public:
 	}
 
 	// conversion function
-	static CXformExploration *
-	Pxformexp(CXform *pxform)
+	static gpos::Ref<CXformExploration>
+	Pxformexp(gpos::Ref<CXform> pxform)
 	{
 		GPOS_ASSERT(nullptr != pxform);
 		GPOS_ASSERT(pxform->FExploration());
 
-		return dynamic_cast<CXformExploration *>(pxform);
+		return dynamic_cast<gpos::Ref<CXformExploration> >(pxform);
 	}
 
 };	// class CXformExploration

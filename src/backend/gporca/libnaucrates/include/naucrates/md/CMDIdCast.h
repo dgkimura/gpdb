@@ -37,10 +37,10 @@ class CMDIdCast : public IMDId
 {
 private:
 	// mdid of source type
-	CMDIdGPDB *m_mdid_src;
+	gpos::Ref<CMDIdGPDB> m_mdid_src;
 
 	// mdid of destinatin type
-	CMDIdGPDB *m_mdid_dest;
+	gpos::Ref<CMDIdGPDB> m_mdid_dest;
 
 
 	// buffer for the serialized mdid
@@ -56,7 +56,7 @@ public:
 	CMDIdCast(const CMDIdCast &) = delete;
 
 	// ctor
-	CMDIdCast(CMDIdGPDB *mdid_src, CMDIdGPDB *mdid_dest);
+	CMDIdCast(gpos::Ref<CMDIdGPDB> mdid_src, gpos::Ref<CMDIdGPDB> mdid_dest);
 
 	// dtor
 	~CMDIdCast() override;
@@ -78,13 +78,13 @@ public:
 	}
 
 	// source type id
-	IMDId *MdidSrc() const;
+	gpos::Ref<IMDId> MdidSrc() const;
 
 	// destination type id
-	IMDId *MdidDest() const;
+	gpos::Ref<IMDId> MdidDest() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -110,20 +110,22 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdCast *
-	CastMdid(const IMDId *mdid)
+	static const gpos::Ref<CMDIdCast>
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdCast *>(mdid);
+		return dynamic_cast<const gpos::Ref<CMDIdCast> >(mdid);
 	}
 
 	// make a copy in the given memory pool
-	IMDId *
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_src = CMDIdGPDB::CastMdid(m_mdid_src->Copy(mp));
-		CMDIdGPDB *mdid_dest = CMDIdGPDB::CastMdid(m_mdid_dest->Copy(mp));
+		gpos::Ref<CMDIdGPDB> mdid_src =
+			CMDIdGPDB::CastMdid(m_mdid_src->Copy(mp));
+		gpos::Ref<CMDIdGPDB> mdid_dest =
+			CMDIdGPDB::CastMdid(m_mdid_dest->Copy(mp));
 		return GPOS_NEW(mp) CMDIdCast(mdid_src, mdid_dest);
 	}
 };

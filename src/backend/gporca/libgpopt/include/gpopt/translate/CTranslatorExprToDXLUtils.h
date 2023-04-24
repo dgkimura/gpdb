@@ -54,90 +54,95 @@ class CTranslatorExprToDXLUtils
 {
 private:
 	// create a column reference
-	static CColRef *PcrCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  CColumnFactory *col_factory, IMDId *mdid,
-							  INT type_modifier, const WCHAR *wszName);
+	static gpos::Ref<CColRef> PcrCreate(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
+		gpos::Ref<IMDId> mdid, INT type_modifier, const WCHAR *wszName);
 
 
 	// compute a DXL datum from a point constraint
-	static CDXLDatum *PdxldatumFromPointConstraint(CMemoryPool *mp,
-												   CMDAccessor *md_accessor,
-												   const CColRef *pcrDistrCol,
-												   CConstraint *pcnstrDistrCol);
+	static gpos::Ref<CDXLDatum> PdxldatumFromPointConstraint(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CColRef> pcrDistrCol,
+		gpos::Ref<CConstraint> pcnstrDistrCol);
 
 	// compute an array of DXL datum arrays from a disjunction of point constraints
 	static CDXLDatum2dArray *PdrgpdrgpdxldatumFromDisjPointConstraint(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const CColRef *pcrDistrCol,
-		CConstraint *pcnstrDistrCol);
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CColRef> pcrDistrCol,
+		gpos::Ref<CConstraint> pcnstrDistrCol);
 
 	// compute the direct dispatch info  from the constraints
 	// on the distribution keys
-	static CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo(
+	static gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CExpressionArray *pdrgpexprHashed, CConstraint *pcnstr);
+		CExpressionArray *pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr);
 
 	// compute the direct dispatch info  from the constraints
 	// for a randomly distributed table
-	static CDXLDirectDispatchInfo *GetDXLDirectDispatchInfoRandDist(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const CColRef *pcrDistrCol,
-		CConstraint *pcnstrDistrCol);
+	static gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfoRandDist(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CColRef> pcrDistrCol,
+		gpos::Ref<CConstraint> pcnstrDistrCol);
 
 	// compute the direct dispatch info for a single distribution key from the constraints
 	// on the distribution key
-	static CDXLDirectDispatchInfo *PdxlddinfoSingleDistrKey(
-		CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexprHashed,
-		CConstraint *pcnstr);
+	static gpos::Ref<CDXLDirectDispatchInfo> PdxlddinfoSingleDistrKey(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::Ref<CExpression> pexprHashed, gpos::Ref<CConstraint> pcnstr);
 
 	// check if the given constant value for a particular distribution column can be used
 	// to identify which segment to direct dispatch to.
 	static BOOL FDirectDispatchable(CMDAccessor *md_accessor,
-									const CColRef *pcrDistrCol,
-									const CDXLDatum *dxl_datum);
+									const gpos::Ref<CColRef> pcrDistrCol,
+									const gpos::Ref<CDXLDatum> dxl_datum);
 
 public:
 	// construct a default properties container
-	static CDXLPhysicalProperties *GetProperties(CMemoryPool *mp);
+	static gpos::Ref<CDXLPhysicalProperties> GetProperties(CMemoryPool *mp);
 
 	// check if the DXL Node is a scalar const TRUE
-	static BOOL FScalarConstTrue(CMDAccessor *md_accessor, CDXLNode *dxlnode);
+	static BOOL FScalarConstTrue(CMDAccessor *md_accessor,
+								 gpos::Ref<CDXLNode> dxlnode);
 
 	// check if the DXL Node is a scalar const false
-	static BOOL FScalarConstFalse(CMDAccessor *md_accessor, CDXLNode *dxlnode);
+	static BOOL FScalarConstFalse(CMDAccessor *md_accessor,
+								  gpos::Ref<CDXLNode> dxlnode);
 
 	// check whether a project list has the same columns in the given array
 	// and in the same order
-	static BOOL FProjectListMatch(CDXLNode *pdxlnPrL,
+	static BOOL FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
 								  CColRefArray *colref_array);
 
 	// create a project list by creating references to the columns of the given
 	// project list of the child node
-	static CDXLNode *PdxlnProjListFromChildProjList(
+	static gpos::Ref<CDXLNode> PdxlnProjListFromChildProjList(
 		CMemoryPool *mp, CColumnFactory *col_factory,
-		ColRefToDXLNodeMap *phmcrdxln, const CDXLNode *pdxlnProjListChild);
+		ColRefToDXLNodeMap *phmcrdxln,
+		const gpos::Ref<CDXLNode> pdxlnProjListChild);
 
 	// create a DXL project elem node from as a scalar identifier for the
 	// child project element node
-	static CDXLNode *PdxlnProjElem(CMemoryPool *mp, CColumnFactory *col_factory,
-								   ColRefToDXLNodeMap *phmcrdxln,
-								   const CDXLNode *pdxlnProjElemChild);
+	static gpos::Ref<CDXLNode> PdxlnProjElem(
+		CMemoryPool *mp, CColumnFactory *col_factory,
+		ColRefToDXLNodeMap *phmcrdxln,
+		const gpos::Ref<CDXLNode> pdxlnProjElemChild);
 
 	// create a scalar identifier node for the given column reference
-	static CDXLNode *PdxlnIdent(CMemoryPool *mp,
-								ColRefToDXLNodeMap *phmcrdxlnSubplans,
-								ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
-								ColRefToUlongMap *phmcrulPartColId,
-								const CColRef *colref);
+	static gpos::Ref<CDXLNode> PdxlnIdent(
+		CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
+		ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
+		ColRefToUlongMap *phmcrulPartColId, const gpos::Ref<CColRef> colref);
 
 	// replace subplan entry in the given map with a dxl column reference
 	static void ReplaceSubplan(CMemoryPool *mp,
 							   ColRefToDXLNodeMap *phmcrdxlnSubplans,
-							   const CColRef *colref,
-							   CDXLScalarProjElem *pdxlopPrEl);
+							   const gpos::Ref<CColRef> colref,
+							   gpos::Ref<CDXLScalarProjElem> pdxlopPrEl);
 
 	// create a project elem from a given col ref
-	static CDXLNode *PdxlnProjElem(CMemoryPool *mp,
-								   ColRefToDXLNodeMap *phmcrdxlnSubplans,
-								   const CColRef *colref);
+	static gpos::Ref<CDXLNode> PdxlnProjElem(
+		CMemoryPool *mp, ColRefToDXLNodeMap *phmcrdxlnSubplans,
+		const gpos::Ref<CColRef> colref);
 
 	// construct an array of NULL datums for a given array of columns
 	static IDatumArray *PdrgpdatumNulls(CMemoryPool *mp,
@@ -150,23 +155,20 @@ public:
 										   CColRefArray *pdrgpcrMapDest);
 
 	// combine two boolean expressions using the given boolean operator
-	static CDXLNode *PdxlnCombineBoolean(CMemoryPool *mp,
-										 CDXLNode *first_child_dxlnode,
-										 CDXLNode *second_child_dxlnode,
-										 EdxlBoolExprType boolexptype);
+	static gpos::Ref<CDXLNode> PdxlnCombineBoolean(
+		CMemoryPool *mp, gpos::Ref<CDXLNode> first_child_dxlnode,
+		gpos::Ref<CDXLNode> second_child_dxlnode, EdxlBoolExprType boolexptype);
 
 	// create a DXL result node
-	static CDXLNode *PdxlnResult(CMemoryPool *mp,
-								 CDXLPhysicalProperties *dxl_properties,
-								 CDXLNode *pdxlnPrL, CDXLNode *filter_dxlnode,
-								 CDXLNode *one_time_filter,
-								 CDXLNode *child_dxlnode);
+	static gpos::Ref<CDXLNode> PdxlnResult(
+		CMemoryPool *mp, gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CDXLNode> pdxlnPrL, gpos::Ref<CDXLNode> filter_dxlnode,
+		gpos::Ref<CDXLNode> one_time_filter, gpos::Ref<CDXLNode> child_dxlnode);
 
 	// create a DXL ValuesScan node
-	static CDXLNode *PdxlnValuesScan(CMemoryPool *mp,
-									 CDXLPhysicalProperties *dxl_properties,
-									 CDXLNode *pdxlnPrL,
-									 IDatum2dArray *pdrgpdrgdatum);
+	static gpos::Ref<CDXLNode> PdxlnValuesScan(
+		CMemoryPool *mp, gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CDXLNode> pdxlnPrL, IDatum2dArray *pdrgpdrgdatum);
 
 	// build hashmap based on a column array, where the key is the column
 	// and the value is the index of that column in the array
@@ -175,57 +177,62 @@ public:
 
 	// set statistics of the operator
 	static void SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
-						 CDXLNode *dxlnode, const IStatistics *stats,
-						 BOOL fRoot);
+						 gpos::Ref<CDXLNode> dxlnode,
+						 const gpos::Ref<IStatistics> stats, BOOL fRoot);
 
 	// set direct dispatch info of the operator
 	static void SetDirectDispatchInfo(
-		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *dxlnode,
-		CExpression *pexpr, CDistributionSpecArray *pdrgpdsBaseTables);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> dxlnode,
+		gpos::Ref<CExpression> pexpr,
+		CDistributionSpecArray *pdrgpdsBaseTables);
 
 	// is the aggregate a local hash aggregate that is safe to stream
-	static BOOL FLocalHashAggStreamSafe(CExpression *pexprAgg);
+	static BOOL FLocalHashAggStreamSafe(gpos::Ref<CExpression> pexprAgg);
 
 	// if operator is a scalar cast or func allowed for Partition selection, extract type and function
-	static void ExtractCastFuncMdids(COperator *pop, IMDId **ppmdidType,
-									 IMDId **ppmdidCastFunc);
+	static void ExtractCastFuncMdids(gpos::Ref<COperator> pop,
+									 gpos::Ref<IMDId> *ppmdidType,
+									 gpos::Ref<IMDId> *ppmdidCastFunc);
 
 	// produce DXL representation of a datum
-	static CDXLDatum *
-	GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor, IDatum *datum)
+	static gpos::Ref<CDXLDatum>
+	GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor,
+				gpos::Ref<IDatum> datum)
 	{
-		IMDId *mdid = datum->MDId();
+		gpos::Ref<IMDId> mdid = datum->MDId();
 		return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, datum);
 	}
 
 	// return a copy the dxl node's physical properties
-	static CDXLPhysicalProperties *PdxlpropCopy(CMemoryPool *mp,
-												CDXLNode *dxlnode);
+	static gpos::Ref<CDXLPhysicalProperties> PdxlpropCopy(
+		CMemoryPool *mp, gpos::Ref<CDXLNode> dxlnode);
 
 	// check if given dxl operator exists in the given list
-	static BOOL FDXLOpExists(const CDXLOperator *pop,
+	static BOOL FDXLOpExists(const gpos::Ref<CDXLOperator> pop,
 							 const gpdxl::Edxlopid *peopid, ULONG ulOps);
 
 	// check if given dxl node has any operator in the given list
-	static BOOL FHasDXLOp(const CDXLNode *dxlnode,
+	static BOOL FHasDXLOp(const gpos::Ref<CDXLNode> dxlnode,
 						  const gpdxl::Edxlopid *peopid, ULONG ulOps);
 
 	// check if the project lists contains subplans with broadcast motion
-	static BOOL FProjListContainsSubplanWithBroadCast(CDXLNode *pdxlnPrLNew);
+	static BOOL FProjListContainsSubplanWithBroadCast(
+		gpos::Ref<CDXLNode> pdxlnPrLNew);
 
 	// check if the dxl node imposes a motion hazard
-	static BOOL FMotionHazard(CMemoryPool *mp, CDXLNode *dxlnode,
+	static BOOL FMotionHazard(CMemoryPool *mp, gpos::Ref<CDXLNode> dxlnode,
 							  const gpdxl::Edxlopid *peopid, ULONG ulOps,
-							  CBitSet *pbsPrjCols);
+							  gpos::Ref<CBitSet> pbsPrjCols);
 
 	// check if the dxl operator does not impose a motion hazard
-	static BOOL FMotionHazardSafeOp(CDXLNode *dxlnode);
+	static BOOL FMotionHazardSafeOp(gpos::Ref<CDXLNode> dxlnode);
 
 	// extract the column ids of the ident from project list
-	static void ExtractIdentColIds(CDXLNode *dxlnode, CBitSet *pbs);
+	static void ExtractIdentColIds(gpos::Ref<CDXLNode> dxlnode,
+								   gpos::Ref<CBitSet> pbs);
 
 	// is this Filter node direct dispatchable?
-	static BOOL FDirectDispatchableFilter(CExpression *pexprFilter);
+	static BOOL FDirectDispatchableFilter(gpos::Ref<CExpression> pexprFilter);
 };
 }  // namespace gpopt
 

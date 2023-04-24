@@ -42,16 +42,16 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLScalarFilter *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarFilter>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarFilter *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarFilter> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -65,7 +65,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

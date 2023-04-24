@@ -58,7 +58,8 @@ CDistributionSpecSingleton::CDistributionSpecSingleton()
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecSingleton::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecSingleton::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Matches(pds))
 	{
@@ -86,7 +87,7 @@ CDistributionSpecSingleton::FSatisfies(const CDistributionSpec *pds) const
 	}
 
 	return (EdtSingleton == pds->Edt() &&
-			m_est == ((CDistributionSpecSingleton *) pds)->Est());
+			m_est == ((gpos::Ref<CDistributionSpecSingleton>) pds)->Est());
 }
 
 
@@ -101,9 +102,9 @@ CDistributionSpecSingleton::FSatisfies(const CDistributionSpec *pds) const
 void
 CDistributionSpecSingleton::AppendEnforcers(CMemoryPool *mp,
 											CExpressionHandle &,  // exprhdl
-											CReqdPropPlan *prpp,
+											gpos::Ref<CReqdPropPlan> prpp,
 											CExpressionArray *pdrgpexpr,
-											CExpression *pexpr)
+											gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -122,17 +123,17 @@ CDistributionSpecSingleton::AppendEnforcers(CMemoryPool *mp,
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 
 	if (!prpp->Peo()->PosRequired()->IsEmpty())
 	{
-		COrderSpec *pos = prpp->Peo()->PosRequired();
+		gpos::Ref<COrderSpec> pos = prpp->Peo()->PosRequired();
 		pos->AddRef();
 		pexpr->AddRef();
 
-		CExpression *pexprGatherMerge = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CExpression> pexprGatherMerge = GPOS_NEW(mp) CExpression(
 			mp, GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est, pos), pexpr);
 		pdrgpexpr->Append(pexprGatherMerge);
 	}

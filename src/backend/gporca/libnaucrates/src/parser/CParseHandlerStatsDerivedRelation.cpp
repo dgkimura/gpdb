@@ -166,7 +166,7 @@ CParseHandlerStatsDerivedRelation::EndElement(
 		CParseHandlerStatsDerivedColumn *stats_derived_col_parse_handler =
 			dynamic_cast<CParseHandlerStatsDerivedColumn *>((*this)[idx]);
 
-		CDXLStatsDerivedColumn *pdxlstatdercol =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatdercol =
 			stats_derived_col_parse_handler->GetDxlStatsDerivedCol();
 		pdxlstatdercol->AddRef();
 		dxl_stats_derived_col_array->Append(pdxlstatdercol);

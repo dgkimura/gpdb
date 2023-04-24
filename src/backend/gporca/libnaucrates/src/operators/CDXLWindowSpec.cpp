@@ -35,8 +35,9 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLWindowSpec::CDXLWindowSpec(CMemoryPool *mp,
 							   ULongPtrArray *partition_by_colid_array,
-							   CMDName *mdname, CDXLNode *sort_col_list_dxlnode,
-							   CDXLWindowFrame *window_frame)
+							   CMDName *mdname,
+							   gpos::Ref<CDXLNode> sort_col_list_dxlnode,
+							   gpos::Ref<CDXLWindowFrame> window_frame)
 	: m_mp(mp),
 	  m_partition_by_colid_array(partition_by_colid_array),
 	  m_mdname(mdname),

@@ -43,19 +43,19 @@ class CScalarSubqueryQuantified : public CScalar
 {
 private:
 	// id of comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of comparison operator
 	const CWStringConst *m_pstrScalarOp;
 
 	// column reference used in comparison
-	const CColRef *m_pcr;
+	const gpos::Ref<CColRef> m_pcr;
 
 protected:
 	// ctor
-	CScalarSubqueryQuantified(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CScalarSubqueryQuantified(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 							  const CWStringConst *pstrScalarOp,
-							  const CColRef *colref);
+							  const gpos::Ref<CColRef> colref);
 
 	// dtor
 	~CScalarSubqueryQuantified() override;
@@ -64,26 +64,26 @@ public:
 	CScalarSubqueryQuantified(const CScalarSubqueryQuantified &) = delete;
 
 	// operator mdid accessor
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// operator name accessor
 	const CWStringConst *PstrOp() const;
 
 	// column reference accessor
-	const CColRef *
+	const gpos::Ref<CColRef>
 	Pcr() const
 	{
 		return m_pcr;
 	}
 
 	// return the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -93,21 +93,22 @@ public:
 	}
 
 	// return locally used columns
-	CColRefSet *PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp,
+								   CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	CPartInfo *PpartinfoDerive(CMemoryPool *mp,
-							   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> PpartinfoDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubqueryQuantified *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarSubqueryQuantified>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAny == pop->Eopid() ||
 					EopScalarSubqueryAll == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryQuantified *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarSubqueryQuantified> >(pop);
 	}
 
 	// print

@@ -35,13 +35,13 @@ class CScalarConst : public CScalar
 {
 private:
 	// constant
-	IDatum *m_pdatum;
+	gpos::Ref<IDatum> m_pdatum;
 
 public:
 	CScalarConst(const CScalarConst &) = delete;
 
 	// ctor
-	CScalarConst(CMemoryPool *mp, IDatum *datum);
+	CScalarConst(CMemoryPool *mp, gpos::Ref<IDatum> datum);
 
 	// dtor
 	~CScalarConst() override;
@@ -61,7 +61,7 @@ public:
 	}
 
 	// accessor of contained constant
-	IDatum *
+	gpos::Ref<IDatum>
 	GetDatum() const
 	{
 		return m_pdatum;
@@ -71,7 +71,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -81,7 +81,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -91,17 +91,17 @@ public:
 	}
 
 	// conversion function
-	static CScalarConst *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarConst>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarConst == pop->Eopid());
 
-		return dynamic_cast<CScalarConst *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarConst> >(pop);
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	INT TypeModifier() const override;
 
@@ -112,11 +112,12 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// is the given expression a scalar cast of a constant
-	static BOOL FCastedConst(CExpression *pexpr);
+	static BOOL FCastedConst(gpos::Ref<CExpression> pexpr);
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.
-	static CScalarConst *PopExtractFromConstOrCastConst(CExpression *pexpr);
+	static gpos::Ref<CScalarConst> PopExtractFromConstOrCastConst(
+		gpos::Ref<CExpression> pexpr);
 
 };	// class CScalarConst
 

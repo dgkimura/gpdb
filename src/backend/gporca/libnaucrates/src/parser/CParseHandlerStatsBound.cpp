@@ -76,7 +76,7 @@ CParseHandlerStatsBound::StartElement(const XMLCh *const,  // element_uri,
 		GPOS_ASSERT(nullptr == m_dxl_datum);
 
 		// translate the datum and add it to the datum array
-		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::Ref<CDXLDatum> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDatum);
 		m_dxl_datum = dxl_datum;
 

@@ -36,13 +36,13 @@ private:
 	CColRefArray *m_pdrgpcr;
 
 	// inlined expression
-	CExpression *m_pexprInlined;
+	gpos::Ref<CExpression> m_pexprInlined;
 
 	// map of CTE producer's output column ids to consumer's output columns
 	UlongToColRefMap *m_phmulcr;
 
 	// output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::Ref<CColRefSet> m_pcrsOutput;
 
 	// create the inlined version of this consumer as well as the column mapping
 	void CreateInlinedExpr(CMemoryPool *mp);
@@ -93,7 +93,7 @@ public:
 		return m_phmulcr;
 	}
 
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprInlined() const
 	{
 		return m_pexprInlined;
@@ -103,26 +103,26 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -134,27 +134,27 @@ public:
 						  CExpressionHandle &exprhdl) const override;
 
 	// derive not nullable output columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive table descriptor
-	CTableDescriptor *DeriveTableDescriptor(
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stats columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput,
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 //pcrsInput,
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalCTEConsumer has no children");
@@ -169,8 +169,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
@@ -182,13 +183,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEConsumer *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalCTEConsumer>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEConsumer == pop->Eopid());
 
-		return dynamic_cast<CLogicalCTEConsumer *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalCTEConsumer> >(pop);
 	}
 
 	// debug print

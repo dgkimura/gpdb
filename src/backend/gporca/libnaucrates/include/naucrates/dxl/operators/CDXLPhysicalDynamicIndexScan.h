@@ -33,10 +33,10 @@ class CDXLPhysicalDynamicIndexScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// index descriptor associated with the scanned table
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::Ref<CDXLIndexDescr> m_dxl_index_descr;
 
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;
@@ -58,8 +58,9 @@ public:
 	};
 
 	//ctor
-	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
-								 CDXLIndexDescr *dxl_index_descr,
+	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp,
+								 gpos::Ref<CDXLTableDescr> table_descr,
+								 gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 								 EdxlIndexScanDirection idx_scan_direction,
 								 IMdIdArray *part_mdids,
 								 ULongPtrArray *selector_ids);
@@ -74,10 +75,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// index descriptor
-	const CDXLIndexDescr *GetDXLIndexDescr() const;
+	const gpos::Ref<CDXLIndexDescr> GetDXLIndexDescr() const;
 
 	//table descriptor
-	const CDXLTableDescr *GetDXLTableDescr() const;
+	const gpos::Ref<CDXLTableDescr> GetDXLTableDescr() const;
 
 	// scan direction
 	EdxlIndexScanDirection GetIndexScanDir() const;
@@ -92,22 +93,23 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDynamicIndexScan *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalDynamicIndexScan>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDynamicIndexScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalDynamicIndexScan *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalDynamicIndexScan> >(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

@@ -32,10 +32,10 @@ class CScalarCast : public CScalar
 {
 private:
 	// return type metadata id in the catalog
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function to be used for casting
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// whether or not this cast is binary coercible
 	BOOL m_is_binary_coercible;
@@ -50,8 +50,8 @@ public:
 	CScalarCast(const CScalarCast &) = delete;
 
 	// ctor
-	CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid, IMDId *mdid_func,
-				BOOL is_binary_coercible);
+	CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
+				gpos::Ref<IMDId> mdid_func, BOOL is_binary_coercible);
 
 	// dtor
 	~CScalarCast() override
@@ -64,14 +64,14 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_return_type_mdid;
 	}
 
 	// func that casts
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid;
@@ -91,7 +91,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -101,7 +101,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -125,13 +125,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarCast *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarCast>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCast == pop->Eopid());
 
-		return dynamic_cast<CScalarCast *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarCast> >(pop);
 	}
 
 };	// class CScalarCast

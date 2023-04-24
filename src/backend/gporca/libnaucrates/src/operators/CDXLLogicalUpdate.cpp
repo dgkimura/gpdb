@@ -30,7 +30,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalUpdate::CDXLLogicalUpdate(CMemoryPool *mp,
-									 CDXLTableDescr *table_descr,
+									 gpos::Ref<CDXLTableDescr> table_descr,
 									 ULONG ctid_colid, ULONG segid_colid,
 									 ULongPtrArray *delete_colid_array,
 									 ULongPtrArray *insert_colid_array)
@@ -99,7 +99,7 @@ CDXLLogicalUpdate::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalUpdate::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *node) const
+								  const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -139,12 +139,12 @@ CDXLLogicalUpdate::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalUpdate::AssertValid(const CDXLNode *node,
+CDXLLogicalUpdate::AssertValid(const gpos::Ref<CDXLNode> node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
 
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

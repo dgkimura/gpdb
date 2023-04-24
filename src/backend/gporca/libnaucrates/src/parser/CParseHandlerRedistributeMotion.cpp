@@ -70,7 +70,7 @@ CParseHandlerRedistributeMotion::StartElement(
 	}
 
 	// parse and create Redistribute motion operator
-	m_dxl_op = (CDXLPhysicalRedistributeMotion *)
+	m_dxl_op = (gpos::Ref<CDXLPhysicalRedistributeMotion>)
 		CDXLOperatorFactory::MakeDXLRedistributeMotion(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 

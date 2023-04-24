@@ -55,7 +55,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -65,7 +65,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -74,7 +74,7 @@ public:
 		return PopCopyDefault();
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarSwitchCase::MdidType()");
@@ -89,13 +89,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarSwitchCase *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarSwitchCase>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSwitchCase == pop->Eopid());
 
-		return dynamic_cast<CScalarSwitchCase *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarSwitchCase> >(pop);
 	}
 
 };	// class CScalarSwitchCase

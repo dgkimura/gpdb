@@ -36,23 +36,24 @@ class CScalarArrayRef : public CScalar
 {
 private:
 	// element type id
-	IMDId *m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// return type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarArrayRef(const CScalarArrayRef &) = delete;
 
 	// ctor
-	CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid, INT type_modifier,
-					IMDId *array_type_mdid, IMDId *return_type_mdid);
+	CScalarArrayRef(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					INT type_modifier, gpos::Ref<IMDId> array_type_mdid,
+					gpos::Ref<IMDId> return_type_mdid);
 
 	// dtor
 	~CScalarArrayRef() override;
@@ -72,7 +73,7 @@ public:
 	}
 
 	// element type id
-	IMDId *
+	gpos::Ref<IMDId>
 	PmdidElem() const
 	{
 		return m_pmdidElem;
@@ -82,7 +83,7 @@ public:
 	INT TypeModifier() const override;
 
 	// array type id
-	IMDId *
+	gpos::Ref<IMDId>
 	PmdidArray() const
 	{
 		return m_pmdidArray;
@@ -92,7 +93,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -102,7 +103,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -112,20 +113,20 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
 	}
 
 	// conversion function
-	static CScalarArrayRef *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarArrayRef>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayRef == pop->Eopid());
 
-		return dynamic_cast<CScalarArrayRef *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarArrayRef> >(pop);
 	}
 
 };	// class CScalarArrayRef

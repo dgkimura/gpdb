@@ -64,9 +64,10 @@ CPhysicalAssert::~CPhysicalAssert()
 //		Compute required output columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalAssert::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
+							  gpos::Ref<CColRefSet> pcrsRequired,
+							  ULONG child_index,
 							  CDrvdPropArray *,	 // pdrgpdpCtxt
 							  ULONG				 // ulOptReq
 )
@@ -88,9 +89,10 @@ CPhysicalAssert::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalAssert::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 COrderSpec *posRequired, ULONG child_index,
+							 gpos::Ref<COrderSpec> posRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 ) const
@@ -109,9 +111,10 @@ CPhysicalAssert::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsRequired, ULONG child_index,
+							 gpos::Ref<CDistributionSpec> pdsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
@@ -139,9 +142,10 @@ CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalAssert::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CRewindabilitySpec *prsRequired, ULONG child_index,
+							 gpos::Ref<CRewindabilitySpec> prsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 ) const
@@ -160,10 +164,10 @@ CPhysicalAssert::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalAssert::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::Ref<CCTEReq> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -185,7 +189,7 @@ CPhysicalAssert::PcteRequired(CMemoryPool *,		//mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalAssert::PosDerive(CMemoryPool *,  // mp
 						   CExpressionHandle &exprhdl) const
 {
@@ -201,7 +205,7 @@ CPhysicalAssert::PosDerive(CMemoryPool *,  // mp
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalAssert::PdsDerive(CMemoryPool *,  // mp
 						   CExpressionHandle &exprhdl) const
 {
@@ -217,7 +221,7 @@ CPhysicalAssert::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalAssert::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -233,14 +237,14 @@ CPhysicalAssert::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalAssert::Matches(COperator *pop) const
+CPhysicalAssert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalAssert *popAssert = CPhysicalAssert::PopConvert(pop);
+	gpos::Ref<CPhysicalAssert> popAssert = CPhysicalAssert::PopConvert(pop);
 	return CException::Equals(*(popAssert->Pexc()), *m_pexc);
 }
 
@@ -255,7 +259,7 @@ CPhysicalAssert::Matches(COperator *pop) const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalAssert::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsRequired,
+								   gpos::Ref<CColRefSet> pcrsRequired,
 								   ULONG  // ulOptReq
 ) const
 {
@@ -273,7 +277,7 @@ CPhysicalAssert::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalAssert::EpetOrder(CExpressionHandle &,	 // exprhdl
-						   const CEnfdOrder *
+						   const gpos::Ref<CEnfdOrder>
 #ifdef GPOS_DEBUG
 							   peo
 #endif	// GPOS_DEBUG
@@ -296,11 +300,12 @@ CPhysicalAssert::EpetOrder(CExpressionHandle &,	 // exprhdl
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalAssert::EpetRewindability(CExpressionHandle &exprhdl,
-								   const CEnfdRewindability *per) const
+CPhysicalAssert::EpetRewindability(
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdRewindability> per) const
 {
 	// get rewindability delivered by the assert node
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::Ref<CRewindabilitySpec> prs =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required rewindability is already provided

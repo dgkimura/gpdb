@@ -120,7 +120,7 @@ private:
 		CMemoryPool *m_mp;
 
 		// logical producer expression
-		CExpression *m_pexprCTEProducer;
+		gpos::Ref<CExpression> m_pexprCTEProducer;
 
 		// map columns of all created consumers of current CTE to their positions in consumer output
 		ColRefToUlongMap *m_phmcrulConsumers;
@@ -130,15 +130,15 @@ private:
 
 	public:
 		// ctors
-		CCTEInfoEntry(CMemoryPool *mp, CExpression *pexprCTEProducer);
-		CCTEInfoEntry(CMemoryPool *mp, CExpression *pexprCTEProducer,
+		CCTEInfoEntry(CMemoryPool *mp, gpos::Ref<CExpression> pexprCTEProducer);
+		CCTEInfoEntry(CMemoryPool *mp, gpos::Ref<CExpression> pexprCTEProducer,
 					  BOOL fUsed);
 
 		// dtor
 		~CCTEInfoEntry() override;
 
 		// CTE expression
-		CExpression *
+		gpos::Ref<CExpression>
 		Pexpr() const
 		{
 			return m_pexprCTEProducer;
@@ -165,7 +165,7 @@ private:
 		void AddConsumerCols(CColRefArray *colref_array);
 
 		// return position of given consumer column in consumer output
-		ULONG UlConsumerColPos(CColRef *colref);
+		ULONG UlConsumerColPos(gpos::Ref<CColRef> colref);
 
 	};	//class CCTEInfoEntry
 
@@ -197,17 +197,18 @@ private:
 	UlongToProducerConsumerMap *m_phmulprodconsmap;
 
 	// initialize default statistics for a given CTE Producer
-	void InitDefaultStats(CExpression *pexprCTEProducer);
+	void InitDefaultStats(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// preprocess CTE producer expression
-	CExpression *PexprPreprocessCTEProducer(
-		const CExpression *pexprCTEProducer);
+	gpos::Ref<CExpression> PexprPreprocessCTEProducer(
+		const gpos::Ref<CExpression> pexprCTEProducer);
 
 	// number of consumers of given CTE inside a given parent
 	ULONG UlConsumersInParent(ULONG ulConsumerId, ULONG ulParentId) const;
 
 	// find all CTE consumers inside given parent, and push them to the given stack
-	void FindConsumersInParent(ULONG ulParentId, CBitSet *pbsUnusedConsumers,
+	void FindConsumersInParent(ULONG ulParentId,
+							   gpos::Ref<CBitSet> pbsUnusedConsumers,
 							   CStack<ULONG> *pstack);
 
 public:
@@ -220,7 +221,7 @@ public:
 	~CCTEInfo() override;
 
 	// logical cte producer with given id
-	CExpression *PexprCTEProducer(ULONG ulCTEId) const;
+	gpos::Ref<CExpression> PexprCTEProducer(ULONG ulCTEId) const;
 
 	// number of CTE consumers of given CTE
 	ULONG UlConsumers(ULONG ulCTEId) const;
@@ -233,10 +234,10 @@ public:
 							ULONG ulParentCTEId = gpos::ulong_max);
 
 	// add cte producer to hashmap
-	void AddCTEProducer(CExpression *pexprCTEProducer);
+	void AddCTEProducer(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// replace cte producer with given expression
-	void ReplaceCTEProducer(CExpression *pexprCTEProducer);
+	void ReplaceCTEProducer(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// next available CTE id
 	ULONG
@@ -247,12 +248,13 @@ public:
 
 	// derive the statistics on the CTE producer
 	void DeriveProducerStats(
-		CLogicalCTEConsumer *popConsumer,  // CTE Consumer operator
-		CColRefSet *pcrsStat  // required stat columns on the CTE Consumer
+		gpos::Ref<CLogicalCTEConsumer> popConsumer,	 // CTE Consumer operator
+		gpos::Ref<CColRefSet>
+			pcrsStat  // required stat columns on the CTE Consumer
 	);
 
 	// return a CTE requirement with all the producers as optional
-	CCTEReq *PcterProducers(CMemoryPool *mp) const;
+	gpos::Ref<CCTEReq> PcterProducers(CMemoryPool *mp) const;
 
 	// return an array of all stored CTE expressions
 	CExpressionArray *PdrgPexpr(CMemoryPool *mp) const;
@@ -282,11 +284,11 @@ public:
 	void AddConsumerCols(ULONG ulCTEId, CColRefArray *colref_array);
 
 	// return position of given consumer column in consumer output
-	ULONG UlConsumerColPos(ULONG ulCTEId, CColRef *colref);
+	ULONG UlConsumerColPos(ULONG ulCTEId, gpos::Ref<CColRef> colref);
 
 	// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
 	UlongToColRefMap *PhmulcrConsumerToProducer(CMemoryPool *mp, ULONG ulCTEId,
-												CColRefSet *pcrs,
+												gpos::Ref<CColRefSet> pcrs,
 												CColRefArray *pdrgpcrProducer);
 
 };	// CCTEInfo

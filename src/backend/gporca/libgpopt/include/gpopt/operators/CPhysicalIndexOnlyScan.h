@@ -34,22 +34,24 @@ class CPhysicalIndexOnlyScan : public CPhysicalScan
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
 
 	// order
-	COrderSpec *m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 public:
 	CPhysicalIndexOnlyScan(const CPhysicalIndexOnlyScan &) = delete;
 
 	// ctors
-	CPhysicalIndexOnlyScan(CMemoryPool *mp, CIndexDescriptor *pindexdesc,
-						   CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-						   const CName *pnameAlias, CColRefArray *colref_array,
-						   COrderSpec *pos);
+	CPhysicalIndexOnlyScan(CMemoryPool *mp,
+						   gpos::Ref<CIndexDescriptor> pindexdesc,
+						   gpos::Ref<CTableDescriptor> ptabdesc,
+						   ULONG ulOriginOpId, const CName *pnameAlias,
+						   CColRefArray *colref_array,
+						   gpos::Ref<COrderSpec> pos);
 
 	// dtor
 	~CPhysicalIndexOnlyScan() override;
@@ -87,10 +89,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
@@ -108,7 +110,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	PosDerive(CMemoryPool *,	   //mp
 			  CExpressionHandle &  //exprhdl
 	) const override
@@ -117,7 +119,7 @@ public:
 		return m_pos;
 	}
 
-	CRewindabilitySpec *
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -134,24 +136,25 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		const gpos::Ref<CEnfdOrder> peo) const override;
 
 	// conversion function
-	static CPhysicalIndexOnlyScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalIndexOnlyScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalIndexOnlyScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalIndexOnlyScan *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalIndexOnlyScan> >(pop);
 	}
 
 	// statistics derivation during costing
-	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	gpos::Ref<IStatistics>
+	PstatsDerive(CMemoryPool *,				// mp
+				 CExpressionHandle &,		// exprhdl
+				 gpos::Ref<CReqdPropPlan>,	// prpplan
+				 IStatisticsArray *			//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

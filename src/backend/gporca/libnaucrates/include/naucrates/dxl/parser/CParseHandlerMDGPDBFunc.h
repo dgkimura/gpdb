@@ -37,13 +37,13 @@ class CParseHandlerMDGPDBFunc : public CParseHandlerMetadataObject
 {
 private:
 	// id and version
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
 	IMdIdArray *m_mdid_types_array;

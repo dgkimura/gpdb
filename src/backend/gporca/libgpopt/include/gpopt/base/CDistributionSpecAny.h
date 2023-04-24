@@ -65,7 +65,7 @@ public:
 
 	// does current distribution satisfy the given one
 	BOOL
-	FSatisfies(const CDistributionSpec *pds) const override
+	FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override
 	{
 		return EdtAny == pds->Edt();
 	}
@@ -80,11 +80,11 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void
 	AppendEnforcers(
-		CMemoryPool *,		  // mp
-		CExpressionHandle &,  // exprhdl: gives access to child properties
-		CReqdPropPlan *,	  // prpp
-		CExpressionArray *,	  // pdrgpexpr
-		CExpression *		  // pexpr
+		CMemoryPool *,			   // mp
+		CExpressionHandle &,	   // exprhdl: gives access to child properties
+		gpos::Ref<CReqdPropPlan>,  // prpp
+		CExpressionArray *,		   // pdrgpexpr
+		gpos::Ref<CExpression>	   // pexpr
 		) override
 	{
 		GPOS_ASSERT(!"attempt to enforce ANY distribution");
@@ -113,13 +113,13 @@ public:
 	}
 
 	// conversion function
-	static CDistributionSpecAny *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecAny>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtAny == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecAny *>(pds);
+		return dynamic_cast<gpos::Ref<CDistributionSpecAny> >(pds);
 	}
 
 	// retrieve the physical operator requesting this distribution spec

@@ -32,7 +32,7 @@ class CLogicalPartitionSelector : public CLogical
 {
 private:
 	// mdid of partitioned table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// filter expressions corresponding to various levels
 	CExpressionArray *m_pdrgpexprFilters;
@@ -43,7 +43,7 @@ public:
 	// ctors
 	explicit CLogicalPartitionSelector(CMemoryPool *mp);
 
-	CLogicalPartitionSelector(CMemoryPool *mp, IMDId *mdid,
+	CLogicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 							  CExpressionArray *pdrgpexprFilters);
 
 	// dtor
@@ -64,7 +64,7 @@ public:
 	}
 
 	// partitioned table mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid;
@@ -78,14 +78,14 @@ public:
 	}
 
 	// filter expression for a given level
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprPartFilter(ULONG ulLevel) const
 	{
 		return (*m_pdrgpexprFilters)[ulLevel];
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -99,20 +99,20 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -124,7 +124,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -132,10 +132,10 @@ public:
 	}
 
 	// compute required stats columns of the n-th child
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *,		   // mp
 			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *pcrsInput,
+			 gpos::Ref<CColRefSet> pcrsInput,
 			 ULONG	// child_index
 	) const override
 	{
@@ -150,7 +150,7 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	CKeyCollection *
+	gpos::Ref<CKeyCollection>
 	DeriveKeyCollection(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) const override
 	{
@@ -159,7 +159,7 @@ public:
 
 
 	// derive statistics
-	IStatistics *
+	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
 				 IStatisticsArray *	 //stats_ctxt
@@ -180,13 +180,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalPartitionSelector *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalPartitionSelector>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalPartitionSelector == pop->Eopid());
 
-		return dynamic_cast<CLogicalPartitionSelector *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalPartitionSelector> >(pop);
 	}
 
 	// debug print

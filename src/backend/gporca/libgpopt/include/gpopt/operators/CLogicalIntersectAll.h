@@ -63,9 +63,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -76,11 +76,11 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -106,28 +106,28 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalIntersectAll *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalIntersectAll>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIntersectAll == pop->Eopid());
 
-		return dynamic_cast<CLogicalIntersectAll *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalIntersectAll> >(pop);
 	}
 
 	// derive statistics
-	static IStatistics *PstatsDerive(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 CColRef2dArray *pdrgpdrgpcrInput,
-									 CColRefSetArray *output_colrefsets);
+	static gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CColRef2dArray *pdrgpdrgpcrInput, CColRefSetArray *output_colrefsets);
 
 };	// class CLogicalIntersectAll
 

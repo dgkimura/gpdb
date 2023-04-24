@@ -32,7 +32,7 @@ class CXformGbAgg2HashAgg : public CXformImplementation
 private:
 protected:
 	// check if the transformation is applicable
-	static BOOL FApplicable(CExpression *pexpr);
+	static BOOL FApplicable(gpos::Ref<CExpression> pexpr);
 
 public:
 	CXformGbAgg2HashAgg(const CXformGbAgg2HashAgg &) = delete;
@@ -41,7 +41,7 @@ public:
 	CXformGbAgg2HashAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformGbAgg2HashAgg(CExpression *pexprPattern);
+	explicit CXformGbAgg2HashAgg(gpos::Ref<CExpression> pexprPattern);
 
 	// dtor
 	~CXformGbAgg2HashAgg() override = default;
@@ -64,8 +64,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 };	// class CXformGbAgg2HashAgg
 

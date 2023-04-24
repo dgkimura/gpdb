@@ -37,7 +37,7 @@ private:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// output columns
 	CColRefArray *m_pdrgpcrOutput;
@@ -46,7 +46,7 @@ private:
 	CColRef2dArray *m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for coordinator only tables)
-	CColRefSet *m_pcrsDist;
+	gpos::Ref<CColRefSet> m_pcrsDist;
 
 	void CreatePartCols(CMemoryPool *mp, const ULongPtrArray *pdrgpulPart);
 
@@ -58,10 +58,11 @@ public:
 	explicit CLogicalGet(CMemoryPool *mp);
 
 	CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-				CTableDescriptor *ptabdesc);
+				gpos::Ref<CTableDescriptor> ptabdesc);
 
 	CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-				CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput);
+				gpos::Ref<CTableDescriptor> ptabdesc,
+				CColRefArray *pdrgpcrOutput);
 
 	// dtor
 	~CLogicalGet() override;
@@ -74,7 +75,7 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual const gpos::Ref<CColRefSet>
 	PcrsDist() const
 	{
 		return m_pcrsDist;
@@ -102,7 +103,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -119,30 +120,30 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive not nullable output columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 // exprhdl
 	) const override
@@ -151,7 +152,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	) const override
@@ -169,7 +170,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -182,11 +183,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,			 // mp,
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalGet has no children");
@@ -201,12 +202,13 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -220,14 +222,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGet *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalGet>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGet == pop->Eopid() ||
 					EopLogicalForeignGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalGet *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalGet> >(pop);
 	}
 
 	// debug print

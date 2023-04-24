@@ -47,10 +47,10 @@ public:
 	}
 
 	// mdid of the relation
-	virtual IMDId *GetRelMdId() const = 0;
+	virtual gpos::Ref<IMDId> GetRelMdId() const = 0;
 
 	// the scalar expression of the check constraint
-	virtual CExpression *GetCheckConstraintExpr(
+	virtual gpos::Ref<CExpression> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CColRefArray *colref_array) const = 0;
 };

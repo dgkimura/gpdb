@@ -73,8 +73,8 @@ const CMDAccessor::SMDProviderElem
 //		Constructs a metadata accessor element for the accessors hashtable
 //
 //---------------------------------------------------------------------------
-CMDAccessor::SMDAccessorElem::SMDAccessorElem(IMDCacheObject *pimdobj,
-											  IMDId *mdid)
+CMDAccessor::SMDAccessorElem::SMDAccessorElem(gpos::Ref<IMDCacheObject> pimdobj,
+											  gpos::Ref<IMDId> mdid)
 	: m_imd_obj(pimdobj), m_mdid(mdid)
 {
 }
@@ -103,7 +103,7 @@ CMDAccessor::SMDAccessorElem::~SMDAccessorElem()
 //		Return the key for this hashtable element
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAccessor::SMDAccessorElem::MDId() const
 {
 	return m_mdid;
@@ -154,7 +154,7 @@ CMDAccessor::SMDAccessorElem::HashValue(const MdidPtr &mdid)
 //
 //---------------------------------------------------------------------------
 CMDAccessor::SMDProviderElem::SMDProviderElem(CSystemId sysid,
-											  IMDProvider *pmdp)
+											  gpos::Ref<IMDProvider> pmdp)
 	: m_sysid(sysid), m_pmdp(pmdp)
 {
 }
@@ -180,7 +180,7 @@ CMDAccessor::SMDProviderElem::~SMDProviderElem()
 //		Returns the MD provider for this hash table element
 //
 //---------------------------------------------------------------------------
-IMDProvider *
+gpos::Ref<IMDProvider>
 CMDAccessor::SMDProviderElem::Pmdp()
 {
 	return m_pmdp;
@@ -259,7 +259,7 @@ CMDAccessor::CMDAccessor(CMemoryPool *mp, MDCache *pcache)
 //
 //---------------------------------------------------------------------------
 CMDAccessor::CMDAccessor(CMemoryPool *mp, MDCache *pcache, CSystemId sysid,
-						 IMDProvider *pmdp)
+						 gpos::Ref<IMDProvider> pmdp)
 	: m_mp(mp), m_pcache(pcache), m_dLookupTime(0.0), m_dFetchTime(0.0)
 {
 	GPOS_ASSERT(nullptr != m_mp);
@@ -394,7 +394,7 @@ CMDAccessor::~CMDAccessor()
 //
 //---------------------------------------------------------------------------
 void
-CMDAccessor::RegisterProvider(CSystemId sysid, IMDProvider *pmdp)
+CMDAccessor::RegisterProvider(CSystemId sysid, gpos::Ref<IMDProvider> pmdp)
 {
 	CAutoP<SMDProviderElem> a_pmdpelem;
 	a_pmdpelem = GPOS_NEW(m_mp) SMDProviderElem(sysid, pmdp);
@@ -427,7 +427,7 @@ CMDAccessor::RegisterProviders(const CSystemIdArray *pdrgpsysid,
 	const ULONG ulProviders = pdrgpmdp->Size();
 	for (ULONG ul = 0; ul < ulProviders; ul++)
 	{
-		IMDProvider *pmdp = (*pdrgpmdp)[ul];
+		gpos::Ref<IMDProvider> pmdp = (*pdrgpmdp)[ul];
 		pmdp->AddRef();
 		RegisterProvider(*((*pdrgpsysid)[ul]), pmdp);
 	}
@@ -442,7 +442,7 @@ CMDAccessor::RegisterProviders(const CSystemIdArray *pdrgpsysid,
 //		Retrieve the MD provider for the given source system id
 //
 //---------------------------------------------------------------------------
-IMDProvider *
+gpos::Ref<IMDProvider>
 CMDAccessor::Pmdp(CSystemId sysid)
 {
 	SMDProviderElem *pmdpelem = nullptr;
@@ -473,8 +473,8 @@ CMDAccessor::Pmdp(CSystemId sysid)
 //		Main workhorse for retrieving the different types of md cache objects.
 //
 //---------------------------------------------------------------------------
-const IMDCacheObject *
-CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
+const gpos::Ref<IMDCacheObject>
+CMDAccessor::GetImdObj(gpos::Ref<IMDId> mdid, IMDCacheObject::Emdtype mdtype)
 {
 	BOOL fPrintOptStats = GPOS_FTRACE(EopttracePrintOptimizationStatistics);
 	CTimerUser timerLookup;	 // timer to measure lookup time
@@ -483,7 +483,7 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 		timerLookup.Restart();
 	}
 
-	const IMDCacheObject *pimdobj = nullptr;
+	const gpos::Ref<IMDCacheObject> pimdobj = nullptr;
 
 	// first, try to locate object in local hashtable
 	{
@@ -501,14 +501,14 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 		// object not in local hashtable, try lookup in the MD cache
 
 		// construct a key for cache lookup
-		IMDProvider *pmdp = Pmdp(mdid->Sysid());
+		gpos::Ref<IMDProvider> pmdp = Pmdp(mdid->Sysid());
 
 		CMDKey mdkey(mdid);
 
 		CAutoP<CacheAccessorMD> a_pmdcacc;
 		a_pmdcacc = GPOS_NEW(m_mp) CacheAccessorMD(m_pcache);
 		a_pmdcacc->Lookup(&mdkey);
-		IMDCacheObject *pmdobjNew = a_pmdcacc->Val();
+		gpos::Ref<IMDCacheObject> pmdobjNew = a_pmdcacc->Val();
 		if (nullptr == pmdobjNew)
 		{
 			// object not found in MD cache: retrieve it from MD provider
@@ -524,7 +524,7 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 			// make a copy of it here in the right memory pool.
 			// An exception is made for CTAS (see below).
 			CMemoryPool *mp = m_mp;
-			IMDId *mdidCopy = mdid;
+			gpos::Ref<IMDId> mdidCopy = mdid;
 			if (IMDId::EmdidGPDBCtas != mdid->MdidType())
 			{
 				// create the accessor memory pool
@@ -561,7 +561,7 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 				// object gets pinned independent of whether insertion succeeded or
 				// failed because object was already in cache
 
-				IMDCacheObject *pmdobjInserted GPOS_ASSERTS_ONLY =
+				gpos::Ref<IMDCacheObject> pmdobjInserted GPOS_ASSERTS_ONLY =
 					a_pmdcacc->Insert(a_pmdkeyCache.Value(), pmdobjNew);
 
 				GPOS_ASSERT(nullptr != pmdobjInserted);
@@ -574,7 +574,7 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 		{
 			// store in local hashtable
 			GPOS_ASSERT(nullptr != pmdobjNew);
-			IMDId *pmdidNew = pmdobjNew->MDId();
+			gpos::Ref<IMDId> pmdidNew = pmdobjNew->MDId();
 			pmdidNew->AddRef();
 
 			CAutoP<SMDAccessorElem> a_pmdaccelem;
@@ -613,10 +613,10 @@ CMDAccessor::GetImdObj(IMDId *mdid, IMDCacheObject::Emdtype mdtype)
 	return pimdobj;
 }
 
-const IMDExtStats *
-CMDAccessor::RetrieveExtStats(IMDId *mdid)
+const gpos::Ref<IMDExtStats>
+CMDAccessor::RetrieveExtStats(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtExtStats);
 	if (IMDCacheObject::EmdtExtStats != pmdobj->MDType())
 	{
@@ -624,13 +624,13 @@ CMDAccessor::RetrieveExtStats(IMDId *mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDExtStats *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDExtStats> >(pmdobj);
 }
 
-const IMDExtStatsInfo *
-CMDAccessor::RetrieveExtStatsInfo(IMDId *mdid)
+const gpos::Ref<IMDExtStatsInfo>
+CMDAccessor::RetrieveExtStatsInfo(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtExtStatsInfo);
 	if (IMDCacheObject::EmdtExtStatsInfo != pmdobj->MDType())
 	{
@@ -638,7 +638,7 @@ CMDAccessor::RetrieveExtStatsInfo(IMDId *mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDExtStatsInfo *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDExtStatsInfo> >(pmdobj);
 }
 
 
@@ -651,17 +651,18 @@ CMDAccessor::RetrieveExtStatsInfo(IMDId *mdid)
 //		it from the external metadata provider and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDRelation *
-CMDAccessor::RetrieveRel(IMDId *mdid)
+const gpos::Ref<IMDRelation>
+CMDAccessor::RetrieveRel(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtRel);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtRel);
 	if (IMDCacheObject::EmdtRel != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDRelation *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDRelation> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -674,17 +675,18 @@ CMDAccessor::RetrieveRel(IMDId *mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
-CMDAccessor::RetrieveType(IMDId *mdid)
+const gpos::Ref<IMDType>
+CMDAccessor::RetrieveType(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtType);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtType);
 	if (IMDCacheObject::EmdtType != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -697,14 +699,14 @@ CMDAccessor::RetrieveType(IMDId *mdid)
 //		and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
+const gpos::Ref<IMDType>
 CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-	IMDProvider *pmdp = Pmdp(sysid);
+	gpos::Ref<IMDProvider> pmdp = Pmdp(sysid);
 	CAutoRef<IMDId> a_pmdid;
 	a_pmdid = pmdp->MDId(m_mp, sysid, type_info);
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(a_pmdid.Value(), IMDCacheObject::EmdtType);
 	if (IMDCacheObject::EmdtType != pmdobj->MDType())
 	{
@@ -712,7 +714,7 @@ CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 				   a_pmdid.Value()->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -725,14 +727,15 @@ CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 //		and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
+const gpos::Ref<IMDType>
 CMDAccessor::RetrieveType(IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
 
-	IMDId *mdid = m_pmdpGeneric->MDId(type_info);
+	gpos::Ref<IMDId> mdid = m_pmdpGeneric->MDId(type_info);
 	GPOS_ASSERT(nullptr != mdid);
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtType);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtType);
 
 	if (IMDCacheObject::EmdtType != pmdobj->MDType())
 	{
@@ -740,7 +743,7 @@ CMDAccessor::RetrieveType(IMDType::ETypeInfo type_info)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -753,17 +756,18 @@ CMDAccessor::RetrieveType(IMDType::ETypeInfo type_info)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDScalarOp *
-CMDAccessor::RetrieveScOp(IMDId *mdid)
+const gpos::Ref<IMDScalarOp>
+CMDAccessor::RetrieveScOp(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtOp);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtOp);
 	if (IMDCacheObject::EmdtOp != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDScalarOp *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDScalarOp> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -776,17 +780,18 @@ CMDAccessor::RetrieveScOp(IMDId *mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDFunction *
-CMDAccessor::RetrieveFunc(IMDId *mdid)
+const gpos::Ref<IMDFunction>
+CMDAccessor::RetrieveFunc(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtFunc);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtFunc);
 	if (IMDCacheObject::EmdtFunc != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDFunction *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDFunction> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -801,9 +806,9 @@ CMDAccessor::RetrieveFunc(IMDId *mdid)
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDAccessor::FAggWindowFunc(IMDId *mdid)
+CMDAccessor::FAggWindowFunc(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtSentinel);
 
 	return IMDCacheObject::EmdtAgg == pmdobj->MDType();
@@ -819,17 +824,18 @@ CMDAccessor::FAggWindowFunc(IMDId *mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDAggregate *
-CMDAccessor::RetrieveAgg(IMDId *mdid)
+const gpos::Ref<IMDAggregate>
+CMDAccessor::RetrieveAgg(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtAgg);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtAgg);
 	if (IMDCacheObject::EmdtAgg != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDAggregate *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDAggregate> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -842,17 +848,18 @@ CMDAccessor::RetrieveAgg(IMDId *mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDIndex *
-CMDAccessor::RetrieveIndex(IMDId *mdid)
+const gpos::Ref<IMDIndex>
+CMDAccessor::RetrieveIndex(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj = GetImdObj(mdid, IMDCacheObject::EmdtInd);
+	const gpos::Ref<IMDCacheObject> pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtInd);
 	if (IMDCacheObject::EmdtInd != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDIndex *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDIndex> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -865,10 +872,10 @@ CMDAccessor::RetrieveIndex(IMDId *mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDCheckConstraint *
-CMDAccessor::RetrieveCheckConstraints(IMDId *mdid)
+const gpos::Ref<IMDCheckConstraint>
+CMDAccessor::RetrieveCheckConstraints(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtCheckConstraint);
 	if (IMDCacheObject::EmdtCheckConstraint != pmdobj->MDType())
 	{
@@ -876,7 +883,7 @@ CMDAccessor::RetrieveCheckConstraints(IMDId *mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDCheckConstraint *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDCheckConstraint> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -888,10 +895,10 @@ CMDAccessor::RetrieveCheckConstraints(IMDId *mdid)
 //		from the external metadata provider and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDColStats *
-CMDAccessor::Pmdcolstats(IMDId *mdid)
+const gpos::Ref<IMDColStats>
+CMDAccessor::Pmdcolstats(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtColStats);
 	if (IMDCacheObject::EmdtColStats != pmdobj->MDType())
 	{
@@ -899,7 +906,7 @@ CMDAccessor::Pmdcolstats(IMDId *mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDColStats *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDColStats> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -911,10 +918,10 @@ CMDAccessor::Pmdcolstats(IMDId *mdid)
 //		from the external metadata provider and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDRelStats *
-CMDAccessor::Pmdrelstats(IMDId *mdid)
+const gpos::Ref<IMDRelStats>
+CMDAccessor::Pmdrelstats(gpos::Ref<IMDId> mdid)
 {
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(mdid, IMDCacheObject::EmdtRelStats);
 	if (IMDCacheObject::EmdtRelStats != pmdobj->MDType())
 	{
@@ -922,7 +929,7 @@ CMDAccessor::Pmdrelstats(IMDId *mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDRelStats *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDRelStats> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -933,8 +940,8 @@ CMDAccessor::Pmdrelstats(IMDId *mdid)
 //		Retrieve cast object between given source and destination types
 //
 //---------------------------------------------------------------------------
-const IMDCast *
-CMDAccessor::Pmdcast(IMDId *mdid_src, IMDId *mdid_dest)
+const gpos::Ref<IMDCast>
+CMDAccessor::Pmdcast(gpos::Ref<IMDId> mdid_src, gpos::Ref<IMDId> mdid_dest)
 {
 	GPOS_ASSERT(nullptr != mdid_src);
 	GPOS_ASSERT(nullptr != mdid_dest);
@@ -946,7 +953,7 @@ CMDAccessor::Pmdcast(IMDId *mdid_src, IMDId *mdid_dest)
 	a_pmdidCast = GPOS_NEW(m_mp) CMDIdCast(CMDIdGPDB::CastMdid(mdid_src),
 										   CMDIdGPDB::CastMdid(mdid_dest));
 
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(a_pmdidCast.Value(), IMDCacheObject::EmdtCastFunc);
 
 	if (IMDCacheObject::EmdtCastFunc != pmdobj->MDType())
@@ -956,7 +963,7 @@ CMDAccessor::Pmdcast(IMDId *mdid_src, IMDId *mdid_dest)
 	}
 	a_pmdidCast.Reset()->Release();
 
-	return dynamic_cast<const IMDCast *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDCast> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -967,8 +974,8 @@ CMDAccessor::Pmdcast(IMDId *mdid_src, IMDId *mdid_dest)
 //		Retrieve scalar comparison object between given types
 //
 //---------------------------------------------------------------------------
-const IMDScCmp *
-CMDAccessor::Pmdsccmp(IMDId *left_mdid, IMDId *right_mdid,
+const gpos::Ref<IMDScCmp>
+CMDAccessor::Pmdsccmp(gpos::Ref<IMDId> left_mdid, gpos::Ref<IMDId> right_mdid,
 					  IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != left_mdid);
@@ -983,7 +990,7 @@ CMDAccessor::Pmdsccmp(IMDId *left_mdid, IMDId *right_mdid,
 		GPOS_NEW(m_mp) CMDIdScCmp(CMDIdGPDB::CastMdid(left_mdid),
 								  CMDIdGPDB::CastMdid(right_mdid), cmp_type);
 
-	const IMDCacheObject *pmdobj =
+	const gpos::Ref<IMDCacheObject> pmdobj =
 		GetImdObj(a_pmdidScCmp.Value(), IMDCacheObject::EmdtScCmp);
 
 	if (IMDCacheObject::EmdtScCmp != pmdobj->MDType())
@@ -993,7 +1000,7 @@ CMDAccessor::Pmdsccmp(IMDId *left_mdid, IMDId *right_mdid,
 	}
 	a_pmdidScCmp.Reset()->Release();
 
-	return dynamic_cast<const IMDScCmp *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDScCmp> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -1005,18 +1012,19 @@ CMDAccessor::Pmdsccmp(IMDId *left_mdid, IMDId *right_mdid,
 //
 //---------------------------------------------------------------------------
 void
-CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
-							   ULONG ulPos, BOOL isSystemCol, BOOL isEmptyTable,
+CMDAccessor::RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
+							   ULONG colid, ULONG ulPos, BOOL isSystemCol,
+							   BOOL isEmptyTable,
 							   UlongToHistogramMap *col_histogram_mapping,
 							   UlongToDoubleMap *colid_width_mapping,
-							   CStatisticsConfig *stats_config)
+							   gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 	GPOS_ASSERT(nullptr != colid_width_mapping);
 
 	// get the column statistics
-	const IMDColStats *pmdcolstats = Pmdcolstats(mp, rel_mdid, ulPos);
+	const gpos::Ref<IMDColStats> pmdcolstats = Pmdcolstats(mp, rel_mdid, ulPos);
 	GPOS_ASSERT(nullptr != pmdcolstats);
 
 	// fetch the column width and insert it into the hashmap
@@ -1024,8 +1032,8 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
 
 	// extract the the histogram and insert it into the hashmap
-	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
-	IMDId *mdid_type = pmdrel->GetMdCol(ulPos)->MdidType();
+	const gpos::Ref<IMDRelation> pmdrel = RetrieveRel(rel_mdid);
+	gpos::Ref<IMDId> mdid_type = pmdrel->GetMdCol(ulPos)->MdidType();
 	CHistogram *histogram = GetHistogram(mp, mdid_type, pmdcolstats);
 	GPOS_ASSERT(nullptr != histogram);
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), histogram);
@@ -1038,7 +1046,7 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 	{
 		// record the columns with missing (dummy) statistics information
 		rel_mdid->AddRef();
-		CMDIdColStats *pmdidCol =
+		gpos::Ref<CMDIdColStats> pmdidCol =
 			GPOS_NEW(mp) CMDIdColStats(CMDIdGPDB::CastMdid(rel_mdid), ulPos);
 		stats_config->AddMissingStatsColumn(pmdidCol);
 		pmdidCol->Release();
@@ -1047,13 +1055,14 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 
 
 // Return the column statistics meta data object for a given column of a table
-const IMDColStats *
-CMDAccessor::Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
+const gpos::Ref<IMDColStats>
+CMDAccessor::Pmdcolstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
+						 ULONG ulPos)
 {
 	rel_mdid->AddRef();
-	CMDIdColStats *mdid_col_stats =
+	gpos::Ref<CMDIdColStats> mdid_col_stats =
 		GPOS_NEW(mp) CMDIdColStats(CMDIdGPDB::CastMdid(rel_mdid), ulPos);
-	const IMDColStats *pmdcolstats = Pmdcolstats(mdid_col_stats);
+	const gpos::Ref<IMDColStats> pmdcolstats = Pmdcolstats(mdid_col_stats);
 	mdid_col_stats->Release();
 
 	return pmdcolstats;
@@ -1067,9 +1076,11 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
 //		Construct a statistics object for the columns of the given relation
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
-					CColRefSet *pcrsWidth, CStatisticsConfig *stats_config)
+gpos::Ref<IStatistics>
+CMDAccessor::Pstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
+					gpos::Ref<CColRefSet> pcrsHist,
+					gpos::Ref<CColRefSet> pcrsWidth,
+					gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);
 	GPOS_ASSERT(nullptr != pcrsHist);
@@ -1077,13 +1088,13 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 
 	// retrieve MD relation and MD relation stats objects
 	rel_mdid->AddRef();
-	CMDIdRelStats *rel_stats_mdid =
+	gpos::Ref<CMDIdRelStats> rel_stats_mdid =
 		GPOS_NEW(mp) CMDIdRelStats(CMDIdGPDB::CastMdid(rel_mdid));
-	const IMDRelStats *pmdRelStats = Pmdrelstats(rel_stats_mdid);
+	const gpos::Ref<IMDRelStats> pmdRelStats = Pmdrelstats(rel_stats_mdid);
 	rel_stats_mdid->Release();
 
 	BOOL fEmptyTable = pmdRelStats->IsEmpty();
-	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
+	const gpos::Ref<IMDRelation> pmdrel = RetrieveRel(rel_mdid);
 
 	UlongToHistogramMap *col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
@@ -1093,10 +1104,10 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 	CColRefSetIter crsiHist(*pcrsHist);
 	while (crsiHist.Advance())
 	{
-		CColRef *pcrHist = crsiHist.Pcr();
+		gpos::Ref<CColRef> pcrHist = crsiHist.Pcr();
 
 		// colref must be one of the base table
-		CColRefTable *pcrtable = CColRefTable::PcrConvert(pcrHist);
+		gpos::Ref<CColRefTable> pcrtable = CColRefTable::PcrConvert(pcrHist);
 
 		// extract the column identifier, position of the attribute in the system catalog
 		ULONG colid = pcrtable->Id();
@@ -1110,12 +1121,12 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 									   GPOS_NEW(m_mp) INT(attno));
 	}
 
-	CMDIdGPDB *pmdid = GPOS_NEW(mp) CMDIdGPDB(
+	gpos::Ref<CMDIdGPDB> pmdid = GPOS_NEW(mp) CMDIdGPDB(
 		IMDId::EmdidExtStatsInfo, CMDIdGPDB::CastMdid(rel_mdid)->Oid());
 
-	const COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
+	const gpos::Ref<COptCtxt> poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
-	const IMDExtStatsInfo *extstats_info =
+	const gpos::Ref<IMDExtStatsInfo> extstats_info =
 		md_accessor->RetrieveExtStatsInfo(pmdid);
 	pmdid->Release();
 
@@ -1124,10 +1135,10 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 
 	while (crsiWidth.Advance())
 	{
-		CColRef *pcrWidth = crsiWidth.Pcr();
+		gpos::Ref<CColRef> pcrWidth = crsiWidth.Pcr();
 
 		// colref must be one of the base table
-		CColRefTable *pcrtable = CColRefTable::PcrConvert(pcrWidth);
+		gpos::Ref<CColRefTable> pcrtable = CColRefTable::PcrConvert(pcrWidth);
 
 		// extract the column identifier, position of the attribute in the system catalog
 		ULONG colid = pcrtable->Id();
@@ -1157,8 +1168,8 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 //
 //---------------------------------------------------------------------------
 CHistogram *
-CMDAccessor::GetHistogram(CMemoryPool *mp, IMDId *mdid_type,
-						  const IMDColStats *pmdcolstats)
+CMDAccessor::GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						  const gpos::Ref<IMDColStats> pmdcolstats)
 {
 	GPOS_ASSERT(nullptr != mdid_type);
 	GPOS_ASSERT(nullptr != pmdcolstats);
@@ -1176,7 +1187,8 @@ CMDAccessor::GetHistogram(CMemoryPool *mp, IMDId *mdid_type,
 	CBucketArray *buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = pmdcolstats->GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket =
+			pmdcolstats->GetDXLBucketAt(ul);
 		CBucket *bucket = Pbucket(mp, mdid_type, dxl_bucket);
 		buckets->Append(bucket);
 	}
@@ -1203,16 +1215,16 @@ CMDAccessor::GetHistogram(CMemoryPool *mp, IMDId *mdid_type,
 //
 //---------------------------------------------------------------------------
 CBucket *
-CMDAccessor::Pbucket(CMemoryPool *mp, IMDId *mdid_type,
-					 const CDXLBucket *dxl_bucket)
+CMDAccessor::Pbucket(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+					 const gpos::Ref<CDXLBucket> dxl_bucket)
 {
-	IDatum *pdatumLower =
+	gpos::Ref<IDatum> pdatumLower =
 		GetDatum(mp, mdid_type, dxl_bucket->GetDXLDatumLower());
-	IDatum *pdatumUpper =
+	gpos::Ref<IDatum> pdatumUpper =
 		GetDatum(mp, mdid_type, dxl_bucket->GetDXLDatumUpper());
 
-	CPoint *bucket_lower_bound = GPOS_NEW(mp) CPoint(pdatumLower);
-	CPoint *bucket_upper_bound = GPOS_NEW(mp) CPoint(pdatumUpper);
+	gpos::Ref<CPoint> bucket_lower_bound = GPOS_NEW(mp) CPoint(pdatumLower);
+	gpos::Ref<CPoint> bucket_upper_bound = GPOS_NEW(mp) CPoint(pdatumUpper);
 
 	return GPOS_NEW(mp)
 		CBucket(bucket_lower_bound, bucket_upper_bound,
@@ -1228,11 +1240,11 @@ CMDAccessor::Pbucket(CMemoryPool *mp, IMDId *mdid_type,
 //		Construct a typed bucket from a DXL bucket
 //
 //---------------------------------------------------------------------------
-IDatum *
-CMDAccessor::GetDatum(CMemoryPool *mp, IMDId *mdid_type,
-					  const CDXLDatum *dxl_datum)
+gpos::Ref<IDatum>
+CMDAccessor::GetDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+					  const gpos::Ref<CDXLDatum> dxl_datum)
 {
-	const IMDType *pmdtype = RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = RetrieveType(mdid_type);
 
 	return pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 }
@@ -1249,15 +1261,15 @@ void
 CMDAccessor::Serialize(COstream &oos)
 {
 	ULONG nentries = m_shtCacheAccessors.Size();
-	IMDCacheObject **cacheEntries;
-	CAutoRg<IMDCacheObject *> aCacheEntries;
+	gpos::Ref<IMDCacheObject> *cacheEntries;
+	CAutoRg<gpos::Ref<IMDCacheObject> > aCacheEntries;
 	ULONG ul;
 
 	// Iterate the hash table and insert all entries to the array.
 	// The iterator holds a lock on the hash table, so we must not
 	// do anything non-trivial that might e.g. allocate memory,
 	// while iterating.
-	cacheEntries = GPOS_NEW_ARRAY(m_mp, IMDCacheObject *, nentries);
+	cacheEntries = GPOS_NEW_ARRAY(m_mp, gpos::Ref<IMDCacheObject>, nentries);
 	aCacheEntries = cacheEntries;
 	{
 		MDHTIter mdhtit(m_shtCacheAccessors);

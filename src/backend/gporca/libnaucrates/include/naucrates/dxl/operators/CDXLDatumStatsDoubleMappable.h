@@ -48,7 +48,7 @@ public:
 	CDXLDatumStatsDoubleMappable(const CDXLDatumStatsDoubleMappable &) = delete;
 
 	// ctor
-	CDXLDatumStatsDoubleMappable(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLDatumStatsDoubleMappable(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 								 INT type_modifier, BOOL is_null, BYTE *data,
 								 ULONG length, CDouble val);
 
@@ -82,14 +82,15 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumStatsDoubleMappable *
-	Cast(CDXLDatum *dxl_datum)
+	static gpos::Ref<CDXLDatumStatsDoubleMappable>
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumStatsDoubleMappable ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumStatsDoubleMappable *>(dxl_datum);
+		return dynamic_cast<gpos::Ref<CDXLDatumStatsDoubleMappable> >(
+			dxl_datum);
 	}
 };
 }  // namespace gpdxl

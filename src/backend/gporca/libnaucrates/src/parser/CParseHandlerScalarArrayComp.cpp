@@ -63,8 +63,8 @@ CParseHandlerScalarArrayComp::StartElement(
 	}
 
 	// parse and create scalar ArrayComp
-	CDXLScalarArrayComp *dxl_op =
-		(CDXLScalarArrayComp *) CDXLOperatorFactory::MakeDXLArrayComp(
+	gpos::Ref<CDXLScalarArrayComp> dxl_op =
+		(gpos::Ref<CDXLScalarArrayComp>) CDXLOperatorFactory::MakeDXLArrayComp(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 	// construct node from the created child nodes

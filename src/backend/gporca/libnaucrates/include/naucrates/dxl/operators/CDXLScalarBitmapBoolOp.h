@@ -42,7 +42,7 @@ public:
 
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// operator type
 	const EdxlBitmapBoolOp m_bitmap_op_type;
@@ -51,7 +51,7 @@ public:
 	CDXLScalarBitmapBoolOp(const CDXLScalarBitmapBoolOp &) = delete;
 
 	// ctor
-	CDXLScalarBitmapBoolOp(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarBitmapBoolOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 						   EdxlBitmapBoolOp bitmap_op_type);
 
 	// dtor
@@ -64,7 +64,7 @@ public:
 	EdxlBitmapBoolOp GetDXLBitmapOpType() const;
 
 	// return type
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	// name of the DXL operator name
 	const CWStringConst *GetOpNameStr() const override;
@@ -74,24 +74,24 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarBitmapBoolOp *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarBitmapBoolOp>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarBitmapBoolOp *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarBitmapBoolOp> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

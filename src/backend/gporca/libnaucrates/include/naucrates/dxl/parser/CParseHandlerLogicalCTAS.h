@@ -36,7 +36,7 @@ class CParseHandlerLogicalCTAS : public CParseHandlerLogicalOp
 {
 private:
 	// mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;

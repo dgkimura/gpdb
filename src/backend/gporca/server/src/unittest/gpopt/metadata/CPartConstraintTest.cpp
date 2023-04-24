@@ -78,10 +78,10 @@ CPartConstraintTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -106,40 +106,43 @@ CPartConstraintTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup an MD accessor
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	CColRef *colref =
+	gpos::Ref<CColRef> colref =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier);
 
 	// create a constraint col \in [1,3)
-	CConstraint *pcnstr13 =
+	gpos::Ref<CConstraint> pcnstr13 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 3 /*ulRight*/);
 
 	// create a constraint col \in [1,5)
-	CConstraint *pcnstr15 =
+	gpos::Ref<CConstraint> pcnstr15 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 5 /*ulRight*/);
 
-	CPartConstraint *ppartcnstr13Default = GPOS_NEW(mp) CPartConstraint(
-		mp, pcnstr13, true /*fDefaultPartition*/, false /*is_unbounded*/);
-	CPartConstraint *ppartcnstr15Default = GPOS_NEW(mp) CPartConstraint(
-		mp, pcnstr15, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr13Default =
+		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr15Default =
+		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
 
 	pcnstr13->AddRef();
-	CPartConstraint *ppartcnstr13NoDefault = GPOS_NEW(mp) CPartConstraint(
-		mp, pcnstr13, false /*fDefaultPartition*/, false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr13NoDefault =
+		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, false /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
 
 	pcnstr13->AddRef();
-	CPartConstraint *ppartcnstr13DefaultUnbounded =
+	gpos::Ref<CPartConstraint> ppartcnstr13DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
 	pcnstr15->AddRef();
-	CPartConstraint *ppartcnstr15DefaultUnbounded =
+	gpos::Ref<CPartConstraint> ppartcnstr15DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
@@ -186,12 +189,14 @@ CPartConstraintTest::EresUnittest_Basic()
 //		Create an interval constraint for the given column and interval boundaries
 //
 //---------------------------------------------------------------------------
-CConstraint *
-CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, CColRef *colref,
+gpos::Ref<CConstraint>
+CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, gpos::Ref<CColRef> colref,
 									ULONG ulLeft, ULONG ulRight)
 {
-	CExpression *pexprConstLeft = CUtils::PexprScalarConstInt4(mp, ulLeft);
-	CExpression *pexprConstRight = CUtils::PexprScalarConstInt4(mp, ulRight);
+	gpos::Ref<CExpression> pexprConstLeft =
+		CUtils::PexprScalarConstInt4(mp, ulLeft);
+	gpos::Ref<CExpression> pexprConstRight =
+		CUtils::PexprScalarConstInt4(mp, ulRight);
 
 	// AND
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -200,9 +205,9 @@ CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, CColRef *colref,
 	pdrgpexpr->Append(
 		CUtils::PexprScalarCmp(mp, colref, pexprConstRight, IMDType::EcmptL));
 
-	CExpression *pexpr =
+	gpos::Ref<CExpression> pexpr =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
-	CConstraint *pcnstr =
+	gpos::Ref<CConstraint> pcnstr =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 
 	pexpr->Release();
@@ -229,11 +234,12 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup an MD accessor
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+	const gpos::Ref<IMDType> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -242,7 +248,7 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
-	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
+	gpos::Ref<CConstraintInterval> pciFirst = CTestUtils::PciGenericInterval(
 		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
@@ -251,28 +257,33 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// create a date interval: ['01-01-2012', '01-22-2012')
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
-	CConstraintInterval *pciSecond = CTestUtils::PciGenericInterval(
+	gpos::Ref<CConstraintInterval> pciSecond = CTestUtils::PciGenericInterval(
 		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate2,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);
 
-	CPartConstraint *ppartcnstr1Default = GPOS_NEW(mp) CPartConstraint(
-		mp, pciFirst, true /*fDefaultPartition*/, false /*is_unbounded*/);
-	CPartConstraint *ppartcnstr2Default = GPOS_NEW(mp) CPartConstraint(
-		mp, pciSecond, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr1Default =
+		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr2Default =
+		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
 
 	pciFirst->AddRef();
-	CPartConstraint *ppartcnstr1NoDefault = GPOS_NEW(mp) CPartConstraint(
-		mp, pciFirst, false /*fDefaultPartition*/, false /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr1NoDefault =
+		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, false /*fDefaultPartition*/,
+									 false /*is_unbounded*/);
 
 	pciFirst->AddRef();
-	CPartConstraint *ppartcnstr1DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(
-		mp, pciFirst, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr1DefaultUnbounded =
+		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,
+									 true /*is_unbounded*/);
 
 	pciSecond->AddRef();
-	CPartConstraint *ppartcnstr2DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(
-		mp, pciSecond, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	gpos::Ref<CPartConstraint> ppartcnstr2DefaultUnbounded =
+		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
+									 true /*is_unbounded*/);
 
 	// tests
 

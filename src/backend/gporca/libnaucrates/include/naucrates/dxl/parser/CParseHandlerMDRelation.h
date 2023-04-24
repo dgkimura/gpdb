@@ -38,7 +38,7 @@ class CParseHandlerMDRelation : public CParseHandlerMetadataObject
 {
 protected:
 	// id and version of the relation
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -71,7 +71,7 @@ protected:
 	ULongPtr2dArray *m_key_sets_arrays;
 
 	// part constraint
-	CDXLNode *m_part_constraint;
+	gpos::Ref<CDXLNode> m_part_constraint;
 
 	// distribution opfamilies parse handler
 	CParseHandlerBase *m_opfamilies_parse_handler;
@@ -83,7 +83,7 @@ protected:
 	BOOL m_part_constraint_unbounded;
 
 	// foreign server (if exists)
-	IMDId *m_foreign_server;
+	gpos::Ref<IMDId> m_foreign_server;
 
 	// helper function to parse main relation attributes: name, id,
 	// distribution policy and keys

@@ -29,7 +29,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CEnfdPartitionPropagation::CEnfdPartitionPropagation(
-	CPartitionPropagationSpec *ppps, EPartitionPropagationMatching eppm)
+	gpos::Ref<CPartitionPropagationSpec> ppps,
+	EPartitionPropagationMatching eppm)
 	: m_ppps(ppps), m_eppm(eppm)
 
 {
@@ -77,7 +78,7 @@ CEnfdPartitionPropagation::HashValue() const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CEnfdPartitionPropagation::Epet(CExpressionHandle &exprhdl,
-								CPhysical *popPhysical,
+								gpos::Ref<CPhysical> popPhysical,
 								BOOL fPropagationReqd) const
 {
 	if (fPropagationReqd)
@@ -124,7 +125,7 @@ CEnfdPartitionPropagation::SzPropagationMatching(
 }
 
 BOOL
-CEnfdPartitionPropagation::Matches(CEnfdPartitionPropagation *pepp)
+CEnfdPartitionPropagation::Matches(gpos::Ref<CEnfdPartitionPropagation> pepp)
 {
 	GPOS_ASSERT(nullptr != pepp);
 
@@ -133,7 +134,7 @@ CEnfdPartitionPropagation::Matches(CEnfdPartitionPropagation *pepp)
 
 BOOL
 CEnfdPartitionPropagation::FCompatible(
-	CPartitionPropagationSpec *pps_drvd) const
+	gpos::Ref<CPartitionPropagationSpec> pps_drvd) const
 {
 	GPOS_ASSERT(nullptr != pps_drvd);
 

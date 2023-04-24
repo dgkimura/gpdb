@@ -20,13 +20,14 @@ class CExtendedStatsProcessor
 {
 public:
 	static void ApplyCorrelatedStatsToScaleFactorFilterCalculation(
-		CDoubleArray *scale_factors, CStatsPredConj *conjunctive_pred_stats,
-		const IMDExtStatsInfo *md_statsinfo,
+		CDoubleArray *scale_factors,
+		gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
+		const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
 		UlongToIntMap *colid_to_attno_mapping, CMemoryPool *mp,
 		UlongToHistogramMap *result_histograms);
 
 	static bool ApplyCorrelatedStatsToNDistinctCalculation(
-		CMemoryPool *mp, const IMDExtStatsInfo *md_statsinfo,
+		CMemoryPool *mp, const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
 		const UlongToIntMap *colid_to_attno_mapping,
 		ULongPtrArray *&src_grouping_cols, DOUBLE *ndistinct);
 };

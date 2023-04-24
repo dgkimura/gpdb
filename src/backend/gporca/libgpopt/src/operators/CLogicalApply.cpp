@@ -74,13 +74,14 @@ CLogicalApply::~CLogicalApply()
 //		Compute required stat columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::Ref<CColRefSet> pcrsInput,
+						ULONG child_index) const
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 
-	CColRefSet *pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
 	// add columns used by scalar child
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(2));
 
@@ -90,7 +91,7 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		pcrsUsed->Union(exprhdl.DeriveOuterReferences(1));
 	}
 
-	CColRefSet *pcrsStat =
+	gpos::Ref<CColRefSet> pcrsStat =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
 	pcrsUsed->Release();
 
@@ -106,7 +107,7 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalApply::Matches(COperator *pop) const
+CLogicalApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

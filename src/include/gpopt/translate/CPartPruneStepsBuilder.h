@@ -54,21 +54,21 @@ public:
 	~CPartPruneStepsBuilder() = default;
 
 	static List *CreatePartPruneInfos(
-		CDXLNode *filterNode, Relation relation, Index rtindex,
+		gpos::Ref<CDXLNode> filterNode, Relation relation, Index rtindex,
 		ULongPtrArray *part_indexes, CMappingColIdVarPlStmt *colid_var_mapping,
 		CTranslatorDXLToScalar *translator_dxl_to_scalar);
 
 	PartitionedRelPruneInfo *CreatePartPruneInfoForOneLevel(
-		CDXLNode *filterNode);
+		gpos::Ref<CDXLNode> filterNode);
 
-	List *PartPruneStepsFromFilter(CDXLNode *filterNode, INT *step_id,
+	List *PartPruneStepsFromFilter(gpos::Ref<CDXLNode> filterNode, INT *step_id,
 								   List *steps_list);
 
-	List *PartPruneStepFromScalarCmp(CDXLNode *node, INT *step_id,
+	List *PartPruneStepFromScalarCmp(gpos::Ref<CDXLNode> node, INT *step_id,
 									 List *steps_list);
 
-	List *PartPruneStepFromScalarBoolExpr(CDXLNode *node, INT *step_id,
-										  List *steps_list);
+	List *PartPruneStepFromScalarBoolExpr(gpos::Ref<CDXLNode> node,
+										  INT *step_id, List *steps_list);
 };
 }  // namespace gpdxl
 

@@ -179,7 +179,8 @@ CParseHandlerTableScan::EndElement(const XMLCh *const element_local_name,
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
 	// set table descriptor
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 	m_dxl_op->SetTableDescriptor(table_descr);
 

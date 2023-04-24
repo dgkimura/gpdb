@@ -66,22 +66,22 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalCTEProducer *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalCTEProducer>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalCTEProducer == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLPhysicalCTEProducer *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalCTEProducer> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

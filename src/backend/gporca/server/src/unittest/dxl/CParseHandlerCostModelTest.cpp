@@ -114,7 +114,7 @@ Eres_ParseCalibratedCostModel()
 
 	fixture.Parse((const XMLByte *) a_szDXL.Rgt(), strlen(a_szDXL.Rgt()));
 
-	ICostModel *pcm = pphcm->GetCostModel();
+	gpos::Ref<ICostModel> pcm = pphcm->GetCostModel();
 
 	GPOS_RTL_ASSERT(ICostModel::EcmtGPDBCalibrated == pcm->Ecmt());
 	GPOS_RTL_ASSERT(3 == pcm->UlHosts());
@@ -145,7 +145,7 @@ Eres_SerializeCalibratedCostModel()
 		GPOS_NEW(mp) CWStringDynamic(mp, wszExpectedString));
 
 	const ULONG ulSegments = 3;
-	CCostModelParamsGPDB *pcp = GPOS_NEW(mp) CCostModelParamsGPDB(mp);
+	gpos::Ref<CCostModelParamsGPDB> pcp = GPOS_NEW(mp) CCostModelParamsGPDB(mp);
 	pcp->SetParam(CCostModelParamsGPDB::EcpNLJFactor, 1024.0, 1023.0, 1025.0);
 	gpos::CAutoRef<CCostModelGPDB> apcm(
 		GPOS_NEW(mp) CCostModelGPDB(mp, ulSegments, pcp));

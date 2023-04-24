@@ -71,8 +71,9 @@ CXformSelect2IndexGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2IndexGet::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformSelect2IndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -81,11 +82,12 @@ CXformSelect2IndexGet::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// get the indexes on this relation
-	CLogicalGet *popGet = CLogicalGet::PopConvert(pexprRelational->Pop());
+	gpos::Ref<CLogicalGet> popGet =
+		CLogicalGet::PopConvert(pexprRelational->Pop());
 	const ULONG ulIndices = popGet->Ptabdesc()->IndexCount();
 	if (0 == ulIndices)
 	{
@@ -98,25 +100,28 @@ CXformSelect2IndexGet::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
 	// derive the scalar and relational properties to build set of required columns
-	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
-	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 
-	CColRefSet *pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsReqd->Include(pcrsOutput);
 	pcrsReqd->Include(pcrsScalarExpr);
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel =
+	const gpos::Ref<IMDRelation> pmdrel =
 		md_accessor->RetrieveRel(popGet->Ptabdesc()->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
-		CExpression *pexprIndexGet = CXformUtils::PexprLogicalIndexGet(
-			mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(), pdrgpexpr,
-			pcrsReqd, pcrsScalarExpr, nullptr /*outer_refs*/, pmdindex, pmdrel);
+		gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(ul);
+		const gpos::Ref<IMDIndex> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
+		gpos::Ref<CExpression> pexprIndexGet =
+			CXformUtils::PexprLogicalIndexGet(
+				mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(),
+				pdrgpexpr, pcrsReqd, pcrsScalarExpr, nullptr /*outer_refs*/,
+				pmdindex, pmdrel);
 		if (nullptr != pexprIndexGet)
 		{
 			pxfres->Add(pexprIndexGet);

@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoalesce::CDXLScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type)
+CDXLScalarCoalesce::CDXLScalarCoalesce(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -84,7 +85,7 @@ CDXLScalarCoalesce::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCoalesce::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *node) const
+								   const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -122,7 +123,7 @@ CDXLScalarCoalesce::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoalesce::AssertValid(const CDXLNode *node,
+CDXLScalarCoalesce::AssertValid(const gpos::Ref<CDXLNode> node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < node->Arity());
@@ -130,7 +131,7 @@ CDXLScalarCoalesce::AssertValid(const CDXLNode *node,
 	const ULONG arity = node->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

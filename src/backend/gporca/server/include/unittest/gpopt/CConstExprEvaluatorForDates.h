@@ -56,7 +56,7 @@ public:
 
 	// evaluate the given expression and return the result as a new expression
 	// caller takes ownership of returned expression
-	CExpression *PexprEval(CExpression *pexpr) override;
+	gpos::Ref<CExpression> PexprEval(gpos::Ref<CExpression> pexpr) override;
 
 	// returns true iff the evaluator can evaluate constant expressions
 	BOOL

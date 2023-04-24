@@ -30,7 +30,8 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDistributionSpecRouted::CDistributionSpecRouted(CColRef *pcrSegmentId)
+CDistributionSpecRouted::CDistributionSpecRouted(
+	gpos::Ref<CColRef> pcrSegmentId)
 	: m_pcrSegmentId(pcrSegmentId)
 {
 	GPOS_ASSERT(nullptr != pcrSegmentId);
@@ -57,7 +58,8 @@ CDistributionSpecRouted::~CDistributionSpecRouted() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecRouted::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Matches(pds))
 	{
@@ -82,12 +84,12 @@ CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
 //		Return a copy of the distribution spec with remapped columns
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	ULONG id = m_pcrSegmentId->Id();
-	CColRef *pcrSegmentId = colref_mapping->Find(&id);
+	gpos::Ref<CColRef> pcrSegmentId = colref_mapping->Find(&id);
 	if (nullptr == pcrSegmentId)
 	{
 		if (must_exist)
@@ -120,13 +122,13 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 void
 CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &,  // exprhdl
-										 CReqdPropPlan *
+										 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG
 										 ,
 										 CExpressionArray *pdrgpexpr,
-										 CExpression *pexpr)
+										 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -146,7 +148,7 @@ CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 	// add a routed distribution enforcer
 	AddRef();
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRoutedDistribute(mp, this), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }
@@ -176,10 +178,10 @@ CDistributionSpecRouted::HashValue() const
 //		Extract columns used by the distribution spec
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pcrSegmentId);
 
 	return pcrs;
@@ -195,14 +197,14 @@ CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::Matches(const CDistributionSpec *pds) const
+CDistributionSpecRouted::Matches(const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Edt() != pds->Edt())
 	{
 		return false;
 	}
 
-	const CDistributionSpecRouted *pdsRouted =
+	const gpos::Ref<CDistributionSpecRouted> pdsRouted =
 		CDistributionSpecRouted::PdsConvert(pds);
 	return m_pcrSegmentId == pdsRouted->Pcr();
 }

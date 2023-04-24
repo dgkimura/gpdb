@@ -46,7 +46,7 @@ CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp) : CLogicalGet(mp)
 //
 //---------------------------------------------------------------------------
 CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
-									   CTableDescriptor *ptabdesc)
+									   gpos::Ref<CTableDescriptor> ptabdesc)
 	: CLogicalGet(mp, pnameAlias, ptabdesc)
 {
 }
@@ -60,7 +60,7 @@ CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
 //
 //---------------------------------------------------------------------------
 CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
-									   CTableDescriptor *ptabdesc,
+									   gpos::Ref<CTableDescriptor> ptabdesc,
 									   CColRefArray *pdrgpcrOutput)
 	: CLogicalGet(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
@@ -75,13 +75,13 @@ CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalForeignGet::Matches(COperator *pop) const
+CLogicalForeignGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CLogicalForeignGet *popGet = CLogicalForeignGet::PopConvert(pop);
+	gpos::Ref<CLogicalForeignGet> popGet = CLogicalForeignGet::PopConvert(pop);
 
 	return Ptabdesc() == popGet->Ptabdesc() &&
 		   PdrgpcrOutput()->Equals(popGet->PdrgpcrOutput());
@@ -95,7 +95,7 @@ CLogicalForeignGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalForeignGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
@@ -113,7 +113,7 @@ CLogicalForeignGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	}
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, Name());
 
-	CTableDescriptor *ptabdesc = Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = Ptabdesc();
 	ptabdesc->AddRef();
 
 	return GPOS_NEW(mp)

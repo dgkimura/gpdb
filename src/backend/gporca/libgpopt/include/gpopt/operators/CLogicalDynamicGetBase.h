@@ -35,7 +35,7 @@ protected:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// dynamic scan id
 	ULONG m_scan_id;
@@ -47,13 +47,13 @@ protected:
 	CColRef2dArray *m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for coordinator only tables)
-	CColRefSet *m_pcrsDist;
+	gpos::Ref<CColRefSet> m_pcrsDist;
 
 	// private copy ctor
 	CLogicalDynamicGetBase(const CLogicalDynamicGetBase &);
 
 	// given a colrefset from a table, get colids and attno
-	void ExtractColIdsAttno(CMemoryPool *mp, CColRefSet *pcrs,
+	void ExtractColIdsAttno(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 							ULongPtrArray *colids,
 							ULongPtrArray *pdrgpulPos) const;
 
@@ -73,13 +73,13 @@ public:
 	explicit CLogicalDynamicGetBase(CMemoryPool *mp);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   CTableDescriptor *ptabdesc, ULONG scan_id,
+						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
 						   CColRefArray *pdrgpcrOutput,
 						   CColRef2dArray *pdrgpdrgpcrPart,
 						   IMdIdArray *partition_mdids);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   CTableDescriptor *ptabdesc, ULONG scan_id,
+						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
 						   IMdIdArray *partition_mdids);
 
 	// dtor
@@ -100,14 +100,14 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual const gpos::Ref<CColRefSet>
 	PcrsDist() const
 	{
 		return m_pcrsDist;
 	}
 
 	// return table's descriptor
-	virtual CTableDescriptor *
+	virtual gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -132,19 +132,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// derive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth
@@ -157,7 +157,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override

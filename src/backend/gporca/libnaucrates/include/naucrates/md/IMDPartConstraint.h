@@ -43,7 +43,7 @@ class IMDPartConstraint : public IMDInterface
 public:
 	// extract the scalar expression of the constraint with the given
 	// column mappings
-	virtual CExpression *GetPartConstraintExpr(
+	virtual gpos::Ref<CExpression> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CColRefArray *colref_array) const = 0;
 

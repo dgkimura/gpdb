@@ -96,7 +96,7 @@ CLogicalIntersectAll::DeriveMaxCard(CMemoryPool *,	// mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalIntersectAll::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -117,7 +117,7 @@ CLogicalIntersectAll::PopCopyWithRemappedColumns(
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalIntersectAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 										  CExpressionHandle &  //exprhdl
 ) const
@@ -151,7 +151,7 @@ CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CColRef2dArray *pdrgpdrgpcrInput,
@@ -160,21 +160,22 @@ CLogicalIntersectAll::PstatsDerive(
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition similar to transform that turns an "intersect all" into a "left semi join"
 	// over a window operation on the individual input (for row_number)
 
 	// TODO:  Jan 8th 2012, add the stats for window operation
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CExpression> pexprScCond =
+		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	CStatsPredJoinArray *join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is a semi-join
 		);
-	IStatistics *pstatsSemiJoin = CLogicalLeftSemiJoin::PstatsDerive(
+	gpos::Ref<IStatistics> pstatsSemiJoin = CLogicalLeftSemiJoin::PstatsDerive(
 		mp, join_preds_stats, outer_stats, inner_side_stats);
 
 	// clean up
@@ -192,7 +193,7 @@ CLogicalIntersectAll::PstatsDerive(
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   IStatisticsArray *  // not used
 ) const
@@ -203,11 +204,11 @@ CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::Ref<CColRefSet> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
-	IStatistics *stats =
+	gpos::Ref<IStatistics> stats =
 		PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
 
 	// clean up

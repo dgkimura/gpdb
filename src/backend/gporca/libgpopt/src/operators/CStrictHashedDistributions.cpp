@@ -21,15 +21,16 @@ CStrictHashedDistributions::CStrictHashedDistributions(
 		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
-			CColRef *colref = (*colref_array)[ulCol];
+			gpos::Ref<CColRef> colref = (*colref_array)[ulCol];
 			if (colref->RetrieveType()->IsRedistributable())
 			{
-				CExpression *pexpr = CUtils::PexprScalarIdent(mp, colref);
+				gpos::Ref<CExpression> pexpr =
+					CUtils::PexprScalarIdent(mp, colref);
 				pdrgpexpr->Append(pexpr);
 			}
 		}
 
-		CDistributionSpec *pdshashed;
+		gpos::Ref<CDistributionSpec> pdshashed;
 		ULONG ulColumnsToRedistribute = pdrgpexpr->Size();
 		if (0 < ulColumnsToRedistribute)
 		{

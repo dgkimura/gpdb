@@ -33,24 +33,24 @@ class CDXLScalarArrayRef : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::Ref<IMDId> m_elem_type_mdid;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::Ref<IMDId> m_array_type_mdid;
 
 	// return type id
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 public:
 	CDXLScalarArrayRef(const CDXLScalarArrayRef &) = delete;
 
 	// ctor
-	CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-					   INT type_modifier, IMDId *array_type_mdid,
-					   IMDId *return_type_mdid);
+	CDXLScalarArrayRef(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					   INT type_modifier, gpos::Ref<IMDId> array_type_mdid,
+					   gpos::Ref<IMDId> return_type_mdid);
 
 	// dtor
 	~CDXLScalarArrayRef() override;
@@ -62,7 +62,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// element type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ElementTypeMDid() const
 	{
 		return m_elem_type_mdid;
@@ -72,14 +72,14 @@ public:
 	INT TypeModifier() const;
 
 	// array type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ArrayTypeMDid() const
 	{
 		return m_array_type_mdid;
 	}
 
 	// return type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMDid() const
 	{
 		return m_return_type_mdid;
@@ -87,7 +87,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -95,18 +95,18 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarArrayRef *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarArrayRef>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayRef == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarArrayRef *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarArrayRef> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

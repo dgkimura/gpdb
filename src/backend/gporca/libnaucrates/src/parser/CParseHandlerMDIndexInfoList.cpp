@@ -63,16 +63,17 @@ CParseHandlerMDIndexInfoList::StartElement(
 					  element_local_name))
 	{
 		// parse mdid
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenIndexInfo);
+		gpos::Ref<IMDId> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenIndexInfo);
 
 		// parse index partial info
 		BOOL is_partial = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenIndexPartial, EdxltokenIndexInfo);
 
-		CMDIndexInfo *md_index_info =
+		gpos::Ref<CMDIndexInfo> md_index_info =
 			GPOS_NEW(m_mp) CMDIndexInfo(mdid, is_partial);
 		m_mdindex_info_array->Append(md_index_info);
 	}

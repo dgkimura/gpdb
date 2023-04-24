@@ -235,7 +235,8 @@ public:
 
 	// serialize operator in DXL format given a serializer object and the
 	// host DXL node, providing access to the operator's children
-	virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const = 0;
+	virtual void SerializeToDXL(CXMLSerializer *,
+								const gpos::Ref<CDXLNode>) const = 0;
 
 	// check if given column is defined by operator
 	virtual BOOL IsColDefined(ULONG	 // colid
@@ -253,7 +254,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	virtual void AssertValid(const CDXLNode *,
+	virtual void AssertValid(const gpos::Ref<CDXLNode>,
 							 BOOL validate_children) const = 0;
 #endif	// GPOS_DEBUG
 };

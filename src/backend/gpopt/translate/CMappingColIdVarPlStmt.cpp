@@ -92,7 +92,8 @@ CMappingColIdVarPlStmt::GetOutputContext()
 //
 //---------------------------------------------------------------------------
 Param *
-CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
+CMappingColIdVarPlStmt::ParamFromDXLNodeScId(
+	const gpos::Ref<CDXLScalarIdent> dxlop)
 {
 	GPOS_ASSERT(nullptr != m_output_context);
 
@@ -124,7 +125,8 @@ CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
 //
 //---------------------------------------------------------------------------
 Var *
-CMappingColIdVarPlStmt::VarFromDXLNodeScId(const CDXLScalarIdent *dxlop)
+CMappingColIdVarPlStmt::VarFromDXLNodeScId(
+	const gpos::Ref<CDXLScalarIdent> dxlop)
 {
 	Index varno = 0;
 	AttrNumber attno = 0;

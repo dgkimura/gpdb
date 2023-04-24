@@ -29,7 +29,8 @@ using namespace gpmd;
 
 // is the given expression a binary coercible cast of a scalar identifier
 BOOL
-CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref)
+CCastUtils::FBinaryCoercibleCastedScId(gpos::Ref<CExpression> pexpr,
+									   gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -38,7 +39,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref)
 		return false;
 	}
 
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
 	// cast(col1)
 	return COperator::EopScalarIdent == pexprChild->Pop()->Eopid() &&
@@ -47,7 +48,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref)
 
 // is the given expression a binary coercible cast of a scalar identifier
 BOOL
-CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCastedScId(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -56,7 +57,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr)
 		return false;
 	}
 
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
 	// cast(col1)
 	return COperator::EopScalarIdent == pexprChild->Pop()->Eopid();
@@ -64,7 +65,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr)
 
 // is the given expression a binary coercible cast of a const
 BOOL
-CCastUtils::FBinaryCoercibleCastedConst(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCastedConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -73,7 +74,7 @@ CCastUtils::FBinaryCoercibleCastedConst(CExpression *pexpr)
 		return false;
 	}
 
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
 	// cast(const)
 	return COperator::EopScalarConst == pexprChild->Pop()->Eopid();
@@ -82,8 +83,8 @@ CCastUtils::FBinaryCoercibleCastedConst(CExpression *pexpr)
 // extract the column reference if the given expression a scalar identifier
 // or a cast of a scalar identifier or a function that casts a scalar identifier.
 // Else return NULL.
-const CColRef *
-CCastUtils::PcrExtractFromScIdOrCastScId(CExpression *pexpr)
+const gpos::Ref<CColRef>
+CCastUtils::PcrExtractFromScIdOrCastScId(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -96,7 +97,7 @@ CCastUtils::PcrExtractFromScIdOrCastScId(CExpression *pexpr)
 		return nullptr;
 	}
 
-	CScalarIdent *popScIdent = nullptr;
+	gpos::Ref<CScalarIdent> popScIdent = nullptr;
 	if (fScIdent)
 	{
 		popScIdent = CScalarIdent::PopConvert(pexpr->Pop());
@@ -111,26 +112,28 @@ CCastUtils::PcrExtractFromScIdOrCastScId(CExpression *pexpr)
 }
 
 // cast the input column reference to the destination mdid
-CExpression *
+gpos::Ref<CExpression>
 CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-					  const CColRef *colref, IMDId *mdid_dest)
+					  const gpos::Ref<CColRef> colref,
+					  gpos::Ref<IMDId> mdid_dest)
 {
 	GPOS_ASSERT(nullptr != mdid_dest);
 
-	IMDId *mdid_src = colref->RetrieveType()->MDId();
+	gpos::Ref<IMDId> mdid_src = colref->RetrieveType()->MDId();
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	mdid_dest->AddRef();
 	pmdcast->GetCastFuncMdId()->AddRef();
-	CExpression *pexpr;
+	gpos::Ref<CExpression> pexpr;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			(CMDArrayCoerceCastGPDB *) pmdcast;
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			(gpos::Ref<CMDArrayCoerceCastGPDB>) pmdcast;
 		pexpr = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -143,7 +146,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 	else
 	{
-		CScalarCast *popCast =
+		gpos::Ref<CScalarCast> popCast =
 			GPOS_NEW(mp) CScalarCast(mp, mdid_dest, pmdcast->GetCastFuncMdId(),
 									 pmdcast->IsBinaryCoercible());
 		pexpr = GPOS_NEW(mp)
@@ -154,33 +157,33 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 // check whether the given expression is a binary coercible cast of something
 BOOL
-CCastUtils::FBinaryCoercibleCast(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCast(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	return FScalarCast(pexpr) &&
 		   CScalarCast::PopConvert(pop)->IsBinaryCoercible();
 }
 
 BOOL
-CCastUtils::FScalarCast(CExpression *pexpr)
+CCastUtils::FScalarCast(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 
 	return COperator::EopScalarCast == pop->Eopid();
 }
 
 // return the given expression without any binary coercible casts
 // that exist on the top
-CExpression *
-CCastUtils::PexprWithoutBinaryCoercibleCasts(CExpression *pexpr)
+gpos::Ref<CExpression>
+CCastUtils::PexprWithoutBinaryCoercibleCasts(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
 
-	CExpression *pexprOutput = pexpr;
+	gpos::Ref<CExpression> pexprOutput = pexpr;
 
 	while (FBinaryCoercibleCast(pexprOutput))
 	{
@@ -193,7 +196,7 @@ CCastUtils::PexprWithoutBinaryCoercibleCasts(CExpression *pexpr)
 
 // add explicit casting to equality operations between compatible types
 CExpressionArray *
-CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, CExpression *pexpr)
+CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
 
@@ -203,14 +206,14 @@ CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, CExpression *pexpr)
 	const ULONG ulPreds = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < ulPreds; ul++)
 	{
-		CExpression *pexprPred = (*pdrgpexpr)[ul];
+		gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
 		pexprPred->AddRef();
-		CExpression *pexprNewPred = pexprPred;
+		gpos::Ref<CExpression> pexprNewPred = pexprPred;
 
 		if (CPredicateUtils::IsEqualityOp(pexprPred) ||
 			CPredicateUtils::FINDF(pexprPred))
 		{
-			CExpression *pexprCasted = PexprAddCast(mp, pexprPred);
+			gpos::Ref<CExpression> pexprCasted = PexprAddCast(mp, pexprPred);
 			if (nullptr != pexprCasted)
 			{
 				// release predicate since we will construct a new one
@@ -229,29 +232,31 @@ CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, CExpression *pexpr)
 // add explicit casting to left child of given equality or INDF predicate
 // and return resulting casted expression;
 // the function returns NULL if operation failed
-CExpression *
-CCastUtils::PexprAddCast(CMemoryPool *mp, CExpression *pexprPred)
+gpos::Ref<CExpression>
+CCastUtils::PexprAddCast(CMemoryPool *mp, gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(CUtils::FScalarCmp(pexprPred) ||
 				CPredicateUtils::FINDF(pexprPred));
 
-	CExpression *pexprChild = pexprPred;
+	gpos::Ref<CExpression> pexprChild = pexprPred;
 
 	if (!CUtils::FScalarCmp(pexprPred))
 	{
 		pexprChild = (*pexprPred)[0];
 	}
 
-	CExpression *pexprLeft = (*pexprChild)[0];
-	CExpression *pexprRight = (*pexprChild)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexprChild)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexprChild)[1];
 
-	IMDId *mdid_type_left = CScalar::PopConvert(pexprLeft->Pop())->MdidType();
-	IMDId *mdid_type_right = CScalar::PopConvert(pexprRight->Pop())->MdidType();
+	gpos::Ref<IMDId> mdid_type_left =
+		CScalar::PopConvert(pexprLeft->Pop())->MdidType();
+	gpos::Ref<IMDId> mdid_type_right =
+		CScalar::PopConvert(pexprRight->Pop())->MdidType();
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	CExpression *pexprNewPred = nullptr;
+	gpos::Ref<CExpression> pexprNewPred = nullptr;
 
 	BOOL fTypesEqual = mdid_type_left->Equals(mdid_type_right);
 	BOOL fCastLtoR = CMDAccessorUtils::FCastExists(md_accessor, mdid_type_left,
@@ -284,8 +289,8 @@ CCastUtils::PexprAddCast(CMemoryPool *mp, CExpression *pexprPred)
 	pexprLeft->AddRef();
 	pexprRight->AddRef();
 
-	CExpression *pexprNewLeft = pexprLeft;
-	CExpression *pexprNewRight = pexprRight;
+	gpos::Ref<CExpression> pexprNewLeft = pexprLeft;
+	gpos::Ref<CExpression> pexprNewRight = pexprRight;
 
 	if (fCastLtoR)
 	{
@@ -313,21 +318,22 @@ CCastUtils::PexprAddCast(CMemoryPool *mp, CExpression *pexprPred)
 }
 
 // add explicit casting on the input expression to the destination type
-CExpression *
+gpos::Ref<CExpression>
 CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-					  CExpression *pexpr, IMDId *mdid_dest)
+					  gpos::Ref<CExpression> pexpr, gpos::Ref<IMDId> mdid_dest)
 {
-	IMDId *mdid_src = CScalar::PopConvert(pexpr->Pop())->MdidType();
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	gpos::Ref<IMDId> mdid_src = CScalar::PopConvert(pexpr->Pop())->MdidType();
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	mdid_dest->AddRef();
 	pmdcast->GetCastFuncMdId()->AddRef();
-	CExpression *pexprCast;
+	gpos::Ref<CExpression> pexprCast;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			(CMDArrayCoerceCastGPDB *) pmdcast;
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			(gpos::Ref<CMDArrayCoerceCastGPDB>) pmdcast;
 		pexprCast = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -340,7 +346,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 	else
 	{
-		CScalarCast *popCast =
+		gpos::Ref<CScalarCast> popCast =
 			GPOS_NEW(mp) CScalarCast(mp, mdid_dest, pmdcast->GetCastFuncMdId(),
 									 pmdcast->IsBinaryCoercible());
 		pexprCast = GPOS_NEW(mp) CExpression(mp, popCast, pexpr);

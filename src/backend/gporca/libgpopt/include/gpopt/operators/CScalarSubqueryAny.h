@@ -35,9 +35,9 @@ public:
 	CScalarSubqueryAny(const CScalarSubqueryAny &) = delete;
 
 	// ctor
-	CScalarSubqueryAny(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CScalarSubqueryAny(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 					   const CWStringConst *pstrScalarOp,
-					   const CColRef *colref);
+					   const gpos::Ref<CColRef> colref);
 
 	// dtor
 	~CScalarSubqueryAny() override = default;
@@ -57,18 +57,18 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
-	static CScalarSubqueryAny *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarSubqueryAny>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAny == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryAny *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarSubqueryAny> >(pop);
 	}
 
 };	// class CScalarSubqueryAny

@@ -57,7 +57,7 @@ private:
 		ULONG m_scan_id;
 
 		// partition table mdid
-		IMDId *m_mdid;
+		gpos::Ref<IMDId> m_mdid;
 
 		// partition keys
 		CPartKeysArray *m_pdrgppartkeys;
@@ -66,7 +66,7 @@ private:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
 
 		// ctor
-		CPartInfoEntry(ULONG scan_id, IMDId *mdid,
+		CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
 					   CPartKeysArray *pdrgppartkeys);
 
 		// dtor
@@ -81,12 +81,12 @@ private:
 
 		// create a copy of the current object, and add a set of remapped
 		// part keys to this entry, using the existing keys and the given hashmap
-		CPartInfoEntry *PpartinfoentryAddRemappedKeys(
-			CMemoryPool *mp, CColRefSet *pcrs,
+		gpos::Ref<CPartInfoEntry> PpartinfoentryAddRemappedKeys(
+			CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table
-		virtual IMDId *
+		virtual gpos::Ref<IMDId>
 		MDId() const
 		{
 			return m_mdid;
@@ -103,7 +103,7 @@ private:
 		IOstream &OsPrint(IOstream &os) const;
 
 		// copy part info entry into given memory pool
-		CPartInfoEntry *PpartinfoentryCopy(CMemoryPool *mp) const;
+		gpos::Ref<CPartInfoEntry> PpartinfoentryCopy(CMemoryPool *mp) const;
 
 	};	// CPartInfoEntry
 
@@ -133,14 +133,14 @@ public:
 	}
 
 	// add part table consumer
-	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id, IMDId *mdid,
+	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id, gpos::Ref<IMDId> mdid,
 						 CColRef2dArray *pdrgpdrgpcrPart);
 
 	// scan id of the entry at the given position
 	ULONG ScanId(ULONG ulPos) const;
 
 	// relation mdid of the entry at the given position
-	IMDId *GetRelMdId(ULONG ulPos) const;
+	gpos::Ref<IMDId> GetRelMdId(ULONG ulPos) const;
 
 	// part keys of the entry at the given position
 	CPartKeysArray *Pdrgppartkeys(ULONG ulPos) const;
@@ -152,16 +152,17 @@ public:
 	CPartKeysArray *PdrgppartkeysByScanId(ULONG scan_id) const;
 
 	// return a new part info object with an additional set of remapped keys
-	CPartInfo *PpartinfoWithRemappedKeys(CMemoryPool *mp,
-										 CColRefArray *pdrgpcrSrc,
-										 CColRefArray *pdrgpcrDest) const;
+	gpos::Ref<CPartInfo> PpartinfoWithRemappedKeys(
+		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
+		CColRefArray *pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;
 
 	// combine two part info objects
-	static CPartInfo *PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
-									   CPartInfo *ppartinfoSnd);
+	static gpos::Ref<CPartInfo> PpartinfoCombine(
+		CMemoryPool *mp, gpos::Ref<CPartInfo> ppartinfoFst,
+		gpos::Ref<CPartInfo> ppartinfoSnd);
 
 };	// CPartInfo
 

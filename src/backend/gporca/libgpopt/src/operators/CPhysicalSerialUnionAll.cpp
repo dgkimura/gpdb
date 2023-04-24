@@ -66,16 +66,19 @@ CPhysicalSerialUnionAll::~CPhysicalSerialUnionAll() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
-CPhysicalSerialUnionAll::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsRequired,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+gpos::Ref<CDistributionSpec>
+CPhysicalSerialUnionAll::PdsRequired(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 gpos::Ref<CDistributionSpec> pdsRequired,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != PdrgpdrgpcrInput());
 	GPOS_ASSERT(child_index < PdrgpdrgpcrInput()->Size());
 	GPOS_ASSERT(2 > ulOptReq);
 
-	CDistributionSpec *pds = PdsRequireSingletonOrReplicated(
+	gpos::Ref<CDistributionSpec> pds = PdsRequireSingletonOrReplicated(
 		mp, exprhdl, pdsRequired, child_index, ulOptReq);
 	if (nullptr != pds)
 	{
@@ -85,7 +88,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	if (0 == ulOptReq && CDistributionSpec::EdtHashed == pdsRequired->Edt())
 	{
 		// attempt passing requested hashed distribution to children
-		CDistributionSpecHashed *pdshashed = PdshashedPassThru(
+		gpos::Ref<CDistributionSpecHashed> pdshashed = PdshashedPassThru(
 			mp, CDistributionSpecHashed::PdsConvert(pdsRequired), child_index);
 		if (nullptr != pdshashed)
 		{
@@ -100,7 +103,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	}
 
 	// inspect distribution delivered by outer child
-	CDistributionSpec *pdsOuter =
+	gpos::Ref<CDistributionSpec> pdsOuter =
 		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
 
 	if (CDistributionSpec::EdtSingleton == pdsOuter->Edt() ||

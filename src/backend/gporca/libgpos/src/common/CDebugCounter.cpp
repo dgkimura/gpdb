@@ -25,7 +25,7 @@ CDebugCounter *CDebugCounter::m_instance = NULL;
 
 ULONG
 CDebugCounter::SDebugCounterKey::HashValue(
-	const CDebugCounter::SDebugCounterKey *key)
+	const gpos::Ref<CDebugCounter::SDebugCounterKey> key)
 {
 	ULONG result = 0;
 	int key_size = key->m_counter_name.size();
@@ -126,7 +126,7 @@ CDebugCounter::NextQry(const char *next_qry_name)
 
 			while (iter.Advance())
 			{
-				const SDebugCounterValue *val = iter.Value();
+				const gpos::Ref<SDebugCounterValue> val = iter.Value();
 				const char *typeString = "";
 				BOOL use_long = true;
 
@@ -177,8 +177,10 @@ CDebugCounter::NextQry(const char *next_qry_name)
 }
 
 BOOL
-CDebugCounter::FindByName(const char *counter_name, SDebugCounterKey **key,
-						  SDebugCounterValue **val, enum ECounterType typ)
+CDebugCounter::FindByName(const char *counter_name,
+						  gpos::Ref<SDebugCounterKey> *key,
+						  gpos::Ref<SDebugCounterValue> *val,
+						  enum ECounterType typ)
 {
 	GPOS_RTL_ASSERT(NULL != key && NULL == *key);
 	GPOS_RTL_ASSERT(NULL != val && NULL == *val);
@@ -204,8 +206,9 @@ CDebugCounter::FindByName(const char *counter_name, SDebugCounterKey **key,
 // insert or update a key value pair that was generated
 // by FindByName()
 void
-CDebugCounter::InsertOrUpdateCounter(SDebugCounterKey *key,
-									 SDebugCounterValue *val, BOOL update)
+CDebugCounter::InsertOrUpdateCounter(gpos::Ref<SDebugCounterKey> key,
+									 gpos::Ref<SDebugCounterValue> val,
+									 BOOL update)
 {
 	if (update)
 	{
@@ -228,8 +231,8 @@ CDebugCounter::Bump(const char *counter_name)
 	{
 		AutoDisable preventInfiniteRecursion;
 
-		SDebugCounterKey *key = NULL;
-		SDebugCounterValue *val = NULL;
+		gpos::Ref<SDebugCounterKey> key = NULL;
+		gpos::Ref<SDebugCounterValue> val = NULL;
 		BOOL found =
 			m_instance->FindByName(counter_name, &key, &val, ECounterTypeCount);
 
@@ -246,8 +249,8 @@ CDebugCounter::Add(const char *counter_name, long delta)
 	{
 		AutoDisable preventInfiniteRecursion;
 
-		SDebugCounterKey *key = NULL;
-		SDebugCounterValue *val = NULL;
+		gpos::Ref<SDebugCounterKey> key = NULL;
+		gpos::Ref<SDebugCounterValue> val = NULL;
 		BOOL found =
 			m_instance->FindByName(counter_name, &key, &val, ECounterTypeSum);
 
@@ -263,8 +266,8 @@ CDebugCounter::AddDouble(const char *counter_name, double delta)
 	{
 		AutoDisable preventInfiniteRecursion;
 
-		SDebugCounterKey *key = NULL;
-		SDebugCounterValue *val = NULL;
+		gpos::Ref<SDebugCounterKey> key = NULL;
+		gpos::Ref<SDebugCounterValue> val = NULL;
 		BOOL found = m_instance->FindByName(counter_name, &key, &val,
 											ECounterTypeSumDouble);
 
@@ -280,8 +283,8 @@ CDebugCounter::StartCpuTime(const char *counter_name)
 	{
 		AutoDisable preventInfiniteRecursion;
 
-		SDebugCounterKey *key = NULL;
-		SDebugCounterValue *val = NULL;
+		gpos::Ref<SDebugCounterKey> key = NULL;
+		gpos::Ref<SDebugCounterValue> val = NULL;
 		BOOL found = m_instance->FindByName(counter_name, &key, &val,
 											ECounterTypeCpuTime);
 
@@ -305,8 +308,8 @@ CDebugCounter::StopCpuTime(const char *counter_name)
 	{
 		AutoDisable preventInfiniteRecursion;
 
-		SDebugCounterKey *key = NULL;
-		SDebugCounterValue *val = NULL;
+		gpos::Ref<SDebugCounterKey> key = NULL;
+		gpos::Ref<SDebugCounterValue> val = NULL;
 		BOOL found = m_instance->FindByName(counter_name, &key, &val,
 											ECounterTypeCpuTime);
 

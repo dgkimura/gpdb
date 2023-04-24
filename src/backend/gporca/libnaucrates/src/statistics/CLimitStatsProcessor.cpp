@@ -14,9 +14,9 @@
 using namespace gpopt;
 
 //	compute the statistics of a limit operation
-CStatistics *
+gpos::Ref<CStatistics>
 CLimitStatsProcessor::CalcLimitStats(CMemoryPool *mp,
-									 const CStatistics *input_stats,
+									 const gpos::Ref<CStatistics> input_stats,
 									 CDouble input_limit_rows)
 {
 	GPOS_ASSERT(nullptr != input_stats);
@@ -30,7 +30,7 @@ CLimitStatsProcessor::CalcLimitStats(CMemoryPool *mp,
 		limit_rows = std::max(CStatistics::MinRows, input_limit_rows);
 	}
 	// create an output stats object
-	CStatistics *pstatsLimit = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> pstatsLimit = GPOS_NEW(mp) CStatistics(
 		mp, colid_histogram, input_stats->CopyWidths(mp), limit_rows,
 		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
 

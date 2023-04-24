@@ -30,8 +30,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt2::CDXLDatumInt2(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null,
-							 SINT val)
+CDXLDatumInt2::CDXLDatumInt2(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+							 BOOL is_null, SINT val)
 	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 2 /*length*/),
 	  m_val(val)
 {

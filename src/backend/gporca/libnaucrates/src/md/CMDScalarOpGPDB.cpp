@@ -30,12 +30,13 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDScalarOpGPDB::CMDScalarOpGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, IMDId *mdid_type_left,
-	IMDId *mdid_type_right, IMDId *result_type_mdid, IMDId *mdid_func,
-	IMDId *mdid_commute_opr, IMDId *m_mdid_inverse_opr,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	gpos::Ref<IMDId> mdid_type_left, gpos::Ref<IMDId> mdid_type_right,
+	gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> mdid_func,
+	gpos::Ref<IMDId> mdid_commute_opr, gpos::Ref<IMDId> m_mdid_inverse_opr,
 	IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-	IMdIdArray *mdid_opfamilies_array, IMDId *mdid_hash_opfamily,
-	IMDId *mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
+	IMdIdArray *mdid_opfamilies_array, gpos::Ref<IMDId> mdid_hash_opfamily,
+	gpos::Ref<IMDId> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -92,7 +93,7 @@ CMDScalarOpGPDB::~CMDScalarOpGPDB()
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::MDId() const
 {
 	return m_mdid;
@@ -120,7 +121,7 @@ CMDScalarOpGPDB::Mdname() const
 //		Type id of left operand
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::GetLeftMdid() const
 {
 	return m_mdid_type_left;
@@ -134,7 +135,7 @@ CMDScalarOpGPDB::GetLeftMdid() const
 //		Type id of right operand
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::GetRightMdid() const
 {
 	return m_mdid_type_right;
@@ -148,7 +149,7 @@ CMDScalarOpGPDB::GetRightMdid() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -162,7 +163,7 @@ CMDScalarOpGPDB::GetResultTypeMdid() const
 //		Id of function which implements the operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::FuncMdId() const
 {
 	return m_func_mdid;
@@ -176,7 +177,7 @@ CMDScalarOpGPDB::FuncMdId() const
 //		Id of commute operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::GetCommuteOpMdid() const
 {
 	return m_mdid_commute_opr;
@@ -190,7 +191,7 @@ CMDScalarOpGPDB::GetCommuteOpMdid() const
 //		Id of inverse operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::GetInverseOpMdid() const
 {
 	return m_mdid_inverse_opr;
@@ -286,10 +287,10 @@ CMDScalarOpGPDB::Serialize(CXMLSerializer *xml_serializer) const
 									EdxltokenGPDBScalarOpHashOpfamily,
 									EdxltokenGPDBScalarOpLegacyHashOpfamily};
 
-	IMDId *mdid_array[8] = {m_mdid_type_left,	  m_mdid_type_right,
-							m_mdid_type_result,	  m_func_mdid,
-							m_mdid_commute_opr,	  m_mdid_inverse_opr,
-							m_mdid_hash_opfamily, m_mdid_legacy_hash_opfamily};
+	gpos::Ref<IMDId> mdid_array[8] = {
+		m_mdid_type_left,	  m_mdid_type_right,		  m_mdid_type_result,
+		m_func_mdid,		  m_mdid_commute_opr,		  m_mdid_inverse_opr,
+		m_mdid_hash_opfamily, m_mdid_legacy_hash_opfamily};
 
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(dxl_token_array); ul++)
 	{
@@ -335,7 +336,7 @@ CMDScalarOpGPDB::OpfamiliesCount() const
 //		Operator family at given position
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::OpfamilyMdidAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_mdid_opfamilies_array->Size());
@@ -344,7 +345,7 @@ CMDScalarOpGPDB::OpfamilyMdidAt(ULONG pos) const
 }
 
 // compatible hash opfamily
-IMDId *
+gpos::Ref<IMDId>
 CMDScalarOpGPDB::HashOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))

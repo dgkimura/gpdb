@@ -29,9 +29,10 @@ using namespace gpopt;
 // relation.  CheckForFullUniqueKeySetInInnerRel method checks if all the
 // unique/primary keys from a particular key set collection of the inner
 // relation are present in the join condition.
-CExpression *
+gpos::Ref<CExpression>
 CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
-	CMemoryPool *mp, CExpression *pexprNew, CColRefSet *output_columns)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprNew,
+	gpos::Ref<CColRefSet> output_columns)
 {
 	GPOS_ASSERT(nullptr != pexprNew);
 	GPOS_ASSERT(nullptr != output_columns);
@@ -46,7 +47,7 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 	// Set to contain the unique keys of inner relation used in the join
 	// condition which are either a constant or equal to some other column
 	// from the outer relation
-	CColRefSet *result = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> result = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Checking 'Join Conditions' to figure out if join is prunable.  If
 	// the join condition contains an operator other than ScalarCmp(=)
@@ -75,7 +76,7 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 	// then we proceed for 'Join Pruning', and return Outer child only
 	if (CheckForFullUniqueKeySetInInnerRel(mp, pexprNew, result))
 	{
-		CExpression *outer_child = (*pexprNew)[0];
+		gpos::Ref<CExpression> outer_child = (*pexprNew)[0];
 		outer_child->AddRef();
 		pexprNew->Release();
 		result->Release();
@@ -90,13 +91,13 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 
 BOOL
 CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnInnerRel(
-	const CExpression *pexprNew, CColRefSet *output_columns)
+	const gpos::Ref<CExpression> pexprNew, gpos::Ref<CColRefSet> output_columns)
 {
 	GPOS_ASSERT(nullptr != pexprNew);
 	GPOS_ASSERT(nullptr != output_columns);
 
-	CExpression *inner_rel = (*pexprNew)[1];
-	const CColRefSet *derive_output_columns_inner_rel =
+	gpos::Ref<CExpression> inner_rel = (*pexprNew)[1];
+	const gpos::Ref<CColRefSet> derive_output_columns_inner_rel =
 		inner_rel->DeriveOutputColumns();
 
 	// If the output_columns of CLogicalLeftOuterJoin operator contains
@@ -112,34 +113,36 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnInnerRel(
 
 BOOL
 CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
-	CMemoryPool *mp, const CExpression *pexprNew, CColRefSet *result)
+	CMemoryPool *mp, const gpos::Ref<CExpression> pexprNew,
+	gpos::Ref<CColRefSet> result)
 {
 	GPOS_ASSERT(nullptr != pexprNew);
 	GPOS_ASSERT(nullptr != result);
 
 	// Outer relation of the left join
-	CExpression *outer_rel = (*pexprNew)[0];
+	gpos::Ref<CExpression> outer_rel = (*pexprNew)[0];
 
 	// Inner relation of the left join
-	CExpression *inner_rel = (*pexprNew)[1];
+	gpos::Ref<CExpression> inner_rel = (*pexprNew)[1];
 
 	// Join conditions of left join
-	CExpression *join_cond = (*pexprNew)[2];
+	gpos::Ref<CExpression> join_cond = (*pexprNew)[2];
 
-	CKeyCollection *inner_rel_key_sets = inner_rel->DeriveKeyCollection();
+	gpos::Ref<CKeyCollection> inner_rel_key_sets =
+		inner_rel->DeriveKeyCollection();
 
 	// Unique keys of inner relation
-	CColRefSet *inner_unique_keys = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> inner_unique_keys = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Derived output columns of the outer relation of the left join
-	CColRefSet *outer_rel_columns = outer_rel->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_rel_columns = outer_rel->DeriveOutputColumns();
 
 	ULONG num_keys = inner_rel_key_sets->Keys();
 
 	// Extracting unique keys of inner relation
 	for (ULONG ul = 0; ul < num_keys; ul++)
 	{
-		CColRefSet *pdrgpcrKey = inner_rel_key_sets->PcrsKey(mp, ul);
+		gpos::Ref<CColRefSet> pdrgpcrKey = inner_rel_key_sets->PcrsKey(mp, ul);
 		inner_unique_keys->Include(pdrgpcrKey);
 		pdrgpcrKey->Release();
 	}
@@ -177,10 +180,10 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 
 		// Contains columns from a join condition that are present in the
 		// inner relation
-		CColRefSet *inner_columns = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> inner_columns = GPOS_NEW(mp) CColRefSet(mp);
 
 		// Columns used in a join condition
-		CColRefSet *usedColumns = join_cond->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> usedColumns = join_cond->DeriveUsedColumns();
 
 		CheckUniqueKeyInJoinCond(inner_columns, usedColumns, result,
 								 inner_unique_keys, outer_rel_columns);
@@ -202,9 +205,9 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 
 BOOL
 CLeftJoinPruningPreprocessor::CheckAndCondInJoinCond(
-	CMemoryPool *mp, const CExpression *join_cond,
-	const CColRefSet *inner_unique_keys, CColRefSet *result,
-	const CColRefSet *outer_rel_columns)
+	CMemoryPool *mp, const gpos::Ref<CExpression> join_cond,
+	const gpos::Ref<CColRefSet> inner_unique_keys, gpos::Ref<CColRefSet> result,
+	const gpos::Ref<CColRefSet> outer_rel_columns)
 {
 	GPOS_ASSERT(nullptr != join_cond);
 	GPOS_ASSERT(nullptr != inner_unique_keys);
@@ -214,7 +217,7 @@ CLeftJoinPruningPreprocessor::CheckAndCondInJoinCond(
 	ULONG arity_join = join_cond->Arity();
 	for (ULONG ul = 0; ul < arity_join; ul++)
 	{
-		CExpression *join_cond_child = (*join_cond)[ul];
+		gpos::Ref<CExpression> join_cond_child = (*join_cond)[ul];
 
 		// If the child of the ScalarBoolAnd is not a ScalarCmp then
 		// join pruning is not possible
@@ -241,10 +244,11 @@ CLeftJoinPruningPreprocessor::CheckAndCondInJoinCond(
 
 		// Contains columns from a join condition that are present in
 		// the inner relation
-		CColRefSet *inner_columns = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> inner_columns = GPOS_NEW(mp) CColRefSet(mp);
 
 		// Columns used in a join condition
-		CColRefSet *usedColumns = join_cond_child->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> usedColumns =
+			join_cond_child->DeriveUsedColumns();
 
 		CheckUniqueKeyInJoinCond(inner_columns, usedColumns, result,
 								 inner_unique_keys, outer_rel_columns);
@@ -256,23 +260,25 @@ CLeftJoinPruningPreprocessor::CheckAndCondInJoinCond(
 
 BOOL
 CLeftJoinPruningPreprocessor::CheckForFullUniqueKeySetInInnerRel(
-	CMemoryPool *mp, const CExpression *pexprNew, const CColRefSet *result)
+	CMemoryPool *mp, const gpos::Ref<CExpression> pexprNew,
+	const gpos::Ref<CColRefSet> result)
 {
 	GPOS_ASSERT(nullptr != pexprNew);
 	GPOS_ASSERT(nullptr != result);
 
-	CExpression *inner_rel = (*pexprNew)[1];
-	CKeyCollection *inner_rel_key_sets = inner_rel->DeriveKeyCollection();
+	gpos::Ref<CExpression> inner_rel = (*pexprNew)[1];
+	gpos::Ref<CKeyCollection> inner_rel_key_sets =
+		inner_rel->DeriveKeyCollection();
 	ULONG ulKeys = inner_rel_key_sets->Keys();
 	BOOL are_all_unique_keys_present;
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
-		CColRefSet *pdrgpcrKey = inner_rel_key_sets->PcrsKey(mp, ul);
+		gpos::Ref<CColRefSet> pdrgpcrKey = inner_rel_key_sets->PcrsKey(mp, ul);
 		CColRefSetIter it(*pdrgpcrKey);
 		are_all_unique_keys_present = true;
 		while (it.Advance())
 		{
-			CColRef *pcr = it.Pcr();
+			gpos::Ref<CColRef> pcr = it.Pcr();
 			if (!result->FMember(pcr))
 			{
 				are_all_unique_keys_present = false;
@@ -296,9 +302,10 @@ CLeftJoinPruningPreprocessor::CheckForFullUniqueKeySetInInnerRel(
 // is inserted in the result set.
 void
 CLeftJoinPruningPreprocessor::CheckUniqueKeyInJoinCond(
-	CColRefSet *inner_columns, const CColRefSet *usedColumns,
-	CColRefSet *result, const CColRefSet *inner_unique_keys,
-	const CColRefSet *outer_rel_columns)
+	gpos::Ref<CColRefSet> inner_columns,
+	const gpos::Ref<CColRefSet> usedColumns, gpos::Ref<CColRefSet> result,
+	const gpos::Ref<CColRefSet> inner_unique_keys,
+	const gpos::Ref<CColRefSet> outer_rel_columns)
 {
 	GPOS_ASSERT(nullptr != inner_columns);
 	GPOS_ASSERT(nullptr != usedColumns);
@@ -322,7 +329,7 @@ CLeftJoinPruningPreprocessor::CheckUniqueKeyInJoinCond(
 
 		while (it.Advance())
 		{
-			CColRef *pcr = it.Pcr();
+			gpos::Ref<CColRef> pcr = it.Pcr();
 			if (!outer_rel_columns->FMember(pcr))
 			{
 				inner_columns->Include(pcr);
@@ -347,9 +354,9 @@ CLeftJoinPruningPreprocessor::CheckUniqueKeyInJoinCond(
 // any scalar subquery is present in the tree and find the output column of that
 // subquery (subquery_colref) and calls back JoinPruningTreeTraversal method
 // to prune any left join present in the subquery.
-CExpression *
+gpos::Ref<CExpression>
 CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
-	CMemoryPool *mp, CExpression *pexprScalar)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 	GPOS_ASSERT(pexprScalar->Pop()->FScalar());
@@ -361,17 +368,17 @@ CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
 	}
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	CColRefSet *subquery_colrefset = GPOS_NEW(mp) CColRefSet(mp);
-	const CColRef *subquery_colref = nullptr;
+	gpos::Ref<CColRefSet> subquery_colrefset = GPOS_NEW(mp) CColRefSet(mp);
+	const gpos::Ref<CColRef> subquery_colref = nullptr;
 	if (COperator::EopScalarSubquery == pexprScalar->Pop()->Eopid())
 	{
-		CScalarSubquery *subquery_pop =
+		gpos::Ref<CScalarSubquery> subquery_pop =
 			CScalarSubquery::PopConvert(pexprScalar->Pop());
 		subquery_colref = subquery_pop->Pcr();
 	}
 	else if (CUtils::FQuantifiedSubquery(pexprScalar->Pop()))
 	{
-		CScalarSubqueryQuantified *subquery_pop =
+		gpos::Ref<CScalarSubqueryQuantified> subquery_pop =
 			CScalarSubqueryQuantified::PopConvert(pexprScalar->Pop());
 		subquery_colref = subquery_pop->Pcr();
 	}
@@ -396,9 +403,11 @@ CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
 // relation.
 void
 CLeftJoinPruningPreprocessor::ComputeOutputColumns(
-	const CExpression *pexpr, const CColRefSet *derived_output_columns,
-	CColRefSet *output_columns, CColRefSet *childs_output_columns,
-	const CColRefSet *pcrsOutput)
+	const gpos::Ref<CExpression> pexpr,
+	const gpos::Ref<CColRefSet> derived_output_columns,
+	gpos::Ref<CColRefSet> output_columns,
+	gpos::Ref<CColRefSet> childs_output_columns,
+	const gpos::Ref<CColRefSet> pcrsOutput)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != derived_output_columns);
@@ -409,7 +418,7 @@ CLeftJoinPruningPreprocessor::ComputeOutputColumns(
 	CColRefSetIter iter_derived_output_columns(*derived_output_columns);
 	while (iter_derived_output_columns.Advance())
 	{
-		CColRef *pcr = iter_derived_output_columns.Pcr();
+		gpos::Ref<CColRef> pcr = iter_derived_output_columns.Pcr();
 		if (pcrsOutput->FMember(pcr))
 		{
 			output_columns->Include(pcr);
@@ -420,10 +429,10 @@ CLeftJoinPruningPreprocessor::ComputeOutputColumns(
 	ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexpr_child = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexpr_child = (*pexpr)[ul];
 		if (pexpr_child->Pop()->FScalar())
 		{
-			CColRefSet *derived_used_columns_scalar =
+			gpos::Ref<CColRefSet> derived_used_columns_scalar =
 				pexpr_child->DeriveUsedColumns();
 			childs_output_columns->Include(output_columns);
 			childs_output_columns->Include(derived_used_columns_scalar);
@@ -431,10 +440,11 @@ CLeftJoinPruningPreprocessor::ComputeOutputColumns(
 	}
 }
 
-CExpression *
+gpos::Ref<CExpression>
 CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
-	CMemoryPool *mp, const CExpression *pexpr, CExpressionArray *pdrgpexpr,
-	const CColRefSet *childs_output_columns)
+	CMemoryPool *mp, const gpos::Ref<CExpression> pexpr,
+	CExpressionArray *pdrgpexpr,
+	const gpos::Ref<CColRefSet> childs_output_columns)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -442,16 +452,16 @@ CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
 	ULONG number_of_childs = pexpr->Arity();
 	for (ULONG ul = 0; ul < number_of_childs; ul++)
 	{
-		CExpression *pexpr_child = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexpr_child = (*pexpr)[ul];
 		if (pexpr_child->Pop()->FLogical())
 		{
-			CExpression *pexprLogicalJoinPrunedChild =
+			gpos::Ref<CExpression> pexprLogicalJoinPrunedChild =
 				PexprPreprocess(mp, pexpr_child, childs_output_columns);
 			pdrgpexpr->Append(pexprLogicalJoinPrunedChild);
 		}
 		else if (pexpr_child->DeriveHasSubquery())
 		{
-			CExpression *pexprScalarJoinPrunedChild =
+			gpos::Ref<CExpression> pexprScalarJoinPrunedChild =
 				PexprJoinPruningScalarSubquery(mp, pexpr_child);
 			pdrgpexpr->Append(pexprScalarJoinPrunedChild);
 		}
@@ -462,9 +472,10 @@ CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
 		}
 	}
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	pop->AddRef();
-	CExpression *pexprNew = GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
+	gpos::Ref<CExpression> pexprNew =
+		GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 	return pexprNew;
 }
 
@@ -522,10 +533,10 @@ CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
 //       |--CScalarIdent "e" (4)
 //       +--CScalarConst (100)
 
-CExpression *
-CLeftJoinPruningPreprocessor::PexprPreprocess(CMemoryPool *mp,
-											  CExpression *pexpr,
-											  const CColRefSet *pcrsOutput)
+gpos::Ref<CExpression>
+CLeftJoinPruningPreprocessor::PexprPreprocess(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	const gpos::Ref<CColRefSet> pcrsOutput)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(pexpr->Pop()->FLogical());
@@ -537,13 +548,13 @@ CLeftJoinPruningPreprocessor::PexprPreprocess(CMemoryPool *mp,
 	}
 
 	// Derived output columns of the current expression
-	CColRefSet *derived_output_columns = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> derived_output_columns = pexpr->DeriveOutputColumns();
 
 	// Columns which are output by the current expression
-	CColRefSet *output_columns = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> output_columns = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Columns which are output by the child tree of the current expression
-	CColRefSet *childs_output_columns = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> childs_output_columns = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Computing output columns of the current expression (output_columns)
 	// and the output columns of child tree (childs_output_columns)
@@ -554,7 +565,7 @@ CLeftJoinPruningPreprocessor::PexprPreprocess(CMemoryPool *mp,
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
 	// Traversing the tree
-	CExpression *pexprNew =
+	gpos::Ref<CExpression> pexprNew =
 		JoinPruningTreeTraversal(mp, pexpr, pdrgpexpr, childs_output_columns);
 	childs_output_columns->Release();
 

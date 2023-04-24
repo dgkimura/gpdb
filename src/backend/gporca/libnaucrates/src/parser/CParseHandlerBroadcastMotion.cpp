@@ -68,7 +68,7 @@ CParseHandlerBroadcastMotion::StartElement(
 	}
 
 	// parse and create Broadcast motion operator
-	m_dxl_op = (CDXLPhysicalBroadcastMotion *)
+	m_dxl_op = (gpos::Ref<CDXLPhysicalBroadcastMotion>)
 		CDXLOperatorFactory::MakeDXLBroadcastMotion(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 

@@ -31,7 +31,7 @@ class CScalarSubquery : public CScalar
 {
 private:
 	// computed column reference
-	const CColRef *m_pcr;
+	const gpos::Ref<CColRef> m_pcr;
 
 	// is subquery generated from existential subquery?
 	BOOL m_fGeneratedByExist;
@@ -43,7 +43,7 @@ public:
 	CScalarSubquery(const CScalarSubquery &) = delete;
 
 	// ctor
-	CScalarSubquery(CMemoryPool *mp, const CColRef *colref,
+	CScalarSubquery(CMemoryPool *mp, const gpos::Ref<CColRef> colref,
 					BOOL fGeneratedByExist, BOOL fGeneratedByQuantified);
 
 	// dtor
@@ -64,20 +64,20 @@ public:
 	}
 
 	// accessor to computed column reference
-	const CColRef *
+	const gpos::Ref<CColRef>
 	Pcr() const
 	{
 		return m_pcr;
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -87,12 +87,13 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return locally used columns
-	CColRefSet *PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp,
+								   CExpressionHandle &exprhdl) override;
 
 	// is subquery generated from existential subquery?
 	BOOL
@@ -109,17 +110,17 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *PpartinfoDerive(CMemoryPool *mp,
-							   CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CPartInfo> PpartinfoDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubquery *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarSubquery>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubquery == pop->Eopid());
 
-		return dynamic_cast<CScalarSubquery *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarSubquery> >(pop);
 	}
 
 	// print

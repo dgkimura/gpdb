@@ -19,11 +19,10 @@
 using namespace gpopt;
 
 // return statistics object after Group by computation
-CStatistics *
-CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
-										 const CStatistics *input_stats,
-										 ULongPtrArray *GCs,
-										 ULongPtrArray *aggs, CBitSet *keys)
+gpos::Ref<CStatistics>
+CGroupByStatsProcessor::CalcGroupByStats(
+	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
+	ULongPtrArray *GCs, ULongPtrArray *aggs, gpos::Ref<CBitSet> keys)
 {
 	// create hash map from colid -> histogram for resultant structure
 	UlongToHistogramMap *col_histogram_mapping =
@@ -34,7 +33,7 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	CStatistics *agg_stats = nullptr;
+	gpos::Ref<CStatistics> agg_stats = nullptr;
 	CDouble agg_rows = CStatistics::MinRows;
 	if (input_stats->IsEmpty())
 	{
@@ -57,8 +56,9 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 			mp, col_factory, col_histogram_mapping, col_width_mapping, aggs,
 			false /* is_empty */);
 
-		CColRefSet *computed_groupby_cols = GPOS_NEW(mp) CColRefSet(mp);
-		CColRefSet *groupby_cols_for_stats =
+		gpos::Ref<CColRefSet> computed_groupby_cols =
+			GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> groupby_cols_for_stats =
 			CStatisticsUtils::MakeGroupByColsForStats(mp, GCs,
 													  computed_groupby_cols);
 
@@ -71,7 +71,8 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 										 col_histogram_mapping,
 										 col_width_mapping);
 
-		const CStatisticsConfig *stats_config = input_stats->GetStatsConfig();
+		const gpos::Ref<CStatisticsConfig> stats_config =
+			input_stats->GetStatsConfig();
 
 		CDoubleArray *NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
 			mp, stats_config, input_stats, groupby_cols_for_stats, keys);

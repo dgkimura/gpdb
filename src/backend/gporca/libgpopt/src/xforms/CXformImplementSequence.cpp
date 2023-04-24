@@ -48,8 +48,9 @@ CXformImplementSequence::CXformImplementSequence(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSequence::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformImplementSequence::Transform(gpos::Ref<CXformContext> pxfctxt,
+								   gpos::Ref<CXformResult> pxfres,
+								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -61,7 +62,7 @@ CXformImplementSequence::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpexpr->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalSequence(mp), pdrgpexpr);
 	// add alternative to transformation result
 	pxfres->Add(pexprAlt);

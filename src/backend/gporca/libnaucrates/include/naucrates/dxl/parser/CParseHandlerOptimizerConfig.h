@@ -40,10 +40,10 @@ class CParseHandlerOptimizerConfig : public CParseHandlerBase
 {
 private:
 	// trace flag bitset
-	CBitSet *m_pbs;
+	gpos::Ref<CBitSet> m_pbs;
 
 	// optimizer configuration
-	COptimizerConfig *m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// process the start of an element
 	void StartElement(
@@ -74,10 +74,10 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// trace flags
-	CBitSet *Pbs() const;
+	gpos::Ref<CBitSet> Pbs() const;
 
 	// optimizer config
-	COptimizerConfig *GetOptimizerConfig() const;
+	gpos::Ref<COptimizerConfig> GetOptimizerConfig() const;
 };
 }  // namespace gpdxl
 

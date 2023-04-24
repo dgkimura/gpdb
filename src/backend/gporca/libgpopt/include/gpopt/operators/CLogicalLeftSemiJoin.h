@@ -64,11 +64,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &hdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *mp,
+											  CExpressionHandle &hdl) override;
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -76,7 +76,7 @@ public:
 	}
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -84,7 +84,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -99,8 +99,9 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// promise level for stat derivation
 	EStatPromise
@@ -116,20 +117,20 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftSemiJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftSemiJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftSemiJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftSemiJoin> >(pop);
 	}
 
 	// derive statistics
-	static IStatistics *PstatsDerive(CMemoryPool *mp,
-									 CStatsPredJoinArray *join_preds_stats,
-									 IStatistics *outer_stats,
-									 IStatistics *inner_side_stats);
+	static gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CStatsPredJoinArray *join_preds_stats,
+		gpos::Ref<IStatistics> outer_stats,
+		gpos::Ref<IStatistics> inner_side_stats);
 
 };	// class CLogicalLeftSemiJoin
 

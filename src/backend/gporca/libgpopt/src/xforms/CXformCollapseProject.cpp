@@ -73,8 +73,9 @@ CXformCollapseProject::Exfp(CExpressionHandle &	 //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformCollapseProject::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformCollapseProject::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -82,7 +83,8 @@ CXformCollapseProject::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprCollapsed = CUtils::PexprCollapseProjects(mp, pexpr);
+	gpos::Ref<CExpression> pexprCollapsed =
+		CUtils::PexprCollapseProjects(mp, pexpr);
 
 	if (nullptr != pexprCollapsed)
 	{

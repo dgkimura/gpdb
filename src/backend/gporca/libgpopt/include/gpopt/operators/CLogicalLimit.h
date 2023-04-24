@@ -32,7 +32,7 @@ class CLogicalLimit : public CLogical
 {
 private:
 	// required sort order
-	COrderSpec *m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// global limit
 	BOOL m_fGlobal;
@@ -48,7 +48,7 @@ public:
 
 	// ctors
 	explicit CLogicalLimit(CMemoryPool *mp);
-	CLogicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
+	CLogicalLimit(CMemoryPool *mp, gpos::Ref<COrderSpec> pos, BOOL fGlobal,
 				  BOOL fHasCount, BOOL fTopLimitUnderDML);
 
 	// dtor
@@ -68,7 +68,7 @@ public:
 	}
 
 	// order spec
-	COrderSpec *
+	gpos::Ref<COrderSpec>
 	Pos() const
 	{
 		return m_pos;
@@ -96,7 +96,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -109,9 +109,9 @@ public:
 	ULONG HashValue() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -121,15 +121,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -137,7 +137,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) const override
 	{
@@ -145,7 +145,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -157,9 +157,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsInput,
-						 ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   gpos::Ref<CColRefSet> pcrsInput,
+								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
@@ -176,21 +176,22 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLimit *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLimit>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLimit == pop->Eopid());
 
-		return dynamic_cast<CLogicalLimit *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLimit> >(pop);
 	}
 
 };	// class CLogicalLimit

@@ -55,13 +55,13 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -71,13 +71,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarNAryJoinPredList *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarNAryJoinPredList>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
-		return dynamic_cast<CScalarNAryJoinPredList *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarNAryJoinPredList> >(pop);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(

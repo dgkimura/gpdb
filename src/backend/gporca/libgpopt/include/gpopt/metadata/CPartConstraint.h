@@ -54,7 +54,7 @@ private:
 	UlongToConstraintMap *m_phmulcnstr;
 
 	// levels at which the default partitions are included
-	CBitSet *m_pbsDefaultParts;
+	gpos::Ref<CBitSet> m_pbsDefaultParts;
 
 	// number of levels;
 	ULONG m_num_of_part_levels;
@@ -69,7 +69,7 @@ private:
 	CColRef2dArray *m_pdrgpdrgpcr;
 
 	// combined constraint
-	CConstraint *m_pcnstrCombined;
+	gpos::Ref<CConstraint> m_pcnstrCombined;
 
 #ifdef GPOS_DEBUG
 	// are all default partitions on all levels included
@@ -77,7 +77,8 @@ private:
 #endif	//GPOS_DEBUG
 
 	// does the current constraint overlap with given one at the given level
-	BOOL FOverlapLevel(CMemoryPool *mp, const CPartConstraint *ppartcnstr,
+	BOOL FOverlapLevel(CMemoryPool *mp,
+					   const gpos::Ref<CPartConstraint> ppartcnstr,
 					   ULONG ulLevel) const;
 
 	// check whether or not the current part constraint can be negated. A part
@@ -86,12 +87,13 @@ private:
 	BOOL FCanNegate() const;
 
 	// construct the combined constraint
-	CConstraint *PcnstrBuildCombined(CMemoryPool *mp);
+	gpos::Ref<CConstraint> PcnstrBuildCombined(CMemoryPool *mp);
 
 	// return the remaining part of the first constraint that is not covered by
 	// the second constraint
-	static CConstraint *PcnstrRemaining(CMemoryPool *mp, CConstraint *pcnstrFst,
-										CConstraint *pcnstrSnd);
+	static gpos::Ref<CConstraint> PcnstrRemaining(
+		CMemoryPool *mp, gpos::Ref<CConstraint> pcnstrFst,
+		gpos::Ref<CConstraint> pcnstrSnd);
 
 	// check if two constaint maps have the same constraints
 	static BOOL FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst,
@@ -101,17 +103,17 @@ private:
 	// check if it is possible to produce a disjunction of the two given part
 	// constraints. This is possible if the first ulLevels-1 have the same
 	// constraints and default flags for both part constraints
-	static BOOL FDisjunctionPossible(CPartConstraint *ppartcnstrFst,
-									 CPartConstraint *ppartcnstrSnd);
+	static BOOL FDisjunctionPossible(gpos::Ref<CPartConstraint> ppartcnstrFst,
+									 gpos::Ref<CPartConstraint> ppartcnstrSnd);
 
 public:
 	CPartConstraint(const CPartConstraint &) = delete;
 
 	// ctors
 	CPartConstraint(CMemoryPool *mp, UlongToConstraintMap *phmulcnstr,
-					CBitSet *pbsDefaultParts, BOOL is_unbounded,
+					gpos::Ref<CBitSet> pbsDefaultParts, BOOL is_unbounded,
 					CColRef2dArray *pdrgpdrgpcr);
-	CPartConstraint(CMemoryPool *mp, CConstraint *pcnstr,
+	CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,
 					BOOL fDefaultPartition, BOOL is_unbounded);
 
 	CPartConstraint(BOOL fUninterpreted);
@@ -120,10 +122,10 @@ public:
 	~CPartConstraint() override;
 
 	// constraint at given level
-	CConstraint *Pcnstr(ULONG ulLevel) const;
+	gpos::Ref<CConstraint> Pcnstr(ULONG ulLevel) const;
 
 	// combined constraint
-	CConstraint *
+	gpos::Ref<CConstraint>
 	PcnstrCombined() const
 	{
 		return m_pcnstrCombined;
@@ -154,31 +156,32 @@ public:
 	}
 
 	// are constraints equivalent
-	BOOL FEquivalent(const CPartConstraint *ppartcnstr) const;
+	BOOL FEquivalent(const gpos::Ref<CPartConstraint> ppartcnstr) const;
 
 	// does constraint overlap with given constraint
-	BOOL FOverlap(CMemoryPool *mp, const CPartConstraint *ppartcnstr) const;
+	BOOL FOverlap(CMemoryPool *mp,
+				  const gpos::Ref<CPartConstraint> ppartcnstr) const;
 
 	// does constraint subsume given one
-	BOOL FSubsume(const CPartConstraint *ppartcnstr) const;
+	BOOL FSubsume(const gpos::Ref<CPartConstraint> ppartcnstr) const;
 
 	// return what remains of the current part constraint after taking out
 	// the given part constraint. Returns NULL is the difference cannot be
 	// performed
-	CPartConstraint *PpartcnstrRemaining(CMemoryPool *mp,
-										 CPartConstraint *ppartcnstr);
+	gpos::Ref<CPartConstraint> PpartcnstrRemaining(
+		CMemoryPool *mp, gpos::Ref<CPartConstraint> ppartcnstr);
 
 	// return a copy of the part constraint with remapped columns
-	CPartConstraint *PpartcnstrCopyWithRemappedColumns(
+	gpos::Ref<CPartConstraint> PpartcnstrCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;
 
 	// construct a disjunction of the two constraints
-	static CPartConstraint *PpartcnstrDisjunction(
-		CMemoryPool *mp, CPartConstraint *ppartcnstrFst,
-		CPartConstraint *ppartcnstrSnd);
+	static gpos::Ref<CPartConstraint> PpartcnstrDisjunction(
+		CMemoryPool *mp, gpos::Ref<CPartConstraint> ppartcnstrFst,
+		gpos::Ref<CPartConstraint> ppartcnstrSnd);
 
 	// combine the two given part constraint maps and return the result
 	static UlongToPartConstraintMap *PpartcnstrmapCombine(

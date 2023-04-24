@@ -25,8 +25,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-								 IMDId *array_type_mdid,
+CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp,
+								 gpos::Ref<IMDId> elem_type_mdid,
+								 gpos::Ref<IMDId> array_type_mdid,
 								 BOOL multi_dimensional_array)
 	: CDXLScalar(mp),
 	  m_elem_type_mdid(elem_type_mdid),
@@ -88,7 +89,7 @@ CDXLScalarArray::GetOpNameStr() const
 //		Id of base element type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarArray::ElementTypeMDid() const
 {
 	return m_elem_type_mdid;
@@ -102,7 +103,7 @@ CDXLScalarArray::ElementTypeMDid() const
 //		Id of array type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarArray::ArrayTypeMDid() const
 {
 	return m_array_type_mdid;
@@ -132,7 +133,7 @@ CDXLScalarArray::IsMultiDimensional() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *dxlnode) const
+								const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -162,13 +163,13 @@ CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArray::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarArray::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							 BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

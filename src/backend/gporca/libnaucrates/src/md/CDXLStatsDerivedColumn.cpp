@@ -105,7 +105,7 @@ CDXLStatsDerivedColumn::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLBucket *dxl_bucket = (*m_dxl_stats_bucket_array)[ul];
+		gpos::Ref<CDXLBucket> dxl_bucket = (*m_dxl_stats_bucket_array)[ul];
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -136,7 +136,8 @@ CDXLStatsDerivedColumn::DebugPrint(IOstream &os) const
 	const ULONG num_of_buckets = m_dxl_stats_bucket_array->Size();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = (*m_dxl_stats_bucket_array)[ul];
+		const gpos::Ref<CDXLBucket> dxl_bucket =
+			(*m_dxl_stats_bucket_array)[ul];
 		dxl_bucket->DebugPrint(os);
 	}
 }

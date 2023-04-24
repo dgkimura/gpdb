@@ -149,14 +149,15 @@ CLogicalConstTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalConstTableGet::Matches(COperator *pop) const
+CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalConstTableGet *popCTG = CLogicalConstTableGet::PopConvert(pop);
+	gpos::Ref<CLogicalConstTableGet> popCTG =
+		CLogicalConstTableGet::PopConvert(pop);
 
 	// match if column descriptors, const values and output columns are identical
 	return m_pdrgpcoldesc->Equals(popCTG->Pdrgpcoldesc()) &&
@@ -172,7 +173,7 @@ CLogicalConstTableGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalConstTableGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -201,12 +202,12 @@ CLogicalConstTableGet::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalConstTableGet::DeriveOutputColumns(CMemoryPool *mp,
 										   CExpressionHandle &	// exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -281,16 +282,16 @@ CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRef *colref = (*colref_array)[ul];
+		gpos::Ref<CColRef> colref = (*colref_array)[ul];
 
 		ULONG length = gpos::ulong_max;
 		if (CColRef::EcrtTable == colref->Ecrt())
 		{
-			CColRefTable *pcrTable = CColRefTable::PcrConvert(colref);
+			gpos::Ref<CColRefTable> pcrTable = CColRefTable::PcrConvert(colref);
 			length = pcrTable->Width();
 		}
 
-		CColumnDescriptor *pcoldesc = GPOS_NEW(mp) CColumnDescriptor(
+		gpos::Ref<CColumnDescriptor> pcoldesc = GPOS_NEW(mp) CColumnDescriptor(
 			mp, colref->RetrieveType(), colref->TypeModifier(), colref->Name(),
 			ul + 1,	 //attno
 			true,	 // IsNullable
@@ -309,20 +310,20 @@ CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalConstTableGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									IStatisticsArray *	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 	ULongPtrArray *pdrgpulColWidth = CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
 
-	IStatistics *stats = CStatistics::MakeDummyStats(
+	gpos::Ref<IStatistics> stats = CStatistics::MakeDummyStats(
 		mp, colids, pdrgpulColWidth, m_pdrgpdrgpdatum->Size());
 
 	// clean up
@@ -366,7 +367,7 @@ CLogicalConstTableGet::OsPrint(IOstream &os) const
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)
 			{
-				IDatum *datum = (*pdrgpdatum)[ulB];
+				gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulB];
 				datum->OsPrint(os);
 
 				if (ulB < length - 1)

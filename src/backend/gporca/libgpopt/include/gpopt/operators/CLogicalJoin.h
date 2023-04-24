@@ -44,7 +44,7 @@ public:
 	CLogicalJoin(const CLogicalJoin &) = delete;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 
 	// sensitivity to order of inputs
@@ -55,7 +55,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -65,12 +65,12 @@ public:
 	}
 
 	// conversion function
-	static CLogicalJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<CLogicalJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalJoin> >(pop);
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -78,14 +78,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl) override
 	{
 		return PcrsDeriveOutputCombineLogical(mp, exprhdl);
 	}
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -94,7 +94,7 @@ public:
 
 
 	// derive keys
-	CKeyCollection *
+	gpos::Ref<CKeyCollection>
 	DeriveKeyCollection(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -102,7 +102,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -133,17 +133,18 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-			 ULONG child_index) const override
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index) const override
 	{
 		const ULONG arity = exprhdl.Arity();
 

@@ -81,12 +81,10 @@ class CTranslatorUtils
 private:
 	// Construct a set of column attnos corresponding to a single grouping set
 	// from either a plain GROUP BY or one set in a list of grouping sets
-	static CBitSet *CreateAttnoSetForGroupingSet(CMemoryPool *mp,
-												 List *group_elems,
-												 ULONG num_cols,
-												 UlongToUlongMap *group_col_pos,
-												 CBitSet *group_cols,
-												 bool use_group_clause);
+	static gpos::Ref<CBitSet> CreateAttnoSetForGroupingSet(
+		CMemoryPool *mp, List *group_elems, ULONG num_cols,
+		UlongToUlongMap *group_col_pos, gpos::Ref<CBitSet> group_cols,
+		bool use_group_clause);
 
 	// check if the given mdid array contains any of the polymorphic
 	// types (ANYELEMENT, ANYARRAY)
@@ -102,26 +100,27 @@ private:
 	// update grouping col position mappings
 	static void UpdateGrpColMapping(CMemoryPool *mp,
 									UlongToUlongMap *grouping_col_to_pos_map,
-									CBitSet *group_cols, ULONG sort_group_ref);
+									gpos::Ref<CBitSet> group_cols,
+									ULONG sort_group_ref);
 
 	// create a set of grouping sets for a rollup
 	static CBitSetArray *CreateGroupingSetsForRollup(
 		CMemoryPool *mp, const GroupingSet *grouping_set, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 	// create a set of grouping sets for a cube
 	static CBitSetArray *CreateGroupingSetsForCube(
 		CMemoryPool *mp, const GroupingSet *grouping_set, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 	// create a set of grouping sets for a grouping sets subclause
 	static CBitSetArray *CreateGroupingSetsForSets(
 		CMemoryPool *mp, const GroupingSet *grouping_set_node, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 	static CBitSetArray *CreateGroupingSetsForSimple(
 		CMemoryPool *mp, const GroupingSet *grouping_set_node, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 public:
 	struct SCmptypeStrategy
@@ -141,8 +140,8 @@ public:
 	static OID GetOpFamilyForIndexQual(INT attno, OID oid_index);
 
 	// find the n-th column descriptor in the table descriptor
-	static const CDXLColDescr *GetColumnDescrAt(
-		const CDXLTableDescr *table_descr, ULONG pos);
+	static const gpos::Ref<CDXLColDescr> GetColumnDescrAt(
+		const gpos::Ref<CDXLTableDescr> table_descr, ULONG pos);
 
 	// translate the join type from its GPDB representation into the DXL one
 	static EdxlJoinType ConvertToDXLJoinType(JoinType jt);
@@ -152,22 +151,20 @@ public:
 		ScanDirection sd);
 
 	// create a DXL index descriptor from an index MD id
-	static CDXLIndexDescr *GetIndexDescr(CMemoryPool *mp,
-										 CMDAccessor *md_accessor, IMDId *mdid);
+	static gpos::Ref<CDXLIndexDescr> GetIndexDescr(CMemoryPool *mp,
+												   CMDAccessor *md_accessor,
+												   gpos::Ref<IMDId> mdid);
 
 	// translate a RangeTableEntry into a CDXLTableDescr
-	static CDXLTableDescr *GetTableDescr(CMemoryPool *mp,
-										 CMDAccessor *md_accessor,
-										 CIdGenerator *id_generator,
-										 const RangeTblEntry *rte,
-										 ULONG assigned_query_id_for_target_rel,
-										 BOOL *is_distributed_table = nullptr);
+	static gpos::Ref<CDXLTableDescr> GetTableDescr(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
+		const RangeTblEntry *rte, ULONG assigned_query_id_for_target_rel,
+		BOOL *is_distributed_table = nullptr);
 
 	// translate a RangeTableEntry into a CDXLLogicalTVF
-	static CDXLLogicalTVF *ConvertToCDXLLogicalTVF(CMemoryPool *mp,
-												   CMDAccessor *md_accessor,
-												   CIdGenerator *id_generator,
-												   const RangeTblEntry *rte);
+	static gpos::Ref<CDXLLogicalTVF> ConvertToCDXLLogicalTVF(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
+		const RangeTblEntry *rte);
 
 	// get column descriptors from a record type
 	static CDXLColDescrArray *GetColumnDescriptorsFromRecord(
@@ -181,18 +178,18 @@ public:
 
 	// get column descriptor from a base type
 	static CDXLColDescrArray *GetColumnDescriptorsFromBase(
-		CMemoryPool *mp, CIdGenerator *id_generator, IMDId *mdid_return_type,
-		INT type_modifier, CMDName *md_name);
+		CMemoryPool *mp, CIdGenerator *id_generator,
+		gpos::Ref<IMDId> mdid_return_type, INT type_modifier, CMDName *md_name);
 
 	// get column descriptors from a composite type
 	static CDXLColDescrArray *GetColumnDescriptorsFromComposite(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
-		const IMDType *md_type);
+		const gpos::Ref<IMDType> md_type);
 
 	// expand a composite type into an array of IMDColumns
-	static CMDColumnArray *ExpandCompositeType(CMemoryPool *mp,
-											   CMDAccessor *md_accessor,
-											   const IMDType *md_type);
+	static CMDColumnArray *ExpandCompositeType(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<IMDType> md_type);
 
 	// return the dxl representation of the set operation
 	static EdxlSetOpType GetSetOpType(SetOperation setop, BOOL is_all);
@@ -201,7 +198,8 @@ public:
 	// to the group by clause
 	static CBitSetArray *GetColumnAttnosForGroupBy(
 		CMemoryPool *mp, List *group_clause, List *grouping_set_list,
-		ULONG num_cols, UlongToUlongMap *group_col_pos, CBitSet *group_cold);
+		ULONG num_cols, UlongToUlongMap *group_col_pos,
+		gpos::Ref<CBitSet> group_cold);
 
 	// return a copy of the query with constant of unknown type being coerced
 	// to the common data type of the output target list
@@ -229,14 +227,14 @@ public:
 											 BOOL keep_res_junked);
 
 	// construct a column descriptor from the given target entry, column identifier and position in the output
-	static CDXLColDescr *GetColumnDescrAt(CMemoryPool *mp,
-										  TargetEntry *target_entry,
-										  ULONG colid, ULONG pos);
+	static gpos::Ref<CDXLColDescr> GetColumnDescrAt(CMemoryPool *mp,
+													TargetEntry *target_entry,
+													ULONG colid, ULONG pos);
 
 	// create a dummy project element to rename the input column identifier
-	static CDXLNode *CreateDummyProjectElem(CMemoryPool *mp, ULONG colid_input,
-											ULONG colid_output,
-											CDXLColDescr *dxl_col_descr);
+	static gpos::Ref<CDXLNode> CreateDummyProjectElem(
+		CMemoryPool *mp, ULONG colid_input, ULONG colid_output,
+		gpos::Ref<CDXLColDescr> dxl_col_descr);
 
 	// construct a list of colids corresponding to the given target list
 	// using the given attno->colid map
@@ -245,7 +243,7 @@ public:
 
 	// construct an array of column ids for the given group by set
 	static ULongPtrArray *GetGroupingColidArray(
-		CMemoryPool *mp, CBitSet *group_by_cols,
+		CMemoryPool *mp, gpos::Ref<CBitSet> group_by_cols,
 		IntToUlongMap *sort_group_cols_to_colid_map);
 
 	// return the Colid of column with given index
@@ -253,7 +251,8 @@ public:
 
 	// return the corresponding ColId for the given varno, varattno and querylevel
 	static ULONG GetColId(ULONG query_level, INT varno, INT var_attno,
-						  IMDId *mdid, CMappingVarColId *var_colid_mapping);
+						  gpos::Ref<IMDId> mdid,
+						  CMappingVarColId *var_colid_mapping);
 
 	// check to see if the target list entry is a sorting column
 	static BOOL IsSortingColumn(const TargetEntry *target_entry,
@@ -263,7 +262,8 @@ public:
 										 List *window_clause_list);
 
 	// check if the project list contains AggRef with ORDER BY
-	static BOOL HasOrderedAggRefInProjList(CDXLNode *proj_list_dxlnode);
+	static BOOL HasOrderedAggRefInProjList(
+		gpos::Ref<CDXLNode> proj_list_dxlnode);
 
 	// extract a matching target entry that is a window spec
 	static TargetEntry *GetWindowSpecTargetEntry(Node *node,
@@ -271,9 +271,8 @@ public:
 												 List *target_list);
 
 	// create a scalar const value expression for the given int8 value
-	static CDXLNode *CreateDXLProjElemFromInt8Const(CMemoryPool *mp,
-													CMDAccessor *md_accessor,
-													INT val);
+	static gpos::Ref<CDXLNode> CreateDXLProjElemFromInt8Const(
+		CMemoryPool *mp, CMDAccessor *md_accessor, INT val);
 
 	// check to see if the target list entry is a grouping column
 	static BOOL IsGroupingColumn(const TargetEntry *target_entry,
@@ -305,7 +304,8 @@ public:
 
 	// check whether the given project list has a project element of the given
 	// operator type
-	static BOOL HasProjElem(CDXLNode *project_list_dxlnode, Edxlopid dxl_op_id);
+	static BOOL HasProjElem(gpos::Ref<CDXLNode> project_list_dxlnode,
+							Edxlopid dxl_op_id);
 
 	// create a multi-byte character string from a wide character string
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
@@ -324,33 +324,30 @@ public:
 
 	// is this a motion sensitive to duplicates
 	static BOOL IsDuplicateSensitiveMotion(
-		gpdxl::CDXLPhysicalMotion *dxl_motion);
+		gpos::Ref<gpdxl::CDXLPhysicalMotion> dxl_motion);
 
 	// construct a project element with a const NULL expression
-	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
-												CMDAccessor *md_accessor,
-												IMDId *mdid, ULONG colid,
-												const WCHAR *col_name);
+	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid,
+		ULONG colid, const WCHAR *col_name);
 
 	// construct a project element with a const NULL expression
-	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
-												CMDAccessor *md_accessor,
-												IMDId *mdid, ULONG colid,
-												CHAR *alias_name);
+	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid,
+		ULONG colid, CHAR *alias_name);
 
 	// create a DXL project element node with a Const NULL of type provided
 	// by the column descriptor
-	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
-												CMDAccessor *md_accessor,
-												CIdGenerator *colid_generator,
-												const IMDColumn *col);
+	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		CIdGenerator *colid_generator, const gpos::Ref<IMDColumn> col);
 
 	// check required permissions for the range table
 	static void CheckRTEPermissions(List *range_table_list);
 
 	// check if given column ids are outer references in the tree rooted by given node
 	static void MarkOuterRefs(ULONG *colid, BOOL *is_outer_ref,
-							  ULONG num_columns, CDXLNode *node);
+							  ULONG num_columns, gpos::Ref<CDXLNode> node);
 
 	// map DXL Subplan type to GPDB SubLinkType
 	static SubLinkType MapDXLSubplanToSublinkType(
@@ -362,22 +359,22 @@ public:
 	// check whether there are triggers for the given operation on
 	// the given relation
 	static BOOL RelHasTriggers(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const IMDRelation *mdrel,
+							   const gpos::Ref<IMDRelation> mdrel,
 							   const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether the given trigger is applicable to the given DML operation
 	static BOOL IsApplicableTrigger(CMDAccessor *md_accessor,
-									IMDId *trigger_mdid,
+									gpos::Ref<IMDId> trigger_mdid,
 									const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether there are NOT NULL or CHECK constraints for the given relation
-	static BOOL RelHasConstraints(const IMDRelation *rel);
+	static BOOL RelHasConstraints(const gpos::Ref<IMDRelation> rel);
 
 	// translate the list of error messages from an assert constraint list
-	static List *GetAssertErrorMsgs(CDXLNode *assert_constraint_list);
+	static List *GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list);
 
 	// return the count of non-system columns in the relation
-	static ULONG GetNumNonSystemColumns(const IMDRelation *mdrel);
+	static ULONG GetNumNonSystemColumns(const gpos::Ref<IMDRelation> mdrel);
 
 	// return agg kind as an EdxlAggrefKind
 	static EdxlAggrefKind GetAggKind(CHAR aggkind);
@@ -390,7 +387,7 @@ public:
 								 const RangeTblFunction *rtfunc);
 
 	// check if rel contains foreign partitions
-	static BOOL RelContainsForeignPartitions(const IMDRelation *rel,
+	static BOOL RelContainsForeignPartitions(const gpos::Ref<IMDRelation> rel,
 											 CMDAccessor *md_accessor);
 };
 }  // namespace gpdxl

@@ -57,7 +57,8 @@ CDistributionSpecNonSingleton::CDistributionSpecNonSingleton(
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecNonSingleton::FSatisfies(const CDistributionSpec *	 // pds
+CDistributionSpecNonSingleton::FSatisfies(
+	const gpos::Ref<CDistributionSpec>	// pds
 ) const
 {
 	GPOS_ASSERT(!"Non-Singleton distribution cannot be derived");
@@ -78,13 +79,13 @@ CDistributionSpecNonSingleton::FSatisfies(const CDistributionSpec *	 // pds
 void
 CDistributionSpecNonSingleton::AppendEnforcers(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl,
-											   CReqdPropPlan *
+											   gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 												   prpp
 #endif	// GPOS_DEBUG
 											   ,
 											   CExpressionArray *pdrgpexpr,
-											   CExpression *pexpr)
+											   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -102,9 +103,9 @@ CDistributionSpecNonSingleton::AppendEnforcers(CMemoryPool *mp,
 		return;
 	}
 
-	CDistributionSpec *expr_dist_spec =
+	gpos::Ref<CDistributionSpec> expr_dist_spec =
 		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
-	CDistributionSpecRandom *random_dist_spec = nullptr;
+	gpos::Ref<CDistributionSpecRandom> random_dist_spec = nullptr;
 
 	// random motions on top of universal specs are converted to hash filters,
 	// and shouldn't be strict random distributions or we may not properly distribute tuples.
@@ -126,7 +127,7 @@ CDistributionSpecNonSingleton::AppendEnforcers(CMemoryPool *mp,
 
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRandom(mp, random_dist_spec), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }

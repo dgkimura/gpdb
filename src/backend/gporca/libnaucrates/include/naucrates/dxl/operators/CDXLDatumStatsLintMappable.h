@@ -48,7 +48,7 @@ public:
 	CDXLDatumStatsLintMappable(const CDXLDatumStatsLintMappable &) = delete;
 
 	// ctor
-	CDXLDatumStatsLintMappable(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLDatumStatsLintMappable(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 							   INT type_modifier, BOOL is_null,
 							   BYTE *byte_array, ULONG length, LINT value);
 
@@ -66,14 +66,14 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumStatsLintMappable *
-	Cast(CDXLDatum *dxl_datum)
+	static gpos::Ref<CDXLDatumStatsLintMappable>
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumStatsLintMappable ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumStatsLintMappable *>(dxl_datum);
+		return dynamic_cast<gpos::Ref<CDXLDatumStatsLintMappable> >(dxl_datum);
 	}
 
 	// statistics related APIs

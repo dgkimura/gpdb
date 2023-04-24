@@ -49,48 +49,52 @@ private:
 	static void HandleExceptionAfterFinalizingMinidump(CException &ex);
 
 	// optimize query in the given query context
-	static CExpression *PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
-									  CSearchStageArray *search_stage_array);
+	static gpos::Ref<CExpression> PexprOptimize(
+		CMemoryPool *mp, CQueryContext *pqc,
+		CSearchStageArray *search_stage_array);
 
 	// translate an optimizer expression into a DXL tree
-	static CDXLNode *CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   CExpression *pexpr,
-								   CColRefArray *colref_array,
-								   CMDNameArray *pdrgpmdname, ULONG ulHosts);
+	static gpos::Ref<CDXLNode> CreateDXLNode(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexpr,
+		CColRefArray *colref_array, CMDNameArray *pdrgpmdname, ULONG ulHosts);
 
 	// helper function to print query expression
-	static void PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
+	static void PrintQuery(CMemoryPool *mp,
+						   gpos::Ref<CExpression> pexprTranslated,
 						   CQueryContext *pqc);
 
 	// helper function to print query plan
-	static void PrintPlan(CMemoryPool *mp, CExpression *pexprPlan);
+	static void PrintPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexprPlan);
 
 	// helper function to dump plan samples
-	static void DumpSamples(CMemoryPool *mp, CEnumeratorConfig *pec,
+	static void DumpSamples(CMemoryPool *mp, gpos::Ref<CEnumeratorConfig> pec,
 							ULONG ulSessionId, ULONG ulCmdId);
 
 	// print query or plan tree
-	static void PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
+	static void PrintQueryOrPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 CQueryContext *pqc = nullptr);
 
 	// Check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
-	static void CheckCTEConsistency(CMemoryPool *mp, CExpression *pexpr);
+	static void CheckCTEConsistency(CMemoryPool *mp,
+									gpos::Ref<CExpression> pexpr);
 
 public:
 	// main optimizer function
-	static CDXLNode *PdxlnOptimize(
+	static gpos::Ref<CDXLNode> PdxlnOptimize(
 		CMemoryPool *mp,
 		CMDAccessor *md_accessor,  // MD accessor
-		const CDXLNode *query,
+		const gpos::Ref<CDXLNode> query,
 		const CDXLNodeArray
 			*query_output_dxlnode_array,  // required output columns
 		const CDXLNodeArray *cte_producers,
-		IConstExprEvaluator *pceeval,  // constant expression evaluator
+		gpos::Ref<IConstExprEvaluator>
+			pceeval,		// constant expression evaluator
 		ULONG ulHosts,		// number of hosts (data nodes) in the system
 		ULONG ulSessionId,	// session id used for logging and minidumps
 		ULONG ulCmdId,		// command id used for logging and minidumps
 		CSearchStageArray *search_stage_array,	// search strategy
-		COptimizerConfig *optimizer_config,		// optimizer configurations
+		gpos::Ref<COptimizerConfig>
+			optimizer_config,  // optimizer configurations
 		const CHAR *szMinidumpFileName =
 			nullptr	 // name of minidump file to be created
 	);

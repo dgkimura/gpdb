@@ -52,7 +52,7 @@ class CQueryContext : public DbgPrintMixin<CQueryContext>
 {
 private:
 	// required plan properties in optimizer's produced plan
-	CReqdPropPlan *m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// required array of output columns
 	CColRefArray *m_pdrgpcr;
@@ -64,7 +64,7 @@ private:
 	CMDNameArray *m_pdrgpmdname;
 
 	// logical expression tree to be optimized
-	CExpression *m_pexpr;
+	gpos::Ref<CExpression> m_pexpr;
 
 	// should statistics derivation take place
 	BOOL m_fDeriveStats;
@@ -73,15 +73,15 @@ private:
 	void SetSystemCols(CMemoryPool *mp);
 
 	// return top level operator in the given expression
-	static COperator *PopTop(CExpression *pexpr);
+	static gpos::Ref<COperator> PopTop(gpos::Ref<CExpression> pexpr);
 
 public:
 	CQueryContext(const CQueryContext &) = delete;
 
 	// ctor
-	CQueryContext(CMemoryPool *mp, CExpression *pexpr, CReqdPropPlan *prpp,
-				  CColRefArray *colref_array, CMDNameArray *pdrgpmdname,
-				  BOOL fDeriveStats);
+	CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+				  gpos::Ref<CReqdPropPlan> prpp, CColRefArray *colref_array,
+				  CMDNameArray *pdrgpmdname, BOOL fDeriveStats);
 
 	// dtor
 	virtual ~CQueryContext();
@@ -93,14 +93,14 @@ public:
 	}
 
 	// expression accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	Pexpr() const
 	{
 		return m_pexpr;
 	}
 
 	// required plan properties accessor
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp;
@@ -129,8 +129,8 @@ public:
 
 	// generate the query context for the given expression and array of output column ref ids
 	static CQueryContext *PqcGenerate(
-		CMemoryPool *mp,	 // memory pool
-		CExpression *pexpr,	 // expression representing the query
+		CMemoryPool *mp,			   // memory pool
+		gpos::Ref<CExpression> pexpr,  // expression representing the query
 		ULongPtrArray
 			*pdrgpulQueryOutputColRefId,  // array of output column reference id
 		CMDNameArray *pdrgpmdname,		  // array of output column names
@@ -144,7 +144,7 @@ public:
 	// walk the expression and add the mapping between computed column
 	// and their corresponding used column(s)
 	static void MapComputedToUsedCols(CColumnFactory *col_factory,
-									  CExpression *pexpr);
+									  gpos::Ref<CExpression> pexpr);
 
 };	// class CQueryContext
 }  // namespace gpopt

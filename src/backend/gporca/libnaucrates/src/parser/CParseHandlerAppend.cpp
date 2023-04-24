@@ -58,8 +58,9 @@ CParseHandlerAppend::SetupInitialHandlers(const Attributes &attrs)
 	GPOS_ASSERT(this->Length() == 0 &&
 				"No handlers should have been added yet");
 
-	m_dxl_op = (CDXLPhysicalAppend *) CDXLOperatorFactory::MakeDXLAppend(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op =
+		(gpos::Ref<CDXLPhysicalAppend>) CDXLOperatorFactory::MakeDXLAppend(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 	// parse handler for the filter
 	CParseHandlerBase *filter_parse_handler =
@@ -179,7 +180,7 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 	{
 		CParseHandlerTableDescr *table_descr_parse_handler =
 			dynamic_cast<CParseHandlerTableDescr *>((*this)[child_index++]);
-		CDXLTableDescr *table_descr =
+		gpos::Ref<CDXLTableDescr> table_descr =
 			table_descr_parse_handler->GetDXLTableDescr();
 		table_descr->AddRef();
 		m_dxl_op->SetDXLTableDesc(table_descr);

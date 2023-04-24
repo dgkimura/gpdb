@@ -58,17 +58,17 @@ CPhysicalLeftOuterHashJoin::~CPhysicalLeftOuterHashJoin() = default;
 //		return NULL if derivation failed
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLeftOuterHashJoin::PdsDeriveFromHashedChildren(
-	CMemoryPool *mp, CDistributionSpec *pdsOuter,
-	CDistributionSpec *pdsInner) const
+	CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+	gpos::Ref<CDistributionSpec> pdsInner) const
 {
 	GPOS_ASSERT(nullptr != pdsOuter);
 	GPOS_ASSERT(nullptr != pdsInner);
 
-	CDistributionSpecHashed *pdshashedOuter =
+	gpos::Ref<CDistributionSpecHashed> pdshashedOuter =
 		CDistributionSpecHashed::PdsConvert(pdsOuter);
-	CDistributionSpecHashed *pdshashedInner =
+	gpos::Ref<CDistributionSpecHashed> pdshashedInner =
 		CDistributionSpecHashed::PdsConvert(pdsInner);
 
 	if (pdshashedOuter->IsCoveredBy(PdrgpexprOuterKeys()) &&
@@ -78,9 +78,9 @@ CPhysicalLeftOuterHashJoin::PdsDeriveFromHashedChildren(
 		// seen as distributed on outer spec or (equivalently) on inner spec,
 		// so create a new spec and mark outer and inner as equivalent
 
-		CDistributionSpecHashed *pdshashedInnerCopy =
+		gpos::Ref<CDistributionSpecHashed> pdshashedInnerCopy =
 			pdshashedInner->Copy(mp, false);
-		CDistributionSpecHashed *combined_hashed_spec =
+		gpos::Ref<CDistributionSpecHashed> combined_hashed_spec =
 			pdshashedOuter->Combine(mp, pdshashedInnerCopy);
 		pdshashedInnerCopy->Release();
 		return combined_hashed_spec;
@@ -97,12 +97,14 @@ CPhysicalLeftOuterHashJoin::PdsDeriveFromHashedChildren(
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLeftOuterHashJoin::PdsDerive(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsInner =
+		exprhdl.Pdpplan(1 /*child_index*/)->Pds();
 
 	// We must use the non-nullable side for the distribution spec for outer joins.
 	// For right join, the hash side is the non-nullable side, so we swap the inner/outer
@@ -116,7 +118,7 @@ CPhysicalLeftOuterHashJoin::PdsDerive(CMemoryPool *mp,
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt() &&
 		CDistributionSpec::EdtHashed == pdsInner->Edt())
 	{
-		CDistributionSpec *pdsDerived =
+		gpos::Ref<CDistributionSpec> pdsDerived =
 			PdsDeriveFromHashedChildren(mp, pdsOuter, pdsInner);
 		if (nullptr != pdsDerived)
 		{
@@ -124,7 +126,7 @@ CPhysicalLeftOuterHashJoin::PdsDerive(CMemoryPool *mp,
 		}
 	}
 
-	CDistributionSpec *pds;
+	gpos::Ref<CDistributionSpec> pds;
 	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
@@ -139,7 +141,7 @@ CPhysicalLeftOuterHashJoin::PdsDerive(CMemoryPool *mp,
 
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdsHashed =
+		gpos::Ref<CDistributionSpecHashed> pdsHashed =
 			CDistributionSpecHashed::PdsConvert(pds);
 
 		// Clean up any incomplete distribution specs since they can no longer be completed above

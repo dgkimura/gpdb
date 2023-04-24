@@ -73,11 +73,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -85,7 +85,7 @@ public:
 	}
 
 	// derive keys
-	CKeyCollection *
+	gpos::Ref<CKeyCollection>
 	DeriveKeyCollection(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) const override
 	{
@@ -97,7 +97,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -116,9 +116,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return true if operator is a left semi apply
 	BOOL
@@ -128,13 +128,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalLeftSemiApply *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftSemiApply>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftSemiApply(pop));
 
-		return dynamic_cast<CLogicalLeftSemiApply *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftSemiApply> >(pop);
 	}
 
 };	// class CLogicalLeftSemiApply

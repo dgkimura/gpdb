@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Constructs a scalar distinct comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp, IMDId *mdid_op)
+CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp,
+											   gpos::Ref<IMDId> mdid_op)
 	: CDXLScalarComp(
 		  mp, mdid_op,
 		  GPOS_NEW(mp) CWStringConst(
@@ -76,7 +77,7 @@ CDXLScalarDistinctComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarDistinctComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *node) const
+									   const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -103,13 +104,13 @@ CDXLScalarDistinctComp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarDistinctComp::AssertValid(const CDXLNode *node,
+CDXLScalarDistinctComp::AssertValid(const gpos::Ref<CDXLNode> node,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlscdistcmpSentinel == node->Arity());
 
-	CDXLNode *dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
-	CDXLNode *dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
+	gpos::Ref<CDXLNode> dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
+	gpos::Ref<CDXLNode> dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
 
 	// assert children are of right type (scalar)
 	GPOS_ASSERT(EdxloptypeScalar ==

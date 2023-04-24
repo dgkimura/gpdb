@@ -59,15 +59,15 @@ CXformImplementCTEConsumer::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementCTEConsumer::Transform(CXformContext *pxfctxt,
-									  CXformResult *pxfres,
-									  CExpression *pexpr) const
+CXformImplementCTEConsumer::Transform(gpos::Ref<CXformContext> pxfctxt,
+									  gpos::Ref<CXformResult> pxfres,
+									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popCTEConsumer =
 		CLogicalCTEConsumer::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
@@ -82,7 +82,7 @@ CXformImplementCTEConsumer::Transform(CXformContext *pxfctxt,
 	colref_mapping->AddRef();
 
 	// create physical CTE Consumer
-	CExpression *pexprAlt =
+	gpos::Ref<CExpression> pexprAlt =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPhysicalCTEConsumer(
 										 mp, id, colref_array, colref_mapping));
 

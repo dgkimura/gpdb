@@ -168,7 +168,7 @@ CHistogram::IsEmpty() const
 // construct new histogram with less than or less than equal to filter
 CHistogram *
 CHistogram::MakeHistogramLessThanOrLessThanEqualFilter(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(CStatsPred::EstatscmptL == stats_cmp_type ||
 				CStatsPred::EstatscmptLEq == stats_cmp_type);
@@ -217,7 +217,7 @@ CHistogram::MakeHistogramLessThanOrLessThanEqualFilter(
 
 // return an array buckets after applying non equality filter on the histogram buckets
 CBucketArray *
-CHistogram::MakeBucketsWithInequalityFilter(CPoint *point) const
+CHistogram::MakeBucketsWithInequalityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 	CBucketArray *new_buckets = GPOS_NEW(m_mp) CBucketArray(m_mp);
@@ -254,7 +254,7 @@ CHistogram::MakeBucketsWithInequalityFilter(CPoint *point) const
 
 // construct new histogram with not equal filter
 CHistogram *
-CHistogram::MakeHistogramInequalityFilter(CPoint *point) const
+CHistogram::MakeHistogramInequalityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -268,7 +268,7 @@ CHistogram::MakeHistogramInequalityFilter(CPoint *point) const
 
 // construct new histogram with IDF filter
 CHistogram *
-CHistogram::MakeHistogramIDFFilter(CPoint *point) const
+CHistogram::MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -287,7 +287,7 @@ CHistogram::MakeHistogramIDFFilter(CPoint *point) const
 
 // return an array buckets after applying equality filter on the histogram buckets
 CBucketArray *
-CHistogram::MakeBucketsWithEqualityFilter(CPoint *point) const
+CHistogram::MakeBucketsWithEqualityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -327,7 +327,7 @@ CHistogram::MakeBucketsWithEqualityFilter(CPoint *point) const
 
 // construct new histogram with equality filter
 CHistogram *
-CHistogram::MakeHistogramEqualFilter(CPoint *point) const
+CHistogram::MakeHistogramEqualFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -358,7 +358,7 @@ CHistogram::MakeHistogramEqualFilter(CPoint *point) const
 
 // construct new histogram with INDF filter
 CHistogram *
-CHistogram::MakeHistogramINDFFilter(CPoint *point) const
+CHistogram::MakeHistogramINDFFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -393,7 +393,7 @@ CHistogram::MakeHistogramINDFFilter(CPoint *point) const
 // construct new histogram with greater than or greater than equal filter
 CHistogram *
 CHistogram::MakeHistogramGreaterThanOrGreaterThanEqualFilter(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(CStatsPred::EstatscmptGEq == stats_cmp_type ||
 				CStatsPred::EstatscmptG == stats_cmp_type);
@@ -600,7 +600,7 @@ CHistogram::IsValid() const
 // construct new histogram with filter and normalize output histogram
 CHistogram *
 CHistogram::MakeHistogramFilterNormalize(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point,
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point,
 	CDouble *scale_factor) const
 {
 	// if histogram is not well-defined, then result is not well defined
@@ -799,7 +799,7 @@ CHistogram::MakeLASJHistogramNormalize(CStatsPred::EStatsCmpType stats_cmp_type,
 // construct new histogram after applying the filter (no normalization)
 CHistogram *
 CHistogram::MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
-								CPoint *point) const
+								gpos::Ref<CPoint> point) const
 {
 	CHistogram *result_histogram = nullptr;
 	GPOS_ASSERT(IsOpSupportedForFilter(stats_cmp_type));
@@ -1381,8 +1381,8 @@ CHistogram::MakeGroupByHistogramNormalize(CDouble,	// rows,
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
 		CBucket *bucket = (*m_histogram_buckets)[ul];
-		CPoint *lower_bound = bucket->GetLowerBound();
-		CPoint *upper_bound = bucket->GetUpperBound();
+		gpos::Ref<CPoint> lower_bound = bucket->GetLowerBound();
+		gpos::Ref<CPoint> upper_bound = bucket->GetUpperBound();
 		lower_bound->AddRef();
 		upper_bound->AddRef();
 
@@ -1691,7 +1691,7 @@ CHistogram::CombineBuckets(CMemoryPool *mp, CBucketArray *buckets,
 	// find the boundaries that are least important and track the index locations
 	// that need to be removed in a BitSet. This allows us to check each boundary
 	// as we walk the bucket array sequentially.
-	CBitSet *indexes_to_merge = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> indexes_to_merge = GPOS_NEW(mp) CBitSet(mp);
 	SAdjBucketBoundary *candidate_to_remove;
 	while (nullptr !=
 		   (candidate_to_remove = boundary_factors->RemoveBestElement()))
@@ -2012,7 +2012,7 @@ CHistogram::operator[](ULONG pos) const
 }
 
 // translate the histogram into a the dxl derived column statistics
-CDXLStatsDerivedColumn *
+gpos::Ref<CDXLStatsDerivedColumn>
 CHistogram::TranslateToDXLDerivedColumnStats(CMDAccessor *md_accessor,
 											 ULONG colid, CDouble width) const
 {
@@ -2027,12 +2027,12 @@ CHistogram::TranslateToDXLDerivedColumnStats(CMDAccessor *md_accessor,
 		CDouble freq = bucket->GetFrequency();
 		CDouble distinct = bucket->GetNumDistinct();
 
-		CDXLDatum *dxl_datum_lower =
+		gpos::Ref<CDXLDatum> dxl_datum_lower =
 			bucket->GetLowerBound()->GetDatumVal(m_mp, md_accessor);
-		CDXLDatum *dxl_datum_upper =
+		gpos::Ref<CDXLDatum> dxl_datum_upper =
 			bucket->GetUpperBound()->GetDatumVal(m_mp, md_accessor);
 
-		CDXLBucket *dxl_bucket = GPOS_NEW(m_mp) CDXLBucket(
+		gpos::Ref<CDXLBucket> dxl_bucket = GPOS_NEW(m_mp) CDXLBucket(
 			dxl_datum_lower, dxl_datum_upper, bucket->IsLowerClosed(),
 			bucket->IsUpperClosed(), freq, distinct);
 
@@ -2179,7 +2179,7 @@ CHistogram::ComputeSkew()
 
 // create the default histogram for a given column reference
 CHistogram *
-CHistogram::MakeDefaultHistogram(CMemoryPool *mp, CColRef *col_ref,
+CHistogram::MakeDefaultHistogram(CMemoryPool *mp, gpos::Ref<CColRef> col_ref,
 								 BOOL is_empty)
 {
 	GPOS_ASSERT(nullptr != col_ref);
@@ -2225,7 +2225,7 @@ CHistogram::NeedsNDVBasedCardEstimationForEq(const CHistogram *histogram)
 
 	const IBucket *bucket = (*histogram->GetBuckets())[0];
 
-	IDatum *datum = bucket->GetLowerBound()->GetDatum();
+	gpos::Ref<IDatum> datum = bucket->GetLowerBound()->GetDatum();
 
 	IMDType::ETypeInfo type_info = datum->GetDatumType();
 	if (IMDType::EtiInt2 == type_info || IMDType::EtiInt4 == type_info ||
@@ -2288,7 +2288,7 @@ CHistogram::AddDummyHistogramAndWidthInfo(
 	{
 		ULONG colid = *(*columns)[ul];
 
-		CColRef *col_ref = col_factory->LookupColRef(colid);
+		gpos::Ref<CColRef> col_ref = col_factory->LookupColRef(colid);
 		GPOS_ASSERT(nullptr != col_ref);
 
 		CHistogram *histogram =
@@ -2328,10 +2328,10 @@ CHistogram::IsHistogramForTextRelatedTypes() const
 {
 	if (m_histogram_buckets->Size() > 0)
 	{
-		IMDId *mdid =
+		gpos::Ref<IMDId> mdid =
 			(*m_histogram_buckets)[0]->GetLowerBound()->GetDatum()->MDId();
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDType *type = md_accessor->RetrieveType(mdid);
+		const gpos::Ref<IMDType> type = md_accessor->RetrieveType(mdid);
 
 		return type->IsTextRelated();
 	}

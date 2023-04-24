@@ -63,17 +63,17 @@ CColumnDescriptorTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CWStringConst strName(GPOS_WSZ_LIT("column desc test"));
 	CName name(&strName);
-	CColumnDescriptor *pcdesc = GPOS_NEW(mp) CColumnDescriptor(
+	gpos::Ref<CColumnDescriptor> pcdesc = GPOS_NEW(mp) CColumnDescriptor(
 		mp, pmdtypeint4, default_type_modifier, name, 1, false /*IsNullable*/);
 
 	GPOS_ASSERT(name.Equals(pcdesc->Name()));

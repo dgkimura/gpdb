@@ -20,7 +20,8 @@
 using namespace gpopt;
 
 CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
-	CMemoryPool *mp, CColRefArray *colref_array, CExpression *origJoinPred)
+	CMemoryPool *mp, CColRefArray *colref_array,
+	gpos::Ref<CExpression> origJoinPred)
 	: CPhysicalLeftOuterNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
 	  m_origJoinPred(origJoinPred)
@@ -41,7 +42,7 @@ CPhysicalLeftOuterIndexNLJoin::~CPhysicalLeftOuterIndexNLJoin()
 
 
 BOOL
-CPhysicalLeftOuterIndexNLJoin::Matches(COperator *pop) const
+CPhysicalLeftOuterIndexNLJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -54,7 +55,7 @@ CPhysicalLeftOuterIndexNLJoin::Matches(COperator *pop) const
 
 CEnfdProp::EPropEnforcingType
 CPhysicalLeftOuterIndexNLJoin::EpetDistribution(
-	CExpressionHandle &exprhdl, const CEnfdDistribution *ped) const
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdDistribution> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
@@ -65,7 +66,8 @@ CPhysicalLeftOuterIndexNLJoin::EpetDistribution(
 	}
 
 	// get distribution delivered by the physical node
-	CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
 	if (ped->FCompatible(pds))
 	{
 		// required distribution is already provided
@@ -75,10 +77,10 @@ CPhysicalLeftOuterIndexNLJoin::EpetDistribution(
 	return CEnfdProp::EpetRequired;
 }
 
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
-	CDistributionSpec *,  //pdsRequired,
+	gpos::Ref<CDistributionSpec>,  //pdsRequired,
 	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 	ULONG  // ulOptReq
 ) const
@@ -90,9 +92,10 @@ CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 	return nullptr;
 }
 
-CEnfdDistribution *
+gpos::Ref<CEnfdDistribution>
 CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CReqdPropPlan *prppInput, ULONG child_index,
+								   gpos::Ref<CReqdPropPlan> prppInput,
+								   ULONG child_index,
 								   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -117,7 +120,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// we need to match distribution of inner
-	CDistributionSpec *pdsInner =
+	gpos::Ref<CDistributionSpec> pdsInner =
 		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
 	CDistributionSpec::EDistributionType edtInner = pdsInner->Edt();
 	if (CDistributionSpec::EdtSingleton == edtInner ||
@@ -132,9 +135,10 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (CDistributionSpec::EdtHashed == edtInner)
 	{
 		// check if we could create an equivalent hashed distribution request to the inner child
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			CDistributionSpecHashed::PdsConvert(pdsInner);
-		CDistributionSpecHashed *pdshashedEquiv = pdshashed->PdshashedEquiv();
+		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv =
+			pdshashed->PdshashedEquiv();
 
 		// If the inner child is a IndexScan on a multi-key distributed index, it
 		// may derive an incomplete equiv spec (see CPhysicalScan::PdsDerive()).
@@ -154,7 +158,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		{
 			// request hashed distribution from outer
 			pdshashedEquiv->Pdrgpexpr()->AddRef();
-			CDistributionSpecHashed *pdsHashedRequired = GPOS_NEW(mp)
+			gpos::Ref<CDistributionSpecHashed> pdsHashedRequired = GPOS_NEW(mp)
 				CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
 										pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);

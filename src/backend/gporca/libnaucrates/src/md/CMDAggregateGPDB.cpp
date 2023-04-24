@@ -29,11 +29,11 @@ using namespace gpdxl;
 //		Constructs a metadata aggregate
 //
 //---------------------------------------------------------------------------
-CMDAggregateGPDB::CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid,
-								   CMDName *mdname, IMDId *result_type_mdid,
-								   IMDId *intermediate_result_type_mdid,
-								   BOOL fOrdered, BOOL is_splittable,
-								   BOOL is_hash_agg_capable, BOOL is_repsafe)
+CMDAggregateGPDB::CMDAggregateGPDB(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	gpos::Ref<IMDId> result_type_mdid,
+	gpos::Ref<IMDId> intermediate_result_type_mdid, BOOL fOrdered,
+	BOOL is_splittable, BOOL is_hash_agg_capable, BOOL is_repsafe)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -75,7 +75,7 @@ CMDAggregateGPDB::~CMDAggregateGPDB()
 //		Agg id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::MDId() const
 {
 	return m_mdid;
@@ -104,7 +104,7 @@ CMDAggregateGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -118,7 +118,7 @@ CMDAggregateGPDB::GetResultTypeMdid() const
 //		Type id of intermediate result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
 	return m_mdid_type_intermediate;

@@ -57,9 +57,10 @@ CParseHandlerScalarLimitOffset::StartElement(
 				 element_local_name))
 	{
 		// parse and create scalar OpExpr
-		CDXLScalarLimitOffset *dxl_op =
-			(CDXLScalarLimitOffset *) CDXLOperatorFactory::MakeDXLLimitOffset(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::Ref<CDXLScalarLimitOffset> dxl_op =
+			(gpos::Ref<CDXLScalarLimitOffset>)
+				CDXLOperatorFactory::MakeDXLLimitOffset(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else

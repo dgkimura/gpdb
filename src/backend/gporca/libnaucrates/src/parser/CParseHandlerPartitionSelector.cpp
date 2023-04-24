@@ -194,7 +194,7 @@ CParseHandlerPartitionSelector::EndElement(
 	}
 
 	m_rel_mdid->AddRef();
-	CDXLPhysicalPartitionSelector *dxl_op =
+	gpos::Ref<CDXLPhysicalPartitionSelector> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalPartitionSelector(
 			m_mp, m_rel_mdid, m_selector_id, m_scan_id, m_partitions);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

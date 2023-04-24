@@ -72,10 +72,10 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin() = default;
 //		  is requested for Non-Singleton (or Singleton if outer delivered Universal distribution)
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 								  CExpressionHandle &exprhdl GPOS_UNUSED,
-								  CDistributionSpec *,	//pdsRequired,
+								  gpos::Ref<CDistributionSpec>,	 //pdsRequired,
 								  ULONG child_index GPOS_UNUSED,
 								  CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 								  ULONG	 // ulOptReq
@@ -88,9 +88,9 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 	return nullptr;
 }
 
-CEnfdDistribution *
+gpos::Ref<CEnfdDistribution>
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CReqdPropPlan *prppInput, ULONG child_index,
+						  gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -98,7 +98,8 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
@@ -126,7 +127,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		if (1 == child_index)
 		{
-			CEnfdDistribution *pEnfdHashedDistribution =
+			gpos::Ref<CEnfdDistribution> pEnfdHashedDistribution =
 				CPhysicalJoin::PedInnerHashedFromOuterHashed(
 					mp, exprhdl, dmatch, (*pdrgpdpCtxt)[0]);
 			if (pEnfdHashedDistribution)
@@ -148,7 +149,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
-	CDistributionSpec *pdsOuter =
+	gpos::Ref<CDistributionSpec> pdsOuter =
 		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{

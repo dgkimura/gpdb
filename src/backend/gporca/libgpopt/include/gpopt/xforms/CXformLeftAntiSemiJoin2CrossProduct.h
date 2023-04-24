@@ -38,7 +38,8 @@ public:
 	explicit CXformLeftAntiSemiJoin2CrossProduct(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformLeftAntiSemiJoin2CrossProduct(CExpression *pexprPattern);
+	explicit CXformLeftAntiSemiJoin2CrossProduct(
+		gpos::Ref<CExpression> pexprPattern);
 
 	// dtor
 	~CXformLeftAntiSemiJoin2CrossProduct() override = default;
@@ -61,8 +62,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 };	// class CXformLeftAntiSemiJoin2CrossProduct
 

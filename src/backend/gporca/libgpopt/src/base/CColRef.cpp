@@ -33,8 +33,8 @@ const ULONG CColRef::m_ulInvalid = gpos::ulong_max;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRef::CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
-				 const CName *pname)
+CColRef::CColRef(const gpos::Ref<IMDType> pmdtype, const INT type_modifier,
+				 ULONG id, const CName *pname)
 	: m_pmdtype(pmdtype),
 	  m_type_modifier(type_modifier),
 	  m_pname(pname),
@@ -86,7 +86,7 @@ CColRef::HashValue(const ULONG &ulptr)
 //
 //---------------------------------------------------------------------------
 ULONG
-CColRef::HashValue(const CColRef *colref)
+CColRef::HashValue(const gpos::Ref<CColRef> colref)
 {
 	ULONG id = colref->Id();
 	return gpos::HashValue<ULONG>(&id);
@@ -127,7 +127,7 @@ CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRef *colref = (*colref_array)[ul];
+		gpos::Ref<CColRef> colref = (*colref_array)[ul];
 		pdrgpul->Append(GPOS_NEW(mp) ULONG(colref->Id()));
 	}
 

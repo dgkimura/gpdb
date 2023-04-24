@@ -62,12 +62,12 @@ CContradictionTest::EresUnittest_Constraint()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	Pfpexpr rgpf[] = {
 		CTestUtils::PexprLogicalApplyWithOuterRef<CLogicalInnerApply>,
@@ -103,7 +103,7 @@ CContradictionTest::EresUnittest_Constraint()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate simple expression
-		CExpression *pexpr = rgpf[i](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
 		// self-match
 		GPOS_ASSERT(pexpr->FMatchDebug(pexpr));
@@ -127,7 +127,7 @@ CContradictionTest::EresUnittest_Constraint()
 		pexpr->DbgPrint();
 #endif	// GPOS_DEBUG
 
-		CExpression *pexprPreprocessed =
+		gpos::Ref<CExpression> pexprPreprocessed =
 			CExpressionPreprocessor::PexprPreprocess(mp, pexpr);
 		oss << std::endl
 			<< "PREPROCESSED EXPR:" << std::endl

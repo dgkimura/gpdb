@@ -72,7 +72,7 @@ CJoinOrderMinCard::~CJoinOrderMinCard()
 //		Create join order
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CJoinOrderMinCard::PexprExpand()
 {
 	GPOS_ASSERT(nullptr == m_pcompResult && "join order is already expanded");
@@ -82,14 +82,14 @@ CJoinOrderMinCard::PexprExpand()
 	while (ulCoveredComps < m_ulComps)
 	{
 		CDouble dMinRows(0.0);
-		SComponent *pcompBest =
+		gpos::Ref<SComponent> pcompBest =
 			nullptr;  // best component to be added to current result
-		SComponent *pcompBestResult =
+		gpos::Ref<SComponent> pcompBestResult =
 			nullptr;  // result after adding best component
 
 		for (ULONG ul = 0; ul < m_ulComps; ul++)
 		{
-			SComponent *pcompCurrent = m_rgpcomp[ul];
+			gpos::Ref<SComponent> pcompCurrent = m_rgpcomp[ul];
 			if (pcompCurrent->m_fUsed)
 			{
 				// used components are already included in current result
@@ -102,7 +102,7 @@ CJoinOrderMinCard::PexprExpand()
 			}
 
 			// combine component with current result and derive stats
-			CJoinOrder::SComponent *pcompTemp =
+			gpos::Ref<CJoinOrder::SComponent> pcompTemp =
 				PcompCombine(m_pcompResult, pcompCurrent);
 			DeriveStats(pcompTemp->m_pexpr);
 			CDouble rows = pcompTemp->m_pexpr->Pstats()->Rows();
@@ -144,7 +144,7 @@ CJoinOrderMinCard::PexprExpand()
 	}
 	GPOS_ASSERT(nullptr != m_pcompResult->m_pexpr);
 
-	CExpression *pexprResult = m_pcompResult->m_pexpr;
+	gpos::Ref<CExpression> pexprResult = m_pcompResult->m_pexpr;
 	pexprResult->AddRef();
 
 	return pexprResult;

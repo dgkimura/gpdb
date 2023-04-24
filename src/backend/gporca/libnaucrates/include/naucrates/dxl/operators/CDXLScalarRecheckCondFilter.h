@@ -63,13 +63,13 @@ public:
 	}
 
 	// conversion function
-	static CDXLScalarRecheckCondFilter *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarRecheckCondFilter>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarRecheckCondFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarRecheckCondFilter *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarRecheckCondFilter> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

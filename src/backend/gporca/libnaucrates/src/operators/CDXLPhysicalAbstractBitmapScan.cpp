@@ -43,7 +43,7 @@ CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalAbstractBitmapScan::AssertValid(const gpos::Ref<CDXLNode> node,
 											BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());
@@ -55,7 +55,7 @@ CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node,
 				(*node)[2]->GetOperator()->GetDXLOperator());
 
 	// assert bitmap access path is valid
-	CDXLNode *bitmap_dxlnode = (*node)[3];
+	gpos::Ref<CDXLNode> bitmap_dxlnode = (*node)[3];
 	GPOS_ASSERT(EdxlopScalarBitmapIndexProbe ==
 					bitmap_dxlnode->GetOperator()->GetDXLOperator() ||
 				EdxlopScalarBitmapBoolOp ==

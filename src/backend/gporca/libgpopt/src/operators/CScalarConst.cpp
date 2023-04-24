@@ -30,7 +30,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarConst::CScalarConst(CMemoryPool *mp, IDatum *datum)
+CScalarConst::CScalarConst(CMemoryPool *mp, gpos::Ref<IDatum> datum)
 	: CScalar(mp), m_pdatum(datum)
 {
 	GPOS_ASSERT(nullptr != datum);
@@ -75,11 +75,11 @@ CScalarConst::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::Matches(COperator *pop) const
+CScalarConst::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarConst *psconst = CScalarConst::PopConvert(pop);
+		gpos::Ref<CScalarConst> psconst = CScalarConst::PopConvert(pop);
 
 		// match if constant values are the same
 		return GetDatum()->Matches(psconst->GetDatum());
@@ -96,7 +96,7 @@ CScalarConst::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarConst::MdidType() const
 {
 	return m_pdatum->MDId();
@@ -130,7 +130,7 @@ CScalarConst::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::FCastedConst(CExpression *pexpr)
+CScalarConst::FCastedConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -156,8 +156,8 @@ CScalarConst::FCastedConst(CExpression *pexpr)
 // 		Else return NULL.
 //
 //---------------------------------------------------------------------------
-CScalarConst *
-CScalarConst::PopExtractFromConstOrCastConst(CExpression *pexpr)
+gpos::Ref<CScalarConst>
+CScalarConst::PopExtractFromConstOrCastConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -199,7 +199,8 @@ CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
 
 	if (IMDType::EtiBool == m_pdatum->GetDatumType())
 	{
-		IDatumBool *pdatumBool = dynamic_cast<IDatumBool *>(m_pdatum);
+		gpos::Ref<IDatumBool> pdatumBool =
+			dynamic_cast<gpos::Ref<IDatumBool> >(m_pdatum);
 		if (pdatumBool->GetValue())
 		{
 			return EberTrue;

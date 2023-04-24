@@ -32,8 +32,9 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
-	CMemoryPool *mp, IMDId *element_func, IMDId *result_type_mdid,
-	INT type_modifier, BOOL is_explicit, ECoercionForm ecf, INT location)
+	CMemoryPool *mp, gpos::Ref<IMDId> element_func,
+	gpos::Ref<IMDId> result_type_mdid, INT type_modifier, BOOL is_explicit,
+	ECoercionForm ecf, INT location)
 	: CScalarCoerceBase(mp, result_type_mdid, type_modifier, ecf, location),
 	  m_pmdidElementFunc(element_func),
 	  m_is_explicit(is_explicit)
@@ -63,7 +64,7 @@ CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 //		Return metadata id of element coerce function
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCoerceExpr::PmdidElementFunc() const
 {
 	return m_pmdidElementFunc;
@@ -124,14 +125,15 @@ CScalarArrayCoerceExpr::SzId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCoerceExpr::Matches(COperator *pop) const
+CScalarArrayCoerceExpr::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayCoerceExpr *popCoerce = CScalarArrayCoerceExpr::PopConvert(pop);
+	gpos::Ref<CScalarArrayCoerceExpr> popCoerce =
+		CScalarArrayCoerceExpr::PopConvert(pop);
 
 	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc) &&
 		   popCoerce->MdidType()->Equals(MdidType()) &&
@@ -164,13 +166,13 @@ CScalarArrayCoerceExpr::FInputOrderSensitive() const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CScalarArrayCoerceExpr *
-CScalarArrayCoerceExpr::PopConvert(COperator *pop)
+gpos::Ref<CScalarArrayCoerceExpr>
+CScalarArrayCoerceExpr::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarArrayCoerceExpr == pop->Eopid());
 
-	return dynamic_cast<CScalarArrayCoerceExpr *>(pop);
+	return dynamic_cast<gpos::Ref<CScalarArrayCoerceExpr> >(pop);
 }
 
 

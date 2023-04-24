@@ -83,9 +83,9 @@ CXformPushGbWithHavingBelowJoin::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformPushGbWithHavingBelowJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										   gpos::Ref<CXformResult> pxfres,
+										   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -93,15 +93,17 @@ CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprGb = (*pexpr)[0];
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexprGb->Pop());
+	gpos::Ref<CExpression> pexprGb = (*pexpr)[0];
+	gpos::Ref<CLogicalGbAgg> popGbAgg =
+		CLogicalGbAgg::PopConvert(pexprGb->Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		// xform only applies to global aggs
 		return;
 	}
 
-	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
+	gpos::Ref<CExpression> pexprResult =
+		CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{

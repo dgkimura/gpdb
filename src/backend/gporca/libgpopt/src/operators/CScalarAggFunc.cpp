@@ -32,8 +32,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-							   IMDId *resolved_rettype,
+CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
+							   gpos::Ref<IMDId> resolved_rettype,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
@@ -57,7 +57,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	GPOS_ASSERT(EaggfuncstageSentinel > eaggfuncstage);
 
 	// store id of type obtained by looking up MD cache
-	IMDId *mdid = PmdidLookupReturnType(
+	gpos::Ref<IMDId> mdid = PmdidLookupReturnType(
 		m_pmdidAggFunc, (EaggfuncstageGlobal == m_eaggfuncstage));
 	mdid->AddRef();
 	m_return_type_mdid = mdid;
@@ -85,7 +85,7 @@ CScalarAggFunc::PstrAggFunc() const
 //		Aggregate function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarAggFunc::MDId() const
 {
 	return m_pmdidAggFunc;
@@ -127,7 +127,7 @@ CScalarAggFunc::FCountAny() const
 
 // Is function either min() or max()?
 BOOL
-CScalarAggFunc::IsMinMax(const IMDType *mdtype) const
+CScalarAggFunc::IsMinMax(const gpos::Ref<IMDType> mdtype) const
 {
 	return m_pmdidAggFunc->Equals(
 			   mdtype->GetMdidForAggType(IMDType::EaggMin)) ||
@@ -163,11 +163,12 @@ CScalarAggFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAggFunc::Matches(COperator *pop) const
+CScalarAggFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pop);
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
+			CScalarAggFunc::PopConvert(pop);
 
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&
@@ -188,9 +189,9 @@ CScalarAggFunc::Matches(COperator *pop) const
 //		Lookup mdid of return type for given Agg function
 //
 //---------------------------------------------------------------------------
-IMDId *
-CScalarAggFunc::PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
-									  CMDAccessor *pmdaInput)
+gpos::Ref<IMDId>
+CScalarAggFunc::PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
+									  BOOL fGlobal, CMDAccessor *pmdaInput)
 {
 	GPOS_ASSERT(nullptr != pmdidAggFunc);
 	CMDAccessor *md_accessor = pmdaInput;
@@ -202,7 +203,8 @@ CScalarAggFunc::PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	// get aggregate function return type from the MD cache
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(pmdidAggFunc);
+	const gpos::Ref<IMDAggregate> pmdagg =
+		md_accessor->RetrieveAgg(pmdidAggFunc);
 	if (fGlobal)
 	{
 		return pmdagg->GetResultTypeMdid();

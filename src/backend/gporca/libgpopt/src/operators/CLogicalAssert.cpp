@@ -60,14 +60,14 @@ CLogicalAssert::CLogicalAssert(CMemoryPool *mp, CException *pexc)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalAssert::Matches(COperator *pop) const
+CLogicalAssert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CLogicalAssert *popAssert = CLogicalAssert::PopConvert(pop);
+	gpos::Ref<CLogicalAssert> popAssert = CLogicalAssert::PopConvert(pop);
 	return CException::Equals(*(popAssert->Pexc()), *m_pexc);
 }
 
@@ -79,7 +79,7 @@ CLogicalAssert::Matches(COperator *pop) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalAssert::DeriveOutputColumns(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl)
 {
@@ -95,7 +95,7 @@ CLogicalAssert::DeriveOutputColumns(CMemoryPool *,	// mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalAssert::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -132,7 +132,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
 	// in case of a false condition or a contradiction, maxcard should be 1
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(1);
+	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarExactChild(1);
 
 	if ((nullptr != pexprScalar && CUtils::FScalarConstFalse(pexprScalar)) ||
 		exprhdl.DerivePropertyConstraint()->FContradiction())
@@ -161,7 +161,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 //		Derive statistics based on filter predicates
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 IStatisticsArray *	 // not used
 ) const
@@ -171,7 +171,7 @@ CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (1 == maxcard.Ull())
 	{
 		// a max card of one requires re-scaling stats
-		IStatistics *stats = exprhdl.Pstats(0);
+		gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 		return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 	}
 

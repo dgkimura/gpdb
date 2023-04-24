@@ -33,10 +33,10 @@ class CDXLScalarArray : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::Ref<IMDId> m_elem_type_mdid;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::Ref<IMDId> m_array_type_mdid;
 
 	// is it a multidimensional array
 	BOOL m_multi_dimensional_array;
@@ -45,8 +45,9 @@ public:
 	CDXLScalarArray(const CDXLScalarArray &) = delete;
 
 	// ctor
-	CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-					IMDId *array_type_mdid, BOOL multi_dimensional_array);
+	CDXLScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					gpos::Ref<IMDId> array_type_mdid,
+					BOOL multi_dimensional_array);
 
 	// dtor
 	~CDXLScalarArray() override;
@@ -58,26 +59,26 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// element type id
-	IMDId *ElementTypeMDid() const;
+	gpos::Ref<IMDId> ElementTypeMDid() const;
 
 	// array type id
-	IMDId *ArrayTypeMDid() const;
+	gpos::Ref<IMDId> ArrayTypeMDid() const;
 
 	// is array multi-dimensional
 	BOOL IsMultiDimensional() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarArray *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarArray>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArray == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarArray *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarArray> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -91,7 +92,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

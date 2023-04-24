@@ -32,10 +32,10 @@ class CDXLWindowKey : public CRefCount<CDXLWindowKey>
 {
 private:
 	// window frame associated with the window key
-	CDXLWindowFrame *m_window_frame_dxl{nullptr};
+	gpos::Ref<CDXLWindowFrame> m_window_frame_dxl{nullptr};
 
 	// sorting columns
-	CDXLNode *m_sort_col_list_dxlnode{nullptr};
+	gpos::Ref<CDXLNode> m_sort_col_list_dxlnode{nullptr};
 
 public:
 	CDXLWindowKey(const CDXLWindowKey &) = delete;
@@ -50,20 +50,20 @@ public:
 	virtual void SerializeToDXL(CXMLSerializer *) const;
 
 	// set window frame definition
-	void SetWindowFrame(CDXLWindowFrame *window_frame);
+	void SetWindowFrame(gpos::Ref<CDXLWindowFrame> window_frame);
 
 	// return window frame
-	CDXLWindowFrame *
+	gpos::Ref<CDXLWindowFrame>
 	GetWindowFrame() const
 	{
 		return m_window_frame_dxl;
 	}
 
 	// set the list of sort columns
-	void SetSortColList(CDXLNode *sort_col_list_dxlnode);
+	void SetSortColList(gpos::Ref<CDXLNode> sort_col_list_dxlnode);
 
 	// sort columns
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	GetSortColListDXL() const
 	{
 		return m_sort_col_list_dxlnode;

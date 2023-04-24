@@ -35,7 +35,7 @@ class CParseHandlerUtils
 {
 public:
 	// parse and the set operator's costing and statistical properties
-	static void SetProperties(CDXLNode *dxlnode,
+	static void SetProperties(gpos::Ref<CDXLNode> dxlnode,
 							  CParseHandlerProperties *prop_parse_handler);
 };
 }  // namespace gpdxl

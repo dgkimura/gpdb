@@ -46,7 +46,7 @@ CColRefSetIter::CColRefSetIter(const CColRefSet &bs) : CBitSetIter(bs)
 //		Return colref of current position of cursor
 //
 //---------------------------------------------------------------------------
-CColRef *
+gpos::Ref<CColRef>
 CColRefSetIter::Pcr() const
 {
 	ULONG id = CBitSetIter::Bit();

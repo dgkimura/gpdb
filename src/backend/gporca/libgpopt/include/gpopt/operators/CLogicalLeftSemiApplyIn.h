@@ -74,18 +74,18 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalLeftSemiApplyIn *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalLeftSemiApplyIn>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiApplyIn == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftSemiApplyIn *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalLeftSemiApplyIn> >(pop);
 	}
 
 };	// class CLogicalLeftSemiApplyIn

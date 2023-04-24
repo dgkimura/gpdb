@@ -69,7 +69,7 @@ CBucketTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -90,11 +90,11 @@ CBucketTest::EresUnittest_CBucketInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer points
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 1);
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 2);
-	CPoint *point3 = CTestUtils::PpointInt4(mp, 3);
-	CPoint *point4 = CTestUtils::PpointInt4(mp, 4);
-	CPoint *point10 = CTestUtils::PpointInt4(mp, 10);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 1);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 2);
+	gpos::Ref<CPoint> point3 = CTestUtils::PpointInt4(mp, 3);
+	gpos::Ref<CPoint> point4 = CTestUtils::PpointInt4(mp, 4);
+	gpos::Ref<CPoint> point10 = CTestUtils::PpointInt4(mp, 10);
 
 	// bucket [1,1]
 	CBucket *bucket1 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
@@ -204,8 +204,8 @@ CBucketTest::EresUnittest_CBucketBool()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate boolean points
-	CPoint *p1 = CTestUtils::PpointBool(mp, true);
-	CPoint *p2 = CTestUtils::PpointBool(mp, false);
+	gpos::Ref<CPoint> p1 = CTestUtils::PpointBool(mp, true);
+	gpos::Ref<CPoint> p2 = CTestUtils::PpointBool(mp, false);
 
 	// bucket for true
 	CBucket *bucket =
@@ -237,7 +237,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer point
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 10);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 10);
 
 	// bucket [1,100)
 	CBucket *bucket1 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
@@ -250,7 +250,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	GPOS_RTL_ASSERT(!bucket2->Contains(point1));
 
 	// new bucket [1, 10) must contain 9
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 9);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 9);
 	GPOS_RTL_ASSERT(bucket2->Contains(point2));
 	point2->Release();
 
@@ -594,8 +594,8 @@ CBucketTest::EresUnittest_CBucketMergeCommutativitySameLowerBounds()
 
 	// 600 rows
 	// b2 = (0,50)
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, 0);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, 50);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, 0);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, 50);
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower, ppUpper, false /* is_lower_closed */,
 				false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
@@ -661,8 +661,8 @@ CBucketTest::EresUnittest_CBucketMergeCommutativitySameUpperBounds()
 
 	// 600 rows
 	// b2 = [0,100]
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, 0);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, 100);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, 0);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, 100);
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower, ppUpper, true /* is_lower_closed */,
 				true /*is_upper_closed*/, CDouble(0.2), CDouble(50));
@@ -776,9 +776,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatum()
 	CMemoryPool *mp = amp.Pmp();
 
 	// [0.0, 100.0)
-	CPoint *ppLower1 =
+	gpos::Ref<CPoint> ppLower1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(0.0));
-	CPoint *ppUpper1 =
+	gpos::Ref<CPoint> ppUpper1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(100.0));
 
 	CBucket *bucket1 = GPOS_NEW(mp)
@@ -786,9 +786,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatum()
 				false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
 	// [50.0, 150.0)
-	CPoint *ppLower2 =
+	gpos::Ref<CPoint> ppLower2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(50.0));
-	CPoint *ppUpper2 =
+	gpos::Ref<CPoint> ppUpper2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(150.0));
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower2, ppUpper2, true /* is_lower_closed */,
@@ -843,9 +843,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatumSameLowerBounds()
 	CMemoryPool *mp = amp.Pmp();
 
 	// b1 = [0,100)
-	CPoint *ppLower1 =
+	gpos::Ref<CPoint> ppLower1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(0.0));
-	CPoint *ppUpper1 =
+	gpos::Ref<CPoint> ppUpper1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(100.0));
 
 	CBucket *bucket1 = GPOS_NEW(mp)
@@ -853,9 +853,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatumSameLowerBounds()
 				false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
 	// b2 = (0,50)
-	CPoint *ppLower2 =
+	gpos::Ref<CPoint> ppLower2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(0.0));
-	CPoint *ppUpper2 =
+	gpos::Ref<CPoint> ppUpper2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(50.0));
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower2, ppUpper2, false /* is_lower_closed */,
@@ -910,9 +910,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatumSameUpperBounds()
 	CMemoryPool *mp = amp.Pmp();
 
 	// b1 = [0,100)
-	CPoint *ppLower1 =
+	gpos::Ref<CPoint> ppLower1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(0.0));
-	CPoint *ppUpper1 =
+	gpos::Ref<CPoint> ppUpper1 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(100.0));
 
 	CBucket *bucket1 = GPOS_NEW(mp)
@@ -920,9 +920,9 @@ CBucketTest::EresUnittest_CBucketMergeCommutativityDoubleDatumSameUpperBounds()
 				false /*is_upper_closed*/, CDouble(0.4), CDouble(50));
 
 	// b2 = [0,100]
-	CPoint *ppLower2 =
+	gpos::Ref<CPoint> ppLower2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(0.0));
-	CPoint *ppUpper2 =
+	gpos::Ref<CPoint> ppUpper2 =
 		CCardinalityTestUtils::PpointDouble(mp, GPDB_FLOAT8, CDouble(100.0));
 	CBucket *bucket2 = GPOS_NEW(mp)
 		CBucket(ppLower2, ppUpper2, true /* is_lower_closed */,

@@ -86,7 +86,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 	GPOS_ASSERT(GPOS_ARRAY_SIZE(rgulRel) == ulRels);
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -96,7 +96,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 
-		CExpression *pexprNAryJoin = CTestUtils::PexprLogicalNAryJoin(
+		gpos::Ref<CExpression> pexprNAryJoin = CTestUtils::PexprLogicalNAryJoin(
 			mp, rgscRel, rgulRel, ulRels, false /*fCrossProduct*/);
 
 		// derive stats on input expression
@@ -107,7 +107,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
-			CExpression *pexprChild = (*pexprNAryJoin)[ul];
+			gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
 			pexprChild->AddRef();
 			pdrgpexpr->Append(pexprChild);
 		}
@@ -116,7 +116,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		pdrgpexpr->AddRef();
 		pdrgpexprPred->AddRef();
 		CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPred);
-		CExpression *pexprResult = jomc.PexprExpand();
+		gpos::Ref<CExpression> pexprResult = jomc.PexprExpand();
 		{
 			CAutoTrace at(mp);
 			at.Os() << std::endl

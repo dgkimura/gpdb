@@ -40,8 +40,8 @@ CConstExprEvaluatorDefault::~CConstExprEvaluatorDefault() = default;
 //		Returns the given expression after having increased its ref count
 //
 //---------------------------------------------------------------------------
-CExpression *
-CConstExprEvaluatorDefault::PexprEval(CExpression *pexpr)
+gpos::Ref<CExpression>
+CConstExprEvaluatorDefault::PexprEval(gpos::Ref<CExpression> pexpr)
 {
 	pexpr->AddRef();
 	return pexpr;

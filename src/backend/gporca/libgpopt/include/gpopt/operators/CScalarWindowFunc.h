@@ -69,10 +69,10 @@ public:
 	CScalarWindowFunc(const CScalarWindowFunc &) = delete;
 
 	// ctor
-	CScalarWindowFunc(CMemoryPool *mp, IMDId *mdid_func,
-					  IMDId *mdid_return_type, const CWStringConst *pstrFunc,
-					  EWinStage ewinstage, BOOL is_distinct, BOOL is_star_arg,
-					  BOOL is_simple_agg);
+	CScalarWindowFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+					  gpos::Ref<IMDId> mdid_return_type,
+					  const CWStringConst *pstrFunc, EWinStage ewinstage,
+					  BOOL is_distinct, BOOL is_star_arg, BOOL is_simple_agg);
 
 	// dtor
 	~CScalarWindowFunc() override = default;
@@ -101,16 +101,16 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// conversion function
-	static CScalarWindowFunc *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarWindowFunc>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarWindowFunc == pop->Eopid());
 
-		return dynamic_cast<CScalarWindowFunc *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarWindowFunc> >(pop);
 	}
 
 	// does window function definition include Distinct?

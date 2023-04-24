@@ -31,26 +31,31 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 class CRangeTest
 {
-	using PfPdatum = IDatum *(*) (CMemoryPool *, INT);
+	using PfPdatum = gpos::Ref<IDatum> (*)(CMemoryPool *, INT);
 
 private:
-	static GPOS_RESULT EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid,
+	static GPOS_RESULT EresInitAndCheckRanges(CMemoryPool *mp,
+											  gpos::Ref<IMDId> mdid,
 											  PfPdatum pf);
 
-	static void TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
-									  CRange *prange2, CRange *prange3,
-									  CRange *prange4, CRange *prange5);
+	static void TestRangeRelationship(CMemoryPool *mp,
+									  gpos::Ref<CRange> prange1,
+									  gpos::Ref<CRange> prange2,
+									  gpos::Ref<CRange> prange3,
+									  gpos::Ref<CRange> prange4,
+									  gpos::Ref<CRange> prange5);
 
-	static void PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange);
+	static void PrintRange(CMemoryPool *mp, gpos::Ref<CColRef> colref,
+						   gpos::Ref<CRange> prange);
 
 	// int2 datum
-	static IDatum *CreateInt2Datum(CMemoryPool *mp, INT i);
+	static gpos::Ref<IDatum> CreateInt2Datum(CMemoryPool *mp, INT i);
 
 	// int4 datum
-	static IDatum *CreateInt4Datum(CMemoryPool *mp, INT i);
+	static gpos::Ref<IDatum> CreateInt4Datum(CMemoryPool *mp, INT i);
 
 	// int8 datum
-	static IDatum *CreateInt8Datum(CMemoryPool *mp, INT li);
+	static gpos::Ref<IDatum> CreateInt8Datum(CMemoryPool *mp, INT li);
 
 public:
 	// unittests

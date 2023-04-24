@@ -63,10 +63,10 @@ private:
 	CMDAccessor *m_pmda;
 
 	// cost model
-	ICostModel *m_cost_model;
+	gpos::Ref<ICostModel> m_cost_model;
 
 	// constant expression evaluator
-	IConstExprEvaluator *m_pceeval;
+	gpos::Ref<IConstExprEvaluator> m_pceeval;
 
 	// comparator between IDatum instances
 	IComparator *m_pcomp;
@@ -75,13 +75,13 @@ private:
 	ULONG m_auPartId;
 
 	// global CTE information
-	CCTEInfo *m_pcteinfo;
+	gpos::Ref<CCTEInfo> m_pcteinfo;
 
 	// system columns required in query output
 	CColRefArray *m_pdrgpcrSystemCols;
 
 	// optimizer configurations
-	COptimizerConfig *m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// whether or not we are optimizing a DML query
 	BOOL m_fDMLQuery;
@@ -126,8 +126,8 @@ public:
 
 	// ctor
 	COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
-			 CMDAccessor *md_accessor, IConstExprEvaluator *pceeval,
-			 COptimizerConfig *optimizer_config);
+			 CMDAccessor *md_accessor, gpos::Ref<IConstExprEvaluator> pceeval,
+			 gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// dtor
 	~COptCtxt() override;
@@ -140,7 +140,7 @@ public:
 	}
 
 	// optimizer configurations
-	COptimizerConfig *
+	gpos::Ref<COptimizerConfig>
 	GetOptimizerConfig() const
 	{
 		return m_optimizer_config;
@@ -179,7 +179,8 @@ public:
 	}
 
 	void
-	AddDirectDispatchableFilterCandidate(CExpression *filter_expression)
+	AddDirectDispatchableFilterCandidate(
+		gpos::Ref<CExpression> filter_expression)
 	{
 		filter_expression->AddRef();
 		m_direct_dispatchable_filters->Append(filter_expression);
@@ -236,14 +237,14 @@ public:
 	}
 
 	// cost model accessor
-	ICostModel *
+	gpos::Ref<ICostModel>
 	GetCostModel() const
 	{
 		return m_cost_model;
 	}
 
 	// constant expression evaluator
-	IConstExprEvaluator *
+	gpos::Ref<IConstExprEvaluator>
 	Pceeval()
 	{
 		return m_pceeval;
@@ -257,7 +258,7 @@ public:
 	}
 
 	// cte info
-	CCTEInfo *
+	gpos::Ref<CCTEInfo>
 	Pcteinfo()
 	{
 		return m_pcteinfo;
@@ -285,7 +286,7 @@ public:
 
 	void AddPartForScanId(ULONG scanid, ULONG index);
 
-	CBitSet *
+	gpos::Ref<CBitSet>
 	GetPartitionsForScanId(ULONG scanid)
 	{
 		return m_scanid_to_part_map->Find(&scanid);
@@ -306,15 +307,16 @@ public:
 	}
 
 	// factory method
-	static COptCtxt *PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  IConstExprEvaluator *pceeval,
-								  COptimizerConfig *optimizer_config);
+	static gpos::Ref<COptCtxt> PoctxtCreate(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::Ref<IConstExprEvaluator> pceeval,
+		gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// shorthand to retrieve opt context from TLS
-	inline static COptCtxt *
+	inline static gpos::Ref<COptCtxt>
 	PoctxtFromTLS()
 	{
-		return reinterpret_cast<COptCtxt *>(
+		return reinterpret_cast<gpos::Ref<COptCtxt>>(
 			ITask::Self()->GetTls().Get(CTaskLocalStorage::EtlsidxOptCtxt));
 	}
 

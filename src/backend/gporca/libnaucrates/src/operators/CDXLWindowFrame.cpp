@@ -31,8 +31,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 								 EdxlFrameExclusionStrategy frame_exc_strategy,
-								 CDXLNode *dxlnode_leading,
-								 CDXLNode *dxlnode_trailing,
+								 gpos::Ref<CDXLNode> dxlnode_leading,
+								 gpos::Ref<CDXLNode> dxlnode_trailing,
 								 OID start_in_range_func, OID end_in_range_func,
 								 OID in_range_coll, bool in_range_asc,
 								 bool in_range_nulls_first)

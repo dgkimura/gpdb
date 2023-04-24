@@ -30,7 +30,8 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLColStats::CDXLColStats(CMemoryPool *mp, CMDIdColStats *mdid_col_stats,
+CDXLColStats::CDXLColStats(CMemoryPool *mp,
+						   gpos::Ref<CMDIdColStats> mdid_col_stats,
 						   CMDName *mdname, CDouble width, CDouble null_freq,
 						   CDouble distinct_remaining, CDouble freq_remaining,
 						   CDXLBucketArray *dxl_stats_bucket_array,
@@ -75,7 +76,7 @@ CDXLColStats::~CDXLColStats()
 //		Returns the metadata id of this column stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLColStats::MDId() const
 {
 	return m_mdid_col_stats;
@@ -131,7 +132,7 @@ CDXLColStats::Buckets() const
 //		Returns the bucket at the given position
 //
 //---------------------------------------------------------------------------
-const CDXLBucket *
+const gpos::Ref<CDXLBucket>
 CDXLColStats::GetDXLBucketAt(ULONG pos) const
 {
 	return (*m_dxl_stats_bucket_array)[pos];
@@ -175,7 +176,7 @@ CDXLColStats::Serialize(CXMLSerializer *xml_serializer) const
 	ULONG num_of_buckets = Buckets();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -208,7 +209,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 
 	for (ULONG ul = 0; ul < Buckets(); ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->DebugPrint(os);
 	}
 }
@@ -223,11 +224,11 @@ CDXLColStats::DebugPrint(IOstream &os) const
 //		Dummy statistics
 //
 //---------------------------------------------------------------------------
-CDXLColStats *
-CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
+gpos::Ref<CDXLColStats>
+CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 									 CMDName *mdname, CDouble width)
 {
-	CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
+	gpos::Ref<CMDIdColStats> mdid_col_stats = CMDIdColStats::CastMdid(mdid);
 
 	CAutoRef<CDXLBucketArray> dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);

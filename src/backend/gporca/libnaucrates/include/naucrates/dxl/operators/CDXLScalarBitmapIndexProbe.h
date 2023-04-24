@@ -36,14 +36,14 @@ class CDXLScalarBitmapIndexProbe : public CDXLScalar
 {
 private:
 	// index descriptor associated with the scanned table
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::Ref<CDXLIndexDescr> m_dxl_index_descr;
 
 public:
 	CDXLScalarBitmapIndexProbe(CDXLScalarBitmapIndexProbe &) = delete;
 
 	// ctor
 	CDXLScalarBitmapIndexProbe(CMemoryPool *mp,
-							   CDXLIndexDescr *dxl_index_descr);
+							   gpos::Ref<CDXLIndexDescr> dxl_index_descr);
 
 	//dtor
 	~CDXLScalarBitmapIndexProbe() override;
@@ -59,7 +59,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// index descriptor
-	virtual const CDXLIndexDescr *
+	virtual const gpos::Ref<CDXLIndexDescr>
 	GetDXLIndexDescr() const
 	{
 		return m_dxl_index_descr;
@@ -67,7 +67,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL
@@ -80,18 +80,18 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarBitmapIndexProbe *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarBitmapIndexProbe>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarBitmapIndexProbe == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarBitmapIndexProbe *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarBitmapIndexProbe> >(dxl_op);
 	}
 
 };	// class CDXLScalarBitmapIndexProbe

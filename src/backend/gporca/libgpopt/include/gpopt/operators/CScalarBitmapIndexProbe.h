@@ -39,18 +39,19 @@ class CScalarBitmapIndexProbe : public CScalar
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	// private copy ctor
 	CScalarBitmapIndexProbe(const CScalarBitmapIndexProbe &);
 
 public:
 	// ctor
-	CScalarBitmapIndexProbe(CMemoryPool *mp, CIndexDescriptor *pindexdesc,
-							IMDId *pmdidBitmapType);
+	CScalarBitmapIndexProbe(CMemoryPool *mp,
+							gpos::Ref<CIndexDescriptor> pindexdesc,
+							gpos::Ref<IMDId> pmdidBitmapType);
 
 	// ctor
 	// only for transforms
@@ -60,14 +61,14 @@ public:
 	~CScalarBitmapIndexProbe() override;
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
 	}
 
 	// bitmap type id
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_pmdidBitmapType;
@@ -91,7 +92,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -101,7 +102,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -114,13 +115,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CScalarBitmapIndexProbe *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarBitmapIndexProbe>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBitmapIndexProbe == pop->Eopid());
 
-		return dynamic_cast<CScalarBitmapIndexProbe *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarBitmapIndexProbe> >(pop);
 	}
 
 };	// class CScalarBitmapIndexProbe

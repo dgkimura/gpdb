@@ -124,7 +124,8 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerProperties *prop_parse_handler =
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
-	CDXLPhysicalSequence *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
+	gpos::Ref<CDXLPhysicalSequence> dxl_op =
+		GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set statistics and physical properties

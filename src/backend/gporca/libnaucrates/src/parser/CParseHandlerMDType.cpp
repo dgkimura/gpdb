@@ -249,7 +249,7 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 	};
 
 	Edxltoken token_type = EdxltokenSentinel;
-	IMDId **token_mdid = nullptr;
+	gpos::Ref<IMDId> *token_mdid = nullptr;
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgmdidmap); ul++)
 	{
 		SMdidMapElem mdidmapelem = rgmdidmap[ul];
@@ -286,14 +286,14 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::IsBuiltInType(const IMDId *mdid)
+CParseHandlerMDType::IsBuiltInType(const gpos::Ref<IMDId> mdid)
 {
 	if (IMDId::EmdidGeneral != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	const gpos::Ref<CMDIdGPDB> mdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	switch (mdidGPDB->Oid())
 	{
@@ -330,7 +330,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
-		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid);
+		const gpos::Ref<CMDIdGPDB> pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid);
 
 		switch (pmdidGPDB->Oid())
 		{

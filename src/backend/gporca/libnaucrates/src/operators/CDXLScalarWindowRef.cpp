@@ -29,12 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowRef::CDXLScalarWindowRef(CMemoryPool *mp, IMDId *mdid_func,
-										 IMDId *mdid_return_type,
-										 BOOL is_distinct, BOOL is_star_arg,
-										 BOOL is_simple_agg,
-										 EdxlWinStage dxl_win_stage,
-										 ULONG ulWinspecPosition)
+CDXLScalarWindowRef::CDXLScalarWindowRef(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+	gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct, BOOL is_star_arg,
+	BOOL is_simple_agg, EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition)
 	: CDXLScalar(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -134,7 +132,7 @@ CDXLScalarWindowRef::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
-									const CDXLNode *dxlnode) const
+									const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -175,7 +173,8 @@ CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	gpos::Ref<IMDId> mdid =
+		md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -190,18 +189,19 @@ CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarWindowRef::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								 BOOL validate_children) const
 {
 	EdxlWinStage edxlwinrefstage =
-		((CDXLScalarWindowRef *) dxlnode->GetOperator())->GetDxlWinStage();
+		((gpos::Ref<CDXLScalarWindowRef>) dxlnode->GetOperator())
+			->GetDxlWinStage();
 
 	GPOS_ASSERT((EdxlwinstageSentinel >= edxlwinrefstage));
 
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_winref_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_winref_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_winref_arg->GetOperator()->GetDXLOperatorType());
 

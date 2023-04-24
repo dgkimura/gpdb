@@ -31,7 +31,7 @@ FORCE_GENERATE_DBGSTR(CPropConstraint);
 //
 //---------------------------------------------------------------------------
 CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
-								 CConstraint *pcnstr)
+								 gpos::Ref<CConstraint> pcnstr)
 	: m_pdrgpcrs(pdrgpcrs), m_phmcrcrs(nullptr), m_pcnstr(pcnstr)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
@@ -74,7 +74,7 @@ CPropConstraint::InitHashMap(CMemoryPool *mp)
 	}
 	for (ULONG ul = 0; ul < ulEquiv; ul++)
 	{
-		CColRefSet *pcrs = (*m_pdrgpcrs)[ul];
+		gpos::Ref<CColRefSet> pcrs = (*m_pdrgpcrs)[ul];
 
 		CColRefSetIter crsi(*pcrs);
 		while (crsi.Advance())
@@ -109,17 +109,17 @@ CPropConstraint::FContradiction() const
 //		on its equivalent columns
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CPropConstraint::PexprScalarMappedFromEquivCols(
-	CMemoryPool *mp, CColRef *colref,
-	CPropConstraint *constraintsForOuterRefs) const
+	CMemoryPool *mp, gpos::Ref<CColRef> colref,
+	gpos::Ref<CPropConstraint> constraintsForOuterRefs) const
 {
 	if (nullptr == m_pcnstr || nullptr == m_phmcrcrs)
 	{
 		return nullptr;
 	}
-	CColRefSet *pcrs = m_phmcrcrs->Find(colref);
-	CColRefSet *equivOuterRefs = nullptr;
+	gpos::Ref<CColRefSet> pcrs = m_phmcrcrs->Find(colref);
+	gpos::Ref<CColRefSet> equivOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
 		nullptr != constraintsForOuterRefs->m_phmcrcrs)
@@ -136,7 +136,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 
 	// get constraints for all other columns in this equivalence class
 	// except the current column
-	CColRefSet *pcrsEquiv = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsEquiv = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsEquiv->Include(pcrs);
 	if (nullptr != equivOuterRefs)
 	{
@@ -145,8 +145,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	pcrsEquiv->Exclude(colref);
 
 	// local constraints on the equivalent column(s)
-	CConstraint *pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
-	CConstraint *pcnstrFromOuterRefs = nullptr;
+	gpos::Ref<CConstraint> pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
+	gpos::Ref<CConstraint> pcnstrFromOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
 		nullptr != constraintsForOuterRefs->m_pcnstr)
@@ -185,8 +185,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	// Now, pcnstr contains constraints on columns that are equivalent
 	// to 'colref'. These constraints may be local or in an outer scope.
 	// Generate a copy of all these constraints for the current column.
-	CConstraint *pcnstrCol = pcnstr->PcnstrRemapForColumn(mp, colref);
-	CExpression *pexprScalar = pcnstrCol->PexprScalar(mp);
+	gpos::Ref<CConstraint> pcnstrCol = pcnstr->PcnstrRemapForColumn(mp, colref);
+	gpos::Ref<CExpression> pexprScalar = pcnstrCol->PexprScalar(mp);
 	pexprScalar->AddRef();
 
 	pcnstr->Release();
@@ -214,7 +214,7 @@ CPropConstraint::OsPrint(IOstream &os) const
 
 		for (ULONG ul = 0; ul < length; ul++)
 		{
-			CColRefSet *pcrs = (*m_pdrgpcrs)[ul];
+			gpos::Ref<CColRefSet> pcrs = (*m_pdrgpcrs)[ul];
 			os << "(" << *pcrs << ") ";
 		}
 

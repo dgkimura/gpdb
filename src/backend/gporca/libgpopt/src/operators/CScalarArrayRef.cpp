@@ -24,9 +24,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-								 INT type_modifier, IMDId *array_type_mdid,
-								 IMDId *return_type_mdid)
+CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
+								 gpos::Ref<IMDId> elem_type_mdid,
+								 INT type_modifier,
+								 gpos::Ref<IMDId> array_type_mdid,
+								 gpos::Ref<IMDId> return_type_mdid)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_type_modifier(type_modifier),
@@ -87,14 +89,14 @@ CScalarArrayRef::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRef::Matches(COperator *pop) const
+CScalarArrayRef::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayRef *popArrayRef = CScalarArrayRef::PopConvert(pop);
+	gpos::Ref<CScalarArrayRef> popArrayRef = CScalarArrayRef::PopConvert(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

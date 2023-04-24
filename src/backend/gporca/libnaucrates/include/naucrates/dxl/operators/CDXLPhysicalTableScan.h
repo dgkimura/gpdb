@@ -41,7 +41,7 @@ class CDXLPhysicalTableScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 public:
 	CDXLPhysicalTableScan(CDXLPhysicalTableScan &) = delete;
@@ -49,13 +49,14 @@ public:
 	// ctors
 	explicit CDXLPhysicalTableScan(CMemoryPool *mp);
 
-	CDXLPhysicalTableScan(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLPhysicalTableScan(CMemoryPool *mp,
+						  gpos::Ref<CDXLTableDescr> table_descr);
 
 	// dtor
 	~CDXLPhysicalTableScan() override;
 
 	// setters
-	void SetTableDescriptor(CDXLTableDescr *);
+	void SetTableDescriptor(gpos::Ref<CDXLTableDescr>);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;
@@ -64,27 +65,27 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// table descriptor
-	const CDXLTableDescr *GetDXLTableDescr();
+	const gpos::Ref<CDXLTableDescr> GetDXLTableDescr();
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalTableScan *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalTableScan>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalTableScan == dxl_op->GetDXLOperator() ||
 					EdxlopPhysicalForeignScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalTableScan *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalTableScan> >(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

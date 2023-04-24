@@ -59,7 +59,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -71,7 +71,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -90,19 +90,20 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInnerJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalInnerJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalInnerJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalInnerJoin> >(pop);
 	}
 
 	// determine if an innerJoin group expression has
 	// less conjuncts than another
-	static BOOL FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
-						   CGroupExpression *pgexprSnd);
+	static BOOL FFewerConj(CMemoryPool *mp,
+						   gpos::Ref<CGroupExpression> pgexprFst,
+						   gpos::Ref<CGroupExpression> pgexprSnd);
 
 
 };	// class CLogicalInnerJoin

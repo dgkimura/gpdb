@@ -38,8 +38,8 @@ CDXLPhysicalForeignScan::CDXLPhysicalForeignScan(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalForeignScan::CDXLPhysicalForeignScan(CMemoryPool *mp,
-												 CDXLTableDescr *table_descr)
+CDXLPhysicalForeignScan::CDXLPhysicalForeignScan(
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLPhysicalTableScan(mp, table_descr)
 {
 }

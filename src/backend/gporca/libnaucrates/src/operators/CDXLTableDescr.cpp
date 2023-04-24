@@ -30,8 +30,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   ULONG ulExecuteAsUser, int lockmode,
+CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							   CMDName *mdname, ULONG ulExecuteAsUser,
+							   int lockmode,
 							   ULONG assigned_query_id_for_target_rel)
 	: m_mdid(mdid),
 	  m_mdname(mdname),
@@ -69,7 +70,7 @@ CDXLTableDescr::~CDXLTableDescr()
 //		Return the metadata id for the table
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLTableDescr::MDId() const
 {
 	return m_mdid;
@@ -149,7 +150,7 @@ CDXLTableDescr::SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array)
 //
 //---------------------------------------------------------------------------
 void
-CDXLTableDescr::AddColumnDescr(CDXLColDescr *column_descr_dxl)
+CDXLTableDescr::AddColumnDescr(gpos::Ref<CDXLColDescr> column_descr_dxl)
 {
 	GPOS_ASSERT(nullptr != m_dxl_column_descr_array);
 	GPOS_ASSERT(nullptr != column_descr_dxl);
@@ -164,7 +165,7 @@ CDXLTableDescr::AddColumnDescr(CDXLColDescr *column_descr_dxl)
 //		Get the column descriptor at the specified position from the col descr list
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
+const gpos::Ref<CDXLColDescr>
 CDXLTableDescr::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx < Arity());
@@ -236,7 +237,7 @@ CDXLTableDescr::SerializeToDXL(CXMLSerializer *xml_serializer) const
 	const ULONG arity = Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_dxl_column_descr_array)[ul];
+		gpos::Ref<CDXLColDescr> pdxlcd = (*m_dxl_column_descr_array)[ul];
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 

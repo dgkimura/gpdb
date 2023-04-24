@@ -42,7 +42,7 @@ CLogicalSequence::CLogicalSequence(CMemoryPool *mp) : CLogical(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequence::Matches(COperator *pop) const
+CLogicalSequence::Matches(gpos::Ref<COperator> pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -72,14 +72,15 @@ CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(1 <= exprhdl.Arity());
 
 	// get output columns of last child
-	CColRefSet *pcrs = exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
+	gpos::Ref<CColRefSet> pcrs =
+		exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
 	pcrs->AddRef();
 
 	return pcrs;
@@ -95,7 +96,7 @@ CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalSequence::DeriveKeyCollection(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl) const
 {
@@ -129,7 +130,7 @@ CLogicalSequence::DeriveMaxCard(CMemoryPool *,	// mp
 //		Derive part consumers
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CLogicalSequence::DerivePartitionInfo(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {

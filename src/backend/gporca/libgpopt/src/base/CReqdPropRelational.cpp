@@ -43,7 +43,8 @@ CReqdPropRelational::CReqdPropRelational()
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational::CReqdPropRelational(CColRefSet *pcrs) : m_pcrsStat(pcrs)
+CReqdPropRelational::CReqdPropRelational(gpos::Ref<CColRefSet> pcrs)
+	: m_pcrsStat(pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 }
@@ -71,16 +72,16 @@ CReqdPropRelational::~CReqdPropRelational()
 //---------------------------------------------------------------------------
 void
 CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CReqdProp *prpInput, ULONG child_index,
+							 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 )
 {
 	GPOS_CHECK_ABORT;
 
-	CReqdPropRelational *prprelInput =
+	gpos::Ref<CReqdPropRelational> prprelInput =
 		CReqdPropRelational::GetReqdRelationalProps(prpInput);
-	CLogical *popLogical = CLogical::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogical> popLogical = CLogical::PopConvert(exprhdl.Pop());
 
 	m_pcrsStat =
 		popLogical->PcrsStat(mp, exprhdl, prprelInput->PcrsStat(), child_index);
@@ -95,10 +96,10 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
-CReqdPropRelational::GetReqdRelationalProps(CReqdProp *prp)
+gpos::Ref<CReqdPropRelational>
+CReqdPropRelational::GetReqdRelationalProps(gpos::Ref<CReqdProp> prp)
 {
-	return dynamic_cast<CReqdPropRelational *>(prp);
+	return dynamic_cast<gpos::Ref<CReqdPropRelational> >(prp);
 }
 
 
@@ -110,13 +111,13 @@ CReqdPropRelational::GetReqdRelationalProps(CReqdProp *prp)
 //		Return difference from given properties
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
+gpos::Ref<CReqdPropRelational>
 CReqdPropRelational::PrprelDifference(CMemoryPool *mp,
-									  CReqdPropRelational *prprel)
+									  gpos::Ref<CReqdPropRelational> prprel)
 {
 	GPOS_ASSERT(nullptr != prprel);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Union(m_pcrsStat);
 	pcrs->Difference(prprel->PcrsStat());
 

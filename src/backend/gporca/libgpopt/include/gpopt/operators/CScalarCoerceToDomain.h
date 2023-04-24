@@ -44,8 +44,9 @@ public:
 	CScalarCoerceToDomain(const CScalarCoerceToDomain &) = delete;
 
 	// ctor
-	CScalarCoerceToDomain(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						  ECoercionForm dxl_coerce_format, INT location);
+	CScalarCoerceToDomain(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						  INT type_modifier, ECoercionForm dxl_coerce_format,
+						  INT location);
 
 	// dtor
 	~CScalarCoerceToDomain() override = default;
@@ -64,7 +65,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -77,13 +78,13 @@ public:
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static CScalarCoerceToDomain *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarCoerceToDomain>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCoerceToDomain == pop->Eopid());
 
-		return dynamic_cast<CScalarCoerceToDomain *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarCoerceToDomain> >(pop);
 	}
 
 };	// class CScalarCoerceToDomain

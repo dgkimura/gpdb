@@ -29,8 +29,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   IConstExprEvaluator *pceeval,
-						   COptimizerConfig *optimizer_config)
+						   gpos::Ref<IConstExprEvaluator> pceeval,
+						   gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	if (nullptr == optimizer_config)
 	{
@@ -43,7 +43,7 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt =
+	gpos::Ref<COptCtxt> poctxt =
 		COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
 	ITask::Self()->GetTls().Store(poctxt);
 }
@@ -58,12 +58,13 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   IConstExprEvaluator *pceeval, ICostModel *pcm)
+						   gpos::Ref<IConstExprEvaluator> pceeval,
+						   gpos::Ref<ICostModel> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 
 	// create default statistics configuration
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptimizerConfig::PoconfDefault(mp, pcm);
 
 	if (nullptr == pceeval)
@@ -72,7 +73,7 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt =
+	gpos::Ref<COptCtxt> poctxt =
 		COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
 	ITask::Self()->GetTls().Store(poctxt);
 }
@@ -88,7 +89,7 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 CAutoOptCtxt::~CAutoOptCtxt()
 {
-	CTaskLocalStorageObject *ptlsobj =
+	gpos::Ref<CTaskLocalStorageObject> ptlsobj =
 		ITask::Self()->GetTls().Get(CTaskLocalStorage::EtlsidxOptCtxt);
 	ITask::Self()->GetTls().Remove(ptlsobj);
 

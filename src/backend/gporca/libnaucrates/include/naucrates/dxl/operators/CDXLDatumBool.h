@@ -47,7 +47,8 @@ public:
 	CDXLDatumBool(const CDXLDatumBool &) = delete;
 
 	// ctor
-	CDXLDatumBool(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null, BOOL value);
+	CDXLDatumBool(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, BOOL is_null,
+				  BOOL value);
 
 	// dtor
 	~CDXLDatumBool() override = default;
@@ -70,14 +71,14 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumBool *
-	Cast(CDXLDatum *dxl_datum)
+	static gpos::Ref<CDXLDatumBool>
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::CDXLDatum::EdxldatumBool ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumBool *>(dxl_datum);
+		return dynamic_cast<gpos::Ref<CDXLDatumBool> >(dxl_datum);
 	}
 };
 }  // namespace gpdxl

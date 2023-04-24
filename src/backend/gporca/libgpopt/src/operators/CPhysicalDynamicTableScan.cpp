@@ -34,9 +34,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
+	IMdIdArray *partition_mdids,
 	ColRefToUlongMapArray *root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
 						   pdrgpcrOutput, pdrgpdrgpcrParts, partition_mdids,
@@ -53,7 +54,7 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicTableScan::Matches(COperator *pop) const
+CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicScan(this, pop);
 }
@@ -66,10 +67,10 @@ CPhysicalDynamicTableScan::Matches(COperator *pop) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
+										gpos::Ref<CReqdPropPlan> prpplan,
 										IStatisticsArray *	// stats_ctxt
 ) const
 {
@@ -80,11 +81,12 @@ CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
 }
 
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalDynamicTableScan::PppsDerive(CMemoryPool *mp,
 									  CExpressionHandle &) const
 {
-	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
+	gpos::Ref<CPartitionPropagationSpec> pps =
+		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps->Insert(ScanId(), CPartitionPropagationSpec::EpptConsumer,
 				Ptabdesc()->MDId(), nullptr, nullptr);
 

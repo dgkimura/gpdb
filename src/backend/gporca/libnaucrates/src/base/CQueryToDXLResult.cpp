@@ -24,7 +24,7 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CQueryToDXLResult::CQueryToDXLResult(CDXLNode *query,
+CQueryToDXLResult::CQueryToDXLResult(gpos::Ref<CDXLNode> query,
 									 CDXLNodeArray *query_output,
 									 CDXLNodeArray *cte_producers)
 	: m_query_dxl(query),
@@ -85,7 +85,7 @@ CQueryToDXLResult::GetCTEProducerDXLArray() const
 //		Return the DXL node representing the query
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+const gpos::Ref<CDXLNode>
 CQueryToDXLResult::CreateDXLNode() const
 {
 	return m_query_dxl;

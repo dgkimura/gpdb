@@ -98,8 +98,8 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 	{
 		GPOS_CHECK_ABORT;
 
-		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul];
-		IMDId *mdid_key = mdcache_obj->MDId();
+		gpos::Ref<IMDCacheObject> mdcache_obj = (*mdcache_obj_array)[ul];
+		gpos::Ref<IMDId> mdid_key = mdcache_obj->MDId();
 		mdid_key->AddRef();
 		CAutoRef<IMDId> mdid_key_autoref;
 		mdid_key_autoref = mdid_key;
@@ -147,7 +147,7 @@ CMDProviderMemory::~CMDProviderMemory()
 CWStringBase *
 CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 								  CMDAccessor *,  //md_accessor
-								  IMDId *mdid) const
+								  gpos::Ref<IMDId> mdid) const
 {
 	GPOS_ASSERT(nullptr != m_mdmap);
 
@@ -230,7 +230,7 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 //		The caller takes ownership over the object.
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 						IMDType::ETypeInfo type_info) const
 {
@@ -238,17 +238,19 @@ CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 }
 
 // return the requested metadata object
-IMDCacheObject *
+gpos::Ref<IMDCacheObject>
 CMDProviderMemory::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							IMDId *mdid, IMDCacheObject::Emdtype) const
+							gpos::Ref<IMDId> mdid,
+							IMDCacheObject::Emdtype) const
 {
 	CAutoP<CWStringBase> a_pstr;
 	a_pstr = GetMDObjDXLStr(mp, md_accessor, mdid);
 
 	GPOS_ASSERT(nullptr != a_pstr.Value());
 
-	IMDCacheObject *pmdobjNew = gpdxl::CDXLUtils::ParseDXLToIMDIdCacheObj(
-		mp, a_pstr.Value(), nullptr /* XSD path */);
+	gpos::Ref<IMDCacheObject> pmdobjNew =
+		gpdxl::CDXLUtils::ParseDXLToIMDIdCacheObj(mp, a_pstr.Value(),
+												  nullptr /* XSD path */);
 	GPOS_ASSERT(nullptr != pmdobjNew);
 
 	return pmdobjNew;

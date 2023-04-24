@@ -123,7 +123,7 @@ public:
 	virtual ULONG SystemColumnsCount() const = 0;
 
 	// retrieve the column at the given position
-	virtual const IMDColumn *GetMdCol(ULONG pos) const = 0;
+	virtual const gpos::Ref<IMDColumn> GetMdCol(ULONG pos) const = 0;
 
 	// number of key sets
 	virtual ULONG KeySetCount() const = 0;
@@ -135,9 +135,9 @@ public:
 	virtual ULONG DistrColumnCount() const = 0;
 
 	// retrieve the column at the given position in the distribution key for the relation
-	virtual const IMDColumn *GetDistrColAt(ULONG pos) const = 0;
+	virtual const gpos::Ref<IMDColumn> GetDistrColAt(ULONG pos) const = 0;
 
-	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const = 0;
 
 	// return true if a hash distributed table needs to be considered as random
 	virtual BOOL ConvertHashToRandom() const = 0;
@@ -149,7 +149,7 @@ public:
 	virtual ULONG PartColumnCount() const = 0;
 
 	// retrieve the partition column at the given position
-	virtual const IMDColumn *PartColAt(ULONG pos) const = 0;
+	virtual const gpos::Ref<IMDColumn> PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
 	virtual CharPtrArray *GetPartitionTypes() const = 0;
@@ -161,16 +161,16 @@ public:
 	virtual ULONG IndexCount() const = 0;
 
 	// retrieve the id of the metadata cache index at the given position
-	virtual IMDId *IndexMDidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> IndexMDidAt(ULONG pos) const = 0;
 
 	// number of check constraints
 	virtual ULONG CheckConstraintCount() const = 0;
 
 	// retrieve the id of the check constraint cache at the given position
-	virtual IMDId *CheckConstraintMDidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
-	virtual CDXLNode *MDPartConstraint() const = 0;
+	virtual gpos::Ref<CDXLNode> MDPartConstraint() const = 0;
 
 	// child partition oids
 	virtual IMdIdArray *
@@ -196,7 +196,7 @@ public:
 	}
 
 	// get oid of foreign server for foreign table
-	virtual IMDId *ForeignServer() const = 0;
+	virtual gpos::Ref<IMDId> ForeignServer() const = 0;
 };
 
 // common structure over relation and external relation metadata for index info

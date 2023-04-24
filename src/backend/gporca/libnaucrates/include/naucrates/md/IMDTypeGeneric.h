@@ -49,8 +49,8 @@ public:
 		return IMDTypeGeneric::GetTypeInfo();
 	}
 
-	virtual IDatum *CreateGenericNullDatum(CMemoryPool *mp,
-										   INT type_modifier) const = 0;
+	virtual gpos::Ref<IDatum> CreateGenericNullDatum(
+		CMemoryPool *mp, INT type_modifier) const = 0;
 };
 }  // namespace gpmd
 

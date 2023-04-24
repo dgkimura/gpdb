@@ -68,15 +68,15 @@ CXformSelect2DynamicBitmapBoolOp::Exfp(CExpressionHandle &) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
-											CXformResult *pxfres,
-											CExpression *pexpr) const
+CXformSelect2DynamicBitmapBoolOp::Transform(gpos::Ref<CXformContext> pxfctxt,
+											gpos::Ref<CXformResult> pxfres,
+											gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicGet *popGet =
+	gpos::Ref<CLogicalDynamicGet> popGet =
 		CLogicalDynamicGet::PopConvert((*pexpr)[0]->Pop());
 	// Do not run if contains foreign partitions, instead run CXformExpandDynamicGetWithForeignPartitions
 	if (popGet->ContainsForeignParts())
@@ -84,12 +84,13 @@ CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
 		return;
 	}
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *pexprResult = CXformUtils::PexprSelect2BitmapBoolOp(mp, pexpr);
+	gpos::Ref<CExpression> pexprResult =
+		CXformUtils::PexprSelect2BitmapBoolOp(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{
 		// create a redundant SELECT on top of DynamicIndexGet to be able to use predicate in partition elimination
-		CExpression *pexprRedundantSelect =
+		gpos::Ref<CExpression> pexprRedundantSelect =
 			CXformUtils::PexprRedundantSelectForDynamicIndex(mp, pexprResult);
 		pexprResult->Release();
 

@@ -36,7 +36,7 @@ class CParseHandlerScalarSwitch : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// was the arg child seen
 	BOOL m_arg_processed;

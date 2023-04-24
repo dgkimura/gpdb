@@ -36,7 +36,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CMappingElementColIdParamId::CMappingElementColIdParamId(ULONG colid,
 														 ULONG paramid,
-														 IMDId *mdid,
+														 gpos::Ref<IMDId> mdid,
 														 INT type_modifier)
 	: m_colid(colid),
 	  m_paramid(paramid),

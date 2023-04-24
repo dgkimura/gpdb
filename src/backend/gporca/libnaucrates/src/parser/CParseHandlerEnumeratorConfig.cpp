@@ -146,7 +146,7 @@ CParseHandlerEnumeratorConfig::GetParseHandlerType() const
 //		Returns the enumerator configuration
 //
 //---------------------------------------------------------------------------
-CEnumeratorConfig *
+gpos::Ref<CEnumeratorConfig>
 CParseHandlerEnumeratorConfig::GetEnumeratorCfg() const
 {
 	return m_enumerator_cfg;

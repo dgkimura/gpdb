@@ -32,9 +32,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicForeignScan::CPhysicalDynamicForeignScan(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
+	IMdIdArray *partition_mdids,
 	ColRefToUlongMapArray *root_col_mapping_per_part, OID foreign_server_oid,
 	BOOL is_coordinator_only)
 
@@ -68,14 +69,14 @@ CPhysicalDynamicForeignScan::CPhysicalDynamicForeignScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicForeignScan::Matches(COperator *pop) const
+CPhysicalDynamicForeignScan::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalDynamicForeignScan *popForeignScan =
+	gpos::Ref<CPhysicalDynamicForeignScan> popForeignScan =
 		CPhysicalDynamicForeignScan::PopConvert(pop);
 	return CUtils::FMatchDynamicScan(this, pop) &&
 		   m_foreign_server_oid == popForeignScan->GetForeignServerOid();
@@ -91,9 +92,10 @@ CPhysicalDynamicForeignScan::Matches(COperator *pop) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalDynamicForeignScan::EpetRewindability(
-	CExpressionHandle &exprhdl, const CEnfdRewindability *per) const
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdRewindability> per) const
 {
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::Ref<CRewindabilitySpec> prs =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		return CEnfdProp::EpetUnnecessary;
@@ -110,10 +112,10 @@ CPhysicalDynamicForeignScan::EpetRewindability(
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CPhysicalDynamicForeignScan::PstatsDerive(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl,
-										  CReqdPropPlan *prpplan,
+										  gpos::Ref<CReqdPropPlan> prpplan,
 										  IStatisticsArray *  // stats_ctxt
 ) const
 {
@@ -123,11 +125,12 @@ CPhysicalDynamicForeignScan::PstatsDerive(CMemoryPool *mp,
 		mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalDynamicForeignScan::PppsDerive(CMemoryPool *mp,
 										CExpressionHandle &) const
 {
-	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
+	gpos::Ref<CPartitionPropagationSpec> pps =
+		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps->Insert(ScanId(), CPartitionPropagationSpec::EpptConsumer,
 				Ptabdesc()->MDId(), nullptr, nullptr);
 

@@ -48,8 +48,8 @@ public:
 	}
 
 	// factory function for OID datums
-	virtual IDatumOid *CreateOidDatum(CMemoryPool *mp, OID oid_value,
-									  BOOL is_null) const = 0;
+	virtual gpos::Ref<IDatumOid> CreateOidDatum(CMemoryPool *mp, OID oid_value,
+												BOOL is_null) const = 0;
 };
 }  // namespace gpmd
 

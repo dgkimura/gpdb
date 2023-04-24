@@ -36,7 +36,7 @@ const CHAR CScalarArrayCmp::m_rgszCmpType[EarrcmpSentinel][10] = {"Any", "All"};
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
+CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 								 const CWStringConst *pstrOp,
 								 EArrCmpType earrcmpt)
 	: CScalar(mp),
@@ -77,7 +77,7 @@ CScalarArrayCmp::Pstr() const
 //		Comparison operator mdid
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCmp::MdIdOp() const
 {
 	return m_mdid_op;
@@ -110,11 +110,11 @@ CScalarArrayCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCmp::Matches(COperator *pop) const
+CScalarArrayCmp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarArrayCmp *popCmp = CScalarArrayCmp::PopConvert(pop);
+		gpos::Ref<CScalarArrayCmp> popCmp = CScalarArrayCmp::PopConvert(pop);
 
 		// match if operator oid are identical
 		return m_earrccmpt == popCmp->Earrcmpt() &&
@@ -132,7 +132,7 @@ CScalarArrayCmp::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCmp::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -187,19 +187,21 @@ CScalarArrayCmp::OsPrint(IOstream &os) const
 //		expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
+gpos::Ref<CExpression>
+CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
+							 gpos::Ref<CExpression> pexprArrayCmp)
 {
 	GPOS_ASSERT(nullptr != pexprArrayCmp);
 	GPOS_ASSERT(EopScalarArrayCmp == pexprArrayCmp->Pop()->Eopid());
 
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG array_expansion_threshold =
 		optimizer_config->GetHint()->UlArrayExpansionThreshold();
-	CExpression *pexprIdent = (*pexprArrayCmp)[0];
-	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexprArrayCmp);
-	CScalarArrayCmp *popArrayCmp =
+	gpos::Ref<CExpression> pexprIdent = (*pexprArrayCmp)[0];
+	gpos::Ref<CExpression> pexprArray =
+		CUtils::PexprScalarArrayChild(pexprArrayCmp);
+	gpos::Ref<CScalarArrayCmp> popArrayCmp =
 		CScalarArrayCmp::PopConvert(pexprArrayCmp->Pop());
 	ULONG ulArrayElems = 0;
 
@@ -220,16 +222,16 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulArrayElems; ul++)
 	{
-		CExpression *pexprArrayElem =
+		gpos::Ref<CExpression> pexprArrayElem =
 			CUtils::PScalarArrayExprChildAt(mp, pexprArray, ul);
 		pexprIdent->AddRef();
 		const CWStringConst *str_opname = popArrayCmp->Pstr();
-		IMDId *mdid_op = popArrayCmp->MdIdOp();
+		gpos::Ref<IMDId> mdid_op = popArrayCmp->MdIdOp();
 		GPOS_ASSERT(IMDId::IsValid(mdid_op));
 
 		mdid_op->AddRef();
 
-		CExpression *pexprCmp = CUtils::PexprScalarCmp(
+		gpos::Ref<CExpression> pexprCmp = CUtils::PexprScalarCmp(
 			mp, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
 		pdrgpexpr->Append(pexprCmp);
 	}

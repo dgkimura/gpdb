@@ -32,9 +32,9 @@ FORCE_GENERATE_DBGSTR(CRange);
 //		Does not take ownership of 'pcomp'.
 //
 //---------------------------------------------------------------------------
-CRange::CRange(IMDId *mdid, const IComparator *pcomp, IDatum *pdatumLeft,
-			   ERangeInclusion eriLeft, IDatum *pdatumRight,
-			   ERangeInclusion eriRight)
+CRange::CRange(gpos::Ref<IMDId> mdid, const IComparator *pcomp,
+			   gpos::Ref<IDatum> pdatumLeft, ERangeInclusion eriLeft,
+			   gpos::Ref<IDatum> pdatumRight, ERangeInclusion eriRight)
 	: m_mdid(mdid),
 	  m_pcomp(pcomp),
 	  m_pdatumLeft(pdatumLeft),
@@ -59,7 +59,7 @@ CRange::CRange(IMDId *mdid, const IComparator *pcomp, IDatum *pdatumLeft,
 //
 //---------------------------------------------------------------------------
 CRange::CRange(const IComparator *pcomp, IMDType::ECmpType cmp_type,
-			   IDatum *datum)
+			   gpos::Ref<IDatum> datum)
 	: m_mdid(nullptr),
 	  m_pcomp(pcomp),
 	  m_pdatumLeft(nullptr),
@@ -142,11 +142,11 @@ CRange::~CRange()
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FDisjointLeft(CRange *prange)
+CRange::FDisjointLeft(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
-	IDatum *pdatumLeft = prange->PdatumLeft();
+	gpos::Ref<IDatum> pdatumLeft = prange->PdatumLeft();
 
 	if (nullptr == m_pdatumRight || nullptr == pdatumLeft)
 	{
@@ -175,7 +175,7 @@ CRange::FDisjointLeft(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::Contains(CRange *prange)
+CRange::Contains(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
@@ -191,7 +191,7 @@ CRange::Contains(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FOverlapsLeft(CRange *prange)
+CRange::FOverlapsLeft(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
@@ -208,7 +208,7 @@ CRange::FOverlapsLeft(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FOverlapsRight(CRange *prange)
+CRange::FOverlapsRight(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
@@ -229,11 +229,11 @@ CRange::FOverlapsRight(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FUpperBoundEqualsLowerBound(CRange *prange)
+CRange::FUpperBoundEqualsLowerBound(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
-	IDatum *pdatumLeft = prange->PdatumLeft();
+	gpos::Ref<IDatum> pdatumLeft = prange->PdatumLeft();
 
 	if (nullptr == pdatumLeft && nullptr == m_pdatumRight)
 	{
@@ -257,14 +257,14 @@ CRange::FUpperBoundEqualsLowerBound(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FStartsWithOrBefore(CRange *prange)
+CRange::FStartsWithOrBefore(gpos::Ref<CRange> prange)
 {
 	if (FStartsBefore(prange))
 	{
 		return true;
 	}
 
-	IDatum *pdatumLeft = prange->PdatumLeft();
+	gpos::Ref<IDatum> pdatumLeft = prange->PdatumLeft();
 	if (nullptr == pdatumLeft && nullptr == m_pdatumLeft)
 	{
 		return true;
@@ -288,11 +288,11 @@ CRange::FStartsWithOrBefore(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FStartsBefore(CRange *prange)
+CRange::FStartsBefore(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
-	IDatum *pdatumLeft = prange->PdatumLeft();
+	gpos::Ref<IDatum> pdatumLeft = prange->PdatumLeft();
 	if (nullptr == pdatumLeft)
 	{
 		return (nullptr == m_pdatumLeft);
@@ -323,11 +323,11 @@ CRange::FStartsBefore(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FEndsAfter(CRange *prange)
+CRange::FEndsAfter(gpos::Ref<CRange> prange)
 {
 	GPOS_ASSERT(nullptr != prange);
 
-	IDatum *pdatumRight = prange->PdatumRight();
+	gpos::Ref<IDatum> pdatumRight = prange->PdatumRight();
 	if (nullptr == pdatumRight)
 	{
 		return (nullptr == m_pdatumRight);
@@ -358,14 +358,14 @@ CRange::FEndsAfter(CRange *prange)
 //
 //---------------------------------------------------------------------------
 BOOL
-CRange::FEndsWithOrAfter(CRange *prange)
+CRange::FEndsWithOrAfter(gpos::Ref<CRange> prange)
 {
 	if (FEndsAfter(prange))
 	{
 		return true;
 	}
 
-	IDatum *pdatumRight = prange->PdatumRight();
+	gpos::Ref<IDatum> pdatumRight = prange->PdatumRight();
 	if (nullptr == pdatumRight && nullptr == m_pdatumRight)
 	{
 		return true;
@@ -403,20 +403,20 @@ CRange::FPoint() const
 //		Construct scalar comparison expression using given column
 //
 //---------------------------------------------------------------------------
-CExpression *
-CRange::PexprScalar(CMemoryPool *mp, const CColRef *colref)
+gpos::Ref<CExpression>
+CRange::PexprScalar(CMemoryPool *mp, const gpos::Ref<CColRef> colref)
 {
-	CExpression *pexprEq = PexprEquality(mp, colref);
+	gpos::Ref<CExpression> pexprEq = PexprEquality(mp, colref);
 	if (nullptr != pexprEq)
 	{
 		return pexprEq;
 	}
 
-	CExpression *pexprLeft =
+	gpos::Ref<CExpression> pexprLeft =
 		PexprScalarCompEnd(mp, m_pdatumLeft, m_eriLeft, IMDType::EcmptGEq,
 						   IMDType::EcmptG, colref);
 
-	CExpression *pexprRight =
+	gpos::Ref<CExpression> pexprRight =
 		PexprScalarCompEnd(mp, m_pdatumRight, m_eriRight, IMDType::EcmptLEq,
 						   IMDType::EcmptL, colref);
 
@@ -443,8 +443,8 @@ CRange::PexprScalar(CMemoryPool *mp, const CColRef *colref)
 //		Construct an equality predicate if possible
 //
 //---------------------------------------------------------------------------
-CExpression *
-CRange::PexprEquality(CMemoryPool *mp, const CColRef *colref)
+gpos::Ref<CExpression>
+CRange::PexprEquality(CMemoryPool *mp, const gpos::Ref<CColRef> colref)
 {
 	if (nullptr == m_pdatumLeft || nullptr == m_pdatumRight ||
 		!m_pcomp->Equals(m_pdatumLeft, m_pdatumRight) ||
@@ -455,7 +455,7 @@ CRange::PexprEquality(CMemoryPool *mp, const CColRef *colref)
 	}
 
 	m_pdatumLeft->AddRef();
-	CExpression *pexprVal = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprVal = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, m_pdatumLeft));
 
 	return CUtils::PexprScalarCmp(mp, colref, pexprVal, IMDType::EcmptEq);
@@ -469,10 +469,11 @@ CRange::PexprEquality(CMemoryPool *mp, const CColRef *colref)
 //		Construct a scalar comparison expression from one of the ends
 //
 //---------------------------------------------------------------------------
-CExpression *
-CRange::PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
-						   IMDType::ECmpType ecmptIncl,
-						   IMDType::ECmpType ecmptExcl, const CColRef *colref)
+gpos::Ref<CExpression>
+CRange::PexprScalarCompEnd(CMemoryPool *mp, gpos::Ref<IDatum> datum,
+						   ERangeInclusion eri, IMDType::ECmpType ecmptIncl,
+						   IMDType::ECmpType ecmptExcl,
+						   const gpos::Ref<CColRef> colref)
 {
 	if (nullptr == datum)
 	{
@@ -481,7 +482,7 @@ CRange::PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
 	}
 
 	datum->AddRef();
-	CExpression *pexprVal =
+	gpos::Ref<CExpression> pexprVal =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
 	IMDType::ECmpType cmp_type;
@@ -505,8 +506,8 @@ CRange::PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
 //		Intersection with another range
 //
 //---------------------------------------------------------------------------
-CRange *
-CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
+gpos::Ref<CRange>
+CRange::PrngIntersect(CMemoryPool *mp, gpos::Ref<CRange> prange)
 {
 	if (Contains(prange))
 	{
@@ -524,7 +525,7 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 	{
 		m_mdid->AddRef();
 
-		IDatum *pdatumLeft = prange->PdatumLeft();
+		gpos::Ref<IDatum> pdatumLeft = prange->PdatumLeft();
 		pdatumLeft->AddRef();
 		m_pdatumRight->AddRef();
 
@@ -537,7 +538,7 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 	{
 		m_mdid->AddRef();
 
-		IDatum *pdatumRight = prange->PdatumRight();
+		gpos::Ref<IDatum> pdatumRight = prange->PdatumRight();
 		pdatumRight->AddRef();
 		m_pdatumLeft->AddRef();
 
@@ -559,8 +560,8 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 //		prange         |-----------|
 //		result  |------|
 //---------------------------------------------------------------------------
-CRange *
-CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
+gpos::Ref<CRange>
+CRange::PrngDifferenceLeft(CMemoryPool *mp, gpos::Ref<CRange> prange)
 {
 	if (FDisjointLeft(prange))
 	{
@@ -577,7 +578,7 @@ CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
 			m_pdatumLeft->AddRef();
 		}
 
-		IDatum *pdatumRight = prange->PdatumLeft();
+		gpos::Ref<IDatum> pdatumRight = prange->PdatumLeft();
 		pdatumRight->AddRef();
 
 		return GPOS_NEW(mp)
@@ -599,8 +600,8 @@ CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
 //		prange      |-----------|
 //		result                  |------|
 //---------------------------------------------------------------------------
-CRange *
-CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
+gpos::Ref<CRange>
+CRange::PrngDifferenceRight(CMemoryPool *mp, gpos::Ref<CRange> prange)
 {
 	if (prange->FDisjointLeft(this))
 	{
@@ -617,7 +618,7 @@ CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
 			m_pdatumRight->AddRef();
 		}
 
-		IDatum *pdatumRight = prange->PdatumRight();
+		gpos::Ref<IDatum> pdatumRight = prange->PdatumRight();
 		pdatumRight->AddRef();
 
 		return GPOS_NEW(mp) CRange(m_mdid, m_pcomp, pdatumRight,
@@ -637,8 +638,8 @@ CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
 //		must start right after this range, otherwise NULL is returned
 //
 //---------------------------------------------------------------------------
-CRange *
-CRange::PrngExtend(CMemoryPool *mp, CRange *prange)
+gpos::Ref<CRange>
+CRange::PrngExtend(CMemoryPool *mp, gpos::Ref<CRange> prange)
 {
 	if ((EriIncluded == prange->EriLeft() || EriIncluded == m_eriRight) &&
 		(m_pcomp->Equals(prange->PdatumLeft(), m_pdatumRight)))
@@ -651,7 +652,7 @@ CRange::PrngExtend(CMemoryPool *mp, CRange *prange)
 			m_pdatumLeft->AddRef();
 		}
 
-		IDatum *pdatumRight = prange->PdatumRight();
+		gpos::Ref<IDatum> pdatumRight = prange->PdatumRight();
 		if (nullptr != pdatumRight)
 		{
 			pdatumRight->AddRef();
@@ -709,7 +710,8 @@ CRange::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 IOstream &
-CRange::OsPrintBound(IOstream &os, IDatum *datum, const CHAR *szInfinity)
+CRange::OsPrintBound(IOstream &os, gpos::Ref<IDatum> datum,
+					 const CHAR *szInfinity)
 {
 	if (nullptr == datum)
 	{

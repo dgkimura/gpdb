@@ -31,7 +31,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_type,
 									   INT type_modifier, ECoercionForm ecf,
 									   INT location)
 	: CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location)
@@ -48,11 +49,12 @@ CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceViaIO::Matches(COperator *pop) const
+CScalarCoerceViaIO::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceViaIO *popCoerce = CScalarCoerceViaIO::PopConvert(pop);
+		gpos::Ref<CScalarCoerceViaIO> popCoerce =
+			CScalarCoerceViaIO::PopConvert(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&
 			   popCoerce->TypeModifier() == TypeModifier() &&

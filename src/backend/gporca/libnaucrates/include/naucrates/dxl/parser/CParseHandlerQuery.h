@@ -35,7 +35,7 @@ class CParseHandlerQuery : public CParseHandlerBase
 {
 private:
 	// the root of the parsed DXL tree constructed by the parse handler
-	CDXLNode *m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 	// list of output columns (represented as scalar ident nodes)
 	CDXLNodeArray *m_output_colums_dxl_array;
@@ -69,7 +69,7 @@ public:
 	~CParseHandlerQuery() override;
 
 	// returns the root of constructed DXL plan
-	CDXLNode *CreateDXLNode() const;
+	gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// returns the dxl representation of the query output
 	CDXLNodeArray *GetOutputColumnsDXLArray() const;

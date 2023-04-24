@@ -96,7 +96,7 @@ CParseHandlerLogicalConstTable::StartElement(
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
 
 		// translate the datum and add it to the datum array
-		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::Ref<CDXLDatum> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenScalarConstValue);
 		m_dxl_datum_array->Append(dxl_datum);
@@ -140,7 +140,7 @@ CParseHandlerLogicalConstTable::EndElement(
 			col_descr_parse_handler->GetDXLColumnDescrArray();
 		dxl_col_descr_array->AddRef();
 
-		CDXLLogicalConstTable *lg_const_table_get_dxl_op =
+		gpos::Ref<CDXLLogicalConstTable> lg_const_table_get_dxl_op =
 			GPOS_NEW(m_mp) CDXLLogicalConstTable(m_mp, dxl_col_descr_array,
 												 m_const_tuples_datum_array);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_const_table_get_dxl_op);

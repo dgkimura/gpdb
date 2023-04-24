@@ -135,11 +135,11 @@ CJobGroupOptimization::~CJobGroupOptimization() = default;
 //---------------------------------------------------------------------------
 void
 CJobGroupOptimization::Init(
-	CGroup *pgroup,
+	gpos::Ref<CGroup> pgroup,
 	CGroupExpression
 		*pgexprOrigin,	// group expression that triggered optimization job,
 						// NULL if this is the Root group
-	COptimizationContext *poc)
+	gpos::Ref<COptimizationContext> poc)
 {
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(pgroup == poc->Pgroup());
@@ -186,10 +186,10 @@ CJobGroupOptimization::Init(
 BOOL
 CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 {
-	CGroupExpression *pgexprLast = m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled;
 
 	// iterate on expressions and schedule them as needed
-	CGroupExpression *pgexpr = PgexprFirstUnsched();
+	gpos::Ref<CGroupExpression> pgexpr = PgexprFirstUnsched();
 	while (nullptr != pgexpr)
 	{
 		// we consider only group expressions matching current optimization level,
@@ -239,7 +239,7 @@ CJobGroupOptimization::EevtStartOptimization(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupOptimization *pjgo = PjConvert(pjOwner);
-	CGroup *pgroup = pjgo->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjgo->m_pgroup;
 	GPOS_ASSERT(COptimizationContext::estUnoptimized == pjgo->m_poc->Est() &&
 				"Group is already optimized under this context");
 
@@ -352,9 +352,11 @@ CJobGroupOptimization::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupOptimization::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-								   CGroupExpression *pgexprOrigin,
-								   COptimizationContext *poc, CJob *pjParent)
+CJobGroupOptimization::ScheduleJob(CSchedulerContext *psc,
+								   gpos::Ref<CGroup> pgroup,
+								   gpos::Ref<CGroupExpression> pgexprOrigin,
+								   gpos::Ref<COptimizationContext> poc,
+								   CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupOptimization);
 

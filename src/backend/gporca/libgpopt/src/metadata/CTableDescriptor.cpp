@@ -35,7 +35,7 @@ FORCE_GENERATE_DBGSTR(CTableDescriptor);
 //
 //---------------------------------------------------------------------------
 CTableDescriptor::CTableDescriptor(
-	CMemoryPool *mp, IMDId *mdid, const CName &name,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, const CName &name,
 	BOOL convert_hash_to_random, IMDRelation::Ereldistrpolicy rel_distr_policy,
 	IMDRelation::Erelstoragetype erelstoragetype, ULONG ulExecuteAsUser,
 	INT lockmode, ULONG assigned_query_id_for_target_rel)
@@ -115,7 +115,7 @@ CTableDescriptor::ColumnCount() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlPos(const CColumnDescriptor *pcoldesc,
+CTableDescriptor::UlPos(const gpos::Ref<CColumnDescriptor> pcoldesc,
 						const CColumnDescriptorArray *pdrgpcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
@@ -150,7 +150,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ul];
+		gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ul];
 		if (pcoldesc->AttrNum() == attno)
 		{
 			ulPos = ul;
@@ -170,7 +170,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 //
 //---------------------------------------------------------------------------
 void
-CTableDescriptor::AddColumn(CColumnDescriptor *pcoldesc)
+CTableDescriptor::AddColumn(gpos::Ref<CColumnDescriptor> pcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 
@@ -187,9 +187,9 @@ CTableDescriptor::AddColumn(CColumnDescriptor *pcoldesc)
 //
 //---------------------------------------------------------------------------
 void
-CTableDescriptor::AddDistributionColumn(ULONG ulPos, IMDId *opfamily)
+CTableDescriptor::AddDistributionColumn(ULONG ulPos, gpos::Ref<IMDId> opfamily)
 {
-	CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ulPos];
+	gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
 	pcoldesc->AddRef();
 	m_pdrgpcoldescDist->Append(pcoldesc);
 	pcoldesc->SetAsDistCol();
@@ -228,7 +228,7 @@ CTableDescriptor::AddPartitionColumn(ULONG ulPos)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTableDescriptor::FAddKeySet(CBitSet *pbs)
+CTableDescriptor::FAddKeySet(gpos::Ref<CBitSet> pbs)
 {
 	GPOS_ASSERT(nullptr != pbs);
 	GPOS_ASSERT(pbs->Size() <= m_pdrgpcoldesc->Size());
@@ -237,7 +237,7 @@ CTableDescriptor::FAddKeySet(CBitSet *pbs)
 	BOOL fFound = false;
 	for (ULONG ul = 0; !fFound && ul < size; ul++)
 	{
-		CBitSet *pbsCurrent = (*m_pdrgpbsKeys)[ul];
+		gpos::Ref<CBitSet> pbsCurrent = (*m_pdrgpbsKeys)[ul];
 		fFound = pbsCurrent->Equals(pbs);
 	}
 
@@ -257,7 +257,7 @@ CTableDescriptor::FAddKeySet(CBitSet *pbs)
 //		Get n-th column descriptor
 //
 //---------------------------------------------------------------------------
-const CColumnDescriptor *
+const gpos::Ref<CColumnDescriptor>
 CTableDescriptor::Pcoldesc(ULONG ulCol) const
 {
 	GPOS_ASSERT(ulCol < ColumnCount());
@@ -300,7 +300,7 @@ CTableDescriptor::IndexCount()
 	GPOS_ASSERT(nullptr != m_mdid);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid);
+	const gpos::Ref<IMDRelation> pmdrel = md_accessor->RetrieveRel(m_mdid);
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;

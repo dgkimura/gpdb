@@ -38,7 +38,7 @@ private:
 	ULONG m_colid;
 
 	// catalog Oid of the sorting operator
-	IMDId *m_mdid_sort_op;
+	gpos::Ref<IMDId> m_mdid_sort_op;
 
 	// name of sorting operator
 	CWStringConst *m_sort_op_name_str;
@@ -50,7 +50,7 @@ public:
 	CDXLScalarSortCol(CDXLScalarSortCol &) = delete;
 
 	// ctor/dtor
-	CDXLScalarSortCol(CMemoryPool *mp, ULONG colid, IMDId *sort_op_id,
+	CDXLScalarSortCol(CMemoryPool *mp, ULONG colid, gpos::Ref<IMDId> sort_op_id,
 					  CWStringConst *pstrTypeName, BOOL fSortNullsFirst);
 
 	~CDXLScalarSortCol() override;
@@ -65,22 +65,23 @@ public:
 	ULONG GetColId() const;
 
 	// mdid of the sorting operator
-	IMDId *GetMdIdSortOp() const;
+	gpos::Ref<IMDId> GetMdIdSortOp() const;
 
 	// whether nulls are sorted before other values
 	BOOL IsSortedNullsFirst() const;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						const gpos::Ref<CDXLNode>) const override;
 
 	// conversion function
-	static CDXLScalarSortCol *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarSortCol>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSortCol == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSortCol *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarSortCol> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -95,7 +96,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

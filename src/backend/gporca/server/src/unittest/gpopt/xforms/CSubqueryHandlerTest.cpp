@@ -87,11 +87,11 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	using Pfpexpr = CExpression *(*) (CMemoryPool *, BOOL);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *, BOOL);
 	Pfpexpr rgpf[] = {
 		CSubqueryTestUtils::PexprSelectWithAggSubquery,
 		CSubqueryTestUtils::PexprSelectWithAggSubqueryConstComparison,
@@ -141,7 +141,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate expression
-		CExpression *pexpr = rgpf[ulIndex](mp, fCorrelated);
+		gpos::Ref<CExpression> pexpr = rgpf[ulIndex](mp, fCorrelated);
 
 		// check for subq xforms
 		CXformSet *pxfsCand =
@@ -151,7 +151,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 		CXformSetIter xsi(*pxfsCand);
 		while (xsi.Advance())
 		{
-			CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+			gpos::Ref<CXform> pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 			GPOS_ASSERT(nullptr != pxform);
 
 			CWStringDynamic str(mp);
@@ -159,12 +159,12 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 
 			oss << std::endl << "INPUT:" << std::endl << *pexpr << std::endl;
 
-			CXformContext *pxfctxt = GPOS_NEW(mp) CXformContext(mp);
-			CXformResult *pxfres = GPOS_NEW(mp) CXformResult(mp);
+			gpos::Ref<CXformContext> pxfctxt = GPOS_NEW(mp) CXformContext(mp);
+			gpos::Ref<CXformResult> pxfres = GPOS_NEW(mp) CXformResult(mp);
 
 			// calling the xform to perform subquery to Apply transformation
 			pxform->Transform(pxfctxt, pxfres, pexpr);
-			CExpression *pexprResult = pxfres->PexprNext();
+			gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 
 			oss << std::endl << "OUTPUT:" << std::endl;
 			if (nullptr != pexprResult)
@@ -209,7 +209,7 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -220,35 +220,37 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 
 	// create a subquery with const table get expression
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::Ref<CExpression> pexprOuter = nullptr;
+	gpos::Ref<CExpression> pexprInner = nullptr;
 	CSubqueryTestUtils::GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
-	CExpression *pexpr = CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
-		mp, pexprOuter, pexprInner, true /*fCorrelated*/,
-		CScalarBoolOp::EboolopOr);
+	gpos::Ref<CExpression> pexpr =
+		CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
+			mp, pexprOuter, pexprInner, true /*fCorrelated*/,
+			CScalarBoolOp::EboolopOr);
 
-	CXform *pxform = CXformFactory::Pxff()->Pxf(CXform::ExfSelect2Apply);
+	gpos::Ref<CXform> pxform =
+		CXformFactory::Pxff()->Pxf(CXform::ExfSelect2Apply);
 
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	oss << std::endl << "EXPRESSION:" << std::endl << *pexpr << std::endl;
 
-	CExpression *pexprLogical = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLogical = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	oss << std::endl << "LOGICAL:" << std::endl << *pexprLogical << std::endl;
 	oss << std::endl << "SCALAR:" << std::endl << *pexprScalar << std::endl;
 
 	GPOS_TRACE(str.GetBuffer());
 	str.Reset();
 
-	CXformContext *pxfctxt = GPOS_NEW(mp) CXformContext(mp);
-	CXformResult *pxfres = GPOS_NEW(mp) CXformResult(mp);
+	gpos::Ref<CXformContext> pxfctxt = GPOS_NEW(mp) CXformContext(mp);
+	gpos::Ref<CXformResult> pxfres = GPOS_NEW(mp) CXformResult(mp);
 
 	// calling the xform to perform subquery to Apply transformation
 	pxform->Transform(pxfctxt, pxfres, pexpr);
-	CExpression *pexprResult = pxfres->PexprNext();
+	gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 
 	oss << std::endl
 		<< "NEW LOGICAL:" << std::endl

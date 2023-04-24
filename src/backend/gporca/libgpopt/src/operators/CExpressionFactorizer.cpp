@@ -42,17 +42,18 @@ using namespace gpopt;
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CExpressionFactorizer::PexprProcessDisjDescendents(
-	CMemoryPool *mp, CExpression *pexpr,
-	CExpression *pexprLowestLogicalAncestor, PexprProcessDisj pfnpepdFunction)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CExpression> pexprLowestLogicalAncestor,
+	PexprProcessDisj pfnpepdFunction)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CExpression *pexprLogicalAncestor = pexprLowestLogicalAncestor;
+	gpos::Ref<CExpression> pexprLogicalAncestor = pexprLowestLogicalAncestor;
 	if (pexpr->Pop()->FLogical())
 	{
 		pexprLogicalAncestor = pexpr;
@@ -68,12 +69,12 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = PexprProcessDisjDescendents(
+		gpos::Ref<CExpression> pexprChild = PexprProcessDisjDescendents(
 			mp, (*pexpr)[ul], pexprLogicalAncestor, pfnpepdFunction);
 		pdrgpexprChildren->Append(pexprChild);
 	}
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	pop->AddRef();
 	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
 }
@@ -89,7 +90,7 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 //
 //---------------------------------------------------------------------------
 void
-CExpressionFactorizer::AddFactor(CMemoryPool *mp, CExpression *pexpr,
+CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 CExpressionArray *pdrgpexprFactors,
 								 CExpressionArray *pdrgpexprResidual,
 								 ExprMap *pexprmapFactors,
@@ -143,7 +144,8 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 CExpressionFactorizer::ExprMap *
-CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp, CExpression *pexpr)
+CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
+									   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(CPredicateUtils::FOr(pexpr) &&
 				"input must be an OR expression");
@@ -159,7 +161,7 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp, CExpression *pexpr)
 	const ULONG ulDisjuncts = pexpr->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulDisjuncts; ulOuter++)
 	{
-		CExpression *pexprDisj = (*pexpr)[ulOuter];
+		gpos::Ref<CExpression> pexprDisj = (*pexpr)[ulOuter];
 
 		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 		pexprDisj->AddRef();
@@ -175,7 +177,7 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp, CExpression *pexpr)
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ulInner = 0; ulInner < size; ulInner++)
 		{
-			CExpression *pexprConj = (*pdrgpexpr)[ulInner];
+			gpos::Ref<CExpression> pexprConj = (*pdrgpexpr)[ulInner];
 			ULONG *pul = pexprmapGlobal->Find(pexprConj);
 			if (nullptr == pul)
 			{
@@ -216,9 +218,10 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp, CExpression *pexpr)
 //		output: [(A=B) AND (C>0 OR A>0 OR B>0)]
 //
 //---------------------------------------------------------------------------
-CExpression *
-CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp, CExpression *pexpr,
-										  CExpression *	 //pexprLogical
+gpos::Ref<CExpression>
+CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr,
+										  gpos::Ref<CExpression>  //pexprLogical
 )
 {
 	GPOS_ASSERT(CPredicateUtils::FOr(pexpr) &&
@@ -234,7 +237,7 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp, CExpression *pexpr,
 	const ULONG ulDisjuncts = pexpr->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulDisjuncts; ulOuter++)
 	{
-		CExpression *pexprDisj = (*pexpr)[ulOuter];
+		gpos::Ref<CExpression> pexprDisj = (*pexpr)[ulOuter];
 		if (CPredicateUtils::FAnd(pexprDisj))
 		{
 			CExpressionArray *pdrgpexprConjuncts =
@@ -242,7 +245,7 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp, CExpression *pexpr,
 			const ULONG size = pexprDisj->Arity();
 			for (ULONG ulInner = 0; ulInner < size; ulInner++)
 			{
-				CExpression *pexprConj = (*pexprDisj)[ulInner];
+				gpos::Ref<CExpression> pexprConj = (*pexprDisj)[ulInner];
 				AddFactor(mp, pexprConj, pdrgpexprFactors, pdrgpexprConjuncts,
 						  pexprmapFactors, ulDisjuncts);
 			}
@@ -291,8 +294,9 @@ CExpressionFactorizer::PexprFactorizeDisj(CMemoryPool *mp, CExpression *pexpr,
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
-CExpressionFactorizer::PexprDiscoverFactors(CMemoryPool *mp, CExpression *pexpr)
+gpos::Ref<CExpression>
+CExpressionFactorizer::PexprDiscoverFactors(CMemoryPool *mp,
+											gpos::Ref<CExpression> pexpr)
 {
 	return PexprProcessDisjDescendents(
 		mp, pexpr, nullptr /*pexprLowestLogicalAncestor*/, PexprFactorizeDisj);
@@ -308,21 +312,22 @@ CExpressionFactorizer::PexprDiscoverFactors(CMemoryPool *mp, CExpression *pexpr)
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
-CExpressionFactorizer::PexprFactorize(CMemoryPool *mp, CExpression *pexpr)
+gpos::Ref<CExpression>
+CExpressionFactorizer::PexprFactorize(CMemoryPool *mp,
+									  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CExpression *pexprFactorized = PexprDiscoverFactors(mp, pexpr);
+	gpos::Ref<CExpression> pexprFactorized = PexprDiscoverFactors(mp, pexpr);
 
 	// factorization might reveal unnested AND/OR
-	CExpression *pexprUnnested =
+	gpos::Ref<CExpression> pexprUnnested =
 		CExpressionUtils::PexprUnnest(mp, pexprFactorized);
 	pexprFactorized->Release();
 
 	// eliminate duplicate AND/OR children
-	CExpression *pexprDeduped =
+	gpos::Ref<CExpression> pexprDeduped =
 		CExpressionUtils::PexprDedupChildren(mp, pexprUnnested);
 	pexprUnnested->Release();
 
@@ -338,8 +343,8 @@ CExpressionFactorizer::PexprFactorize(CMemoryPool *mp, CExpression *pexpr)
 //		the set of used columns.
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CExpressionFactorizer::PcrsUsedByPushableScalar(CExpression *pexpr)
+gpos::Ref<CColRefSet>
+CExpressionFactorizer::PcrsUsedByPushableScalar(gpos::Ref<CExpression> pexpr)
 {
 	if (!pexpr->Pop()->FScalar())
 	{
@@ -370,9 +375,9 @@ CExpressionFactorizer::PcrsUsedByPushableScalar(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionFactorizer::FOpSourceIdOrComputedColumn(CExpression *pexpr,
-												   ULONG *ulOpSourceId,
-												   CColRef **ppcrComputedColumn)
+CExpressionFactorizer::FOpSourceIdOrComputedColumn(
+	gpos::Ref<CExpression> pexpr, ULONG *ulOpSourceId,
+	gpos::Ref<CColRef> *ppcrComputedColumn)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != ulOpSourceId);
@@ -381,7 +386,7 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(CExpression *pexpr,
 	*ulOpSourceId = gpos::ulong_max;
 	*ppcrComputedColumn = nullptr;
 
-	CColRefSet *pcrsUsed = PcrsUsedByPushableScalar(pexpr);
+	gpos::Ref<CColRefSet> pcrsUsed = PcrsUsedByPushableScalar(pexpr);
 	if (nullptr == pcrsUsed || 0 == pcrsUsed->Size())
 	{
 		return false;
@@ -391,7 +396,7 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(CExpression *pexpr,
 	CColRefSetIter crsi(*pcrsUsed);
 	while (crsi.Advance())
 	{
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		if (CColRef::EcrtTable != colref->Ecrt())
 		{
 			if (nullptr == *ppcrComputedColumn)
@@ -411,7 +416,8 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(CExpression *pexpr,
 			return false;
 		}
 
-		const CColRefTable *pcrTable = CColRefTable::PcrConvert(colref);
+		const gpos::Ref<CColRefTable> pcrTable =
+			CColRefTable::PcrConvert(colref);
 		if (gpos::ulong_max == ulComputedOpSourceId)
 		{
 			ulComputedOpSourceId = pcrTable->UlSourceOpId();
@@ -480,7 +486,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 CExpressionArrays *
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
 	CMemoryPool *mp, ColumnToArrayPosMap *pcol2array, BOOL fAllowNewSources,
-	CColRef *colref)
+	gpos::Ref<CColRef> colref)
 {
 	GPOS_ASSERT(nullptr != pcol2array);
 	CExpressionArrays *pdrgpdrgpexpr = pcol2array->Find(colref);
@@ -521,12 +527,13 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
 //---------------------------------------------------------------------------
 void
 CExpressionFactorizer::StoreBaseOpToColumnExpr(
-	CMemoryPool *mp, CExpression *pexpr, SourceToArrayPosMap *psrc2array,
-	ColumnToArrayPosMap *pcol2array, const CColRefSet *pcrsProducedByChildren,
-	BOOL fAllowNewSources, ULONG ulPosition)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array,
+	const gpos::Ref<CColRefSet> pcrsProducedByChildren, BOOL fAllowNewSources,
+	ULONG ulPosition)
 {
 	ULONG ulOpSourceId;
-	CColRef *pcrComputed = nullptr;
+	gpos::Ref<CColRef> pcrComputed = nullptr;
 	if (!FOpSourceIdOrComputedColumn(pexpr, &ulOpSourceId, &pcrComputed))
 	{
 		return;
@@ -594,9 +601,9 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 //		of the given map.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CExpressionFactorizer::PexprAddInferredFilters(CMemoryPool *mp,
-											   CExpression *pexpr,
+											   gpos::Ref<CExpression> pexpr,
 											   SourceToArrayPosMap *psrc2array,
 											   ColumnToArrayPosMap *pcol2array)
 {
@@ -649,7 +656,7 @@ CExpressionFactorizer::AddInferredFiltersFromArray(
 		for (ULONG ul = 0; ul < ulEntryLength; ++ul)
 		{
 			(*pdrgpdrgpexpr)[ul]->AddRef();
-			CExpression *pexprConj =
+			gpos::Ref<CExpression> pexprConj =
 				CPredicateUtils::PexprConjunction(mp, (*pdrgpdrgpexpr)[ul]);
 			pdrgpexprDisjuncts->Append(pexprConj);
 		}
@@ -670,24 +677,25 @@ CExpressionFactorizer::AddInferredFiltersFromArray(
 //		children
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CExpressionFactorizer::PcrsColumnsProducedByChildren(CMemoryPool *mp,
-													 CExpression *pexpr)
+gpos::Ref<CColRefSet>
+CExpressionFactorizer::PcrsColumnsProducedByChildren(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	const ULONG arity = pexpr->Arity();
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	for (ULONG ulTop = 0; ulTop < arity; ulTop++)
 	{
-		CExpression *pexprChild = (*pexpr)[ulTop];
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ulTop];
 		const ULONG ulChildArity = pexprChild->Arity();
 		for (ULONG ulBelowChild = 0; ulBelowChild < ulChildArity;
 			 ulBelowChild++)
 		{
-			CExpression *pexprGrandChild = (*pexprChild)[ulBelowChild];
+			gpos::Ref<CExpression> pexprGrandChild =
+				(*pexprChild)[ulBelowChild];
 			if (pexprGrandChild->Pop()->FScalar())
 			{
-				CColRefSet *pcrsChildDefined =
+				gpos::Ref<CColRefSet> pcrsChildDefined =
 					pexprGrandChild->DeriveDefinedColumns();
 				pcrs->Include(pcrsChildDefined);
 			}
@@ -705,10 +713,10 @@ CExpressionFactorizer::PcrsColumnsProducedByChildren(CMemoryPool *mp,
 //		Compute disjunctive inferred filters that can be pushed to the column creators
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
-	CMemoryPool *mp, CExpression *pexpr,
-	CExpression *pexprLowestLogicalAncestor)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CExpression> pexprLowestLogicalAncestor)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
@@ -727,7 +735,7 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 	// create a similar map for computed columns
 	ColumnToArrayPosMap *pcol2array = GPOS_NEW(mp) ColumnToArrayPosMap(mp);
 
-	CColRefSet *pcrsProducedByChildren = nullptr;
+	gpos::Ref<CColRefSet> pcrsProducedByChildren = nullptr;
 	if (COperator::EopLogicalSelect ==
 		pexprLowestLogicalAncestor->Pop()->Eopid())
 	{
@@ -737,7 +745,7 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprCurrent = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprCurrent = (*pexpr)[ul];
 		BOOL fFirst = 0 == ul;
 		if (CPredicateUtils::FAnd(pexprCurrent))
 		{
@@ -767,12 +775,12 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 		}
 		GPOS_CHECK_ABORT;
 	}
-	CExpression *pexprWithPrefilters =
+	gpos::Ref<CExpression> pexprWithPrefilters =
 		PexprAddInferredFilters(mp, pexpr, psrc2array, pcol2array);
 	psrc2array->Release();
 	pcol2array->Release();
 	SafeRelease(pcrsProducedByChildren);
-	CExpression *pexprDeduped =
+	gpos::Ref<CExpression> pexprDeduped =
 		CExpressionUtils::PexprDedupChildren(mp, pexprWithPrefilters);
 	pexprWithPrefilters->Release();
 
@@ -800,9 +808,9 @@ CExpressionFactorizer::PexprExtractInferredFiltersFromDisj(
 //		which can later be pushed down by the normalizer
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CExpressionFactorizer::PexprExtractInferredFilters(CMemoryPool *mp,
-												   CExpression *pexpr)
+												   gpos::Ref<CExpression> pexpr)
 {
 	return PexprProcessDisjDescendents(mp, pexpr,
 									   nullptr /*pexprLowestLogicalAncestor*/,

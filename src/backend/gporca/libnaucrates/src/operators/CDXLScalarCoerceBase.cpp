@@ -34,7 +34,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
+CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid_type,
 										   INT type_modifier,
 										   EdxlCoercionForm dxl_coerce_format,
 										   INT location)
@@ -72,7 +73,7 @@ CDXLScalarCoerceBase::~CDXLScalarCoerceBase()
 //---------------------------------------------------------------------------
 void
 CDXLScalarCoerceBase::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *node) const
+									 const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -124,12 +125,12 @@ CDXLScalarCoerceBase::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoerceBase::AssertValid(const CDXLNode *node,
+CDXLScalarCoerceBase::AssertValid(const gpos::Ref<CDXLNode> node,
 								  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
 
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

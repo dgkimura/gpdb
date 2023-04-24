@@ -67,14 +67,15 @@ CXformImplementSplit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformImplementSplit::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalSplit *popSplit = CLogicalSplit::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalSplit> popSplit = CLogicalSplit::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -84,18 +85,18 @@ CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRefArray *pdrgpcrInsert = popSplit->PdrgpcrInsert();
 	pdrgpcrInsert->AddRef();
 
-	CColRef *pcrAction = popSplit->PcrAction();
-	CColRef *pcrCtid = popSplit->PcrCtid();
-	CColRef *pcrSegmentId = popSplit->PcrSegmentId();
+	gpos::Ref<CColRef> pcrAction = popSplit->PcrAction();
+	gpos::Ref<CColRef> pcrCtid = popSplit->PcrCtid();
+	gpos::Ref<CColRef> pcrSegmentId = popSplit->PcrSegmentId();
 
 	// child of Split operator
-	CExpression *pexprChild = (*pexpr)[0];
-	CExpression *pexprProjList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjList = (*pexpr)[1];
 	pexprChild->AddRef();
 	pexprProjList->AddRef();
 
 	// create physical Split
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
 									pcrSegmentId, pcrAction),

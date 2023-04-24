@@ -42,8 +42,8 @@ CDXLPhysicalBitmapTableScan::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalBitmapTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-											const CDXLNode *dxlnode) const
+CDXLPhysicalBitmapTableScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

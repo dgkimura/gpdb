@@ -35,13 +35,13 @@ class CDXLMinidump
 {
 private:
 	// traceflags
-	CBitSet *m_pbs;
+	gpos::Ref<CBitSet> m_pbs;
 
 	// optimizer configuration
-	COptimizerConfig *m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// DXL query tree
-	CDXLNode *m_query_dxl_root;
+	gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// Array of DXL nodes that represent the query output
 	CDXLNodeArray *m_query_output;
@@ -50,7 +50,7 @@ private:
 	CDXLNodeArray *m_cte_producers;
 
 	// DXL plan
-	CDXLNode *m_plan_dxl_root;
+	gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// metadata objects
 	IMDCacheObjectArray *m_mdid_cached_obj_array;
@@ -68,9 +68,11 @@ public:
 	CDXLMinidump(const CDXLMinidump &) = delete;
 
 	// ctor
-	CDXLMinidump(CBitSet *pbs, COptimizerConfig *optimizer_config,
-				 CDXLNode *query, CDXLNodeArray *query_output_dxlnode_array,
-				 CDXLNodeArray *cte_producers, CDXLNode *pdxlnPlan,
+	CDXLMinidump(gpos::Ref<CBitSet> pbs,
+				 gpos::Ref<COptimizerConfig> optimizer_config,
+				 gpos::Ref<CDXLNode> query,
+				 CDXLNodeArray *query_output_dxlnode_array,
+				 CDXLNodeArray *cte_producers, gpos::Ref<CDXLNode> pdxlnPlan,
 				 IMDCacheObjectArray *mdcache_obj_array,
 				 CSystemIdArray *pdrgpsysid, ULLONG plan_id,
 				 ULLONG plan_space_size);
@@ -79,17 +81,17 @@ public:
 	~CDXLMinidump();
 
 	// traceflags
-	const CBitSet *Pbs() const;
+	const gpos::Ref<CBitSet> Pbs() const;
 
 	// optimizer configuration
-	COptimizerConfig *
+	gpos::Ref<COptimizerConfig>
 	GetOptimizerConfig() const
 	{
 		return m_optimizer_config;
 	}
 
 	// query object
-	const CDXLNode *GetQueryDXLRoot() const;
+	const gpos::Ref<CDXLNode> GetQueryDXLRoot() const;
 
 	// query output columns
 	const CDXLNodeArray *PdrgpdxlnQueryOutput() const;
@@ -98,7 +100,7 @@ public:
 	const CDXLNodeArray *GetCTEProducerDXLArray() const;
 
 	// plan
-	const CDXLNode *PdxlnPlan() const;
+	const gpos::Ref<CDXLNode> PdxlnPlan() const;
 
 	// metadata objects
 	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;

@@ -8,7 +8,7 @@
 using namespace gpopt;
 
 CConstraintArray *
-CColConstraintsHashMapper::PdrgPcnstrLookup(CColRef *colref)
+CColConstraintsHashMapper::PdrgPcnstrLookup(gpos::Ref<CColRef> colref)
 {
 	CConstraintArray *pdrgpcnstrCol = m_phmColConstr->Find(colref);
 	pdrgpcnstrCol->AddRef();
@@ -26,12 +26,12 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CConstraint *pcnstrChild = (*drgPcnstr)[ul];
-		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
+		gpos::Ref<CConstraint> pcnstrChild = (*drgPcnstr)[ul];
+		gpos::Ref<CColRefSet> pcrs = pcnstrChild->PcrsUsed();
 
 		if (1 == pcrs->Size())
 		{
-			CColRef *colref = pcrs->PcrFirst();
+			gpos::Ref<CColRef> colref = pcrs->PcrFirst();
 			CConstraintArray *pcnstrMapped = phmcolconstr->Find(colref);
 			if (nullptr == pcnstrMapped)
 			{

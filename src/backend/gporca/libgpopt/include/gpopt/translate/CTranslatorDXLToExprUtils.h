@@ -45,29 +45,31 @@ class CTranslatorDXLToExprUtils
 {
 public:
 	// create a cast expression from INT to INT8
-	static CExpression *PexprConstInt8(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CSystemId sysid, LINT liValue);
+	static gpos::Ref<CExpression> PexprConstInt8(CMemoryPool *mp,
+												 CMDAccessor *md_accessor,
+												 CSystemId sysid, LINT liValue);
 
 	// create a scalar const operator from a DXL scalar const operator
-	static CScalarConst *PopConst(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  const CDXLScalarConstValue *dxl_op);
+	static gpos::Ref<CScalarConst> PopConst(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CDXLScalarConstValue> dxl_op);
 
 	// create a datum from a DXL scalar const operator
-	static IDatum *GetDatum(CMDAccessor *md_accessor,
-							const CDXLScalarConstValue *dxl_op);
+	static gpos::Ref<IDatum> GetDatum(
+		CMDAccessor *md_accessor, const gpos::Ref<CDXLScalarConstValue> dxl_op);
 
 	// create a datum array from a dxl datum array
 	static IDatumArray *Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 								   const CDXLDatumArray *pdrgpdatum);
 
 	// update table descriptor's key sets info from the MD cache object
-	static void AddKeySets(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-						   const IMDRelation *pmdrel,
+	static void AddKeySets(CMemoryPool *mp,
+						   gpos::Ref<CTableDescriptor> ptabdesc,
+						   const gpos::Ref<IMDRelation> pmdrel,
 						   UlongToUlongMap *phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type
-	static BOOL FScalarBool(const CDXLNode *dxlnode,
+	static BOOL FScalarBool(const gpos::Ref<CDXLNode> dxlnode,
 							EdxlBoolExprType edxlboolexprtype);
 
 	// returns the equivalent bool expression type in the optimizer for
@@ -81,8 +83,9 @@ public:
 								 const ULongPtrArray *colids);
 
 	// is the given expression is a scalar function that casts
-	static BOOL FCastFunc(CMDAccessor *md_accessor, const CDXLNode *dxlnode,
-						  IMDId *pmdidInput);
+	static BOOL FCastFunc(CMDAccessor *md_accessor,
+						  const gpos::Ref<CDXLNode> dxlnode,
+						  gpos::Ref<IMDId> pmdidInput);
 };
 }  // namespace gpopt
 

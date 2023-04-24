@@ -58,10 +58,10 @@ private:
 	EdxlFrameExclusionStrategy m_dxl_frame_exclusion_strategy;
 
 	// scalar value representing the boundary leading
-	CDXLNode *m_dxlnode_leading;
+	gpos::Ref<CDXLNode> m_dxlnode_leading;
 
 	// scalar value representing the boundary trailing
-	CDXLNode *m_dxlnode_trailing;
+	gpos::Ref<CDXLNode> m_dxlnode_trailing;
 
 	// in_range function for startOffset
 	OID m_start_in_range_func;
@@ -84,7 +84,8 @@ public:
 	// ctor
 	CDXLWindowFrame(EdxlFrameSpec edxlfs,
 					EdxlFrameExclusionStrategy frame_exc_strategy,
-					CDXLNode *dxlnode_leading, CDXLNode *dxlnode_trailing,
+					gpos::Ref<CDXLNode> dxlnode_leading,
+					gpos::Ref<CDXLNode> dxlnode_trailing,
 					OID start_in_range_func, OID end_in_range_func,
 					OID in_range_coll, bool in_range_asc,
 					bool in_range_nulls_first);
@@ -106,14 +107,14 @@ public:
 	}
 
 	// return window boundary trailing
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	PdxlnTrailing() const
 	{
 		return m_dxlnode_trailing;
 	}
 
 	// return window boundary leading
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	PdxlnLeading() const
 	{
 		return m_dxlnode_leading;

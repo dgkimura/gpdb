@@ -77,7 +77,7 @@ public:
 
 	// helper method to copy stats on columns that are not excluded by bitset
 	void AddNotExcludedHistograms(
-		CMemoryPool *mp, CBitSet *excluded_cols,
+		CMemoryPool *mp, gpos::Ref<CBitSet> excluded_cols,
 		UlongToHistogramMap *col_histogram_mapping) const;
 
 private:
@@ -112,14 +112,14 @@ private:
 	ULONG m_num_predicates;
 
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::Ref<CStatisticsConfig> m_stats_conf;
 
 	// array of upper bound of ndv per source;
 	// source can be one of the following operators: like Get, Group By, and Project
 	CUpperBoundNDVPtrArray *m_src_upper_bound_NDVs;
 
 	// extended statistics metadata
-	const IMDExtStatsInfo *m_ext_stats;
+	const gpos::Ref<IMDExtStatsInfo> m_ext_stats;
 
 	// map colid to attno (required because extended stats are stored as attno)
 	UlongToIntMap *m_colid_to_attno_mapping;
@@ -156,7 +156,7 @@ public:
 				UlongToDoubleMap *colid_width_mapping, CDouble rows,
 				BOOL is_empty, ULONG relpages, ULONG relallvisible,
 				CDouble rebinds, ULONG num_predicates,
-				const IMDExtStatsInfo *extstats,
+				const gpos::Ref<IMDExtStatsInfo> extstats,
 				UlongToIntMap *colid_to_attno_mapping);
 
 
@@ -199,7 +199,8 @@ public:
 	CDouble Width(ULongPtrArray *colids) const override;
 
 	// what is the width in bytes of set of column references
-	CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const override;
+	CDouble Width(CMemoryPool *mp,
+				  gpos::Ref<CColRefSet> colrefs) const override;
 
 	// what is the width in bytes
 	CDouble Width() const override;
@@ -219,7 +220,7 @@ public:
 	}
 
 	// look up the number of distinct values of a particular column
-	CDouble GetNDVs(const CColRef *colref) override;
+	CDouble GetNDVs(const gpos::Ref<CColRef> colref) override;
 
 	// look up the width of a particular column
 	virtual const CDouble *GetWidth(ULONG colid) const;
@@ -239,18 +240,18 @@ public:
 	}
 
 	// inner join with another stats structure
-	IStatistics *CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	gpos::Ref<IStatistics> CalcInnerJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// LOJ with another stats structure
-	IStatistics *CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	gpos::Ref<IStatistics> CalcLOJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// left anti semi join with another stats structure
-	IStatistics *CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+	gpos::Ref<IStatistics> CalcLASJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
@@ -258,15 +259,16 @@ public:
 	) const override;
 
 	// semi join stats computation
-	IStatistics *CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+	gpos::Ref<IStatistics> CalcLSJoinStats(
+		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// return required props associated with stats object
-	CReqdPropRelational *GetReqdRelationalProps(CMemoryPool *mp) const override;
+	gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
+		CMemoryPool *mp) const override;
 
 	// append given stats to current object
-	void AppendStats(CMemoryPool *mp, IStatistics *stats) override;
+	void AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> stats) override;
 
 	// set number of rebinds
 	void
@@ -278,21 +280,22 @@ public:
 	}
 
 	// copy stats
-	IStatistics *CopyStats(CMemoryPool *mp) const override;
+	gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) const override;
 
 	// return a copy of this stats object scaled by a given factor
-	IStatistics *ScaleStats(CMemoryPool *mp, CDouble factor) const override;
+	gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp,
+									  CDouble factor) const override;
 
 	// copy stats with remapped column id
-	IStatistics *CopyStatsWithRemap(CMemoryPool *mp,
-									UlongToColRefMap *colref_mapping,
-									BOOL must_exist) const override;
+	gpos::Ref<IStatistics> CopyStatsWithRemap(CMemoryPool *mp,
+											  UlongToColRefMap *colref_mapping,
+											  BOOL must_exist) const override;
 
 	// return the set of column references we have stats for
-	CColRefSet *GetColRefSet(CMemoryPool *mp) const override;
+	gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp) const override;
 
 	// generate the DXL representation of the statistics object
-	CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
+	gpos::Ref<CDXLStatsDerivedRelation> GetDxlStatsDrvdRelation(
 		CMemoryPool *mp, CMDAccessor *md_accessor) const override;
 
 	// print function
@@ -302,10 +305,10 @@ public:
 	virtual void AddCardUpperBound(CUpperBoundNDVs *upper_bound_NDVs);
 
 	// return the upper bound of the number of distinct values for a given column
-	virtual CDouble GetColUpperBoundNDVs(const CColRef *colref);
+	virtual CDouble GetColUpperBoundNDVs(const gpos::Ref<CColRef> colref);
 
 	// return the index of the array of upper bound ndvs to which column reference belongs
-	virtual ULONG GetIndexUpperBoundNDVs(const CColRef *colref);
+	virtual ULONG GetIndexUpperBoundNDVs(const gpos::Ref<CColRef> colref);
 
 	// return the column identifiers of all columns statistics maintained
 	virtual ULongPtrArray *GetColIdsWithStats(CMemoryPool *mp) const;
@@ -316,7 +319,7 @@ public:
 		return m_num_predicates;
 	}
 
-	CStatisticsConfig *
+	gpos::Ref<CStatisticsConfig>
 	GetStatsConfig() const
 	{
 		return m_stats_conf;
@@ -328,7 +331,7 @@ public:
 		return m_src_upper_bound_NDVs;
 	}
 
-	const IMDExtStatsInfo *
+	const gpos::Ref<IMDExtStatsInfo>
 	GetExtStatsInfo() const
 	{
 		return m_ext_stats;
@@ -341,11 +344,12 @@ public:
 	}
 
 	// create an empty statistics object
-	static CStatistics *
+	static gpos::Ref<CStatistics>
 	MakeEmptyStats(CMemoryPool *mp)
 	{
 		ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
-		CStatistics *stats = MakeDummyStats(mp, colids, DefaultRelationRows);
+		gpos::Ref<CStatistics> stats =
+			MakeDummyStats(mp, colids, DefaultRelationRows);
 
 		// clean up
 		colids->Release();
@@ -354,22 +358,22 @@ public:
 	}
 
 	// conversion function
-	static CStatistics *
-	CastStats(IStatistics *pstats)
+	static gpos::Ref<CStatistics>
+	CastStats(gpos::Ref<IStatistics> pstats)
 	{
 		GPOS_ASSERT(nullptr != pstats);
-		return dynamic_cast<CStatistics *>(pstats);
+		return dynamic_cast<gpos::Ref<CStatistics>>(pstats);
 	}
 
 	// create a dummy statistics object
-	static CStatistics *MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
-									   CDouble rows);
+	static gpos::Ref<CStatistics> MakeDummyStats(CMemoryPool *mp,
+												 ULongPtrArray *colids,
+												 CDouble rows);
 
 	// create a dummy statistics object
-	static CStatistics *MakeDummyStats(CMemoryPool *mp,
-									   ULongPtrArray *col_histogram_mapping,
-									   ULongPtrArray *colid_width_mapping,
-									   CDouble rows);
+	static gpos::Ref<CStatistics> MakeDummyStats(
+		CMemoryPool *mp, ULongPtrArray *col_histogram_mapping,
+		ULongPtrArray *colid_width_mapping, CDouble rows);
 
 	// default column width
 	static const CDouble DefaultColumnWidth;
@@ -387,12 +391,13 @@ public:
 	static const CDouble DefaultDistinctValues;
 
 	// check if the input statistics from join statistics computation empty
-	static BOOL IsEmptyJoin(const CStatistics *outer_stats,
-							const CStatistics *inner_side_stats, BOOL IsLASJ);
+	static BOOL IsEmptyJoin(const gpos::Ref<CStatistics> outer_stats,
+							const gpos::Ref<CStatistics> inner_side_stats,
+							BOOL IsLASJ);
 
 	// add upper bound ndvs information for a given set of columns
 	static void CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
-											  CStatistics *stats,
+											  gpos::Ref<CStatistics> stats,
 											  ULongPtrArray *colids,
 											  CDouble rows);
 

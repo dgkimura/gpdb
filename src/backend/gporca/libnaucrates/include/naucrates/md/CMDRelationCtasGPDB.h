@@ -51,7 +51,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -94,7 +94,7 @@ private:
 	ULongPtrArray *m_nondrop_col_pos_array;
 
 	// storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
 
 	// vartypemod list
 	IntPtrArray *m_vartypemod_array;
@@ -107,12 +107,12 @@ public:
 
 	// ctor
 	CMDRelationCtasGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname,
-		BOOL fTemporary, Erelstoragetype rel_storage_type,
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
+		CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
 		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
 		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
 		IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
-		CDXLCtasStorageOptions *dxl_ctas_storage_options,
+		gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
 		IntPtrArray *vartypemod_array);
 
 	// dtor
@@ -126,7 +126,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// schema name
 	CMDName *GetMdNameSchema() const override;
@@ -152,7 +152,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::Ref<CDXLCtasStorageOptions>
 	GetDxlCtasStorageOption() const override
 	{
 		return m_dxl_ctas_storage_option;
@@ -189,15 +189,15 @@ public:
 	ULONG SystemColumnsCount() const override;
 
 	// retrieve the column at the given position
-	const IMDColumn *GetMdCol(ULONG pos) const override;
+	const gpos::Ref<IMDColumn> GetMdCol(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	const IMDColumn *GetDistrColAt(ULONG pos) const override;
+	const gpos::Ref<IMDColumn> GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// number of indices
 	ULONG
@@ -223,7 +223,7 @@ public:
 	}
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *IndexMDidAt(ULONG  // pos
+	gpos::Ref<IMDId> IndexMDidAt(ULONG	// pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no indexes");
@@ -241,7 +241,7 @@ public:
 	}
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG	// pos
+	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no constraints");
@@ -255,7 +255,7 @@ public:
 		return m_vartypemod_array;
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	ForeignServer() const override
 	{
 		return nullptr;

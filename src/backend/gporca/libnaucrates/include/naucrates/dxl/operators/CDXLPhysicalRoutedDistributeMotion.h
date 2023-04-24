@@ -73,23 +73,24 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalRoutedDistributeMotion *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalRoutedDistributeMotion>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalMotionRoutedDistribute ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalRoutedDistributeMotion *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalRoutedDistributeMotion> >(
+			dxl_op);
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

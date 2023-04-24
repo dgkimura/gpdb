@@ -37,31 +37,31 @@ private:
 	// map given ColRefSet, expressed in terms of outputs,
 	// into an equivalent ColRefSet, expressed in terms
 	// of input number n
-	CColRefSet *MapOutputColRefsToInput(CMemoryPool *mp,
-										CColRefSet *out_col_refs,
-										ULONG child_index);
+	gpos::Ref<CColRefSet> MapOutputColRefsToInput(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> out_col_refs, ULONG child_index);
 
 	// derive hashed distribution from child operators
-	CDistributionSpecHashed *PdshashedDerive(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl) const;
+	gpos::Ref<CDistributionSpecHashed> PdshashedDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// derive strict random distribution spec if all the children of the parallel union all
 	// node derive strict random; derive null spec otherwise
-	static CDistributionSpecRandom *PdsStrictRandomParallelUnionAllChildren(
-		CMemoryPool *mp, CExpressionHandle &expr_handle);
+	static gpos::Ref<CDistributionSpecRandom>
+	PdsStrictRandomParallelUnionAllChildren(CMemoryPool *mp,
+											CExpressionHandle &expr_handle);
 
 	// compute output hashed distribution matching the outer child's hashed distribution
-	CDistributionSpecHashed *PdsMatching(
+	gpos::Ref<CDistributionSpecHashed> PdsMatching(
 		CMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
 
 	// derive output distribution based on child distribution
-	static CDistributionSpec *PdsDeriveFromChildren(CMemoryPool *mp,
-													CExpressionHandle &exprhdl);
+	static gpos::Ref<CDistributionSpec> PdsDeriveFromChildren(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 protected:
 	// compute required hashed distribution of the n-th child
-	CDistributionSpecHashed *PdshashedPassThru(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashedRequired,
+	gpos::Ref<CDistributionSpecHashed> PdshashedPassThru(
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashedRequired,
 		ULONG child_index) const;
 
 public:
@@ -71,7 +71,7 @@ public:
 	~CPhysicalUnionAll() override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// ident accessors
 	EOperatorId Eopid() const override = 0;
@@ -96,36 +96,40 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::Ref<CColRefSet> pcrsRequired,
+									   ULONG child_index,
+									   CDrvdPropArray *pdrgpdpCtxt,
+									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	CCTEReq *PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CCTEReq *pcter, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt,
-						  ULONG ulOptReq) const override;
-
-	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
-
-	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CRewindabilitySpec *prsRequired,
-									ULONG child_index,
+	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
+	// compute required sort order of the n-th child
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  gpos::Ref<COrderSpec> posRequired,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
+
+	// compute required rewindability of the n-th child
+	gpos::Ref<CRewindabilitySpec> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+
 	// conversion function
-	static CPhysicalUnionAll *PopConvert(COperator *pop);
+	static gpos::Ref<CPhysicalUnionAll> PopConvert(gpos::Ref<COperator> pop);
 
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -133,16 +137,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CDistributionSpec> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
-								  CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CRewindabilitySpec> PrsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -151,12 +155,13 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		const gpos::Ref<CEnfdOrder> peo) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,		// exprhdl
-		const CEnfdRewindability *	// per
+		CExpressionHandle &,				 // exprhdl
+		const gpos::Ref<CEnfdRewindability>	 // per
 	) const override;
 };
 }  // namespace gpopt

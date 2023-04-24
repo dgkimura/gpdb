@@ -55,7 +55,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// is the mdid valid
 	BOOL IsValid() const override;
@@ -67,12 +67,12 @@ public:
 	static CMDIdGPDBCtas m_mdid_invalid_key;
 
 	// const converter
-	static const CMDIdGPDBCtas *
-	CastMdid(const IMDId *mdid)
+	static const gpos::Ref<CMDIdGPDBCtas>
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdGPDBCtas *>(mdid);
+		return dynamic_cast<const gpos::Ref<CMDIdGPDBCtas> >(mdid);
 	}
 };
 

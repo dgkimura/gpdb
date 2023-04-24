@@ -87,8 +87,8 @@ CParseHandlerScalarBooleanTest::StartElement(
 
 	m_dxl_boolean_test_type = dxl_boolean_test_type;
 	// parse and create scalar BooleanTest
-	CDXLScalarBooleanTest *dxl_op =
-		(CDXLScalarBooleanTest *) CDXLOperatorFactory::MakeDXLBooleanTest(
+	gpos::Ref<CDXLScalarBooleanTest> dxl_op = (gpos::Ref<CDXLScalarBooleanTest>)
+		CDXLOperatorFactory::MakeDXLBooleanTest(
 			m_parse_handler_mgr->GetDXLMemoryManager(),
 			m_dxl_boolean_test_type);
 

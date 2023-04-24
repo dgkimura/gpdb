@@ -50,8 +50,8 @@ public:
 
 private:
 	// helper for combining partition consumer arrays of scalar children
-	static CPartInfo *PpartinfoDeriveCombineScalar(CMemoryPool *mp,
-												   CExpressionHandle &exprhdl);
+	static gpos::Ref<CPartInfo> PpartinfoDeriveCombineScalar(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 protected:
 	// perform conjunction of child boolean evaluation results
@@ -88,13 +88,13 @@ public:
 	}
 
 	// create derived properties container
-	CDrvdProp *PdpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const override;
 
 	// return locally defined columns
-	virtual CColRefSet *
+	virtual gpos::Ref<CColRefSet>
 	PcrsDefined(CMemoryPool *mp,
 				CExpressionHandle &	 // exprhdl
 	)
@@ -104,7 +104,7 @@ public:
 	}
 
 	// return columns containing set-returning function
-	virtual CColRefSet *
+	virtual gpos::Ref<CColRefSet>
 	PcrsSetReturningFunction(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	)
@@ -114,7 +114,7 @@ public:
 	}
 
 	// return locally used columns
-	virtual CColRefSet *
+	virtual gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp,
 			 CExpressionHandle &  // exprhdl
 	)
@@ -124,14 +124,14 @@ public:
 	}
 
 	// derive partition consumer info
-	virtual CPartInfo *
+	virtual gpos::Ref<CPartInfo>
 	PpartinfoDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PpartinfoDeriveCombineScalar(mp, exprhdl);
 	}
 
 	// derive function properties
-	virtual CFunctionProp *
+	virtual gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PfpDeriveFromChildren(mp, exprhdl,
@@ -160,20 +160,20 @@ public:
 
 	// perform boolean evaluation of the given expression tree
 	static EBoolEvalResult EberEvaluate(CMemoryPool *mp,
-										CExpression *pexprScalar);
+										gpos::Ref<CExpression> pexprScalar);
 
 	// conversion function
-	static CScalar *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalar>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FScalar());
 
-		return dynamic_cast<CScalar *>(pop);
+		return dynamic_cast<gpos::Ref<CScalar> >(pop);
 	}
 
 	// the type of the scalar expression
-	virtual IMDId *MdidType() const = 0;
+	virtual gpos::Ref<IMDId> MdidType() const = 0;
 
 	// the type modifier of the scalar expression
 	virtual INT

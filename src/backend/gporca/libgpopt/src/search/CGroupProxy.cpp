@@ -30,7 +30,7 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CGroupProxy::CGroupProxy(CGroup *pgroup) : m_pgroup(pgroup)
+CGroupProxy::CGroupProxy(gpos::Ref<CGroup> pgroup) : m_pgroup(pgroup)
 {
 	GPOS_ASSERT(nullptr != pgroup);
 }
@@ -56,7 +56,7 @@ CGroupProxy::~CGroupProxy() = default;
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::Insert(CGroupExpression *pgexpr)
+CGroupProxy::Insert(gpos::Ref<CGroupExpression> pgexpr)
 {
 	pgexpr->Init(m_pgroup, m_pgroup->m_ulGExprs++);
 
@@ -75,7 +75,7 @@ CGroupProxy::Insert(CGroupExpression *pgexpr)
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::MoveDuplicateGExpr(CGroupExpression *pgexpr)
+CGroupProxy::MoveDuplicateGExpr(gpos::Ref<CGroupExpression> pgexpr)
 {
 	GPOS_ASSERT(pgexpr->Pgroup() == m_pgroup);
 
@@ -98,7 +98,7 @@ CGroupProxy::MoveDuplicateGExpr(CGroupExpression *pgexpr)
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::InitProperties(CDrvdProp *pdp)
+CGroupProxy::InitProperties(gpos::Ref<CDrvdProp> pdp)
 {
 	m_pgroup->InitProperties(pdp);
 }
@@ -113,7 +113,7 @@ CGroupProxy::InitProperties(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::InitStats(IStatistics *stats)
+CGroupProxy::InitStats(gpos::Ref<IStatistics> stats)
 {
 	m_pgroup->InitStats(stats);
 }
@@ -127,8 +127,8 @@ CGroupProxy::InitStats(IStatistics *stats)
 //		Retrieve next group expression;
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
-CGroupProxy::PgexprNext(CGroupExpression *pgexpr)
+gpos::Ref<CGroupExpression>
+CGroupProxy::PgexprNext(gpos::Ref<CGroupExpression> pgexpr)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 	return m_pgroup->PgexprNext(pgexpr);
@@ -143,7 +143,7 @@ CGroupProxy::PgexprNext(CGroupExpression *pgexpr)
 //		Retrieve first group expression;
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
+gpos::Ref<CGroupExpression>
 CGroupProxy::PgexprFirst()
 {
 	return m_pgroup->PgexprFirst();
@@ -160,10 +160,11 @@ CGroupProxy::PgexprFirst()
 //		flag
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
-CGroupProxy::PgexprSkip(CGroupExpression *pgexprStart, BOOL fSkipLogical)
+gpos::Ref<CGroupExpression>
+CGroupProxy::PgexprSkip(gpos::Ref<CGroupExpression> pgexprStart,
+						BOOL fSkipLogical)
 {
-	CGroupExpression *pgexpr = pgexprStart;
+	gpos::Ref<CGroupExpression> pgexpr = pgexprStart;
 	while (nullptr != pgexpr && fSkipLogical == pgexpr->Pop()->FLogical())
 	{
 		pgexpr = PgexprNext(pgexpr);
@@ -182,8 +183,8 @@ CGroupProxy::PgexprSkip(CGroupExpression *pgexprStart, BOOL fSkipLogical)
 //		expression;
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
-CGroupProxy::PgexprSkipLogical(CGroupExpression *pgexpr)
+gpos::Ref<CGroupExpression>
+CGroupProxy::PgexprSkipLogical(gpos::Ref<CGroupExpression> pgexpr)
 {
 	if (nullptr == pgexpr)
 	{
@@ -203,8 +204,8 @@ CGroupProxy::PgexprSkipLogical(CGroupExpression *pgexpr)
 //		Find the first logical group expression after the given expression
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
-CGroupProxy::PgexprNextLogical(CGroupExpression *pgexpr)
+gpos::Ref<CGroupExpression>
+CGroupProxy::PgexprNextLogical(gpos::Ref<CGroupExpression> pgexpr)
 {
 	GPOS_ASSERT(!m_pgroup->FScalar());
 

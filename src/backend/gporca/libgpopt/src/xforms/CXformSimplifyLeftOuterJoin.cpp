@@ -58,7 +58,8 @@ CXformSimplifyLeftOuterJoin::CXformSimplifyLeftOuterJoin(CMemoryPool *mp)
 CXform::EXformPromise
 CXformSimplifyLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 	if (nullptr != pexprScalar && CUtils::FScalarConstFalse(pexprScalar))
 	{
 		// if LOJ predicate is False, we can replace inner child with empty table
@@ -78,9 +79,9 @@ CXformSimplifyLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformSimplifyLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+									   gpos::Ref<CXformResult> pxfres,
+									   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -90,13 +91,13 @@ CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	pexprOuter->AddRef();
 	pexprScalar->AddRef();
-	CExpression *pexprResult = nullptr;
+	gpos::Ref<CExpression> pexprResult = nullptr;
 
 	// inner child of LOJ can be replaced with empty table
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
@@ -105,7 +106,7 @@ CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	CColRefArray *colref_array = pexprInner->DeriveOutputColumns()->Pdrgpcr(mp);
 
 	// generate empty constant table with the same columns
-	COperator *popCTG = GPOS_NEW(mp)
+	gpos::Ref<COperator> popCTG = GPOS_NEW(mp)
 		CLogicalConstTableGet(mp, colref_array, GPOS_NEW(mp) IDatum2dArray(mp));
 	pexprResult = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp), pexprOuter,

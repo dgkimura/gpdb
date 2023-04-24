@@ -41,9 +41,11 @@ protected:
 	CColRefArray *m_pdrgpcrArgDQA;
 
 	// compute required stats columns for a GbAgg
-	CColRefSet *PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsInput, ULONG child_index,
-							  CColRefArray *pdrgpcrGrp) const;
+	gpos::Ref<CColRefSet> PcrsStatGbAgg(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::Ref<CColRefSet> pcrsInput,
+										ULONG child_index,
+										CColRefArray *pdrgpcrGrp) const;
 
 public:
 	CLogicalGbAgg(const CLogicalGbAgg &) = delete;
@@ -131,7 +133,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -172,28 +174,28 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive not null columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -201,7 +203,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stats columns of the n-th child
@@ -210,9 +212,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsInput,
-						 ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   gpos::Ref<CColRefSet> pcrsInput,
+								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
@@ -222,8 +224,9 @@ public:
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -237,24 +240,24 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGbAgg *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalGbAgg>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAgg == pop->Eopid() ||
 					EopLogicalGbAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CLogicalGbAgg *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalGbAgg> >(pop);
 	}
 
 	// debug print
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// derive statistics
-	static IStatistics *PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
-									 CColRefArray *pdrgpcrGroupingCols,
-									 ULongPtrArray *pdrgpulComputedCols,
-									 CBitSet *keys);
+	static gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
+		CColRefArray *pdrgpcrGroupingCols, ULongPtrArray *pdrgpulComputedCols,
+		gpos::Ref<CBitSet> keys);
 
 	// print group by aggregate type
 	static IOstream &OsPrintGbAggType(IOstream &os,

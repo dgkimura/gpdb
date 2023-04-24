@@ -24,7 +24,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdScCmp::CMDIdScCmp(CMDIdGPDB *left_mdid, CMDIdGPDB *right_mdid,
+CMDIdScCmp::CMDIdScCmp(gpos::Ref<CMDIdGPDB> left_mdid,
+					   gpos::Ref<CMDIdGPDB> right_mdid,
 					   IMDType::ECmpType cmp_type)
 	: m_mdid_left(left_mdid),
 	  m_mdid_right(right_mdid),
@@ -96,7 +97,7 @@ CMDIdScCmp::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdScCmp::GetLeftMdid() const
 {
 	return m_mdid_left;
@@ -110,7 +111,7 @@ CMDIdScCmp::GetLeftMdid() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdScCmp::GetRightMdid() const
 {
 	return m_mdid_right;
@@ -141,14 +142,14 @@ CMDIdScCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdScCmp::Equals(const IMDId *mdid) const
+CMDIdScCmp::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidScCmp != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdScCmp *pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
+	const gpos::Ref<CMDIdScCmp> pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
 
 	return m_mdid_left->Equals(pmdidScCmp->GetLeftMdid()) &&
 		   m_mdid_right->Equals(pmdidScCmp->GetRightMdid()) &&

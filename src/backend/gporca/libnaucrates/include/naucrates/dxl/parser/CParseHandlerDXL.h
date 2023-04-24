@@ -40,16 +40,16 @@ class CParseHandlerDXL : public CParseHandlerBase
 {
 private:
 	// traceflags
-	CBitSet *m_trace_flags_bitset;
+	gpos::Ref<CBitSet> m_trace_flags_bitset;
 
 	// optimizer config
-	COptimizerConfig *m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// MD request
-	CMDRequest *m_mdrequest;
+	gpos::Ref<CMDRequest> m_mdrequest;
 
 	// the root of the parsed DXL query
-	CDXLNode *m_query_dxl_root;
+	gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// list of query output columns
 	CDXLNodeArray *m_output_colums_dxl_array;
@@ -58,7 +58,7 @@ private:
 	CDXLNodeArray *m_cte_producers;
 
 	// the root of the parsed DXL plan
-	CDXLNode *m_plan_dxl_root;
+	gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// list of parsed metadata objects
 	IMDCacheObjectArray *m_mdid_cached_obj_array;
@@ -67,7 +67,7 @@ private:
 	IMdIdArray *m_mdid_array;
 
 	// the root of the parsed scalar expression
-	CDXLNode *m_scalar_expr_dxl;
+	gpos::Ref<CDXLNode> m_scalar_expr_dxl;
 
 	// list of source system ids
 	CSystemIdArray *m_system_id_array;
@@ -85,7 +85,7 @@ private:
 	ULLONG m_plan_space_size;
 
 	// cost model params
-	ICostModelParams *m_cost_model_params;
+	gpos::Ref<ICostModelParams> m_cost_model_params;
 
 	// process the start of an element
 	void StartElement(
@@ -145,13 +145,13 @@ public:
 	~CParseHandlerDXL() override;
 
 	// traceflag bitset
-	CBitSet *Pbs() const;
+	gpos::Ref<CBitSet> Pbs() const;
 
 	// optimizer config
-	COptimizerConfig *GetOptimizerConfig() const;
+	gpos::Ref<COptimizerConfig> GetOptimizerConfig() const;
 
 	// returns the root of the parsed DXL query
-	CDXLNode *GetQueryDXLRoot() const;
+	gpos::Ref<CDXLNode> GetQueryDXLRoot() const;
 
 	// returns the list of query output columns
 	CDXLNodeArray *GetOutputColumnsDXLArray() const;
@@ -160,7 +160,7 @@ public:
 	CDXLNodeArray *GetCTEProducerDXLArray() const;
 
 	// returns the root of the parsed DXL plan
-	CDXLNode *PdxlnPlan() const;
+	gpos::Ref<CDXLNode> PdxlnPlan() const;
 
 	// return the list of parsed metadata objects
 	IMDCacheObjectArray *GetMdIdCachedObjArray() const;
@@ -169,10 +169,10 @@ public:
 	IMdIdArray *GetMdIdArray() const;
 
 	// return the MD request object
-	CMDRequest *GetMiniDumper() const;
+	gpos::Ref<CMDRequest> GetMiniDumper() const;
 
 	// return the root of the parsed scalar expression
-	CDXLNode *GetScalarExprDXLRoot() const;
+	gpos::Ref<CDXLNode> GetScalarExprDXLRoot() const;
 
 	// return the list of parsed source system id objects
 	CSystemIdArray *GetSysidPtrArray() const;
@@ -190,7 +190,7 @@ public:
 	ULLONG GetPlanSpaceSize() const;
 
 	// return cost params
-	ICostModelParams *GetCostModelParams() const;
+	gpos::Ref<ICostModelParams> GetCostModelParams() const;
 
 	// process the end of the document
 	void endDocument() override;

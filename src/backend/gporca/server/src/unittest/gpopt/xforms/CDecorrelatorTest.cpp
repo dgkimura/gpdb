@@ -57,12 +57,12 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// test cases
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 	Pfpexpr rgpf[] = {CTestUtils::PexprLogicalGbAggCorrelated,
 					  CTestUtils::PexprLogicalSelectCorrelated,
 					  CTestUtils::PexprLogicalJoinCorrelated,
@@ -75,7 +75,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate expression
-		CExpression *pexpr = rgpf[ulCase](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[ulCase](mp);
 
 		CWStringDynamic str(mp);
 		COstreamString oss(&str);
@@ -83,9 +83,9 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 
-		CExpression *pexprResult = nullptr;
+		gpos::Ref<CExpression> pexprResult = nullptr;
 		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-		CColRefSet *outerRefs = pexpr->DeriveOuterReferences();
+		gpos::Ref<CColRefSet> outerRefs = pexpr->DeriveOuterReferences();
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
 #endif	// GPOS_DEBUG
@@ -94,7 +94,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_ASSERT(fSuccess);
 
 		// convert residuals into one single conjunct
-		CExpression *pexprResidual =
+		gpos::Ref<CExpression> pexprResidual =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 		oss << std::endl

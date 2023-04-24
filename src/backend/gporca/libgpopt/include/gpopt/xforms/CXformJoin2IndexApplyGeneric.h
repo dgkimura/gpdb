@@ -28,10 +28,10 @@ private:
 
 	// Can we transform left outer join to left outer index apply?
 	static BOOL FCanLeftOuterIndexApply(CMemoryPool *mp,
-										CExpression *pexprInner,
-										CExpression *pexprScalar,
-										CTableDescriptor *ptabDesc,
-										const CColRefSet *pcrsDist);
+										gpos::Ref<CExpression> pexprInner,
+										gpos::Ref<CExpression> pexprScalar,
+										gpos::Ref<CTableDescriptor> ptabDesc,
+										const gpos::Ref<CColRefSet> pcrsDist);
 
 public:
 	CXformJoin2IndexApplyGeneric(const CXformJoin2IndexApplyGeneric &) = delete;
@@ -61,8 +61,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 	// Return true if xform should be applied only once.
 	// For now return true. We may need to revisit this if we find that

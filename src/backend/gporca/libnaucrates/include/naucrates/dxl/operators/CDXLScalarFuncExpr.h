@@ -34,10 +34,10 @@ class CDXLScalarFuncExpr : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -52,9 +52,10 @@ public:
 	CDXLScalarFuncExpr(const CDXLScalarFuncExpr &) = delete;
 
 	// ctor
-	CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-					   IMDId *mdid_return_type, INT return_type_modifier,
-					   BOOL returns_set, BOOL funcvariadic);
+	CDXLScalarFuncExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+					   gpos::Ref<IMDId> mdid_return_type,
+					   INT return_type_modifier, BOOL returns_set,
+					   BOOL funcvariadic);
 
 	//dtor
 	~CDXLScalarFuncExpr() override;
@@ -66,10 +67,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// function id
-	IMDId *FuncMdId() const;
+	gpos::Ref<IMDId> FuncMdId() const;
 
 	// return type
-	IMDId *ReturnTypeMdId() const;
+	gpos::Ref<IMDId> ReturnTypeMdId() const;
 
 	INT TypeModifier() const;
 
@@ -81,16 +82,16 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarFuncExpr *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarFuncExpr>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarFuncExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarFuncExpr *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarFuncExpr> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -99,7 +100,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

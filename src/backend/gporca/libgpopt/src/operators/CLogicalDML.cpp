@@ -52,10 +52,12 @@ CLogicalDML::CLogicalDML(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDML::CLogicalDML(CMemoryPool *mp, EDMLOperator edmlop,
-						 CTableDescriptor *ptabdesc,
-						 CColRefArray *pdrgpcrSource, CBitSet *pbsModified,
-						 CColRef *pcrAction, CColRef *pcrCtid,
-						 CColRef *pcrSegmentId, BOOL fSplit)
+						 gpos::Ref<CTableDescriptor> ptabdesc,
+						 CColRefArray *pdrgpcrSource,
+						 gpos::Ref<CBitSet> pbsModified,
+						 gpos::Ref<CColRef> pcrAction,
+						 gpos::Ref<CColRef> pcrCtid,
+						 gpos::Ref<CColRef> pcrSegmentId, BOOL fSplit)
 	: CLogical(mp),
 	  m_edmlop(edmlop),
 	  m_ptabdesc(ptabdesc),
@@ -112,14 +114,14 @@ CLogicalDML::~CLogicalDML()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDML::Matches(COperator *pop) const
+CLogicalDML::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalDML *popDML = CLogicalDML::PopConvert(pop);
+	gpos::Ref<CLogicalDML> popDML = CLogicalDML::PopConvert(pop);
 
 	return m_pcrAction == popDML->PcrAction() &&
 		   m_pcrCtid == popDML->PcrCtid() &&
@@ -164,27 +166,27 @@ CLogicalDML::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDML::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										UlongToColRefMap *colref_mapping,
 										BOOL must_exist)
 {
 	CColRefArray *colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrSource, colref_mapping, must_exist);
-	CColRef *pcrAction =
+	gpos::Ref<CColRef> pcrAction =
 		CUtils::PcrRemap(m_pcrAction, colref_mapping, must_exist);
 
 	// no need to remap modified columns bitset as it represent column indexes
 	// and not actual columns
 	m_pbsModified->AddRef();
 
-	CColRef *pcrCtid = nullptr;
+	gpos::Ref<CColRef> pcrCtid = nullptr;
 	if (nullptr != m_pcrCtid)
 	{
 		pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	}
 
-	CColRef *pcrSegmentId = nullptr;
+	gpos::Ref<CColRef> pcrSegmentId = nullptr;
 	if (nullptr != m_pcrSegmentId)
 	{
 		pcrSegmentId =
@@ -206,12 +208,12 @@ CLogicalDML::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalDML::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  //exprhdl
 )
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
 	if (nullptr != m_pcrCtid)
 	{
@@ -233,13 +235,14 @@ CLogicalDML::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive constraint property
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::Ref<CPropConstraint>
 CLogicalDML::DerivePropertyConstraint(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
-	CPropConstraint *ppc = PpcDeriveConstraintRestrict(mp, exprhdl, pcrsOutput);
+	gpos::Ref<CPropConstraint> ppc =
+		PpcDeriveConstraintRestrict(mp, exprhdl, pcrsOutput);
 	pcrsOutput->Release();
 
 	return ppc;
@@ -253,7 +256,7 @@ CLogicalDML::DerivePropertyConstraint(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalDML::DeriveKeyCollection(CMemoryPool *,	 // mp
 								 CExpressionHandle &exprhdl) const
 {
@@ -300,7 +303,7 @@ CLogicalDML::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDML::PstatsDerive(CMemoryPool *,  // mp,
 						  CExpressionHandle &exprhdl,
 						  IStatisticsArray *  // not used

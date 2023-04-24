@@ -50,10 +50,10 @@ public:
 
 	// match function
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::Ref<COperator> pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
-			   m_match == static_cast<CPatternNode *>(pop)->m_match;
+			   m_match == static_cast<gpos::Ref<CPatternNode> >(pop)->m_match;
 	}
 
 	// check if operator is a pattern leaf
@@ -64,13 +64,13 @@ public:
 	}
 
 	// conversion function
-	static CPatternNode *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPatternNode>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(COperator::EopPatternNode == pop->Eopid());
 
-		return static_cast<CPatternNode *>(pop);
+		return static_cast<gpos::Ref<CPatternNode> >(pop);
 	}
 
 	// ident accessors

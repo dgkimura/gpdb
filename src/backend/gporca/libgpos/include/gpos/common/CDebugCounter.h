@@ -142,9 +142,10 @@ class CDebugCounter
 		{
 		}
 
-		static ULONG HashValue(const SDebugCounterKey *key);
+		static ULONG HashValue(const gpos::Ref<SDebugCounterKey> key);
 		static BOOL
-		Equals(const SDebugCounterKey *first, const SDebugCounterKey *second)
+		Equals(const gpos::Ref<SDebugCounterKey> first,
+			   const gpos::Ref<SDebugCounterKey> second)
 		{
 			return first->m_counter_name == second->m_counter_name;
 		}
@@ -247,13 +248,13 @@ private:
 
 	// search for a counter by name and return
 	// allocated (existing or new) key and value structs
-	BOOL FindByName(const char *counter_name, SDebugCounterKey **key,
-					SDebugCounterValue **val, enum ECounterType typ);
+	BOOL FindByName(const char *counter_name, gpos::Ref<SDebugCounterKey> *key,
+					gpos::Ref<SDebugCounterValue> *val, enum ECounterType typ);
 
 	// insert or update a key value pair that was generated
 	// by FindByName()
-	void InsertOrUpdateCounter(SDebugCounterKey *key, SDebugCounterValue *val,
-							   BOOL update);
+	void InsertOrUpdateCounter(gpos::Ref<SDebugCounterKey> key,
+							   gpos::Ref<SDebugCounterValue> val, BOOL update);
 
 	CMemoryPool *m_mp;
 

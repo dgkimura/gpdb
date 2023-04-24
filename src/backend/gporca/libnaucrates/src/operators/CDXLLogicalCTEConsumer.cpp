@@ -112,7 +112,7 @@ CDXLLogicalCTEConsumer::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *	 //dxlnode
+									   const gpos::Ref<CDXLNode>  //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -142,7 +142,7 @@ CDXLLogicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEConsumer::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalCTEConsumer::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									BOOL  // validate_children
 ) const
 {

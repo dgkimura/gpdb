@@ -43,10 +43,10 @@ private:
 
 protected:
 	// copy function
-	CDrvdPropCtxt *PdpctxtCopy(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdPropCtxt> PdpctxtCopy(CMemoryPool *mp) const override;
 
 	// add props to context
-	void AddProps(CDrvdProp *pdp) override;
+	void AddProps(gpos::Ref<CDrvdProp> pdp) override;
 
 public:
 	CDrvdPropCtxtPlan(const CDrvdPropCtxtPlan &) = delete;
@@ -61,10 +61,10 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// return the plan properties of CTE producer with given id
-	CDrvdPropPlan *PdpplanCTEProducer(ULONG ulCTEId) const;
+	gpos::Ref<CDrvdPropPlan> PdpplanCTEProducer(ULONG ulCTEId) const;
 
 	// copy plan properties of given CTE prdoucer
-	void CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId);
+	void CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan, ULONG ulCTEId);
 
 #ifdef GPOS_DEBUG
 
@@ -78,12 +78,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDrvdPropCtxtPlan *
-	PdpctxtplanConvert(CDrvdPropCtxt *pdpctxt)
+	static gpos::Ref<CDrvdPropCtxtPlan>
+	PdpctxtplanConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<CDrvdPropCtxtPlan *>(pdpctxt);
+		return dynamic_cast<gpos::Ref<CDrvdPropCtxtPlan> >(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtPlan

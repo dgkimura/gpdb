@@ -43,7 +43,7 @@ class CXformApply2Join : public CXformExploration
 private:
 	// check if we can create a correlated apply expression from the given expression
 	static BOOL
-	FCanCreateCorrelatedApply(CMemoryPool *, CExpression *pexprApply)
+	FCanCreateCorrelatedApply(CMemoryPool *, gpos::Ref<CExpression> pexprApply)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 
@@ -60,22 +60,22 @@ private:
 
 	// create correlated apply expression
 	static void
-	CreateCorrelatedApply(CMemoryPool *mp, CExpression *pexprApply,
-						  CXformResult *pxfres)
+	CreateCorrelatedApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprApply,
+						  gpos::Ref<CXformResult> pxfres)
 	{
 		if (!FCanCreateCorrelatedApply(mp, pexprApply))
 		{
 			return;
 		}
 
-		CExpression *pexprInner = (*pexprApply)[1];
-		CExpression *pexprOuter = (*pexprApply)[0];
-		CExpression *pexprScalar = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprInner = (*pexprApply)[1];
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprScalar = (*pexprApply)[2];
 
 		pexprOuter->AddRef();
 		pexprInner->AddRef();
 		pexprScalar->AddRef();
-		CExpression *pexprResult = nullptr;
+		gpos::Ref<CExpression> pexprResult = nullptr;
 
 		TApply *popApply = TApply::PopConvert(pexprApply->Pop());
 		CColRefArray *colref_array = popApply->PdrgPcrInner();
@@ -133,8 +133,9 @@ private:
 protected:
 	// helper function to attempt decorrelating Apply's inner child
 	static BOOL
-	FDecorrelate(CMemoryPool *mp, CExpression *pexprApply,
-				 CExpression **ppexprInner, CExpressionArray **ppdrgpexpr)
+	FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexprApply,
+				 gpos::Ref<CExpression> *ppexprInner,
+				 CExpressionArray **ppdrgpexpr)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 		GPOS_ASSERT(nullptr != ppexprInner);
@@ -142,7 +143,7 @@ protected:
 
 		*ppdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
-		CExpression *pexprPredicateOrig = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprPredicateOrig = (*pexprApply)[2];
 
 		// add original predicate to array
 		pexprPredicateOrig->AddRef();
@@ -180,8 +181,9 @@ protected:
 
 	// helper function to decorrelate apply expression and insert alternative into results container
 	static void
-	Decorrelate(CXformContext *pxfctxt, CXformResult *pxfres,
-				CExpression *pexprApply)
+	Decorrelate(gpos::Ref<CXformContext> pxfctxt,
+				gpos::Ref<CXformResult> pxfres,
+				gpos::Ref<CExpression> pexprApply)
 	{
 		GPOS_ASSERT(CUtils::HasOuterRefs((*pexprApply)[1]) &&
 					"Apply's inner child must have outer references");
@@ -194,7 +196,7 @@ protected:
 
 		CMemoryPool *mp = pxfctxt->Pmp();
 		CExpressionArray *pdrgpexpr = nullptr;
-		CExpression *pexprInner = nullptr;
+		gpos::Ref<CExpression> pexprInner = nullptr;
 		if (!FDecorrelate(mp, pexprApply, &pexprInner, &pdrgpexpr))
 		{
 			// decorrelation failed, create correlated apply expression if possible
@@ -206,15 +208,15 @@ protected:
 		// build substitute
 		GPOS_ASSERT(nullptr != pexprInner);
 		(*pexprApply)[0]->AddRef();
-		CExpression *pexprOuter = (*pexprApply)[0];
-		CExpression *pexprPredicate =
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprPredicate =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
-		CExpression *pexprResult =
+		gpos::Ref<CExpression> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator
 									 pexprOuter, pexprInner, pexprPredicate);
-		CExpression *pexprNormalized =
+		gpos::Ref<CExpression> pexprNormalized =
 			CNormalizer::PexprNormalize(mp, pexprResult);
 		pexprResult->Release();
 
@@ -224,8 +226,9 @@ protected:
 
 	// helper function to create a join expression from an apply expression and insert alternative into results container
 	static void
-	CreateJoinAlternative(CXformContext *pxfctxt, CXformResult *pxfres,
-						  CExpression *pexprApply)
+	CreateJoinAlternative(gpos::Ref<CXformContext> pxfctxt,
+						  gpos::Ref<CXformResult> pxfres,
+						  gpos::Ref<CExpression> pexprApply)
 	{
 #ifdef GPOS_DEBUG
 		CExpressionHandle exprhdl(pxfctxt->Pmp());
@@ -238,13 +241,13 @@ protected:
 #endif	// GPOS_DEBUG
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		CExpression *pexprOuter = (*pexprApply)[0];
-		CExpression *pexprInner = (*pexprApply)[1];
-		CExpression *pexprPred = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprInner = (*pexprApply)[1];
+		gpos::Ref<CExpression> pexprPred = (*pexprApply)[2];
 		pexprOuter->AddRef();
 		pexprInner->AddRef();
 		pexprPred->AddRef();
-		CExpression *pexprResult =
+		gpos::Ref<CExpression> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator
 									 pexprOuter, pexprInner, pexprPred);
@@ -288,7 +291,7 @@ public:
 
 	// ctor for passed pattern
 	CXformApply2Join<TApply, TJoin>(CMemoryPool *,	// mp
-									CExpression *pexprPattern)
+									gpos::Ref<CExpression> pexprPattern)
 		: CXformExploration(pexprPattern)
 	{
 	}

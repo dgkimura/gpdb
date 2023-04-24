@@ -32,10 +32,10 @@ private:
 	CDouble m_ndistinct;
 
 	// attnos values
-	CBitSet *m_attnos;
+	gpos::Ref<CBitSet> m_attnos;
 
 	// ndistinct object
-	CMDNDistinct *m_ndistinct_md;
+	gpos::Ref<CMDNDistinct> m_ndistinct_md;
 
 	// process the start of an element
 	void StartElement(
@@ -65,7 +65,7 @@ public:
 	~CParseHandlerExtStatsNDistinct() override;
 
 	// returns the constructed ndistinct
-	CMDNDistinct *GetNDistinctAt() const;
+	gpos::Ref<CMDNDistinct> GetNDistinctAt() const;
 };
 }  // namespace gpdxl
 

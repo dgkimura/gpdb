@@ -32,8 +32,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDatumStatsLintMappable::CDXLDatumStatsLintMappable(
-	CMemoryPool *mp, IMDId *mdid_type, INT type_modifier, BOOL is_null,
-	BYTE *byte_array, ULONG length, LINT value)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, INT type_modifier,
+	BOOL is_null, BYTE *byte_array, ULONG length, LINT value)
 	: CDXLDatumGeneric(mp, mdid_type, type_modifier, is_null, byte_array,
 					   length),
 	  m_val(value)

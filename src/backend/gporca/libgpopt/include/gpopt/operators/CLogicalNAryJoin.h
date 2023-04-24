@@ -75,15 +75,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
 	CMaxCard DeriveMaxCard(CMemoryPool *mp,
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -111,16 +111,17 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalNAryJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CLogicalNAryJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<CLogicalNAryJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CLogicalNAryJoin> >(pop);
 	}
 
 	// conversion function, only if the NAryJoin has LOJ children
-	static CLogicalNAryJoin *PopConvertNAryLOJ(COperator *pop);
+	static gpos::Ref<CLogicalNAryJoin> PopConvertNAryLOJ(
+		gpos::Ref<COperator> pop);
 
 	BOOL
 	HasOuterJoinChildren() const
@@ -141,8 +142,8 @@ public:
 		return m_lojChildPredIndexes;
 	}
 
-	CExpression *
-	GetInnerJoinPreds(CExpression *nary_join_expr) const
+	gpos::Ref<CExpression>
+	GetInnerJoinPreds(gpos::Ref<CExpression> nary_join_expr) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
 		if (HasOuterJoinChildren())
@@ -153,8 +154,8 @@ public:
 		return (*nary_join_expr)[nary_join_expr->Arity() - 1];
 	}
 
-	CExpression *
-	GetOnPredicateForLOJChild(CExpression *nary_join_expr,
+	gpos::Ref<CExpression>
+	GetOnPredicateForLOJChild(gpos::Ref<CExpression> nary_join_expr,
 							  ULONG child_num) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
@@ -169,14 +170,14 @@ public:
 
 	// get the true inner join predicates, excluding predicates that use ColRefs
 	// coming from non-inner joins
-	CExpression *GetTrueInnerJoinPreds(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl) const;
+	gpos::Ref<CExpression> GetTrueInnerJoinPreds(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// given an existing scalar child of an NAry join, make a new copy, replacing
 	// only the inner join predicates and leaving the LOJ ON predicates the same
-	CExpression *ReplaceInnerJoinPredicates(
-		CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
-		CExpression *new_inner_join_preds);
+	gpos::Ref<CExpression> ReplaceInnerJoinPredicates(
+		CMemoryPool *mp, gpos::Ref<CExpression> old_nary_join_scalar_expr,
+		gpos::Ref<CExpression> new_inner_join_preds);
 
 	IOstream &OsPrint(IOstream &os) const override;
 

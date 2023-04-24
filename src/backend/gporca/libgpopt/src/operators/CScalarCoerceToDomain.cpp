@@ -25,7 +25,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp,
+											 gpos::Ref<IMDId> mdid_type,
 											 INT type_modifier,
 											 ECoercionForm ecf, INT location)
 	: CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location),
@@ -43,11 +44,11 @@ CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp, IMDId *mdid_type,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceToDomain::Matches(COperator *pop) const
+CScalarCoerceToDomain::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceToDomain *popCoerce =
+		gpos::Ref<CScalarCoerceToDomain> popCoerce =
 			CScalarCoerceToDomain::PopConvert(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&

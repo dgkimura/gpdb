@@ -71,7 +71,7 @@ CLogicalLeftSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalLeftSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 										  CExpressionHandle &exprhdl)
 {
@@ -89,7 +89,7 @@ CLogicalLeftSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalLeftSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 										  CExpressionHandle &exprhdl) const
 {
@@ -121,11 +121,11 @@ CLogicalLeftSemiJoin::DeriveMaxCard(CMemoryPool *,	// mp
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp,
 								   CStatsPredJoinArray *join_preds_stats,
-								   IStatistics *outer_stats,
-								   IStatistics *inner_side_stats)
+								   gpos::Ref<IStatistics> outer_stats,
+								   gpos::Ref<IStatistics> inner_side_stats)
 {
 	return outer_stats->CalcLSJoinStats(mp, inner_side_stats, join_preds_stats);
 }
@@ -139,18 +139,18 @@ CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp,
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 	CStatsPredJoinArray *join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*semi-join*/);
-	IStatistics *pstatsSemiJoin =
+	gpos::Ref<IStatistics> pstatsSemiJoin =
 		PstatsDerive(mp, join_preds_stats, outer_stats, inner_side_stats);
 
 	join_preds_stats->Release();

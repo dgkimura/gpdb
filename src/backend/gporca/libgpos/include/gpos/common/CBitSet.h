@@ -97,7 +97,8 @@ protected:
 	CBitSet(const CBitSet &);
 
 	// find link with offset less or equal to given value
-	CBitSetLink *FindLinkByOffset(ULONG, CBitSetLink * = nullptr) const;
+	gpos::Ref<CBitSetLink> FindLinkByOffset(
+		ULONG, gpos::Ref<CBitSetLink> = nullptr) const;
 
 	// reset set
 	void Clear();
@@ -126,22 +127,22 @@ public:
 	BOOL ExchangeClear(ULONG pos);
 
 	// union sets
-	void Union(const CBitSet *);
+	void Union(const gpos::Ref<CBitSet>);
 
 	// intersect sets
-	void Intersection(const CBitSet *);
+	void Intersection(const gpos::Ref<CBitSet>);
 
 	// difference of sets
-	void Difference(const CBitSet *);
+	void Difference(const gpos::Ref<CBitSet>);
 
 	// is subset
-	BOOL ContainsAll(const CBitSet *) const;
+	BOOL ContainsAll(const gpos::Ref<CBitSet>) const;
 
 	// equality
-	BOOL Equals(const CBitSet *) const;
+	BOOL Equals(const gpos::Ref<CBitSet>) const;
 
 	// disjoint
-	BOOL IsDisjoint(const CBitSet *) const;
+	BOOL IsDisjoint(const gpos::Ref<CBitSet>) const;
 
 	// hash value for set
 	ULONG HashValue() const;

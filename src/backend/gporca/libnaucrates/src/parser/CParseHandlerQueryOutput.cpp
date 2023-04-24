@@ -153,7 +153,7 @@ CParseHandlerQueryOutput::EndElement(const XMLCh *const,  // element_uri,
 
 		GPOS_ASSERT(nullptr != child_parse_handler);
 
-		CDXLNode *pdxlnIdent = child_parse_handler->CreateDXLNode();
+		gpos::Ref<CDXLNode> pdxlnIdent = child_parse_handler->CreateDXLNode();
 		pdxlnIdent->AddRef();
 		m_dxl_array->Append(pdxlnIdent);
 	}

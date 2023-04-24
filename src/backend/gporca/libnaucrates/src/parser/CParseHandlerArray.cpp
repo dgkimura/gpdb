@@ -56,8 +56,8 @@ CParseHandlerArray::StartElement(const XMLCh *const element_uri,
 		nullptr == m_dxl_node)
 	{
 		// parse and create array
-		CDXLScalarArray *dxl_op =
-			(CDXLScalarArray *) CDXLOperatorFactory::MakeDXLArray(
+		gpos::Ref<CDXLScalarArray> dxl_op =
+			(gpos::Ref<CDXLScalarArray>) CDXLOperatorFactory::MakeDXLArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}

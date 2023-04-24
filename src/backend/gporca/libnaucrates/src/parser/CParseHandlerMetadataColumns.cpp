@@ -129,7 +129,7 @@ CParseHandlerMetadataColumns::EndElement(const XMLCh *const,  // element_uri,
 
 			GPOS_ASSERT(nullptr != md_col_parse_handler->GetMdCol());
 
-			CMDColumn *md_col = md_col_parse_handler->GetMdCol();
+			gpos::Ref<CMDColumn> md_col = md_col_parse_handler->GetMdCol();
 			md_col->AddRef();
 
 			m_md_col_array->Append(md_col);

@@ -43,7 +43,7 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::CLogicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid, CExpressionArray *pdrgpexprFilters)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CExpressionArray *pdrgpexprFilters)
 	: CLogical(mp), m_mdid(mdid), m_pdrgpexprFilters(pdrgpexprFilters)
 {
 	GPOS_ASSERT(mdid->IsValid());
@@ -74,14 +74,14 @@ CLogicalPartitionSelector::~CLogicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalPartitionSelector::Matches(COperator *pop) const
+CLogicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CLogicalPartitionSelector *popPartSelector =
+	gpos::Ref<CLogicalPartitionSelector> popPartSelector =
 		CLogicalPartitionSelector::PopConvert(pop);
 
 	return popPartSelector->MDId()->Equals(m_mdid) &&
@@ -110,7 +110,7 @@ CLogicalPartitionSelector::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL /* must_exist */)
 {
@@ -130,11 +130,11 @@ CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalPartitionSelector::DeriveOutputColumns(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 
 	pcrsOutput->Union(exprhdl.DeriveOutputColumns(0));
 

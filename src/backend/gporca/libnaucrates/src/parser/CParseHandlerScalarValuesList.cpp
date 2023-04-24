@@ -40,7 +40,7 @@ CParseHandlerScalarValuesList::StartElement(
 				 CDXLTokens::XmlstrToken(EdxltokenScalarValuesList),
 				 element_local_name))
 	{
-		CDXLScalarValuesList *dxl_op =
+		gpos::Ref<CDXLScalarValuesList> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}

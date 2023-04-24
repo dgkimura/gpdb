@@ -46,10 +46,10 @@ private:
 	CMDName *m_mdname;
 
 	// sorting columns
-	CDXLNode *m_sort_col_list_dxlnode;
+	gpos::Ref<CDXLNode> m_sort_col_list_dxlnode;
 
 	// window frame associated with the window key
-	CDXLWindowFrame *m_window_frame;
+	gpos::Ref<CDXLWindowFrame> m_window_frame;
 
 	// private copy ctor
 	CDXLWindowSpec(const CDXLWindowSpec &);
@@ -57,8 +57,8 @@ private:
 public:
 	// ctor
 	CDXLWindowSpec(CMemoryPool *mp, ULongPtrArray *partition_by_colid_array,
-				   CMDName *mdname, CDXLNode *sort_col_list_dxlnode,
-				   CDXLWindowFrame *window_frame);
+				   CMDName *mdname, gpos::Ref<CDXLNode> sort_col_list_dxlnode,
+				   gpos::Ref<CDXLWindowFrame> window_frame);
 
 	// dtor
 	~CDXLWindowSpec() override;
@@ -67,10 +67,10 @@ public:
 	virtual void SerializeToDXL(CXMLSerializer *) const;
 
 	// set window frame definition
-	void SetWindowFrame(CDXLWindowFrame *window_frame);
+	void SetWindowFrame(gpos::Ref<CDXLWindowFrame> window_frame);
 
 	// return window frame
-	CDXLWindowFrame *
+	gpos::Ref<CDXLWindowFrame>
 	GetWindowFrame() const
 	{
 		return m_window_frame;
@@ -84,7 +84,7 @@ public:
 	}
 
 	// sort columns
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	GetSortColListDXL() const
 	{
 		return m_sort_col_list_dxlnode;

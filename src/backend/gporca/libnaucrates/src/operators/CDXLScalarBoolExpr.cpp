@@ -97,7 +97,7 @@ CDXLScalarBoolExpr::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarBoolExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+								   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -125,11 +125,12 @@ CDXLScalarBoolExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBoolExpr::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBoolExpr::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	EdxlBoolExprType dxl_bool_type =
-		((CDXLScalarBoolExpr *) dxlnode->GetOperator())->GetDxlBoolTypeStr();
+		((gpos::Ref<CDXLScalarBoolExpr>) dxlnode->GetOperator())
+			->GetDxlBoolTypeStr();
 
 	GPOS_ASSERT((dxl_bool_type == Edxlnot) || (dxl_bool_type == Edxlor) ||
 				(dxl_bool_type == Edxland));
@@ -146,7 +147,7 @@ CDXLScalarBoolExpr::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

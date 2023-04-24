@@ -58,9 +58,9 @@ CXformIntersectAll2LeftSemiJoin::CXformIntersectAll2LeftSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										   gpos::Ref<CXformResult> pxfres,
+										   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -74,17 +74,19 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalIntersectAll *popIntersectAll =
+	gpos::Ref<CLogicalIntersectAll> popIntersectAll =
 		CLogicalIntersectAll::PopConvert(pexpr->Pop());
 	CColRef2dArray *pdrgpdrgpcrInput = popIntersectAll->PdrgpdrgpcrInput();
 
-	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
-	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
+	gpos::Ref<CExpression> pexprLeftWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild,
+											  (*pdrgpdrgpcrInput)[0]);
+	gpos::Ref<CExpression> pexprRightWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild,
+											  (*pdrgpdrgpcrInput)[1]);
 
 	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
 	CColRefArray *pdrgpcrLeftNew =
@@ -100,11 +102,11 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 	pdrgpdrgpcrInputNew->Append(pdrgpcrLeftNew);
 	pdrgpdrgpcrInputNew->Append(pdrgpcrRightNew);
 
-	CExpression *pexprScCond =
+	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new logical operator
-	CExpression *pexprLSJ = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprLSJ = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftSemiJoin(mp), pexprLeftWindow,
 					pexprRightWindow, pexprScCond);
 

@@ -35,7 +35,7 @@ class CParseHandlerCost : public CParseHandlerBase
 {
 private:
 	// physical operator cost constructed by the parse handler
-	CDXLOperatorCost *m_operator_cost_dxl;
+	gpos::Ref<CDXLOperatorCost> m_operator_cost_dxl;
 
 	// process the start of an element
 	void StartElement(
@@ -62,7 +62,7 @@ public:
 	~CParseHandlerCost() override;
 
 	// returns operator cost constructed by the handler
-	CDXLOperatorCost *GetDXLOperatorCost();
+	gpos::Ref<CDXLOperatorCost> GetDXLOperatorCost();
 };
 }  // namespace gpdxl
 

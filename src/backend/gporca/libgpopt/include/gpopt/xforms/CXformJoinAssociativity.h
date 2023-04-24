@@ -31,7 +31,7 @@ class CXformJoinAssociativity : public CXformExploration
 {
 private:
 	// helper function for creating the new join predicate
-	static void CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
+	static void CreatePredicates(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 CExpressionArray *pdrgpexprLower,
 								 CExpressionArray *pdrgpexprUpper);
 
@@ -62,8 +62,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 };	// class CXformJoinAssociativity
 

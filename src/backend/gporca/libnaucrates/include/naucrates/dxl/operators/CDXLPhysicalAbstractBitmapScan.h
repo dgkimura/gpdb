@@ -48,14 +48,15 @@ class CDXLPhysicalAbstractBitmapScan : public CDXLPhysical
 private:
 protected:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 public:
 	CDXLPhysicalAbstractBitmapScan(const CDXLPhysicalAbstractBitmapScan &) =
 		delete;
 
 	// ctor
-	CDXLPhysicalAbstractBitmapScan(CMemoryPool *mp, CDXLTableDescr *table_descr)
+	CDXLPhysicalAbstractBitmapScan(CMemoryPool *mp,
+								   gpos::Ref<CDXLTableDescr> table_descr)
 		: CDXLPhysical(mp), m_dxl_table_descr(table_descr)
 	{
 		GPOS_ASSERT(nullptr != table_descr);
@@ -65,7 +66,7 @@ public:
 	~CDXLPhysicalAbstractBitmapScan() override;
 
 	// table descriptor
-	const CDXLTableDescr *
+	const gpos::Ref<CDXLTableDescr>
 	GetDXLTableDescr()
 	{
 		return m_dxl_table_descr;
@@ -74,7 +75,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };		// class CDXLPhysicalAbstractBitmapScan

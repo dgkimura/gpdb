@@ -34,7 +34,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerAppend : public CParseHandlerPhysicalOp
 {
 private:
-	CDXLPhysicalAppend *m_dxl_op;
+	gpos::Ref<CDXLPhysicalAppend> m_dxl_op;
 
 	// set up initial handlers
 	void SetupInitialHandlers(const Attributes &attrs);

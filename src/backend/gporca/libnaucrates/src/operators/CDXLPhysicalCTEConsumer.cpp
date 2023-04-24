@@ -87,7 +87,7 @@ CDXLPhysicalCTEConsumer::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
-										const CDXLNode *dxlnode) const
+										const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -120,12 +120,12 @@ CDXLPhysicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTEConsumer::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalCTEConsumer::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *dxlnode_proj_list = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> dxlnode_proj_list = (*dxlnode)[0];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				dxlnode_proj_list->GetOperator()->GetDXLOperator());
 

@@ -96,7 +96,7 @@ CLogicalIntersect::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalIntersect::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											  UlongToColRefMap *colref_mapping,
 											  BOOL must_exist)
@@ -134,7 +134,7 @@ CLogicalIntersect::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalIntersect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								IStatisticsArray *	// not used
 ) const
@@ -148,18 +148,19 @@ CLogicalIntersect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::Ref<CColRefSet> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *pstatsIntersectAll = CLogicalIntersectAll::PstatsDerive(
-		mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
+	gpos::Ref<IStatistics> pstatsIntersectAll =
+		CLogicalIntersectAll::PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput,
+										   output_colrefsets);
 
 	// computed columns
 	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsIntersectAll,
 		(*m_pdrgpdrgpcrInput)[0],  // we group by the columns of the first child
 		pdrgpulComputedCols,	   // no computed columns for set ops

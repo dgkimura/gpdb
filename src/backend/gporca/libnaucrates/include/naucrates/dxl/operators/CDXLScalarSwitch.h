@@ -35,13 +35,13 @@ class CDXLScalarSwitch : public CDXLScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarSwitch(const CDXLScalarSwitch &) = delete;
 
 	// ctor
-	CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	//dtor
 	~CDXLScalarSwitch() override;
@@ -50,23 +50,23 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return type
-	virtual IMDId *MdidType() const;
+	virtual gpos::Ref<IMDId> MdidType() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarSwitch *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarSwitch>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSwitch == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSwitch *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarSwitch> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -75,7 +75,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

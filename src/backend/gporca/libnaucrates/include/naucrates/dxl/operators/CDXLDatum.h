@@ -42,7 +42,7 @@ protected:
 	CMemoryPool *m_mp;
 
 	// mdid of the datum's type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	const INT m_type_modifier;
 
@@ -69,7 +69,7 @@ public:
 		EdxldatumSentinel
 	};
 	// ctor
-	CDXLDatum(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
+	CDXLDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, INT type_modifier,
 			  BOOL is_null, ULONG length);
 
 	// dtor
@@ -79,7 +79,7 @@ public:
 	}
 
 	// mdid type of the datum
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid_type;

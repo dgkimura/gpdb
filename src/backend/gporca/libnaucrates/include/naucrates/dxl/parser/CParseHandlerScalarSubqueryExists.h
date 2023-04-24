@@ -36,7 +36,7 @@ class CParseHandlerScalarSubqueryExists : public CParseHandlerScalarOp
 {
 private:
 	// scalar subquery operator
-	CDXLScalar *m_dxl_op;
+	gpos::Ref<CDXLScalar> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

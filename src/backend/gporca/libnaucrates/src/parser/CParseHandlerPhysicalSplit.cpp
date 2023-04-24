@@ -152,7 +152,7 @@ CParseHandlerPhysicalSplit::EndElement(const XMLCh *const,	// element_uri,
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	CDXLPhysicalSplit *dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLPhysicalSplit> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalSplit(m_mp, m_deletion_colid_array, m_insert_colid_array,
 						  m_action_colid, m_ctid_colid, m_segid_colid);
 

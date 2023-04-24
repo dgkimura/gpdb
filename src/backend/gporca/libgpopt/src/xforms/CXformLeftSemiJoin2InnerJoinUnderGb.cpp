@@ -60,8 +60,8 @@ CXformLeftSemiJoin2InnerJoinUnderGb::CXformLeftSemiJoin2InnerJoinUnderGb(
 CXform::EXformPromise
 CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2);
+	gpos::Ref<CColRefSet> pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
+	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarExactChild(2);
 	CAutoMemoryPool amp;
 	if (exprhdl.HasOuterRefs() || nullptr == exprhdl.DeriveKeyCollection(0) ||
 		nullptr == pexprScalar ||
@@ -83,9 +83,9 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
-											   CXformResult *pxfres,
-											   CExpression *pexpr) const
+CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -94,9 +94,9 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	pexprOuter->AddRef();
 	pexprInner->AddRef();
@@ -107,10 +107,11 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
 
-	CExpression *pexprInnerJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, pexprOuter, pexprInner, pexprScalar);
+	gpos::Ref<CExpression> pexprInnerJoin =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
+													pexprScalar);
 
-	CExpression *pexprGb = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, pdrgpcrGrouping, COperator::EgbaggtypeGlobal /*egbaggtype*/,

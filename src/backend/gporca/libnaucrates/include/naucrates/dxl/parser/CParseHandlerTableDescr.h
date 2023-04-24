@@ -37,7 +37,7 @@ class CParseHandlerTableDescr : public CParseHandlerBase
 {
 private:
 	// the table descriptor to construct
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +64,7 @@ public:
 
 	~CParseHandlerTableDescr() override;
 
-	CDXLTableDescr *GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> GetDXLTableDescr();
 };
 }  // namespace gpdxl
 

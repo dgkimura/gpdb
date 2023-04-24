@@ -61,14 +61,14 @@ CDrvdPropPlan::~CDrvdPropPlan()
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
-CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
+gpos::Ref<CDrvdPropPlan>
+CDrvdPropPlan::Pdpplan(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptPlan == pdp->Ept() &&
 				"This is not a plan properties container");
 
-	return dynamic_cast<CDrvdPropPlan *>(pdp);
+	return dynamic_cast<gpos::Ref<CDrvdPropPlan> >(pdp);
 }
 
 
@@ -82,9 +82,9 @@ CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 //---------------------------------------------------------------------------
 void
 CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					  CDrvdPropCtxt *pdpctxt)
+					  gpos::Ref<CDrvdPropCtxt> pdpctxt)
 {
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::Ref<CPhysical> popPhysical = CPhysical::PopConvert(exprhdl.Pop());
 	if (nullptr != pdpctxt &&
 		COperator::EopPhysicalCTEConsumer == popPhysical->Eopid())
 	{
@@ -115,16 +115,17 @@ CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-										COperator *pop)
+CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
+										gpos::Ref<CDrvdPropCtxt> pdpctxt,
+										gpos::Ref<COperator> pop)
 {
-	CDrvdPropCtxtPlan *pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		CDrvdPropCtxtPlan::PdpctxtplanConvert(pdpctxt);
-	CPhysicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CPhysicalCTEConsumer> popCTEConsumer =
 		CPhysicalCTEConsumer::PopConvert(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
 	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
-	CDrvdPropPlan *pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
+	gpos::Ref<CDrvdPropPlan> pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{
 		// copy producer plan properties after remapping columns
@@ -156,7 +157,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropPlan::FSatisfies(const CReqdPropPlan *prpp) const
+CDrvdPropPlan::FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->Peo());
@@ -199,7 +200,7 @@ CDrvdPropPlan::HashValue() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CDrvdPropPlan::Equals(const CDrvdPropPlan *pdpplan) const
+CDrvdPropPlan::Equals(const gpos::Ref<CDrvdPropPlan> pdpplan) const
 {
 	return m_pos->Matches(pdpplan->Pos()) && m_pds->Equals(pdpplan->Pds()) &&
 		   m_prs->Matches(pdpplan->Prs()) && m_ppps->Equals(pdpplan->Ppps()) &&

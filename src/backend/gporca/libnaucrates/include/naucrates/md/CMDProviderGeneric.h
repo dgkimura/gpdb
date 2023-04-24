@@ -37,19 +37,19 @@ class CMDProviderGeneric
 {
 private:
 	// mdid of int2
-	IMDId *m_mdid_int2;
+	gpos::Ref<IMDId> m_mdid_int2;
 
 	// mdid of int4
-	IMDId *m_mdid_int4;
+	gpos::Ref<IMDId> m_mdid_int4;
 
 	// mdid of int8
-	IMDId *m_mdid_int8;
+	gpos::Ref<IMDId> m_mdid_int8;
 
 	// mdid of bool
-	IMDId *m_mdid_bool;
+	gpos::Ref<IMDId> m_mdid_bool;
 
 	// mdid of oid
-	IMDId *m_mdid_oid;
+	gpos::Ref<IMDId> m_mdid_oid;
 
 public:
 	CMDProviderGeneric(const CMDProviderGeneric &) = delete;
@@ -61,7 +61,7 @@ public:
 	~CMDProviderGeneric();
 
 	// return the mdid for the requested type
-	IMDId *MDId(IMDType::ETypeInfo type_info) const;
+	gpos::Ref<IMDId> MDId(IMDType::ETypeInfo type_info) const;
 
 	// default system id
 	static CSystemId SysidDefault();

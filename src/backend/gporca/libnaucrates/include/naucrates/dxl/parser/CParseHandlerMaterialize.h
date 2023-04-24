@@ -37,7 +37,7 @@ class CParseHandlerMaterialize : public CParseHandlerPhysicalOp
 {
 private:
 	// the materialize operator
-	CDXLPhysicalMaterialize *m_dxl_op;
+	gpos::Ref<CDXLPhysicalMaterialize> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

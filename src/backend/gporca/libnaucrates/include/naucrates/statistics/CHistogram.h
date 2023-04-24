@@ -96,30 +96,33 @@ private:
 	BOOL m_is_col_stats_missing;
 
 	// return an array buckets after applying equality filter on the histogram buckets
-	CBucketArray *MakeBucketsWithEqualityFilter(CPoint *point) const;
+	CBucketArray *MakeBucketsWithEqualityFilter(gpos::Ref<CPoint> point) const;
 
 	// return an array buckets after applying non equality filter on the histogram buckets
-	CBucketArray *MakeBucketsWithInequalityFilter(CPoint *point) const;
+	CBucketArray *MakeBucketsWithInequalityFilter(
+		gpos::Ref<CPoint> point) const;
 
 	// less than or less than equal filter
 	CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		gpos::Ref<CPoint> point) const;
 
 	// greater than or greater than equal filter
 	CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		gpos::Ref<CPoint> point) const;
 
 	// equal filter
-	CHistogram *MakeHistogramEqualFilter(CPoint *point) const;
+	CHistogram *MakeHistogramEqualFilter(gpos::Ref<CPoint> point) const;
 
 	// not equal filter
-	CHistogram *MakeHistogramInequalityFilter(CPoint *point) const;
+	CHistogram *MakeHistogramInequalityFilter(gpos::Ref<CPoint> point) const;
 
 	// IDF filter
-	CHistogram *MakeHistogramIDFFilter(CPoint *point) const;
+	CHistogram *MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const;
 
 	// INDF filter
-	CHistogram *MakeHistogramINDFFilter(CPoint *point) const;
+	CHistogram *MakeHistogramINDFFilter(gpos::Ref<CPoint> point) const;
 
 	// equality join
 	CHistogram *MakeJoinHistogramEqualityFilter(
@@ -253,11 +256,11 @@ public:
 
 	// filter by comparing with point
 	CHistogram *MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
-									CPoint *point) const;
+									gpos::Ref<CPoint> point) const;
 
 	// filter by comparing with point and normalize
 	CHistogram *MakeHistogramFilterNormalize(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point,
+		CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point,
 		CDouble *scale_factor) const;
 
 	// join with another histogram
@@ -372,7 +375,7 @@ public:
 	BOOL IsNormalized() const;
 
 	// translate the histogram into a derived column stats
-	CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats(
+	gpos::Ref<CDXLStatsDerivedColumn> TranslateToDXLDerivedColumnStats(
 		CMDAccessor *md_accessor, ULONG colid, CDouble width) const;
 
 	// randomly pick a bucket index
@@ -430,7 +433,8 @@ public:
 		CStatsPred::EStatsCmpType stats_cmp_type);
 
 	// create the default histogram for a given column reference
-	static CHistogram *MakeDefaultHistogram(CMemoryPool *mp, CColRef *col_ref,
+	static CHistogram *MakeDefaultHistogram(CMemoryPool *mp,
+											gpos::Ref<CColRef> col_ref,
 											BOOL is_empty);
 
 	// create the default non empty histogram for a boolean column

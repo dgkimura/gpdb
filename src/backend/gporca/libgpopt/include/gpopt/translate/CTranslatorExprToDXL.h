@@ -90,7 +90,7 @@ private:
 	ColRefToUlongMap *m_phmcrulPartColId = nullptr;
 
 	// derived plan properties of the translated expression
-	CDrvdPropPlan *m_pdpplan;
+	gpos::Ref<CDrvdPropPlan> m_pdpplan;
 
 	// a copy of the pointer to column factory, obtained at construction time
 	CColumnFactory *m_pcf;
@@ -111,508 +111,547 @@ private:
 	static EdxlDmlType Edxldmloptype(const CLogicalDML::EDMLOperator edmlop);
 
 	// return outer refs in correlated join inner child
-	static CColRefSet *PcrsOuterRefsForCorrelatedNLJoin(CExpression *pexpr);
+	static gpos::Ref<CColRefSet> PcrsOuterRefsForCorrelatedNLJoin(
+		gpos::Ref<CExpression> pexpr);
 
 	// functions translating different optimizer expressions into their
 	// DXL counterparts
 
-	CDXLNode *PdxlnTblScan(CExpression *pexprTblScan, CColRefSet *pcrsOutput,
-						   CColRefArray *colref_array,
-						   CDistributionSpecArray *pdrgpdsBaseTables,
-						   CExpression *pexprScalarCond,
-						   CDXLPhysicalProperties *dxl_properties);
+	gpos::Ref<CDXLNode> PdxlnTblScan(
+		gpos::Ref<CExpression> pexprTblScan, gpos::Ref<CColRefSet> pcrsOutput,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprScalarCond,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
 	// create a (dynamic) index scan node after inlining the given scalar condition, if needed
-	CDXLNode *PdxlnIndexScanWithInlinedCondition(
-		CExpression *pexprIndexScan, CExpression *pexprScalarCond,
-		CDXLPhysicalProperties *dxl_properties, CColRefArray *colref_array,
-		CDistributionSpecArray *pdrgpdsBaseTables);
+	gpos::Ref<CDXLNode> PdxlnIndexScanWithInlinedCondition(
+		gpos::Ref<CExpression> pexprIndexScan,
+		gpos::Ref<CExpression> pexprScalarCond,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables);
 
 	// translate index scan based on passed properties
-	CDXLNode *PdxlnIndexScan(CExpression *pexprIndexScan,
-							 CColRefArray *colref_array,
-							 CDXLPhysicalProperties *dxl_properties,
-							 CReqdPropPlan *prpp);
+	gpos::Ref<CDXLNode> PdxlnIndexScan(
+		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
 
 	// translate index scan
-	CDXLNode *PdxlnIndexScan(CExpression *pexprIndexScan,
-							 CColRefArray *colref_array,
-							 CDistributionSpecArray *pdrgpdsBaseTables,
-							 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnIndexScan(
+		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	CDXLNode *PdxlnIndexOnlyScan(CExpression *pexprIndexScan,
-								 CColRefArray *colref_array,
-								 CDistributionSpecArray *pdrgpdsBaseTables,
-								 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnIndexOnlyScan(
+		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	CDXLNode *PdxlnIndexOnlyScan(CExpression *pexprIndexScan,
-								 CColRefArray *colref_array,
-								 CDXLPhysicalProperties *dxl_properties,
-								 CReqdPropPlan *prpp);
+	gpos::Ref<CDXLNode> PdxlnIndexOnlyScan(
+		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
 
 	// translate a bitmap index probe expression to DXL
-	CDXLNode *PdxlnBitmapIndexProbe(CExpression *pexprBitmapIndexProbe);
+	gpos::Ref<CDXLNode> PdxlnBitmapIndexProbe(
+		gpos::Ref<CExpression> pexprBitmapIndexProbe);
 
 	// translate a bitmap bool op expression to DXL
-	CDXLNode *PdxlnBitmapBoolOp(CExpression *pexprBitmapBoolOp);
+	gpos::Ref<CDXLNode> PdxlnBitmapBoolOp(
+		gpos::Ref<CExpression> pexprBitmapBoolOp);
 
 	// translate a bitmap table scan expression to DXL
-	CDXLNode *PdxlnBitmapTableScan(CExpression *pexprBitmapTableScan,
-								   CColRefArray *colref_array,
-								   CDistributionSpecArray *pdrgpdsBaseTables,
-								   ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnBitmapTableScan(
+		gpos::Ref<CExpression> pexprBitmapTableScan, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// translate a bitmap table scan expression to DXL
-	CDXLNode *PdxlnBitmapTableScan(CExpression *pexprBitmapTableScan,
-								   CColRefSet *pcrsOutput,
-								   CColRefArray *colref_array,
-								   CDistributionSpecArray *pdrgpdsBaseTables,
-								   CExpression *pexprScalar,
-								   CDXLPhysicalProperties *dxl_properties);
+	gpos::Ref<CDXLNode> PdxlnBitmapTableScan(
+		gpos::Ref<CExpression> pexprBitmapTableScan,
+		gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprScalar,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
 	// create a DXL result node from an optimizer filter node
-	CDXLNode *PdxlnResultFromFilter(CExpression *pexprFilter,
+	gpos::Ref<CDXLNode> PdxlnResultFromFilter(
+		gpos::Ref<CExpression> pexprFilter, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	gpos::Ref<CDXLNode> PdxlnResult(gpos::Ref<CExpression> pexprFilter,
 									CColRefArray *colref_array,
 									CDistributionSpecArray *pdrgpdsBaseTables,
 									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	CDXLNode *PdxlnResult(CExpression *pexprFilter, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
-
 	// create a DXL result node for the given project list
-	CDXLNode *PdxlnResult(CDXLNode *proj_list_dxlnode, CExpression *pexprFilter,
-						  CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnResult(gpos::Ref<CDXLNode> proj_list_dxlnode,
+									gpos::Ref<CExpression> pexprFilter,
+									CColRefArray *colref_array,
+									CDistributionSpecArray *pdrgpdsBaseTables,
+									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// given a DXL plan tree child_dxlnode which represents the physical plan pexprRelational, construct a DXL
 	// Result node that filters on top of it using the scalar condition pdxlnScalar
-	CDXLNode *PdxlnAddScalarFilterOnRelationalChild(
-		CDXLNode *pdxlnRelationalChild, CDXLNode *pdxlnScalarChild,
-		CDXLPhysicalProperties *dxl_properties, CColRefSet *pcrsOutput,
-		CColRefArray *pdrgpcrOrder);
+	gpos::Ref<CDXLNode> PdxlnAddScalarFilterOnRelationalChild(
+		gpos::Ref<CDXLNode> pdxlnRelationalChild,
+		gpos::Ref<CDXLNode> pdxlnScalarChild,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *pdrgpcrOrder);
 
-	CDXLNode *PdxlnFromFilter(CExpression *pexprFilter,
-							  CColRefArray *colref_array,
-							  CDistributionSpecArray *pdrgpdsBaseTables,
-							  ULONG *pulNonGatherMotions, BOOL *pfDML,
-							  CDXLPhysicalProperties *dxl_properties);
+	gpos::Ref<CDXLNode> PdxlnFromFilter(
+		gpos::Ref<CExpression> pexprFilter, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML, gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
-	CDXLNode *PdxlnResult(CExpression *pexprRelational,
-						  CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML,
-						  CDXLNode *pdxlnScalar,
-						  CDXLPhysicalProperties *dxl_properties);
+	gpos::Ref<CDXLNode> PdxlnResult(
+		gpos::Ref<CExpression> pexprRelational, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML, gpos::Ref<CDXLNode> pdxlnScalar,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
-	CDXLNode *PdxlnResult(CExpression *pexprRelational,
-						  CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML,
-						  CDXLNode *pdxlnScalar);
+	gpos::Ref<CDXLNode> PdxlnResult(gpos::Ref<CExpression> pexprRelational,
+									CColRefArray *colref_array,
+									CDistributionSpecArray *pdrgpdsBaseTables,
+									ULONG *pulNonGatherMotions, BOOL *pfDML,
+									gpos::Ref<CDXLNode> pdxlnScalar);
 
-	CDXLNode *PdxlnComputeScalar(CExpression *pexprComputeScalar,
-								 CColRefArray *colref_array,
-								 CDistributionSpecArray *pdrgpdsBaseTables,
-								 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnComputeScalar(
+		gpos::Ref<CExpression> pexprComputeScalar, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	CDXLNode *PdxlnAggregate(CExpression *pexprHashAgg,
-							 CColRefArray *colref_array,
-							 CDistributionSpecArray *pdrgpdsBaseTables,
-							 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnAggregate(
+		gpos::Ref<CExpression> pexprHashAgg, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	CDXLNode *PdxlnAggregateDedup(CExpression *pexprAgg,
+	gpos::Ref<CDXLNode> PdxlnAggregateDedup(
+		gpos::Ref<CExpression> pexprAgg, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	gpos::Ref<CDXLNode> PdxlnAggregate(
+		gpos::Ref<CExpression> pexprAgg, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML, EdxlAggStrategy dxl_agg_strategy,
+		const CColRefArray *pdrgpcrGroupingCols,
+		gpos::Ref<CColRefSet> pcrsKeys);
+
+	gpos::Ref<CDXLNode> PdxlnSort(gpos::Ref<CExpression> pexprSort,
 								  CColRefArray *colref_array,
 								  CDistributionSpecArray *pdrgpdsBaseTables,
 								  ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	CDXLNode *PdxlnAggregate(CExpression *pexprAgg, CColRefArray *colref_array,
-							 CDistributionSpecArray *pdrgpdsBaseTables,
-							 ULONG *pulNonGatherMotions, BOOL *pfDML,
-							 EdxlAggStrategy dxl_agg_strategy,
-							 const CColRefArray *pdrgpcrGroupingCols,
-							 CColRefSet *pcrsKeys);
+	gpos::Ref<CDXLNode> PdxlnLimit(gpos::Ref<CExpression> pexprLimit,
+								   CColRefArray *colref_array,
+								   CDistributionSpecArray *pdrgpdsBaseTables,
+								   ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	CDXLNode *PdxlnSort(CExpression *pexprSort, CColRefArray *colref_array,
-						CDistributionSpecArray *pdrgpdsBaseTables,
-						ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnLimit(CExpression *pexprLimit, CColRefArray *colref_array,
-						 CDistributionSpecArray *pdrgpdsBaseTables,
-						 ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnWindow(CExpression *pexprSeqPrj, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnNLJoin(CExpression *pexprNLJ, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnMergeJoin(CExpression *pexprMJ, CColRefArray *colref_array,
-							 CDistributionSpecArray *pdrgpdsBaseTables,
-							 ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnHashJoin(CExpression *pexprHJ, CColRefArray *colref_array,
-							CDistributionSpecArray *pdrgpdsBaseTables,
-							ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnCorrelatedNLJoin(CExpression *pexprNLJ,
+	gpos::Ref<CDXLNode> PdxlnWindow(gpos::Ref<CExpression> pexprSeqPrj,
 									CColRefArray *colref_array,
 									CDistributionSpecArray *pdrgpdsBaseTables,
 									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	CDXLNode *PdxlnCTEProducer(CExpression *pexprCTEProducer,
-							   CColRefArray *colref_array,
-							   CDistributionSpecArray *pdrgpdsBaseTables,
-							   ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnCTEConsumer(CExpression *pexprCTEConsumer,
-							   CColRefArray *colref_array,
-							   CDistributionSpecArray *pdrgpdsBaseTables,
-							   ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	// store outer references in index NLJ inner child into global map
-	void StoreIndexNLJOuterRefs(CPhysical *pop);
-
-	// build a scalar DXL subplan node
-	void BuildDxlnSubPlan(CDXLNode *pdxlnRelChild, const CColRef *colref,
-						  CDXLColRefArray *dxl_colref_array);
-
-	// build a boolean scalar dxl node with a subplan as its child
-	CDXLNode *PdxlnBooleanScalarWithSubPlan(CDXLNode *pdxlnRelChild,
-											CDXLColRefArray *dxl_colref_array);
-
-	CDXLNode *PdxlnScBoolExpr(EdxlBoolExprType boolexptype,
-							  CDXLNode *dxlnode_left, CDXLNode *dxlnode_right);
-
-	CDXLNode *PdxlnTblScanFromNLJoinOuter(
-		CExpression *pexprRelational, CDXLNode *pdxlnScalar,
-		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
-		ULONG *pulNonGatherMotions, CDXLPhysicalProperties *dxl_properties);
-
-	CDXLNode *PdxlnResultFromNLJoinOuter(
-		CExpression *pexprRelational, CDXLNode *pdxlnScalar,
-		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
-		ULONG *pulNonGatherMotions, BOOL *pfDML,
-		CDXLPhysicalProperties *dxl_properties);
-
-	CDXLNode *PdxlnMotion(CExpression *pexprMotion, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	CDXLNode *PdxlnMaterialize(CExpression *pexprSpool,
-							   CColRefArray *colref_array,
-							   CDistributionSpecArray *pdrgpdsBaseTables,
-							   ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	// translate a sequence expression
-	CDXLNode *PdxlnSequence(CExpression *pexprSequence,
-							CColRefArray *colref_array,
-							CDistributionSpecArray *pdrgpdsBaseTables,
-							ULONG *pulNonGatherMotions, BOOL *pfDML);
-
-	// translate a dynamic table scan
-	CDXLNode *PdxlnDynamicTableScan(CExpression *pexprDTS,
+	gpos::Ref<CDXLNode> PdxlnNLJoin(gpos::Ref<CExpression> pexprNLJ,
 									CColRefArray *colref_array,
 									CDistributionSpecArray *pdrgpdsBaseTables,
 									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	// translate a dynamic table scan with a scalar condition
-	CDXLNode *PdxlnDynamicTableScan(CExpression *pexprDTS,
-									CColRefArray *colref_array,
-									CDistributionSpecArray *pdrgpdsBaseTables,
-									CExpression *pexprScalarCond,
-									CDXLPhysicalProperties *dxl_properties);
-
-	// translate a dynamic bitmap table scan
-	CDXLNode *PdxlnDynamicBitmapTableScan(
-		CExpression *pexprDynamicBitmapTableScan, CColRefArray *colref_array,
+	gpos::Ref<CDXLNode> PdxlnMergeJoin(
+		gpos::Ref<CExpression> pexprMJ, CColRefArray *colref_array,
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 		BOOL *pfDML);
 
-	// translate a dynamic foreign scan
-	CDXLNode *PdxlnDynamicForeignScan(CExpression *pexprDFS,
+	gpos::Ref<CDXLNode> PdxlnHashJoin(gpos::Ref<CExpression> pexprHJ,
 									  CColRefArray *colref_array,
 									  CDistributionSpecArray *pdrgpdsBaseTables,
 									  ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	// translate a dynamic foreign scan with a scalar condition
-	CDXLNode *PdxlnDynamicForeignScan(CExpression *pexprDFS,
-									  CColRefArray *colref_array,
-									  CDistributionSpecArray *pdrgpdsBaseTables,
-									  CExpression *pexprScalarCond,
-									  CDXLPhysicalProperties *dxl_properties);
+	gpos::Ref<CDXLNode> PdxlnCorrelatedNLJoin(
+		gpos::Ref<CExpression> pexprNLJ, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	// Construct a table descr for a child partition
-	CTableDescriptor *MakeTableDescForPart(const IMDRelation *part,
-										   CTableDescriptor *root_table_desc);
+	gpos::Ref<CDXLNode> PdxlnCTEProducer(
+		gpos::Ref<CExpression> pexprCTEProducer, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	// Construct a dxl index descriptor for a child partition
-	static CDXLIndexDescr *PdxlnIndexDescForPart(
-		CMemoryPool *m_mp, MdidHashSet *child_index_mdids_set,
-		const IMDRelation *part, const CWStringConst *index_name);
+	gpos::Ref<CDXLNode> PdxlnCTEConsumer(
+		gpos::Ref<CExpression> pexprCTEConsumer, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
-	// translate a dynamic bitmap table scan
-	CDXLNode *PdxlnDynamicBitmapTableScan(
-		CExpression *pexprDynamicBitmapTableScan, CColRefArray *colref_array,
-		CDistributionSpecArray *pdrgpdsBaseTables, CExpression *pexprScalar,
-		CDXLPhysicalProperties *dxl_properties);
+	// store outer references in index NLJ inner child into global map
+	void StoreIndexNLJOuterRefs(gpos::Ref<CPhysical> pop);
 
-	// translate a dynamic index scan based on passed properties
-	CDXLNode *PdxlnDynamicIndexScan(CExpression *pexprDIS,
-									CColRefArray *colref_array,
-									CDXLPhysicalProperties *dxl_properties,
-									CReqdPropPlan *prpp);
+	// build a scalar DXL subplan node
+	void BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
+						  const gpos::Ref<CColRef> colref,
+						  CDXLColRefArray *dxl_colref_array);
 
-	// translate a dynamic index scan
-	CDXLNode *PdxlnDynamicIndexScan(CExpression *pexprDIS,
+	// build a boolean scalar dxl node with a subplan as its child
+	gpos::Ref<CDXLNode> PdxlnBooleanScalarWithSubPlan(
+		gpos::Ref<CDXLNode> pdxlnRelChild, CDXLColRefArray *dxl_colref_array);
+
+	gpos::Ref<CDXLNode> PdxlnScBoolExpr(EdxlBoolExprType boolexptype,
+										gpos::Ref<CDXLNode> dxlnode_left,
+										gpos::Ref<CDXLNode> dxlnode_right);
+
+	gpos::Ref<CDXLNode> PdxlnTblScanFromNLJoinOuter(
+		gpos::Ref<CExpression> pexprRelational, gpos::Ref<CDXLNode> pdxlnScalar,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		ULONG *pulNonGatherMotions,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
+
+	gpos::Ref<CDXLNode> PdxlnResultFromNLJoinOuter(
+		gpos::Ref<CExpression> pexprRelational, gpos::Ref<CDXLNode> pdxlnScalar,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		ULONG *pulNonGatherMotions, BOOL *pfDML,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
+
+	gpos::Ref<CDXLNode> PdxlnMotion(gpos::Ref<CExpression> pexprMotion,
 									CColRefArray *colref_array,
 									CDistributionSpecArray *pdrgpdsBaseTables,
 									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	// translate a const table get into a result node
-	CDXLNode *PdxlnResultFromConstTableGet(
-		CExpression *pexprCTG, CColRefArray *colref_array,
+	gpos::Ref<CDXLNode> PdxlnMaterialize(
+		gpos::Ref<CExpression> pexprSpool, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	// translate a sequence expression
+	gpos::Ref<CDXLNode> PdxlnSequence(gpos::Ref<CExpression> pexprSequence,
+									  CColRefArray *colref_array,
+									  CDistributionSpecArray *pdrgpdsBaseTables,
+									  ULONG *pulNonGatherMotions, BOOL *pfDML);
+
+	// translate a dynamic table scan
+	gpos::Ref<CDXLNode> PdxlnDynamicTableScan(
+		gpos::Ref<CExpression> pexprDTS, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	// translate a dynamic table scan with a scalar condition
+	gpos::Ref<CDXLNode> PdxlnDynamicTableScan(
+		gpos::Ref<CExpression> pexprDTS, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprScalarCond,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
+
+	// translate a dynamic bitmap table scan
+	gpos::Ref<CDXLNode> PdxlnDynamicBitmapTableScan(
+		gpos::Ref<CExpression> pexprDynamicBitmapTableScan,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		ULONG *pulNonGatherMotions, BOOL *pfDML);
+
+	// translate a dynamic foreign scan
+	gpos::Ref<CDXLNode> PdxlnDynamicForeignScan(
+		gpos::Ref<CExpression> pexprDFS, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	// translate a dynamic foreign scan with a scalar condition
+	gpos::Ref<CDXLNode> PdxlnDynamicForeignScan(
+		gpos::Ref<CExpression> pexprDFS, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprScalarCond,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
+
+	// Construct a table descr for a child partition
+	gpos::Ref<CTableDescriptor> MakeTableDescForPart(
+		const gpos::Ref<IMDRelation> part,
+		gpos::Ref<CTableDescriptor> root_table_desc);
+
+	// Construct a dxl index descriptor for a child partition
+	static gpos::Ref<CDXLIndexDescr> PdxlnIndexDescForPart(
+		CMemoryPool *m_mp, MdidHashSet *child_index_mdids_set,
+		const gpos::Ref<IMDRelation> part, const CWStringConst *index_name);
+
+	// translate a dynamic bitmap table scan
+	gpos::Ref<CDXLNode> PdxlnDynamicBitmapTableScan(
+		gpos::Ref<CExpression> pexprDynamicBitmapTableScan,
+		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprScalar,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
+
+	// translate a dynamic index scan based on passed properties
+	gpos::Ref<CDXLNode> PdxlnDynamicIndexScan(
+		gpos::Ref<CExpression> pexprDIS, CColRefArray *colref_array,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
+
+	// translate a dynamic index scan
+	gpos::Ref<CDXLNode> PdxlnDynamicIndexScan(
+		gpos::Ref<CExpression> pexprDIS, CColRefArray *colref_array,
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 		BOOL *pfDML);
 
 	// translate a const table get into a result node
-	CDXLNode *PdxlnResultFromConstTableGet(CExpression *pexprCTG,
-										   CColRefArray *colref_array,
-										   CExpression *pexprScalarCond);
+	gpos::Ref<CDXLNode> PdxlnResultFromConstTableGet(
+		gpos::Ref<CExpression> pexprCTG, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
+
+	// translate a const table get into a result node
+	gpos::Ref<CDXLNode> PdxlnResultFromConstTableGet(
+		gpos::Ref<CExpression> pexprCTG, CColRefArray *colref_array,
+		gpos::Ref<CExpression> pexprScalarCond);
 
 	// translate a table-valued function
-	CDXLNode *PdxlnTVF(CExpression *pexprTVF, CColRefArray *colref_array,
-					   CDistributionSpecArray *pdrgpdsBaseTables,
-					   ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnTVF(gpos::Ref<CExpression> pexprTVF,
+								 CColRefArray *colref_array,
+								 CDistributionSpecArray *pdrgpdsBaseTables,
+								 ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate an union all op
-	CDXLNode *PdxlnAppend(CExpression *pexprUnionAll,
-						  CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnAppend(gpos::Ref<CExpression> pexprUnionAll,
+									CColRefArray *colref_array,
+									CDistributionSpecArray *pdrgpdsBaseTables,
+									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate a partition selector
-	CDXLNode *PdxlnPartitionSelector(CExpression *pexpr,
-									 CColRefArray *colref_array,
-									 CDistributionSpecArray *pdrgpdsBaseTables,
-									 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnPartitionSelector(
+		gpos::Ref<CExpression> pexpr, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// translate a DML operator
-	CDXLNode *PdxlnDML(CExpression *pexpr, CColRefArray *colref_array,
-					   CDistributionSpecArray *pdrgpdsBaseTables,
-					   ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnDML(gpos::Ref<CExpression> pexpr,
+								 CColRefArray *colref_array,
+								 CDistributionSpecArray *pdrgpdsBaseTables,
+								 ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate a CTAS operator
-	CDXLNode *PdxlnCTAS(CExpression *pexpr,
-						CDistributionSpecArray *pdrgpdsBaseTables,
-						ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnCTAS(gpos::Ref<CExpression> pexpr,
+								  CDistributionSpecArray *pdrgpdsBaseTables,
+								  ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate a split operator
-	CDXLNode *PdxlnSplit(CExpression *pexpr, CColRefArray *colref_array,
-						 CDistributionSpecArray *pdrgpdsBaseTables,
-						 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnSplit(gpos::Ref<CExpression> pexpr,
+								   CColRefArray *colref_array,
+								   CDistributionSpecArray *pdrgpdsBaseTables,
+								   ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate an assert operator
-	CDXLNode *PdxlnAssert(CExpression *pexprAssert, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnAssert(gpos::Ref<CExpression> pexprAssert,
+									CColRefArray *colref_array,
+									CDistributionSpecArray *pdrgpdsBaseTables,
+									ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// translate a scalar If statement
-	CDXLNode *PdxlnScIfStmt(CExpression *pexprScIf);
+	gpos::Ref<CDXLNode> PdxlnScIfStmt(gpos::Ref<CExpression> pexprScIf);
 
 	// translate a scalar switch
-	CDXLNode *PdxlnScSwitch(CExpression *pexprScSwitch);
+	gpos::Ref<CDXLNode> PdxlnScSwitch(gpos::Ref<CExpression> pexprScSwitch);
 
 	// translate a scalar switch case
-	CDXLNode *PdxlnScSwitchCase(CExpression *pexprScSwitchCase);
+	gpos::Ref<CDXLNode> PdxlnScSwitchCase(
+		gpos::Ref<CExpression> pexprScSwitchCase);
 
 	// translate a scalar case test
-	CDXLNode *PdxlnScCaseTest(CExpression *pexprScCaseTest);
+	gpos::Ref<CDXLNode> PdxlnScCaseTest(gpos::Ref<CExpression> pexprScCaseTest);
 
 	// translate a scalar comparison
-	CDXLNode *PdxlnScCmp(CExpression *pexprScCmp);
+	gpos::Ref<CDXLNode> PdxlnScCmp(gpos::Ref<CExpression> pexprScCmp);
 
 	// translate a scalar distinct comparison
-	CDXLNode *PdxlnScDistinctCmp(CExpression *pexprScIsDistFrom);
+	gpos::Ref<CDXLNode> PdxlnScDistinctCmp(
+		gpos::Ref<CExpression> pexprScIsDistFrom);
 
 	// translate a scalar op node
-	CDXLNode *PdxlnScOp(CExpression *pexprScOp);
+	gpos::Ref<CDXLNode> PdxlnScOp(gpos::Ref<CExpression> pexprScOp);
 
 	// translate a scalar constant
-	CDXLNode *PdxlnScConst(CExpression *pexprScConst);
+	gpos::Ref<CDXLNode> PdxlnScConst(gpos::Ref<CExpression> pexprScConst);
 
-	CDXLNode *PdxlnScSortGroupClause(CExpression *pexprScSortGroupClause);
+	gpos::Ref<CDXLNode> PdxlnScSortGroupClause(
+		gpos::Ref<CExpression> pexprScSortGroupClause);
 
 	// translate a scalar coalesce
-	CDXLNode *PdxlnScCoalesce(CExpression *pexprScCoalesce);
+	gpos::Ref<CDXLNode> PdxlnScCoalesce(gpos::Ref<CExpression> pexprScCoalesce);
 
 	// translate a scalar MinMax
-	CDXLNode *PdxlnScMinMax(CExpression *pexprScMinMax);
+	gpos::Ref<CDXLNode> PdxlnScMinMax(gpos::Ref<CExpression> pexprScMinMax);
 
 	// translate a scalar boolean expression
-	CDXLNode *PdxlnScBoolExpr(CExpression *pexprScBoolExpr);
+	gpos::Ref<CDXLNode> PdxlnScBoolExpr(gpos::Ref<CExpression> pexprScBoolExpr);
 
 	// translate a scalar identifier
-	CDXLNode *PdxlnScId(CExpression *pexprScId);
+	gpos::Ref<CDXLNode> PdxlnScId(gpos::Ref<CExpression> pexprScId);
 
 	// translate a scalar function expression
-	CDXLNode *PdxlnScFuncExpr(CExpression *pexprScFunc);
+	gpos::Ref<CDXLNode> PdxlnScFuncExpr(gpos::Ref<CExpression> pexprScFunc);
 
 	// translate a scalar window function expression
-	CDXLNode *PdxlnScWindowFuncExpr(CExpression *pexprScFunc);
+	gpos::Ref<CDXLNode> PdxlnScWindowFuncExpr(
+		gpos::Ref<CExpression> pexprScFunc);
 
 	// get the DXL representation of the window stage
 	static EdxlWinStage Ews(CScalarWindowFunc::EWinStage ews);
 
 	// translate a scalar aggref
-	CDXLNode *PdxlnScAggref(CExpression *pexprScAggFunc);
+	gpos::Ref<CDXLNode> PdxlnScAggref(gpos::Ref<CExpression> pexprScAggFunc);
 
 	// translate a scalar nullif
-	CDXLNode *PdxlnScNullIf(CExpression *pexprScNullIf);
+	gpos::Ref<CDXLNode> PdxlnScNullIf(gpos::Ref<CExpression> pexprScNullIf);
 
 	// translate a scalar null test
-	CDXLNode *PdxlnScNullTest(CExpression *pexprScNullTest);
+	gpos::Ref<CDXLNode> PdxlnScNullTest(gpos::Ref<CExpression> pexprScNullTest);
 
 	// translate a scalar boolean test
-	CDXLNode *PdxlnScBooleanTest(CExpression *pexprScBooleanTest);
+	gpos::Ref<CDXLNode> PdxlnScBooleanTest(
+		gpos::Ref<CExpression> pexprScBooleanTest);
 
 	// translate a scalar cast
-	CDXLNode *PdxlnScCast(CExpression *pexprScCast);
+	gpos::Ref<CDXLNode> PdxlnScCast(gpos::Ref<CExpression> pexprScCast);
 
 	// translate a scalar coerce
-	CDXLNode *PdxlnScCoerceToDomain(CExpression *pexprScCoerce);
+	gpos::Ref<CDXLNode> PdxlnScCoerceToDomain(
+		gpos::Ref<CExpression> pexprScCoerce);
 
 	// translate a scalar coerce using I/O functions
-	CDXLNode *PdxlnScCoerceViaIO(CExpression *pexprScCoerce);
+	gpos::Ref<CDXLNode> PdxlnScCoerceViaIO(
+		gpos::Ref<CExpression> pexprScCoerce);
 
 	// translate a scalar array coerce expr with element coerce function
-	CDXLNode *PdxlnScArrayCoerceExpr(CExpression *pexprScArrayCoerceExpr);
+	gpos::Ref<CDXLNode> PdxlnScArrayCoerceExpr(
+		gpos::Ref<CExpression> pexprScArrayCoerceExpr);
 
-	CDXLNode *PdxlnValuesList(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnValuesList(gpos::Ref<CExpression> pexpr);
 
 	// translate an array
-	CDXLNode *PdxlnArray(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnArray(gpos::Ref<CExpression> pexpr);
 
 	// translate an arrayref
-	CDXLNode *PdxlnArrayRef(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnArrayRef(gpos::Ref<CExpression> pexpr);
 
 	// translate an arrayref index list
-	CDXLNode *PdxlnArrayRefIndexList(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnArrayRefIndexList(gpos::Ref<CExpression> pexpr);
 
 	// translate the arrayref index list bound
 	static CDXLScalarArrayRefIndexList::EIndexListBound Eilb(
 		const CScalarArrayRefIndexList::EIndexListType eilt);
 
 	// translate an array compare
-	CDXLNode *PdxlnArrayCmp(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnArrayCmp(gpos::Ref<CExpression> pexpr);
 
 	// translate an assert predicate
-	CDXLNode *PdxlnAssertPredicate(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnAssertPredicate(gpos::Ref<CExpression> pexpr);
 
 	// translate an assert constraint
-	CDXLNode *PdxlnAssertConstraint(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnAssertConstraint(gpos::Ref<CExpression> pexpr);
 
 	// translate a DML action expression
-	CDXLNode *PdxlnDMLAction(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnDMLAction(gpos::Ref<CExpression> pexpr);
 
 	// translate a window frame
-	CDXLWindowFrame *GetWindowFrame(CWindowFrame *pwf);
+	gpos::Ref<CDXLWindowFrame> GetWindowFrame(gpos::Ref<CWindowFrame> pwf);
 
-	CDXLTableDescr *MakeDXLTableDescr(const CTableDescriptor *ptabdesc,
-									  const CColRefArray *pdrgpcrOutput,
-									  const CReqdPropPlan *requiredProperties);
+	gpos::Ref<CDXLTableDescr> MakeDXLTableDescr(
+		const gpos::Ref<CTableDescriptor> ptabdesc,
+		const CColRefArray *pdrgpcrOutput,
+		const gpos::Ref<CReqdPropPlan> requiredProperties);
 
 	// compute physical properties like operator cost from the expression
-	CDXLPhysicalProperties *GetProperties(const CExpression *pexpr);
+	gpos::Ref<CDXLPhysicalProperties> GetProperties(
+		const gpos::Ref<CExpression> pexpr);
 
 	// translate a colref set of output col into a dxl proj list
-	CDXLNode *PdxlnProjList(const CColRefSet *pcrsOutput,
-							CColRefArray *colref_array);
+	gpos::Ref<CDXLNode> PdxlnProjList(const gpos::Ref<CColRefSet> pcrsOutput,
+									  CColRefArray *colref_array);
 
 	// Construct a project list for a child partition
-	CDXLNode *PdxlnProjListForChildPart(
+	gpos::Ref<CDXLNode> PdxlnProjListForChildPart(
 		const ColRefToUlongMap *root_col_mapping,
-		const CColRefArray *part_colrefs, const CColRefSet *reqd_colrefs,
+		const CColRefArray *part_colrefs,
+		const gpos::Ref<CColRefSet> reqd_colrefs,
 		const CColRefArray *colref_array);
 
 	// translate a filter expr on the root for a child partition
-	CDXLNode *PdxlnCondForChildPart(const ColRefToUlongMap *root_col_mapping,
-									const CColRefArray *part_colrefs,
-									const CColRefArray *root_colrefs,
-									CExpression *pred);
+	gpos::Ref<CDXLNode> PdxlnCondForChildPart(
+		const ColRefToUlongMap *root_col_mapping,
+		const CColRefArray *part_colrefs, const CColRefArray *root_colrefs,
+		gpos::Ref<CExpression> pred);
 
 	// translate a project list expression into a DXL proj list node
 	// according to the order specified in the dynamic array
-	CDXLNode *PdxlnProjList(const CExpression *pexprProjList,
-							const CColRefSet *pcrsOutput,
-							CColRefArray *colref_array);
+	gpos::Ref<CDXLNode> PdxlnProjList(
+		const gpos::Ref<CExpression> pexprProjList,
+		const gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *colref_array);
 
 	// translate a project list expression into a DXL proj list node
-	CDXLNode *PdxlnProjList(const CExpression *pexprProjList,
-							const CColRefSet *pcrsOutput);
+	gpos::Ref<CDXLNode> PdxlnProjList(
+		const gpos::Ref<CExpression> pexprProjList,
+		const gpos::Ref<CColRefSet> pcrsOutput);
 
 	// create a project list for a result node from a tuple of a
 	// const table get operator
-	CDXLNode *PdxlnProjListFromConstTableGet(CColRefArray *pdrgpcrReqOutput,
-											 CColRefArray *pdrgpcrCTGOutput,
-											 IDatumArray *pdrgpdatumValues);
+	gpos::Ref<CDXLNode> PdxlnProjListFromConstTableGet(
+		CColRefArray *pdrgpcrReqOutput, CColRefArray *pdrgpcrCTGOutput,
+		IDatumArray *pdrgpdatumValues);
 
 	// create a DXL project elem node from a proj element expression
-	CDXLNode *PdxlnProjElem(const CExpression *pexprProjElem);
+	gpos::Ref<CDXLNode> PdxlnProjElem(
+		const gpos::Ref<CExpression> pexprProjElem);
 
 	// create a project element for a computed column from a column reference
 	// and value expresison
-	CDXLNode *PdxlnProjElem(const CColRef *colref, CDXLNode *pdxlnValue);
+	gpos::Ref<CDXLNode> PdxlnProjElem(const gpos::Ref<CColRef> colref,
+									  gpos::Ref<CDXLNode> pdxlnValue);
 
 	// create a DXL sort col list node from an order spec
-	CDXLNode *GetSortColListDXL(const COrderSpec *pos);
+	gpos::Ref<CDXLNode> GetSortColListDXL(const gpos::Ref<COrderSpec> pos);
 
 	// create a DXL sort col list node for a Motion expression
-	CDXLNode *GetSortColListDXL(CExpression *pexprMotion);
+	gpos::Ref<CDXLNode> GetSortColListDXL(gpos::Ref<CExpression> pexprMotion);
 
 	// create a DXL hash expr list from an array of hash columns
-	CDXLNode *PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
-								const IMdIdArray *opfamilies);
+	gpos::Ref<CDXLNode> PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
+										  const IMdIdArray *opfamilies);
 
 	// create a DXL filter node with the given scalar expression
-	CDXLNode *PdxlnFilter(CDXLNode *pdxlnCond);
+	gpos::Ref<CDXLNode> PdxlnFilter(gpos::Ref<CDXLNode> pdxlnCond);
 
 	// construct an array with input segment ids for the given motion expression
-	IntPtrArray *GetInputSegIdsArray(CExpression *pexprMotion);
+	IntPtrArray *GetInputSegIdsArray(gpos::Ref<CExpression> pexprMotion);
 
 	// construct an array with output segment ids for the given motion expression
-	IntPtrArray *GetOutputSegIdsArray(CExpression *pexprMotion);
+	IntPtrArray *GetOutputSegIdsArray(gpos::Ref<CExpression> pexprMotion);
 
 	// find the position of the given colref in the array
-	static ULONG UlPosInArray(const CColRef *colref,
+	static ULONG UlPosInArray(const gpos::Ref<CColRef> colref,
 							  const CColRefArray *colref_array);
 
 	// return hash join type
-	static EdxlJoinType EdxljtHashJoin(CPhysicalHashJoin *popHJ);
+	static EdxlJoinType EdxljtHashJoin(gpos::Ref<CPhysicalHashJoin> popHJ);
 
 	// main translation routine for Expr tree -> DXL tree
-	CDXLNode *CreateDXLNode(CExpression *pexpr, CColRefArray *colref_array,
-							CDistributionSpecArray *pdrgpdsBaseTables,
-							ULONG *pulNonGatherMotions, BOOL *pfDML,
-							BOOL fRemap, BOOL fRoot);
+	gpos::Ref<CDXLNode> CreateDXLNode(gpos::Ref<CExpression> pexpr,
+									  CColRefArray *colref_array,
+									  CDistributionSpecArray *pdrgpdsBaseTables,
+									  ULONG *pulNonGatherMotions, BOOL *pfDML,
+									  BOOL fRemap, BOOL fRoot);
 
 	// translate expression children and add them as children of the DXL node
-	void TranslateScalarChildren(CExpression *pexpr, CDXLNode *dxlnode);
+	void TranslateScalarChildren(gpos::Ref<CExpression> pexpr,
+								 gpos::Ref<CDXLNode> dxlnode);
 
 	// add a result node, if required a materialize node is added below result node to avoid deadlock hazard
-	CDXLNode *PdxlnResult(CDXLPhysicalProperties *dxl_properties,
-						  CDXLNode *pdxlnPrL, CDXLNode *child_dxlnode);
+	gpos::Ref<CDXLNode> PdxlnResult(
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CDXLNode> pdxlnPrL, gpos::Ref<CDXLNode> child_dxlnode);
 
 	// add a materialize node
-	CDXLNode *PdxlnMaterialize(CDXLNode *dxlnode);
+	gpos::Ref<CDXLNode> PdxlnMaterialize(gpos::Ref<CDXLNode> dxlnode);
 
 	// add result node if necessary
-	CDXLNode *PdxlnRemapOutputColumns(CExpression *pexpr, CDXLNode *dxlnode,
-									  CColRefArray *pdrgpcrRequired,
-									  CColRefArray *pdrgpcrOrder);
+	gpos::Ref<CDXLNode> PdxlnRemapOutputColumns(gpos::Ref<CExpression> pexpr,
+												gpos::Ref<CDXLNode> dxlnode,
+												CColRefArray *pdrgpcrRequired,
+												CColRefArray *pdrgpcrOrder);
 
 	// combines the ordered columns and required columns into a single list
 	static CColRefArray *PdrgpcrMerge(CMemoryPool *mp,
@@ -620,26 +659,31 @@ private:
 									  CColRefArray *pdrgpcrRequired);
 
 	// helper to add a project of bool constant
-	CDXLNode *PdxlnProjectBoolConst(CDXLNode *dxlnode, BOOL value);
+	gpos::Ref<CDXLNode> PdxlnProjectBoolConst(gpos::Ref<CDXLNode> dxlnode,
+											  BOOL value);
 
 	// helper to build a Result expression with project list restricted to required column
-	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, const CColRef *colref);
+	gpos::Ref<CDXLNode> PdxlnRestrictResult(gpos::Ref<CDXLNode> dxlnode,
+											const gpos::Ref<CColRef> colref);
 
 	// helper to build a Result expression with project list restricted to required columns
-	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, const CColRefSet *colrefs);
+	gpos::Ref<CDXLNode> PdxlnRestrictResult(
+		gpos::Ref<CDXLNode> dxlnode, const gpos::Ref<CColRefSet> colrefs);
 
 	//	helper to build subplans from correlated LOJ
 	void BuildSubplansForCorrelatedLOJ(
-		CExpression *pexprCorrelatedLOJ, CDXLColRefArray *dxl_colref_array,
-		CDXLNode **
+		gpos::Ref<CExpression> pexprCorrelatedLOJ,
+		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLNode> *
 			ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 		BOOL *pfDML);
 
 	// helper to build subplans of different types
 	void BuildSubplans(
-		CExpression *pexprCorrelatedNLJoin, CDXLColRefArray *dxl_colref_array,
-		CDXLNode **
+		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
+		CDXLColRefArray *dxl_colref_array,
+		gpos::Ref<CDXLNode> *
 			ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 		BOOL *pfDML);
@@ -647,47 +691,53 @@ private:
 	// helper to build scalar subplans from inner column references and store them
 	// in subplan map
 	void BuildScalarSubplans(CColRefArray *pdrgpcrInner,
-							 CExpression *pexprInner,
+							 gpos::Ref<CExpression> pexprInner,
 							 CDXLColRefArray *dxl_colref_array,
 							 CDistributionSpecArray *pdrgpdsBaseTables,
 							 ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// helper to build subplans for quantified (ANY/ALL) subqueries
-	CDXLNode *PdxlnQuantifiedSubplan(CColRefArray *pdrgpcrInner,
-									 CExpression *pexprCorrelatedNLJoin,
-									 CDXLColRefArray *dxl_colref_array,
-									 CDistributionSpecArray *pdrgpdsBaseTables,
-									 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnQuantifiedSubplan(
+		CColRefArray *pdrgpcrInner,
+		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
+		CDXLColRefArray *dxl_colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// helper to build subplans for existential subqueries
-	CDXLNode *PdxlnExistentialSubplan(CColRefArray *pdrgpcrInner,
-									  CExpression *pexprCorrelatedNLJoin,
-									  CDXLColRefArray *dxl_colref_array,
-									  CDistributionSpecArray *pdrgpdsBaseTables,
-									  ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::Ref<CDXLNode> PdxlnExistentialSubplan(
+		CColRefArray *pdrgpcrInner,
+		gpos::Ref<CExpression> pexprCorrelatedNLJoin,
+		CDXLColRefArray *dxl_colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// compute the direct dispatch info for the given DML expression
-	CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo(CExpression *pexprDML);
+	gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo(
+		gpos::Ref<CExpression> pexprDML);
 
 	// check if result node imposes a motion hazard
-	BOOL FNeedsMaterializeUnderResult(CDXLNode *proj_list_dxlnode,
-									  CDXLNode *child_dxlnode);
+	BOOL FNeedsMaterializeUnderResult(gpos::Ref<CDXLNode> proj_list_dxlnode,
+									  gpos::Ref<CDXLNode> child_dxlnode);
 
 	void AddPartForScanId(ULONG scanid, ULONG index);
 
 	// helper to find subplan type from a correlated left outer join expression
 	static EdxlSubPlanType EdxlsubplantypeCorrelatedLOJ(
-		CExpression *pexprCorrelatedLOJ);
+		gpos::Ref<CExpression> pexprCorrelatedLOJ);
 
 	// helper to find subplan type from a correlated join expression
-	static EdxlSubPlanType Edxlsubplantype(CExpression *pexprCorrelatedNLJoin);
+	static EdxlSubPlanType Edxlsubplantype(
+		gpos::Ref<CExpression> pexprCorrelatedNLJoin);
 
 	// add used columns in the bitmap re-check and the remaining scalar filter condition to the
 	// required output column
 	static void AddBitmapFilterColumns(
-		CMemoryPool *mp, CPhysicalScan *pop, CExpression *pexprRecheckCond,
-		CExpression *pexprScalar,
-		CColRefSet *pcrsReqdOutput	// append the required column reference
+		CMemoryPool *mp, gpos::Ref<CPhysicalScan> pop,
+		gpos::Ref<CExpression> pexprRecheckCond,
+		gpos::Ref<CExpression> pexprScalar,
+		gpos::Ref<CColRefSet>
+			pcrsReqdOutput	// append the required column reference
 	);
 
 public:
@@ -700,12 +750,13 @@ public:
 	~CTranslatorExprToDXL();
 
 	// main driver
-	CDXLNode *PdxlnTranslate(CExpression *pexpr, CColRefArray *colref_array,
-							 CMDNameArray *pdrgpmdname);
+	gpos::Ref<CDXLNode> PdxlnTranslate(gpos::Ref<CExpression> pexpr,
+									   CColRefArray *colref_array,
+									   CMDNameArray *pdrgpmdname);
 
 	// translate a scalar expression into a DXL scalar node
 	// if the expression is not a scalar, an UnsupportedOp exception is raised
-	CDXLNode *PdxlnScalar(CExpression *pexpr);
+	gpos::Ref<CDXLNode> PdxlnScalar(gpos::Ref<CExpression> pexpr);
 };
 }  // namespace gpopt
 

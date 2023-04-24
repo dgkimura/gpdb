@@ -60,28 +60,29 @@ CColumnFactoryTest::EresUnittest_Basic()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	CColumnFactory cf;
 
 	// typed colref
-	CColRef *pcrOne = cf.PcrCreate(pmdtypeint4, default_type_modifier);
+	gpos::Ref<CColRef> pcrOne =
+		cf.PcrCreate(pmdtypeint4, default_type_modifier);
 	GPOS_ASSERT(pcrOne == cf.LookupColRef(pcrOne->m_id));
 	cf.Destroy(pcrOne);
 
 	// typed/named colref
 	CWStringConst strName(GPOS_WSZ_LIT("C_CustKey"));
-	CColRef *pcrTwo =
+	gpos::Ref<CColRef> pcrTwo =
 		cf.PcrCreate(pmdtypeint4, default_type_modifier, CName(&strName));
 	GPOS_ASSERT(pcrTwo == cf.LookupColRef(pcrTwo->m_id));
 
 	// clone previous colref
-	CColRef *pcrThree = cf.PcrCreate(pcrTwo);
+	gpos::Ref<CColRef> pcrThree = cf.PcrCreate(pcrTwo);
 	GPOS_ASSERT(pcrThree != cf.LookupColRef(pcrTwo->m_id));
 	GPOS_ASSERT(!pcrThree->Name().Equals(pcrTwo->Name()));
 	cf.Destroy(pcrThree);

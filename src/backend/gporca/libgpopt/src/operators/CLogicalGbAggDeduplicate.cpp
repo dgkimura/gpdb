@@ -89,7 +89,7 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -118,9 +118,9 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 //		Compute required stats columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalGbAggDeduplicate::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsInput,
+								   gpos::Ref<CColRefSet> pcrsInput,
 								   ULONG child_index) const
 {
 	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index, m_pdrgpcrKeys);
@@ -157,12 +157,12 @@ CLogicalGbAggDeduplicate::HashValue() const
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 											  CExpressionHandle &  //exprhdl
 ) const
 {
-	CKeyCollection *pkc = nullptr;
+	gpos::Ref<CKeyCollection> pkc = nullptr;
 
 	// Gb produces a key only if it's global
 	if (FGlobal())
@@ -184,14 +184,14 @@ CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAggDeduplicate::Matches(COperator *pop) const
+CLogicalGbAggDeduplicate::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalGbAggDeduplicate *popAgg =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAgg =
 		CLogicalGbAggDeduplicate::PopConvert(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
@@ -232,30 +232,30 @@ CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
 									   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
 	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
 	// construct bitset with keys of join child
-	CBitSet *keys = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> keys = GPOS_NEW(mp) CBitSet(mp);
 	const ULONG ulKeys = m_pdrgpcrKeys->Size();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
-		CColRef *colref = (*m_pdrgpcrKeys)[ul];
+		gpos::Ref<CColRef> colref = (*m_pdrgpcrKeys)[ul];
 		keys->ExchangeSet(colref->Id());
 	}
 
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(mp, child_stats, Pdrgpcr(),
-													 pdrgpulComputedCols, keys);
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
+		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, keys);
 	keys->Release();
 	pdrgpulComputedCols->Release();
 

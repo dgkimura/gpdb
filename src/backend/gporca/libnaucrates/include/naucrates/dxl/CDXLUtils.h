@@ -81,9 +81,11 @@ public:
 		CMemoryPool *, const CHAR *dxl_filename, const CHAR *xsd_file_path);
 
 	// parse a DXL document containing a DXL plan
-	static CDXLNode *GetPlanDXLNode(CMemoryPool *, const CHAR *dxl_string,
-									const CHAR *xsd_file_path, ULLONG *plan_id,
-									ULLONG *plan_space_size);
+	static gpos::Ref<CDXLNode> GetPlanDXLNode(CMemoryPool *,
+											  const CHAR *dxl_string,
+											  const CHAR *xsd_file_path,
+											  ULLONG *plan_id,
+											  ULLONG *plan_space_size);
 
 	// parse a DXL document representing a query
 	// to return the DXL tree representing the query and
@@ -92,22 +94,21 @@ public:
 		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
 	// parse a DXL document containing a scalar expression
-	static CDXLNode *ParseDXLToScalarExprDXLNode(CMemoryPool *,
-												 const CHAR *dxl_string,
-												 const CHAR *xsd_file_path);
+	static gpos::Ref<CDXLNode> ParseDXLToScalarExprDXLNode(
+		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
 	// parse an MD request
-	static CMDRequest *ParseDXLToMDRequest(CMemoryPool *mp,
-										   const CHAR *dxl_string,
-										   const CHAR *xsd_file_path);
+	static gpos::Ref<CMDRequest> ParseDXLToMDRequest(CMemoryPool *mp,
+													 const CHAR *dxl_string,
+													 const CHAR *xsd_file_path);
 
 	// parse a list of mdids from a MD request message
-	static CMDRequest *ParseDXLToMDRequest(CMemoryPool *mp,
-										   const WCHAR *dxl_string,
-										   const CHAR *xsd_file_path);
+	static gpos::Ref<CMDRequest> ParseDXLToMDRequest(CMemoryPool *mp,
+													 const WCHAR *dxl_string,
+													 const CHAR *xsd_file_path);
 
 	// parse optimizer config DXL
-	static COptimizerConfig *ParseDXLToOptimizerConfig(
+	static gpos::Ref<COptimizerConfig> ParseDXLToOptimizerConfig(
 		CMemoryPool *mp, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
 	static IMDCacheObjectArray *ParseDXLToIMDObjectArray(
@@ -118,10 +119,11 @@ public:
 		const CHAR *xsd_file_path);
 
 	// parse mdid from a metadata document
-	static IMDId *ParseDXLToMDId(CMemoryPool *, const CWStringBase *dxl_string,
-								 const CHAR *xsd_file_path);
+	static gpos::Ref<IMDId> ParseDXLToMDId(CMemoryPool *,
+										   const CWStringBase *dxl_string,
+										   const CHAR *xsd_file_path);
 
-	static IMDCacheObject *ParseDXLToIMDIdCacheObj(
+	static gpos::Ref<IMDCacheObject> ParseDXLToIMDIdCacheObj(
 		CMemoryPool *, const CWStringBase *dxl_string,
 		const CHAR *xsd_file_path);
 
@@ -143,11 +145,11 @@ public:
 	// dxl buckets in the dxl derived column statistics object
 	static CBucketArray *ParseDXLToBucketsArray(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CDXLStatsDerivedColumn *dxl_derived_col_stats);
+		gpos::Ref<CDXLStatsDerivedColumn> dxl_derived_col_stats);
 
 	// serialize a DXL query tree into DXL Document
 	static void SerializeQuery(CMemoryPool *mp, IOstream &os,
-							   const CDXLNode *dxl_query_node,
+							   const gpos::Ref<CDXLNode> dxl_query_node,
 							   const CDXLNodeArray *query_output_dxlnode_array,
 							   const CDXLNodeArray *cte_producers,
 							   BOOL serialize_document_header_footer,
@@ -158,7 +160,7 @@ public:
 
 	// serialize a plan into DXL
 	static void SerializePlan(CMemoryPool *mp, IOstream &os,
-							  const CDXLNode *node, ULLONG plan_id,
+							  const gpos::Ref<CDXLNode> node, ULLONG plan_id,
 							  ULLONG plan_space_size,
 							  BOOL serialize_document_header_footer,
 							  BOOL indentation);
@@ -183,7 +185,8 @@ public:
 								  BOOL indentation);
 
 	// serialize metadata ids into a MD request message
-	static void SerializeMDRequest(CMemoryPool *mp, CMDRequest *md_request,
+	static void SerializeMDRequest(CMemoryPool *mp,
+								   gpos::Ref<CMDRequest> md_request,
 								   IOstream &os,
 								   BOOL serialize_document_header_footer,
 								   BOOL indentation);
@@ -195,25 +198,27 @@ public:
 
 	// serialize a metadata id into DXL
 	static CWStringDynamic *SerializeMetadata(
-		CMemoryPool *mp, const IMDId *mdid,
+		CMemoryPool *mp, const gpos::Ref<IMDId> mdid,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize sample plans
 	static CWStringDynamic *SerializeSamplePlans(
-		CMemoryPool *mp, CEnumeratorConfig *enumerator_cfg, BOOL indentation);
+		CMemoryPool *mp, gpos::Ref<CEnumeratorConfig> enumerator_cfg,
+		BOOL indentation);
 
 	// serialize cost distribution plans
 	static CWStringDynamic *SerializeCostDistr(
-		CMemoryPool *mp, CEnumeratorConfig *enumerator_cfg, BOOL indentation);
+		CMemoryPool *mp, gpos::Ref<CEnumeratorConfig> enumerator_cfg,
+		BOOL indentation);
 
 	// serialize a metadata object into DXL
 	static CWStringDynamic *SerializeMDObj(
-		CMemoryPool *, const IMDCacheObject *,
+		CMemoryPool *, const gpos::Ref<IMDCacheObject>,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a scalar expression into DXL
 	static CWStringDynamic *SerializeScalarExpr(
-		CMemoryPool *mp, const CDXLNode *node,
+		CMemoryPool *mp, const gpos::Ref<CDXLNode> node,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// create a GPOS dynamic string from a Xerces XMLCh array
@@ -270,8 +275,8 @@ public:
 											CDouble value);
 
 	// translate the optimizer datum from dxl datum object
-	static IDatum *GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-							const CDXLDatum *dxl_datum);
+	static gpos::Ref<IDatum> GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
+									  const gpos::Ref<CDXLDatum> dxl_datum);
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

@@ -51,7 +51,7 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	EOperatorId
 	Eopid() const override
@@ -67,7 +67,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -77,7 +77,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -87,13 +87,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarDMLAction *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarDMLAction>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarDMLAction == pop->Eopid());
 
-		return dynamic_cast<CScalarDMLAction *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarDMLAction> >(pop);
 	}
 
 };	// class CScalarDMLAction

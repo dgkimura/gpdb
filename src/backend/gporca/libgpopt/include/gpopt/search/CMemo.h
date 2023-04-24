@@ -62,7 +62,7 @@ private:
 	ULONG m_aul;
 
 	// root group
-	CGroup *m_pgroupRoot;
+	gpos::Ref<CGroup> m_pgroupRoot;
 
 	// number of groups
 	ULONG_PTR m_ulpGrps;
@@ -79,18 +79,20 @@ private:
 		m_sht;
 
 	// add new group
-	void Add(CGroup *pgroup, CExpression *pexprOrigin);
+	void Add(gpos::Ref<CGroup> pgroup, gpos::Ref<CExpression> pexprOrigin);
 
 	// rehash all group expressions after group merge - not thread-safe
 	BOOL FRehash();
 
 	// helper for inserting group expression in target group
-	CGroup *PgroupInsert(CGroup *pgroupTarget, CGroupExpression *pgexpr,
-						 CExpression *pexprOrigin, BOOL fNewGroup);
+	gpos::Ref<CGroup> PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
+								   gpos::Ref<CGroupExpression> pgexpr,
+								   gpos::Ref<CExpression> pexprOrigin,
+								   BOOL fNewGroup);
 
 	// helper to check if a new group needs to be created
-	BOOL FNewGroup(CGroup **ppgroupTarget, CGroupExpression *pgexpr,
-				   BOOL fScalar);
+	BOOL FNewGroup(gpos::Ref<CGroup> *ppgroupTarget,
+				   gpos::Ref<CGroupExpression> pgexpr, BOOL fScalar);
 
 public:
 	CMemo(const CMemo &) = delete;
@@ -102,7 +104,7 @@ public:
 	~CMemo();
 
 	// return root group
-	CGroup *
+	gpos::Ref<CGroup>
 	PgroupRoot() const
 	{
 		return m_pgroupRoot;
@@ -122,7 +124,8 @@ public:
 	ULONG UlDuplicateGroups();
 
 	// mark groups as duplicates
-	static void MarkDuplicates(CGroup *pgroupFst, CGroup *pgroupSnd);
+	static void MarkDuplicates(gpos::Ref<CGroup> pgroupFst,
+							   gpos::Ref<CGroup> pgroupSnd);
 
 	// return tree map
 	MemoTreeMap *
@@ -132,16 +135,18 @@ public:
 	}
 
 	// set root group
-	void SetRoot(CGroup *pgroup);
+	void SetRoot(gpos::Ref<CGroup> pgroup);
 
 	// insert group expression into hash table
-	CGroup *PgroupInsert(CGroup *pgroupTarget, CExpression *pexprOrigin,
-						 CGroupExpression *pgexpr);
+	gpos::Ref<CGroup> PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
+								   gpos::Ref<CExpression> pexprOrigin,
+								   gpos::Ref<CGroupExpression> pgexpr);
 
 	// extract a plan that delivers the given required properties
-	CExpression *PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
-								  CReqdPropPlan *prppInput,
-								  ULONG ulSearchStages);
+	gpos::Ref<CExpression> PexprExtractPlan(CMemoryPool *mp,
+											gpos::Ref<CGroup> pgroupRoot,
+											gpos::Ref<CReqdPropPlan> prppInput,
+											ULONG ulSearchStages);
 
 	// merge duplicate groups
 	void GroupMerge();
@@ -159,7 +164,7 @@ public:
 	void DeriveStatsIfAbsent(CMemoryPool *mp);
 
 	// build tree map
-	void BuildTreeMap(COptimizationContext *poc);
+	void BuildTreeMap(gpos::Ref<COptimizationContext> poc);
 
 	// reset tree map
 	void ResetTreeMap();
@@ -168,7 +173,7 @@ public:
 	void Trace();
 
 	// get group by id
-	CGroup *Pgroup(ULONG id);
+	gpos::Ref<CGroup> Pgroup(ULONG id);
 
 };	// class CMemo
 

@@ -71,40 +71,41 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// construct an array of ranges to be used to create an interval
-	static CRangeArray *Pdrgprng(CMemoryPool *mp, IMDId *mdid,
+	static CRangeArray *Pdrgprng(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 								 const SRangeInfo rgRangeInfo[],
 								 ULONG ulRanges);
 
-	static CConstraintInterval *PciFirstInterval(CMemoryPool *mp, IMDId *mdid,
-												 CColRef *colref);
+	static gpos::Ref<CConstraintInterval> PciFirstInterval(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, gpos::Ref<CColRef> colref);
 
-	static CConstraintInterval *PciSecondInterval(CMemoryPool *mp, IMDId *mdid,
-												  CColRef *colref);
+	static gpos::Ref<CConstraintInterval> PciSecondInterval(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, gpos::Ref<CColRef> colref);
 
 	// interval from scalar comparison
 	static GPOS_RESULT EresUnittest_CIntervalFromScalarCmp(
-		CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CColRef> colref);
 
 	// generate comparison expression
-	static CExpression *PexprScalarCmp(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CColRef *colref,
-									   IMDType::ECmpType cmp_type, LINT val);
+	static gpos::Ref<CExpression> PexprScalarCmp(CMemoryPool *mp,
+												 CMDAccessor *md_accessor,
+												 gpos::Ref<CColRef> colref,
+												 IMDType::ECmpType cmp_type,
+												 LINT val);
 
 	// interval from scalar bool op
 	static GPOS_RESULT EresUnittest_CIntervalFromScalarBoolOp(
-		CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CColRef> colref);
 
 	// debug print
-	static void PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr);
+	static void PrintConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr);
 
 	// build a conjunction
-	static CConstraintConjunction *Pcstconjunction(CMemoryPool *mp, IMDId *mdid,
-												   CColRef *colref);
+	static gpos::Ref<CConstraintConjunction> Pcstconjunction(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, gpos::Ref<CColRef> colref);
 
 	// build a disjunction
-	static CConstraintDisjunction *Pcstdisjunction(CMemoryPool *mp, IMDId *mdid,
-												   CColRef *colref);
+	static gpos::Ref<CConstraintDisjunction> Pcstdisjunction(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, gpos::Ref<CColRef> colref);
 
 public:
 	// unittests

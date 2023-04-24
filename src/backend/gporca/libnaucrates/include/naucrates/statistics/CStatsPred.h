@@ -114,8 +114,10 @@ using CStatsPredPtrArry = CDynamicPtrArray<CStatsPred, CleanupRelease>;
 INT
 CStatsPred::StatsPredSortCmpFunc(const void *val1, const void *val2)
 {
-	const CStatsPred *stats_pred1 = *(const CStatsPred **) val1;
-	const CStatsPred *stats_pred2 = *(const CStatsPred **) val2;
+	const gpos::Ref<CStatsPred> stats_pred1 =
+		*(const gpos::Ref<CStatsPred> *) val1;
+	const gpos::Ref<CStatsPred> stats_pred2 =
+		*(const gpos::Ref<CStatsPred> *) val2;
 
 	return (INT) stats_pred1->GetColId() - (INT) stats_pred2->GetColId();
 }

@@ -19,14 +19,14 @@ CHashedDistributions::CHashedDistributions(CMemoryPool *mp,
 		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
-			CColRef *colref = (*colref_array)[ulCol];
-			CExpression *pexpr = CUtils::PexprScalarIdent(mp, colref);
+			gpos::Ref<CColRef> colref = (*colref_array)[ulCol];
+			gpos::Ref<CExpression> pexpr = CUtils::PexprScalarIdent(mp, colref);
 			pdrgpexpr->Append(pexpr);
 		}
 
 		// create a hashed distribution on input columns of the current child
 		BOOL fNullsColocated = true;
-		CDistributionSpec *pdshashed =
+		gpos::Ref<CDistributionSpec> pdshashed =
 			GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, fNullsColocated);
 		Append(pdshashed);
 	}

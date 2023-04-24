@@ -29,18 +29,19 @@ using namespace gpmd;
 
 CWStringBase *
 CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-									IMDId *md_id) const
+									gpos::Ref<IMDId> md_id) const
 {
 	// not used
 	return nullptr;
 }
 
 // return the requested metadata object
-IMDCacheObject *
+gpos::Ref<IMDCacheObject>
 CMDProviderRelcache::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  IMDId *mdid, IMDCacheObject::Emdtype mdtype) const
+							  gpos::Ref<IMDId> mdid,
+							  IMDCacheObject::Emdtype mdtype) const
 {
-	IMDCacheObject *md_obj =
+	gpos::Ref<IMDCacheObject> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, mdid, mdtype);
 	GPOS_ASSERT(nullptr != md_obj);
 

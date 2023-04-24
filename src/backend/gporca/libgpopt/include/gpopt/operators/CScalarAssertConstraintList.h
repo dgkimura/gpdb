@@ -68,7 +68,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -78,7 +78,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -88,16 +88,16 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// conversion function
-	static CScalarAssertConstraintList *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarAssertConstraintList>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAssertConstraintList == pop->Eopid());
 
-		return dynamic_cast<CScalarAssertConstraintList *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarAssertConstraintList> >(pop);
 	}
 
 };	// class CScalarAssertConstraintList

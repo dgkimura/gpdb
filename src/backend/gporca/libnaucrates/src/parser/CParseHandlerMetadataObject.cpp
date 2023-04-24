@@ -56,7 +56,7 @@ CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 //		Returns the constructed metadata object.
 //
 //---------------------------------------------------------------------------
-IMDCacheObject *
+gpos::Ref<IMDCacheObject>
 CParseHandlerMetadataObject::GetImdObj() const
 {
 	return m_imd_obj;

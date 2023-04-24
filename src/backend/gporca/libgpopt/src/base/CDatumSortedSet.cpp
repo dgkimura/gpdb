@@ -11,7 +11,8 @@
 
 using namespace gpopt;
 
-CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
+CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
+								 gpos::Ref<CExpression> pexprArray,
 								 const IComparator *pcomp)
 	: IDatumArray(mp), m_fIncludesNull(false)
 {
@@ -23,9 +24,9 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
 	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
-		CScalarConst *popScConst =
+		gpos::Ref<CScalarConst> popScConst =
 			CUtils::PScalarArrayConstChildAt(pexprArray, ul);
-		IDatum *datum = popScConst->GetDatum();
+		gpos::Ref<IDatum> datum = popScConst->GetDatum();
 		if (datum->IsNull())
 		{
 			m_fIncludesNull = true;
@@ -40,7 +41,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
 
 	// de-duplicate
 	const ULONG ulRangeArrayArity = aprngdatum->Size();
-	IDatum *pdatumPrev = (*aprngdatum)[0];
+	gpos::Ref<IDatum> pdatumPrev = (*aprngdatum)[0];
 	pdatumPrev->AddRef();
 	Append(pdatumPrev);
 	for (ULONG ul = 1; ul < ulRangeArrayArity; ul++)

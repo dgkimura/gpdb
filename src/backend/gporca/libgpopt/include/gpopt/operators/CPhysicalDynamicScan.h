@@ -60,7 +60,7 @@ public:
 	CPhysicalDynamicScan(const CPhysicalDynamicScan &) = delete;
 
 	// ctor
-	CPhysicalDynamicScan(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	CPhysicalDynamicScan(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
 						 ULONG ulOriginOpId, const CName *pnameAlias,
 						 ULONG scan_id, CColRefArray *pdrgpcrOutput,
 						 CColRef2dArray *pdrgpdrgpcrParts,
@@ -124,7 +124,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalDynamicScan *PopConvert(COperator *pop);
+	static gpos::Ref<CPhysicalDynamicScan> PopConvert(gpos::Ref<COperator> pop);
 };
 }  // namespace gpopt
 

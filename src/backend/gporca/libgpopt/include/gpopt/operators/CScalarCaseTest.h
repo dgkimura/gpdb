@@ -32,13 +32,13 @@ class CScalarCaseTest : public CScalar
 {
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarCaseTest(const CScalarCaseTest &) = delete;
 
 	// ctor
-	CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarCaseTest() override;
@@ -58,7 +58,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -68,13 +68,13 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -84,13 +84,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarCaseTest *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarCaseTest>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCaseTest == pop->Eopid());
 
-		return dynamic_cast<CScalarCaseTest *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarCaseTest> >(pop);
 	}
 
 };	// class CScalarCaseTest

@@ -60,10 +60,11 @@ CPhysicalRightOuterHashJoin::~CPhysicalRightOuterHashJoin() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CEnfdDistribution *
+gpos::Ref<CEnfdDistribution>
 CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CReqdPropPlan *prppInput, ULONG child_index,
-								 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+								 gpos::Ref<CReqdPropPlan> prppInput,
+								 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+								 ULONG ulOptReq)
 {
 	// create the following requests:
 	// 1) hash-hash (provided by CPhysicalHashJoin::Ped)
@@ -72,7 +73,8 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// We also could create a replicated-hashed and replicated-non-singleton request, but that isn't a promising
 	// alternative as we would be broadcasting the outer side. In that case, an LOJ would be better.
 
-	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsInput =
+		prppInput->Ped()->PdsRequired();
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 
@@ -87,11 +89,11 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (ulOptReq < ulHashDistributeRequests)
 	{
 		// requests 1 .. N are (redistribute, redistribute)
-		CDistributionSpec *pds = PdsRequiredRedistribute(
+		gpos::Ref<CDistributionSpec> pds = PdsRequiredRedistribute(
 			mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
 		if (CDistributionSpec::EdtHashed == pds->Edt())
 		{
-			CDistributionSpecHashed *pdsHashed =
+			gpos::Ref<CDistributionSpecHashed> pdsHashed =
 				CDistributionSpecHashed::PdsConvert(pds);
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}
@@ -121,10 +123,10 @@ CPhysicalRightOuterHashJoin::CreateOptRequests(CMemoryPool *mp)
 	SetPartPropagateRequests(2);
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalRightOuterHashJoin::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	CPartitionPropagationSpec *pppsRequired, ULONG child_index,
+	gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
 	CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	return PppsRequiredForJoins(mp, exprhdl, pppsRequired, child_index,
@@ -133,7 +135,7 @@ CPhysicalRightOuterHashJoin::PppsRequired(
 
 // In the following function, we are generating the Derived property :
 // "Partition Propagation Spec" of Right Outer Hash join.
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalRightOuterHashJoin::PppsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl) const
 {

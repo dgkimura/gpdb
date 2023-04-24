@@ -56,7 +56,7 @@ CColRefSetIterTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -68,18 +68,18 @@ CColRefSetIterTest::EresUnittest_Basics()
 	// get column factory from optimizer context object
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
 	// create a int4 datum
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *colref =
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 		pcrs->Include(colref);
 
@@ -94,7 +94,7 @@ CColRefSetIterTest::EresUnittest_Basics()
 	{
 		GPOS_ASSERT((BOOL) crsi);
 
-		CColRef *colref = crsi.Pcr();
+		gpos::Ref<CColRef> colref = crsi.Pcr();
 		GPOS_ASSERT(colref->Name().Equals(name));
 
 		// to avoid unused variable warnings

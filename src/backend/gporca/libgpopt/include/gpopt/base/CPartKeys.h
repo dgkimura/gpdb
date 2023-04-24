@@ -53,7 +53,7 @@ public:
 	~CPartKeys() override;
 
 	// return key at a given level
-	CColRef *PcrKey(ULONG ulLevel) const;
+	gpos::Ref<CColRef> PcrKey(ULONG ulLevel) const;
 
 	// return array of keys
 	CColRef2dArray *
@@ -70,15 +70,15 @@ public:
 	}
 
 	// copy part key into the given memory pool
-	CPartKeys *PpartkeysCopy(CMemoryPool *mp);
+	gpos::Ref<CPartKeys> PpartkeysCopy(CMemoryPool *mp);
 
 	// check whether the key columns overlap the given column
-	BOOL FOverlap(CColRefSet *pcrs) const;
+	BOOL FOverlap(gpos::Ref<CColRefSet> pcrs) const;
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
-	CPartKeys *PpartkeysRemap(CMemoryPool *mp,
-							  UlongToColRefMap *colref_mapping) const;
+	gpos::Ref<CPartKeys> PpartkeysRemap(CMemoryPool *mp,
+										UlongToColRefMap *colref_mapping) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

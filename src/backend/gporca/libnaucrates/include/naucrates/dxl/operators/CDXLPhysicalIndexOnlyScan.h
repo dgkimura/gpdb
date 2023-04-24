@@ -36,8 +36,9 @@ public:
 	CDXLPhysicalIndexOnlyScan(CDXLPhysicalIndexOnlyScan &) = delete;
 
 	//ctor
-	CDXLPhysicalIndexOnlyScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
-							  CDXLIndexDescr *dxl_index_descr,
+	CDXLPhysicalIndexOnlyScan(CMemoryPool *mp,
+							  gpos::Ref<CDXLTableDescr> table_descr,
+							  gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 							  EdxlIndexScanDirection idx_scan_direction);
 
 	//dtor
@@ -50,13 +51,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLPhysicalIndexOnlyScan *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalIndexOnlyScan>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalIndexOnlyScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalIndexOnlyScan *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalIndexOnlyScan> >(dxl_op);
 	}
 };
 }  // namespace gpdxl

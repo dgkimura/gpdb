@@ -31,24 +31,26 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
+CPhysicalMotion::FValidContext(CMemoryPool *,
+							   gpos::Ref<COptimizationContext> poc,
 							   COptimizationContextArray *pdrgpocChild) const
 {
 	GPOS_ASSERT(nullptr != pdrgpocChild);
 	GPOS_ASSERT(1 == pdrgpocChild->Size());
 
-	COptimizationContext *pocChild = (*pdrgpocChild)[0];
-	CCostContext *pccBest = pocChild->PccBest();
+	gpos::Ref<COptimizationContext> pocChild = (*pdrgpocChild)[0];
+	gpos::Ref<CCostContext> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
 
-	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
-	CPartitionPropagationSpec *pps_req = poc->Prpp()->Pepp()->PppsRequired();
+	gpos::Ref<CDrvdPropPlan> pdpplanChild = pccBest->Pdpplan();
+	gpos::Ref<CPartitionPropagationSpec> pps_req =
+		poc->Prpp()->Pepp()->PppsRequired();
 	if (pdpplanChild->Ppps()->IsUnsupportedPartSelector(pps_req))
 	{
 		return false;
 	}
 
-	CEnfdDistribution *ped = poc->Prpp()->Ped();
+	gpos::Ref<CEnfdDistribution> ped = poc->Prpp()->Ped();
 	if (ped->FCompatible(this->Pds()) && ped->FCompatible(pdpplanChild->Pds()))
 	{
 		// required distribution is compatible with the distribution delivered by Motion and its child plan,
@@ -68,10 +70,10 @@ CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalMotion::PdsRequired(CMemoryPool *mp,
 							 CExpressionHandle &,  // exprhdl
-							 CDistributionSpec *pdsRequired,
+							 gpos::Ref<CDistributionSpec> pdsRequired,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -152,10 +154,10 @@ CPhysicalMotion::PdsRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalMotion::PrsRequired(CMemoryPool *mp,
-							 CExpressionHandle &,	// exprhdl
-							 CRewindabilitySpec *,	// prsRequired
+							 CExpressionHandle &,			 // exprhdl
+							 gpos::Ref<CRewindabilitySpec>,	 // prsRequired
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -174,9 +176,9 @@ CPhysicalMotion::PrsRequired(CMemoryPool *mp,
 										   CRewindabilitySpec::EmhtNoMotion);
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
-							  CPartitionPropagationSpec *, ULONG,
+							  gpos::Ref<CPartitionPropagationSpec>, ULONG,
 							  CDrvdPropArray *, ULONG) const
 {
 	// A motion is a hard barrier for partition propagation since it executes in a
@@ -192,10 +194,10 @@ CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalMotion::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::Ref<CCTEReq> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -217,11 +219,11 @@ CPhysicalMotion::PcteRequired(CMemoryPool *,		//mp,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalMotion::PdsDerive(CMemoryPool * /*mp*/, CExpressionHandle & /*exprhdl*/
 ) const
 {
-	CDistributionSpec *pds = Pds();
+	gpos::Ref<CDistributionSpec> pds = Pds();
 	pds->AddRef();
 
 	return pds;
@@ -236,7 +238,7 @@ CPhysicalMotion::PdsDerive(CMemoryPool * /*mp*/, CExpressionHandle & /*exprhdl*/
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalMotion::PrsDerive(CMemoryPool *mp,
 						   CExpressionHandle &	// exprhdl
 ) const
@@ -246,7 +248,7 @@ CPhysicalMotion::PrsDerive(CMemoryPool *mp,
 										   CRewindabilitySpec::EmhtMotion);
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalMotion::PppsDerive(CMemoryPool *mp, CExpressionHandle &) const
 {
 	// A Motion cannot pass propagation spec
@@ -264,7 +266,7 @@ CPhysicalMotion::PppsDerive(CMemoryPool *mp, CExpressionHandle &) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotion::EpetDistribution(CExpressionHandle &,	// exprhdl
-								  const CEnfdDistribution *ped) const
+								  const gpos::Ref<CEnfdDistribution> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
@@ -287,7 +289,7 @@ CPhysicalMotion::EpetDistribution(CExpressionHandle &,	// exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotion::EpetRewindability(CExpressionHandle &exprhdl,
-								   const CEnfdRewindability *  // per
+								   const gpos::Ref<CEnfdRewindability>	// per
 ) const
 {
 	if (exprhdl.HasOuterRefs())

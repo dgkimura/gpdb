@@ -37,10 +37,11 @@ private:
 
 	CDouble m_ndistnct_value;
 
-	CBitSet *m_attrs;
+	gpos::Ref<CBitSet> m_attrs;
 
 public:
-	CMDNDistinct(CMemoryPool *mp, DOUBLE ndistinct_value, CBitSet *attrs)
+	CMDNDistinct(CMemoryPool *mp, DOUBLE ndistinct_value,
+				 gpos::Ref<CBitSet> attrs)
 		: m_mp(mp), m_ndistnct_value(ndistinct_value), m_attrs(attrs)
 	{
 	}
@@ -93,7 +94,7 @@ public:
 			CDXLTokens::GetDXLTokenStr(EdxltokenMVNDistinct));
 	}
 
-	CBitSet *
+	gpos::Ref<CBitSet>
 	GetAttrs() const
 	{
 		return m_attrs;

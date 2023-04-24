@@ -29,11 +29,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalPartitionSelector::CPhysicalPartitionSelector(CMemoryPool *mp,
-													   ULONG scan_id,
-													   ULONG selector_id,
-													   IMDId *mdid,
-													   CExpression *pexprScalar)
+CPhysicalPartitionSelector::CPhysicalPartitionSelector(
+	CMemoryPool *mp, ULONG scan_id, ULONG selector_id, gpos::Ref<IMDId> mdid,
+	gpos::Ref<CExpression> pexprScalar)
 	: CPhysical(mp),
 	  m_scan_id(scan_id),
 	  m_selector_id(selector_id),
@@ -67,14 +65,14 @@ CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalPartitionSelector::Matches(COperator *pop) const
+CPhysicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalPartitionSelector *popPartSelector =
+	gpos::Ref<CPhysicalPartitionSelector> popPartSelector =
 		CPhysicalPartitionSelector::PopConvert(pop);
 
 	BOOL fScanIdCmp = popPartSelector->ScanId() == m_scan_id;
@@ -107,10 +105,10 @@ CPhysicalPartitionSelector::HashValue() const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 CColRefSet *pcrsInput,
+										 gpos::Ref<CColRefSet> pcrsInput,
 										 ULONG child_index,
 										 CDrvdPropArray *,	// pdrgpdpCtxt
 										 ULONG				// ulOptReq
@@ -120,7 +118,7 @@ CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 		0 == child_index &&
 		"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsInput);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsInput);
 	pcrs->Union(m_filter_expr->DeriveUsedColumns());
 	pcrs->Intersection(exprhdl.DeriveOutputColumns(child_index));
 
@@ -135,10 +133,10 @@ CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										COrderSpec *posRequired,
+										gpos::Ref<COrderSpec> posRequired,
 										ULONG child_index,
 										CDrvdPropArray *,  // pdrgpdpCtxt
 										ULONG			   // ulOptReq
@@ -157,10 +155,10 @@ CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CDistributionSpec *pdsInput,
+										gpos::Ref<CDistributionSpec> pdsInput,
 										ULONG child_index,
 										CDrvdPropArray *,  // pdrgpdpCtxt
 										ULONG			   // ulOptReq
@@ -168,7 +166,7 @@ CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CPartInfo *ppartinfo = exprhdl.DerivePartitionInfo();
+	gpos::Ref<CPartInfo> ppartinfo = exprhdl.DerivePartitionInfo();
 	BOOL fCovered = ppartinfo->FContainsScanId(m_scan_id);
 
 	if (fCovered)
@@ -190,13 +188,12 @@ CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
-CPhysicalPartitionSelector::PrsRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CRewindabilitySpec *prsRequired,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+gpos::Ref<CRewindabilitySpec>
+CPhysicalPartitionSelector::PrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
+	CDrvdPropArray *,  // pdrgpdpCtxt
+	ULONG			   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -212,10 +209,10 @@ CPhysicalPartitionSelector::PrsRequired(CMemoryPool *mp,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalPartitionSelector::PcteRequired(CMemoryPool *,		   //mp,
 										 CExpressionHandle &,  //exprhdl,
-										 CCTEReq *pcter,
+										 gpos::Ref<CCTEReq> pcter,
 										 ULONG
 #ifdef GPOS_DEBUG
 											 child_index
@@ -229,15 +226,15 @@ CPhysicalPartitionSelector::PcteRequired(CMemoryPool *,		   //mp,
 	return PcterPushThru(pcter);
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalPartitionSelector::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &,
-	CPartitionPropagationSpec *pppsRequired,
+	gpos::Ref<CPartitionPropagationSpec> pppsRequired,
 	ULONG child_index GPOS_ASSERTS_ONLY, CDrvdPropArray *, ULONG) const
 {
 	GPOS_ASSERT(child_index == 0);
 
-	CPartitionPropagationSpec *pps_result =
+	gpos::Ref<CPartitionPropagationSpec> pps_result =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps_result->InsertAllExcept(pppsRequired, m_scan_id);
 	return pps_result;
@@ -252,9 +249,9 @@ CPhysicalPartitionSelector::PppsRequired(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalPartitionSelector::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											  CColRefSet *pcrsRequired,
-											  ULONG	 // ulOptReq
+CPhysicalPartitionSelector::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::Ref<CColRefSet> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -268,7 +265,7 @@ CPhysicalPartitionSelector::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalPartitionSelector::PosDerive(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl) const
 {
@@ -283,7 +280,7 @@ CPhysicalPartitionSelector::PosDerive(CMemoryPool *,  // mp
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalPartitionSelector::PdsDerive(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl) const
 {
@@ -298,23 +295,23 @@ CPhysicalPartitionSelector::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalPartitionSelector::PrsDerive(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
 }
 
-CPartitionPropagationSpec *
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalPartitionSelector::PppsDerive(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl) const
 {
-	CPartitionPropagationSpec *pps_result =
+	gpos::Ref<CPartitionPropagationSpec> pps_result =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	CPartitionPropagationSpec *pps_child =
+	gpos::Ref<CPartitionPropagationSpec> pps_child =
 		exprhdl.Pdpplan(0 /* child_index */)->Ppps();
 
-	CBitSet *selector_ids = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> selector_ids = GPOS_NEW(mp) CBitSet(mp);
 	selector_ids->ExchangeSet(m_selector_id);
 
 	pps_result->InsertAll(pps_child);
@@ -334,10 +331,10 @@ CPhysicalPartitionSelector::PppsDerive(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalPartitionSelector::EpetDistribution(CExpressionHandle &exprhdl,
-											 const CEnfdDistribution *ped) const
+CPhysicalPartitionSelector::EpetDistribution(
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdDistribution> ped) const
 {
-	CDrvdPropPlan *pdpplan = exprhdl.Pdpplan(0 /* child_index */);
+	gpos::Ref<CDrvdPropPlan> pdpplan = exprhdl.Pdpplan(0 /* child_index */);
 
 	if (ped->FCompatible(pdpplan->Pds()))
 	{
@@ -345,7 +342,7 @@ CPhysicalPartitionSelector::EpetDistribution(CExpressionHandle &exprhdl,
 		return CEnfdProp::EpetUnnecessary;
 	}
 
-	CPartitionPropagationSpec *ppps = pdpplan->Ppps();
+	gpos::Ref<CPartitionPropagationSpec> ppps = pdpplan->Ppps();
 
 	if (!ppps->Contains(m_scan_id))
 	{
@@ -366,10 +363,11 @@ CPhysicalPartitionSelector::EpetDistribution(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalPartitionSelector::EpetRewindability(
-	CExpressionHandle &exprhdl, const CEnfdRewindability *per) const
+	CExpressionHandle &exprhdl, const gpos::Ref<CEnfdRewindability> per) const
 {
 	// get rewindability delivered by the node
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::Ref<CRewindabilitySpec> prs =
+		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required rewindability is already provided
@@ -389,8 +387,8 @@ CPhysicalPartitionSelector::EpetRewindability(
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalPartitionSelector::EpetOrder(CExpressionHandle &,	// exprhdl,
-									  const CEnfdOrder *	// ped
+CPhysicalPartitionSelector::EpetOrder(CExpressionHandle &,		   // exprhdl,
+									  const gpos::Ref<CEnfdOrder>  // ped
 ) const
 {
 	return CEnfdProp::EpetOptional;

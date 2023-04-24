@@ -56,7 +56,8 @@ public:
 }  // namespace
 
 static void
-SerializeOptimizerConfig(CMemoryPool *mp, COptimizerConfig *optimizer_config,
+SerializeOptimizerConfig(CMemoryPool *mp,
+						 gpos::Ref<COptimizerConfig> optimizer_config,
 						 COstream &oos, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -68,7 +69,7 @@ SerializeOptimizerConfig(CMemoryPool *mp, COptimizerConfig *optimizer_config,
 	CDXLUtils::SerializeHeader(mp, &xml_serializer);
 
 	// Make a dummy bitset
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, 256);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, 256);
 
 	optimizer_config->Serialize(mp, &xml_serializer, pbs);
 
@@ -102,7 +103,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
-	COptimizerConfig *poc =
+	gpos::Ref<COptimizerConfig> poc =
 		CDXLUtils::ParseDXLToOptimizerConfig(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != poc);

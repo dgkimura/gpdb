@@ -45,7 +45,7 @@ public:
 
 private:
 	// required distribution
-	CDistributionSpec *m_pds;
+	gpos::Ref<CDistributionSpec> m_pds;
 
 	// distribution matching type
 	EDistributionMatching m_edm;
@@ -57,13 +57,14 @@ public:
 	CEnfdDistribution(const CEnfdDistribution &) = delete;
 
 	// ctor
-	CEnfdDistribution(CDistributionSpec *pds, EDistributionMatching edm);
+	CEnfdDistribution(gpos::Ref<CDistributionSpec> pds,
+					  EDistributionMatching edm);
 
 	// dtor
 	~CEnfdDistribution() override;
 
 	// distribution spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_pds;
@@ -78,7 +79,7 @@ public:
 
 	// matching function
 	BOOL
-	Matches(CEnfdDistribution *ped)
+	Matches(gpos::Ref<CEnfdDistribution> ped)
 	{
 		GPOS_ASSERT(nullptr != ped);
 
@@ -90,17 +91,18 @@ public:
 
 	// check if the given distribution specification is compatible with the
 	// distribution specification of this object for the specified matching type
-	BOOL FCompatible(CDistributionSpec *pds) const;
+	BOOL FCompatible(gpos::Ref<CDistributionSpec> pds) const;
 
 	// required distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	PdsRequired() const
 	{
 		return m_pds;
 	}
 
 	// get distribution enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::Ref<CPhysical> popPhysical,
 							BOOL fDistribReqd) const;
 
 	// print function

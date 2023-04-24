@@ -46,7 +46,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// metadata id of the object
-	CMDIdColStats *m_mdid_col_stats;
+	gpos::Ref<CMDIdColStats> m_mdid_col_stats;
 
 	// column name
 	CMDName *m_mdname;
@@ -76,7 +76,7 @@ public:
 	CDXLColStats(const CDXLColStats &) = delete;
 
 	// ctor
-	CDXLColStats(CMemoryPool *mp, CMDIdColStats *mdid_col_stats,
+	CDXLColStats(CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats,
 				 CMDName *mdname, CDouble width, CDouble null_freq,
 				 CDouble distinct_remaining, CDouble freq_remaining,
 				 CDXLBucketArray *dxl_stats_bucket_array,
@@ -86,7 +86,7 @@ public:
 	~CDXLColStats() override;
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -133,7 +133,7 @@ public:
 	}
 
 	// get the bucket at the given position
-	const CDXLBucket *GetDXLBucketAt(ULONG ul) const override;
+	const gpos::Ref<CDXLBucket> GetDXLBucketAt(ULONG ul) const override;
 
 	// serialize column stats in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -144,8 +144,10 @@ public:
 #endif
 
 	// dummy colstats
-	static CDXLColStats *CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
-												CMDName *mdname, CDouble width);
+	static gpos::Ref<CDXLColStats> CreateDXLDummyColStats(CMemoryPool *mp,
+														  gpos::Ref<IMDId> mdid,
+														  CMDName *mdname,
+														  CDouble width);
 };
 
 // array of dxl column stats

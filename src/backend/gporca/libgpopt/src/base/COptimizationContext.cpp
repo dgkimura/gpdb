@@ -62,7 +62,7 @@ COptimizationContext::~COptimizationContext()
 //		Best group expression accessor
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
+gpos::Ref<CGroupExpression>
 COptimizationContext::PgexprBest() const
 {
 	if (nullptr == m_pccBest)
@@ -83,13 +83,13 @@ COptimizationContext::PgexprBest() const
 //
 //---------------------------------------------------------------------------
 void
-COptimizationContext::SetBest(CCostContext *pcc)
+COptimizationContext::SetBest(gpos::Ref<CCostContext> pcc)
 {
 	GPOS_ASSERT(nullptr != pcc);
 
 	m_pccBest = pcc;
 
-	COperator *pop = pcc->Pgexpr()->Pop();
+	gpos::Ref<COperator> pop = pcc->Pgexpr()->Pop();
 	if (CUtils::FPhysicalAgg(pop) &&
 		CPhysicalAgg::PopConvert(pop)->FMultiStage())
 	{
@@ -107,7 +107,7 @@ COptimizationContext::SetBest(CCostContext *pcc)
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::Matches(const COptimizationContext *poc) const
+COptimizationContext::Matches(const gpos::Ref<COptimizationContext> poc) const
 {
 	GPOS_ASSERT(nullptr != poc);
 
@@ -117,8 +117,8 @@ COptimizationContext::Matches(const COptimizationContext *poc) const
 		return false;
 	}
 
-	CReqdPropPlan *prppFst = this->Prpp();
-	CReqdPropPlan *prppSnd = poc->Prpp();
+	gpos::Ref<CReqdPropPlan> prppFst = this->Prpp();
+	gpos::Ref<CReqdPropPlan> prppSnd = poc->Prpp();
 
 	// make sure we are not comparing to invalid context
 	if (nullptr == prppFst || nullptr == prppSnd)
@@ -139,8 +139,9 @@ COptimizationContext::Matches(const COptimizationContext *poc) const
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FEqualForStats(const COptimizationContext *pocLeft,
-									 const COptimizationContext *pocRight)
+COptimizationContext::FEqualForStats(
+	const gpos::Ref<COptimizationContext> pocLeft,
+	const gpos::Ref<COptimizationContext> pocRight)
 {
 	GPOS_ASSERT(nullptr != pocLeft);
 	GPOS_ASSERT(nullptr != pocRight);
@@ -161,12 +162,13 @@ COptimizationContext::FEqualForStats(const COptimizationContext *pocLeft,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimize(CMemoryPool *mp, CGroupExpression *pgexprParent,
-								CGroupExpression *pgexprChild,
-								COptimizationContext *pocChild,
+COptimizationContext::FOptimize(CMemoryPool *mp,
+								gpos::Ref<CGroupExpression> pgexprParent,
+								gpos::Ref<CGroupExpression> pgexprChild,
+								gpos::Ref<COptimizationContext> pocChild,
 								ULONG ulSearchStages)
 {
-	COperator *pop = pgexprChild->Pop();
+	gpos::Ref<COperator> pop = pgexprChild->Pop();
 
 	if (CUtils::FPhysicalMotion(pop))
 	{
@@ -238,18 +240,20 @@ COptimizationContext::FEqualContextIds(COptimizationContextArray *pdrgpocFst,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeMotion(CMemoryPool *,	   // mp
-									  CGroupExpression *,  // pgexprParent
-									  CGroupExpression *pgexprMotion,
-									  COptimizationContext *poc,
-									  ULONG	 // ulSearchStages
+COptimizationContext::FOptimizeMotion(
+	CMemoryPool *,				  // mp
+	gpos::Ref<CGroupExpression>,  // pgexprParent
+	gpos::Ref<CGroupExpression> pgexprMotion,
+	gpos::Ref<COptimizationContext> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprMotion);
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(CUtils::FPhysicalMotion(pgexprMotion->Pop()));
 
-	CPhysicalMotion *pop = CPhysicalMotion::PopConvert(pgexprMotion->Pop());
+	gpos::Ref<CPhysicalMotion> pop =
+		CPhysicalMotion::PopConvert(pgexprMotion->Pop());
 
 	return poc->Prpp()->Ped()->FCompatible(pop->Pds());
 }
@@ -264,21 +268,21 @@ COptimizationContext::FOptimizeMotion(CMemoryPool *,	   // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeSort(CMemoryPool *,		 // mp
-									CGroupExpression *,	 // pgexprParent
-									CGroupExpression *pgexprSort,
-									COptimizationContext *poc,
-									ULONG  // ulSearchStages
+COptimizationContext::FOptimizeSort(
+	CMemoryPool *,				  // mp
+	gpos::Ref<CGroupExpression>,  // pgexprParent
+	gpos::Ref<CGroupExpression> pgexprSort, gpos::Ref<COptimizationContext> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprSort);
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(COperator::EopPhysicalSort == pgexprSort->Pop()->Eopid());
 
-	CPhysicalSort *pop = CPhysicalSort::PopConvert(pgexprSort->Pop());
+	gpos::Ref<CPhysicalSort> pop = CPhysicalSort::PopConvert(pgexprSort->Pop());
 
 	return poc->Prpp()->Peo()->FCompatible(
-		const_cast<COrderSpec *>(pop->Pos()));
+		const_cast<gpos::Ref<COrderSpec> >(pop->Pos()));
 }
 
 
@@ -292,9 +296,9 @@ COptimizationContext::FOptimizeSort(CMemoryPool *,		 // mp
 //---------------------------------------------------------------------------
 BOOL
 COptimizationContext::FOptimizeAgg(CMemoryPool *mp,
-								   CGroupExpression *,	// pgexprParent
-								   CGroupExpression *pgexprAgg,
-								   COptimizationContext *poc,
+								   gpos::Ref<CGroupExpression>,	 // pgexprParent
+								   gpos::Ref<CGroupExpression> pgexprAgg,
+								   gpos::Ref<COptimizationContext> poc,
 								   ULONG ulSearchStages)
 {
 	GPOS_ASSERT(nullptr != pgexprAgg);
@@ -321,7 +325,7 @@ COptimizationContext::FOptimizeAgg(CMemoryPool *mp,
 	}
 
 	// otherwise, we need to avoid optimizing node unless it is a multi-stage agg
-	COptimizationContext *pocFound =
+	gpos::Ref<COptimizationContext> pocFound =
 		pgexprAgg->Pgroup()->PocLookupBest(mp, ulSearchStages, poc->Prpp());
 	if (nullptr != pocFound && pocFound->FHasMultiStageAggPlan())
 	{
@@ -343,18 +347,18 @@ COptimizationContext::FOptimizeAgg(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeNLJoin(CMemoryPool *mp,
-									  CGroupExpression *,  // pgexprParent
-									  CGroupExpression *pgexprJoin,
-									  COptimizationContext *poc,
-									  ULONG	 // ulSearchStages
+COptimizationContext::FOptimizeNLJoin(
+	CMemoryPool *mp,
+	gpos::Ref<CGroupExpression>,  // pgexprParent
+	gpos::Ref<CGroupExpression> pgexprJoin, gpos::Ref<COptimizationContext> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprJoin);
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(CUtils::FNLJoin(pgexprJoin->Pop()));
 
-	COperator *pop = pgexprJoin->Pop();
+	gpos::Ref<COperator> pop = pgexprJoin->Pop();
 	if (!CUtils::FCorrelatedNLJoin(pop))
 	{
 		return true;
@@ -362,9 +366,10 @@ COptimizationContext::FOptimizeNLJoin(CMemoryPool *mp,
 
 	// for correlated join, the requested columns must be covered by outer child
 	// columns and columns to be generated from inner child
-	CPhysicalNLJoin *popNLJoin = CPhysicalNLJoin::PopConvert(pop);
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
-	CColRefSet *pcrsOuterChild =
+	gpos::Ref<CPhysicalNLJoin> popNLJoin = CPhysicalNLJoin::PopConvert(pop);
+	gpos::Ref<CColRefSet> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
+	gpos::Ref<CColRefSet> pcrsOuterChild =
 		CDrvdPropRelational::GetRelationalProperties((*pgexprJoin)[0]->Pdp())
 			->GetOutputColumns();
 	pcrs->Include(pcrsOuterChild);
@@ -384,16 +389,16 @@ COptimizationContext::FOptimizeNLJoin(CMemoryPool *mp,
 //		of CTE consumer
 //
 //---------------------------------------------------------------------------
-CReqdPropPlan *
+gpos::Ref<CReqdPropPlan>
 COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
-									  COptimizationContext *poc,
+									  gpos::Ref<COptimizationContext> poc,
 									  ULONG ulSearchStages)
 {
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(nullptr != poc->PccBest());
 
-	CCostContext *pccBest = poc->PccBest();
-	CGroupExpression *pgexpr = pccBest->Pgexpr();
+	gpos::Ref<CCostContext> pccBest = poc->PccBest();
+	gpos::Ref<CGroupExpression> pgexpr = pccBest->Pgexpr();
 	BOOL fOptimizeCTESequence =
 		(COperator::EopPhysicalSequence == pgexpr->Pop()->Eopid() &&
 		 (*pgexpr)[0]->FHasCTEProducer());
@@ -404,41 +409,41 @@ COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	COptimizationContext *pocProducer = (*pgexpr)[0]->PocLookupBest(
+	gpos::Ref<COptimizationContext> pocProducer = (*pgexpr)[0]->PocLookupBest(
 		mp, ulSearchStages, (*pccBest->Pdrgpoc())[0]->Prpp());
 	if (nullptr == pocProducer)
 	{
 		return nullptr;
 	}
 
-	CCostContext *pccProducer = pocProducer->PccBest();
+	gpos::Ref<CCostContext> pccProducer = pocProducer->PccBest();
 	if (nullptr == pccProducer)
 	{
 		return nullptr;
 	}
-	COptimizationContext *pocConsumer = (*pgexpr)[1]->PocLookupBest(
+	gpos::Ref<COptimizationContext> pocConsumer = (*pgexpr)[1]->PocLookupBest(
 		mp, ulSearchStages, (*pccBest->Pdrgpoc())[1]->Prpp());
 	if (nullptr == pocConsumer)
 	{
 		return nullptr;
 	}
 
-	CCostContext *pccConsumer = pocConsumer->PccBest();
+	gpos::Ref<CCostContext> pccConsumer = pocConsumer->PccBest();
 	if (nullptr == pccConsumer)
 	{
 		return nullptr;
 	}
 
-	CColRefSet *pcrsInnerOutput =
+	gpos::Ref<CColRefSet> pcrsInnerOutput =
 		CDrvdPropRelational::GetRelationalProperties((*pgexpr)[1]->Pdp())
 			->GetOutputColumns();
-	CPhysicalCTEProducer *popProducer =
+	gpos::Ref<CPhysicalCTEProducer> popProducer =
 		CPhysicalCTEProducer::PopConvert(pccProducer->Pgexpr()->Pop());
 	UlongToColRefMap *colref_mapping =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PhmulcrConsumerToProducer(
 			mp, popProducer->UlCTEId(), pcrsInnerOutput,
 			popProducer->Pdrgpcr());
-	CReqdPropPlan *prppProducer = CReqdPropPlan::PrppRemapForCTE(
+	gpos::Ref<CReqdPropPlan> prppProducer = CReqdPropPlan::PrppRemapForCTE(
 		mp, pocProducer->Prpp(), pccConsumer->Pdpplan(), colref_mapping);
 	colref_mapping->Release();
 

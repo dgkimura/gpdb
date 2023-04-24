@@ -23,8 +23,9 @@ using namespace gpopt;
 using namespace gpmd;
 
 // Ctor
-CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-						   IMDId *array_type_mdid, BOOL is_multidimenstional)
+CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+						   gpos::Ref<IMDId> array_type_mdid,
+						   BOOL is_multidimenstional)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_pmdidArray(array_type_mdid),
@@ -37,8 +38,9 @@ CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
 
 
 // Ctor
-CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-						   IMDId *array_type_mdid, BOOL is_multidimenstional,
+CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+						   gpos::Ref<IMDId> array_type_mdid,
+						   BOOL is_multidimenstional,
 						   CScalarConstArray *pdrgPconst)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
@@ -66,7 +68,7 @@ CScalarArray::~CScalarArray()
 //		Element type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::PmdidElem() const
 {
 	return m_pmdidElem;
@@ -80,7 +82,7 @@ CScalarArray::PmdidElem() const
 //		Array type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::PmdidArray() const
 {
 	return m_pmdidArray;
@@ -126,11 +128,11 @@ CScalarArray::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArray::Matches(COperator *pop) const
+CScalarArray::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarArray *popArray = CScalarArray::PopConvert(pop);
+		gpos::Ref<CScalarArray> popArray = CScalarArray::PopConvert(pop);
 
 		// match if components are identical
 		if (popArray->FMultiDimensional() == FMultiDimensional() &&
@@ -140,8 +142,9 @@ CScalarArray::Matches(COperator *pop) const
 		{
 			for (ULONG ul = 0; ul < m_pdrgPconst->Size(); ul++)
 			{
-				CScalarConst *popConst1 = (*m_pdrgPconst)[ul];
-				CScalarConst *popConst2 = (*popArray->PdrgPconst())[ul];
+				gpos::Ref<CScalarConst> popConst1 = (*m_pdrgPconst)[ul];
+				gpos::Ref<CScalarConst> popConst2 =
+					(*popArray->PdrgPconst())[ul];
 				if (!popConst1->Matches(popConst2))
 				{
 					return false;
@@ -162,7 +165,7 @@ CScalarArray::Matches(COperator *pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::MdidType() const
 {
 	return m_pmdidArray;

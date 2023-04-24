@@ -74,7 +74,7 @@ CLogicalCTEProducer::~CLogicalCTEProducer()
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalCTEProducer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 )
@@ -91,11 +91,11 @@ CLogicalCTEProducer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 //		Derive not nullable output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalCTEProducer::DeriveNotNullColumns(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
 	pcrs->Intersection(exprhdl.DeriveNotNullColumns(0));
 
 	return pcrs;
@@ -109,7 +109,7 @@ CLogicalCTEProducer::DeriveNotNullColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalCTEProducer::DeriveKeyCollection(CMemoryPool *,	 // mp
 										 CExpressionHandle &exprhdl) const
 {
@@ -132,7 +132,7 @@ CLogicalCTEProducer::DeriveMaxCard(CMemoryPool *,  // mp
 	return exprhdl.DeriveMaxCard(0);
 }
 
-CTableDescriptor *
+gpos::Ref<CTableDescriptor>
 CLogicalCTEProducer::DeriveTableDescriptor(CMemoryPool *,  // mp
 										   CExpressionHandle &exprhdl) const
 {
@@ -149,14 +149,15 @@ CLogicalCTEProducer::DeriveTableDescriptor(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEProducer::Matches(COperator *pop) const
+CLogicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalCTEProducer *popCTEProducer = CLogicalCTEProducer::PopConvert(pop);
+	gpos::Ref<CLogicalCTEProducer> popCTEProducer =
+		CLogicalCTEProducer::PopConvert(pop);
 
 	return m_id == popCTEProducer->UlCTEId() &&
 		   m_pdrgpcr->Equals(popCTEProducer->Pdrgpcr());
@@ -187,7 +188,7 @@ CLogicalCTEProducer::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalCTEProducer::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

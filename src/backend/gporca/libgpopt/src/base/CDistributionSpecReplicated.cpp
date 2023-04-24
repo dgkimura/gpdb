@@ -37,7 +37,8 @@ using namespace gpopt;
 //	| others not Singleton    | T                |(default) F        |
 //	+-------------------------+------------------+-------------------+
 BOOL
-CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
+CDistributionSpecReplicated::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pdss) const
 {
 	GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
@@ -82,7 +83,7 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 			// a replicated distribution satisfies the non-singleton
 			// distribution, only if allowed by non-singleton distribution object
 			return CDistributionSpecNonSingleton::PdsConvert(
-					   const_cast<CDistributionSpec *>(pdss))
+					   const_cast<gpos::Ref<CDistributionSpec> >(pdss))
 				->FAllowReplicated();
 		}
 
@@ -100,9 +101,10 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 
 		// a replicated distribution satisfies any non-singleton one,
 		// as well as singleton distributions that are not coordinator-only
-		return !(EdtSingleton == pdss->Edt() &&
-				 (dynamic_cast<const CDistributionSpecSingleton *>(pdss))
-					 ->FOnCoordinator());
+		return !(
+			EdtSingleton == pdss->Edt() &&
+			(dynamic_cast<const gpos::Ref<CDistributionSpecSingleton> >(pdss))
+				->FOnCoordinator());
 	}
 
 	return false;
@@ -111,13 +113,13 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 void
 CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &,  // exprhdl
-											 CReqdPropPlan *
+											 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 												 prpp
 #endif	// GPOS_DEBUG
 											 ,
 											 CExpressionArray *pdrgpexpr,
-											 CExpression *pexpr)
+											 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -136,7 +138,7 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalMotionBroadcast(mp, m_ignore_broadcast_threshold),
 		pexpr);

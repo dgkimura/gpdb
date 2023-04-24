@@ -29,8 +29,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid_rel, ULONG selector_id, ULONG scan_id,
-	ULongPtrArray *parts)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel, ULONG selector_id,
+	ULONG scan_id, ULongPtrArray *parts)
 	: CDXLPhysical(mp),
 	  m_rel_mdid(mdid_rel),
 	  m_selector_id(selector_id),
@@ -90,8 +90,8 @@ CDXLPhysicalPartitionSelector::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
-											  const CDXLNode *dxlnode) const
+CDXLPhysicalPartitionSelector::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -142,14 +142,14 @@ CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalPartitionSelector::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 										   BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(6 == arity || 7 == arity);
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[idx];
 		if (validate_children)
 		{
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

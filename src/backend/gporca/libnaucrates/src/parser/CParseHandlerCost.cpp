@@ -57,7 +57,7 @@ CParseHandlerCost::~CParseHandlerCost()
 //		Destructor
 //
 //---------------------------------------------------------------------------
-CDXLOperatorCost *
+gpos::Ref<CDXLOperatorCost>
 CParseHandlerCost::GetDXLOperatorCost()
 {
 	return m_operator_cost_dxl;

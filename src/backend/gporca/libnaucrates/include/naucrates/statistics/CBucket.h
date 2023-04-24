@@ -47,10 +47,10 @@ class CBucket : public IBucket, public gpos::DbgPrintMixin<CBucket>
 {
 private:
 	// lower bound of bucket
-	CPoint *m_bucket_lower_bound;
+	gpos::Ref<CPoint> m_bucket_lower_bound;
 
 	// upper bound of bucket
-	CPoint *m_bucket_upper_bound;
+	gpos::Ref<CPoint> m_bucket_upper_bound;
 
 	// is lower bound closed (does bucket include boundary value)
 	BOOL m_is_lower_closed;
@@ -70,24 +70,24 @@ public:
 	CBucket(const CBucket &) = delete;
 
 	// ctor
-	CBucket(CPoint *bucket_lower_bound, CPoint *bucket_upper_bound,
-			BOOL is_lower_closed, BOOL is_upper_closed, CDouble frequency,
-			CDouble distinct);
+	CBucket(gpos::Ref<CPoint> bucket_lower_bound,
+			gpos::Ref<CPoint> bucket_upper_bound, BOOL is_lower_closed,
+			BOOL is_upper_closed, CDouble frequency, CDouble distinct);
 
 	// dtor
 	~CBucket() override;
 
 	// does bucket contain point
-	BOOL Contains(const CPoint *point) const;
+	BOOL Contains(const gpos::Ref<CPoint> point) const;
 
 	// is the point before the lower bound of the bucket
-	BOOL IsBefore(const CPoint *point) const;
+	BOOL IsBefore(const gpos::Ref<CPoint> point) const;
 
 	// is the point after the upper bound of the bucket
-	BOOL IsAfter(const CPoint *point) const;
+	BOOL IsAfter(const gpos::Ref<CPoint> point) const;
 
 	// what percentage of bucket is covered by [lb,pp]
-	CDouble GetOverlapPercentage(const CPoint *point,
+	CDouble GetOverlapPercentage(const gpos::Ref<CPoint> point,
 								 BOOL include_point = true) const;
 
 	// frequency associated with bucket
@@ -125,14 +125,14 @@ public:
 	}
 
 	// lower point
-	CPoint *
+	gpos::Ref<CPoint>
 	GetLowerBound() const override
 	{
 		return m_bucket_lower_bound;
 	}
 
 	// upper point
-	CPoint *
+	gpos::Ref<CPoint>
 	GetUpperBound() const override
 	{
 		return m_bucket_upper_bound;
@@ -168,20 +168,23 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// construct new bucket with lower bound greater than given point
-	CBucket *MakeBucketGreaterThan(CMemoryPool *mp, CPoint *point) const;
+	CBucket *MakeBucketGreaterThan(CMemoryPool *mp,
+								   gpos::Ref<CPoint> point) const;
 
 	// scale down version of bucket adjusting upper boundary
-	CBucket *MakeBucketScaleUpper(CMemoryPool *mp, CPoint *bucket_upper_bound,
+	CBucket *MakeBucketScaleUpper(CMemoryPool *mp,
+								  gpos::Ref<CPoint> bucket_upper_bound,
 								  BOOL include_upper) const;
 
 	// scale down version of bucket adjusting lower boundary
-	CBucket *MakeBucketScaleLower(CMemoryPool *mp, CPoint *bucket_lower_bound,
+	CBucket *MakeBucketScaleLower(CMemoryPool *mp,
+								  gpos::Ref<CPoint> bucket_lower_bound,
 								  BOOL include_lower) const;
 
 	// extract singleton bucket at given point
 	// use_width to calculate the scaling ratio instead of default (ndv)
 	CBucket *MakeBucketSingleton(CMemoryPool *mp,
-								 CPoint *point_singleton) const;
+								 gpos::Ref<CPoint> point_singleton) const;
 
 	// create a new bucket by intersecting with another and return the percentage of each of the buckets that intersect
 	CBucket *MakeBucketIntersect(CMemoryPool *mp, CBucket *bucket,
@@ -232,7 +235,8 @@ public:
 											 const CBucket *bucket2);
 
 	// create a new singleton bucket with the given datum as it lower and upper bounds
-	static CBucket *MakeBucketSingleton(CMemoryPool *mp, IDatum *datum);
+	static CBucket *MakeBucketSingleton(CMemoryPool *mp,
+										gpos::Ref<IDatum> datum);
 };
 }  // namespace gpnaucrates
 

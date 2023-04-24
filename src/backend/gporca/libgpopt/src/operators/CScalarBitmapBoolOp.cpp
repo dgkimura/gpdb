@@ -41,7 +41,7 @@ const WCHAR CScalarBitmapBoolOp::m_rgwszBitmapOpType[EbitmapboolSentinel][30] =
 //---------------------------------------------------------------------------
 CScalarBitmapBoolOp::CScalarBitmapBoolOp(CMemoryPool *mp,
 										 EBitmapBoolOp ebitmapboolop,
-										 IMDId *pmdidBitmapType)
+										 gpos::Ref<IMDId> pmdidBitmapType)
 	: CScalar(mp),
 	  m_ebitmapboolop(ebitmapboolop),
 	  m_pmdidBitmapType(pmdidBitmapType)
@@ -90,13 +90,13 @@ CScalarBitmapBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapBoolOp::Matches(COperator *pop) const
+CScalarBitmapBoolOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CScalarBitmapBoolOp *popBitmapBoolOp = PopConvert(pop);
+	gpos::Ref<CScalarBitmapBoolOp> popBitmapBoolOp = PopConvert(pop);
 
 	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&
 		   popBitmapBoolOp->MdidType()->Equals(m_pmdidBitmapType);

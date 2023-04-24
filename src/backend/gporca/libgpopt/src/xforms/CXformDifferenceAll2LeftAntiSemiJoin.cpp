@@ -48,9 +48,9 @@ CXformDifferenceAll2LeftAntiSemiJoin::CXformDifferenceAll2LeftAntiSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
-												CXformResult *pxfres,
-												CExpression *pexpr) const
+CXformDifferenceAll2LeftAntiSemiJoin::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -63,17 +63,19 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalDifferenceAll *popDifferenceAll =
+	gpos::Ref<CLogicalDifferenceAll> popDifferenceAll =
 		CLogicalDifferenceAll::PopConvert(pexpr->Pop());
 	CColRef2dArray *pdrgpdrgpcrInput = popDifferenceAll->PdrgpdrgpcrInput();
 
-	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
-	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
+	gpos::Ref<CExpression> pexprLeftWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild,
+											  (*pdrgpdrgpcrInput)[0]);
+	gpos::Ref<CExpression> pexprRightWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild,
+											  (*pdrgpdrgpcrInput)[1]);
 
 	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
 	CColRefArray *pdrgpcrLeftNew =
@@ -90,11 +92,11 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	pdrgpdrgpcrInputNew->Append(pdrgpcrRightNew);
 
 	// generate the scalar condition for the left anti-semi join
-	CExpression *pexprScCond =
+	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new left anti-semi join logical operator
-	CExpression *pexprLASJ = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprLASJ = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
 					pexprLeftWindow, pexprRightWindow, pexprScCond);
 

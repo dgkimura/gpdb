@@ -193,27 +193,28 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerEnumeratorConfig *pphEnumeratorConfig =
 		dynamic_cast<CParseHandlerEnumeratorConfig *>((*this)[0]);
-	CEnumeratorConfig *pec = pphEnumeratorConfig->GetEnumeratorCfg();
+	gpos::Ref<CEnumeratorConfig> pec = pphEnumeratorConfig->GetEnumeratorCfg();
 	pec->AddRef();
 
 	CParseHandlerStatisticsConfig *pphStatisticsConfig =
 		dynamic_cast<CParseHandlerStatisticsConfig *>((*this)[1]);
-	CStatisticsConfig *stats_config = pphStatisticsConfig->GetStatsConf();
+	gpos::Ref<CStatisticsConfig> stats_config =
+		pphStatisticsConfig->GetStatsConf();
 	stats_config->AddRef();
 
 	CParseHandlerCTEConfig *pphCTEConfig =
 		dynamic_cast<CParseHandlerCTEConfig *>((*this)[2]);
-	CCTEConfig *pcteconfig = pphCTEConfig->GetCteConf();
+	gpos::Ref<CCTEConfig> pcteconfig = pphCTEConfig->GetCteConf();
 	pcteconfig->AddRef();
 
 	CParseHandlerWindowOids *pphDefoidsGPDB =
 		dynamic_cast<CParseHandlerWindowOids *>((*this)[3]);
-	CWindowOids *pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
+	gpos::Ref<CWindowOids> pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
 	GPOS_ASSERT(nullptr != pwindowoidsGPDB);
 	pwindowoidsGPDB->AddRef();
 
-	ICostModel *pcm = nullptr;
-	CHint *phint = nullptr;
+	gpos::Ref<ICostModel> pcm = nullptr;
+	gpos::Ref<CHint> phint = nullptr;
 	if (5 == this->Length())
 	{
 		// no cost model: use default one
@@ -276,7 +277,7 @@ CParseHandlerOptimizerConfig::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CParseHandlerOptimizerConfig::Pbs() const
 {
 	return m_pbs;
@@ -290,7 +291,7 @@ CParseHandlerOptimizerConfig::Pbs() const
 //		Returns the optimizer config
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::Ref<COptimizerConfig>
 CParseHandlerOptimizerConfig::GetOptimizerConfig() const
 {
 	return m_optimizer_config;

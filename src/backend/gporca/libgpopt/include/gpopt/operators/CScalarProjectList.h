@@ -55,13 +55,13 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -71,16 +71,16 @@ public:
 	}
 
 	// conversion function
-	static CScalarProjectList *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarProjectList>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarProjectList == pop->Eopid());
 
-		return dynamic_cast<CScalarProjectList *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarProjectList> >(pop);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarProjectList::MdidType()");

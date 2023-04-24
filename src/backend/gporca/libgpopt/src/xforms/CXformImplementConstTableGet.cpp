@@ -44,15 +44,15 @@ CXformImplementConstTableGet::CXformImplementConstTableGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformImplementConstTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalConstTableGet *popConstTableGet =
+	gpos::Ref<CLogicalConstTableGet> popConstTableGet =
 		CLogicalConstTableGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
@@ -67,7 +67,7 @@ CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalConstTableGet(
 							mp, pdrgpcoldesc, pdrgpdrgpdatum, pdrgpcrOutput));
 

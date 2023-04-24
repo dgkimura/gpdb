@@ -48,7 +48,7 @@ private:
 	EBitmapBoolOp m_ebitmapboolop;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	static const WCHAR m_rgwszBitmapOpType[EbitmapboolSentinel][30];
 
@@ -57,7 +57,7 @@ public:
 
 	// ctor
 	CScalarBitmapBoolOp(CMemoryPool *mp, EBitmapBoolOp ebitmapboolop,
-						IMDId *pmdidBitmapType);
+						gpos::Ref<IMDId> pmdidBitmapType);
 
 
 	// dtor
@@ -71,7 +71,7 @@ public:
 	}
 
 	// bitmap type id
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_pmdidBitmapType;
@@ -95,7 +95,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -105,7 +105,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -118,13 +118,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CScalarBitmapBoolOp *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarBitmapBoolOp>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBitmapBoolOp == pop->Eopid());
 
-		return dynamic_cast<CScalarBitmapBoolOp *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarBitmapBoolOp> >(pop);
 	}
 
 };	// class CScalarBitmapBoolOp

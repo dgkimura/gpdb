@@ -67,11 +67,11 @@ CPhysicalConstTableGet::~CPhysicalConstTableGet()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalConstTableGet::Matches(COperator *pop) const
+CPhysicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
-		CPhysicalConstTableGet *popCTG =
+		gpos::Ref<CPhysicalConstTableGet> popCTG =
 			CPhysicalConstTableGet::PopConvert(pop);
 		return m_pdrgpcoldesc == popCTG->Pdrgpcoldesc() &&
 			   m_pdrgpdrgpdatum == popCTG->Pdrgpdrgpdatum() &&
@@ -91,13 +91,13 @@ CPhysicalConstTableGet::Matches(COperator *pop) const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,		   // mp,
-									 CExpressionHandle &,  // exprhdl,
-									 CColRefSet *,		   // pcrsRequired,
-									 ULONG,				   // child_index,
-									 CDrvdPropArray *,	   // pdrgpdpCtxt
-									 ULONG				   // ulOptReq
+gpos::Ref<CColRefSet>
+CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,			 // mp,
+									 CExpressionHandle &,	 // exprhdl,
+									 gpos::Ref<CColRefSet>,	 // pcrsRequired,
+									 ULONG,					 // child_index,
+									 CDrvdPropArray *,		 // pdrgpdpCtxt
+									 ULONG					 // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -113,13 +113,13 @@ CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,		   // mp,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalConstTableGet::PosRequired(CMemoryPool *,		  // mp,
-									CExpressionHandle &,  // exprhdl,
-									COrderSpec *,		  // posRequired,
-									ULONG,				  // child_index,
-									CDrvdPropArray *,	  // pdrgpdpCtxt
-									ULONG				  // ulOptReq
+gpos::Ref<COrderSpec>
+CPhysicalConstTableGet::PosRequired(CMemoryPool *,			// mp,
+									CExpressionHandle &,	// exprhdl,
+									gpos::Ref<COrderSpec>,	// posRequired,
+									ULONG,					// child_index,
+									CDrvdPropArray *,		// pdrgpdpCtxt
+									ULONG					// ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -134,13 +134,14 @@ CPhysicalConstTableGet::PosRequired(CMemoryPool *,		  // mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
-CPhysicalConstTableGet::PdsRequired(CMemoryPool *,		  // mp,
-									CExpressionHandle &,  // exprhdl,
-									CDistributionSpec *,  // pdsRequired,
-									ULONG,				  //child_index
-									CDrvdPropArray *,	  // pdrgpdpCtxt
-									ULONG				  // ulOptReq
+gpos::Ref<CDistributionSpec>
+CPhysicalConstTableGet::PdsRequired(
+	CMemoryPool *,				   // mp,
+	CExpressionHandle &,		   // exprhdl,
+	gpos::Ref<CDistributionSpec>,  // pdsRequired,
+	ULONG,						   //child_index
+	CDrvdPropArray *,			   // pdrgpdpCtxt
+	ULONG						   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -156,13 +157,14 @@ CPhysicalConstTableGet::PdsRequired(CMemoryPool *,		  // mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
-CPhysicalConstTableGet::PrsRequired(CMemoryPool *,		   // mp,
-									CExpressionHandle &,   // exprhdl,
-									CRewindabilitySpec *,  // prsRequired,
-									ULONG,				   // child_index,
-									CDrvdPropArray *,	   // pdrgpdpCtxt
-									ULONG				   // ulOptReq
+gpos::Ref<CRewindabilitySpec>
+CPhysicalConstTableGet::PrsRequired(
+	CMemoryPool *,					// mp,
+	CExpressionHandle &,			// exprhdl,
+	gpos::Ref<CRewindabilitySpec>,	// prsRequired,
+	ULONG,							// child_index,
+	CDrvdPropArray *,				// pdrgpdpCtxt
+	ULONG							// ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -177,10 +179,10 @@ CPhysicalConstTableGet::PrsRequired(CMemoryPool *,		   // mp,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::Ref<CCTEReq>
 CPhysicalConstTableGet::PcteRequired(CMemoryPool *,		   //mp,
 									 CExpressionHandle &,  //exprhdl,
-									 CCTEReq *,			   //pcter,
+									 gpos::Ref<CCTEReq>,   //pcter,
 									 ULONG,				   //child_index,
 									 CDrvdPropArray *,	   //pdrgpdpCtxt,
 									 ULONG				   //ulOptReq
@@ -200,13 +202,13 @@ CPhysicalConstTableGet::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalConstTableGet::FProvidesReqdCols(CExpressionHandle &,	// exprhdl,
-										  CColRefSet *pcrsRequired,
+										  gpos::Ref<CColRefSet> pcrsRequired,
 										  ULONG	 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	BOOL result = pcrs->ContainsAll(pcrsRequired);
@@ -225,7 +227,7 @@ CPhysicalConstTableGet::FProvidesReqdCols(CExpressionHandle &,	// exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalConstTableGet::PosDerive(CMemoryPool *mp,
 								  CExpressionHandle &  // exprhdl
 ) const
@@ -242,7 +244,7 @@ CPhysicalConstTableGet::PosDerive(CMemoryPool *mp,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalConstTableGet::PdsDerive(CMemoryPool *mp,
 								  CExpressionHandle &  // exprhdl
 ) const
@@ -259,7 +261,7 @@ CPhysicalConstTableGet::PdsDerive(CMemoryPool *mp,
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::Ref<CRewindabilitySpec>
 CPhysicalConstTableGet::PrsDerive(CMemoryPool *mp,
 								  CExpressionHandle &  // exprhdl
 ) const
@@ -277,7 +279,7 @@ CPhysicalConstTableGet::PrsDerive(CMemoryPool *mp,
 //		Derive cte map
 //
 //---------------------------------------------------------------------------
-CCTEMap *
+gpos::Ref<CCTEMap>
 CPhysicalConstTableGet::PcmDerive(CMemoryPool *mp,
 								  CExpressionHandle &  //exprhdl
 ) const
@@ -295,7 +297,7 @@ CPhysicalConstTableGet::PcmDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalConstTableGet::EpetOrder(CExpressionHandle &,	// exprhdl
-								  const CEnfdOrder *
+								  const gpos::Ref<CEnfdOrder>
 #ifdef GPOS_DEBUG
 									  peo
 #endif	// GPOS_DEBUG
@@ -317,8 +319,9 @@ CPhysicalConstTableGet::EpetOrder(CExpressionHandle &,	// exprhdl
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalConstTableGet::EpetRewindability(CExpressionHandle &,		  // exprhdl
-										  const CEnfdRewindability *  // per
+CPhysicalConstTableGet::EpetRewindability(
+	CExpressionHandle &,				 // exprhdl
+	const gpos::Ref<CEnfdRewindability>	 // per
 ) const
 {
 	// rewindability is already provided
@@ -352,7 +355,7 @@ CPhysicalConstTableGet::OsPrint(IOstream &os) const
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)
 			{
-				IDatum *datum = (*pdrgpdatum)[ulB];
+				gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulB];
 				datum->OsPrint(os);
 
 				if (ulB < length - 1)

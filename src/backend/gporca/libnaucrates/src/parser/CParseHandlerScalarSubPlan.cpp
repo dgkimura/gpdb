@@ -193,14 +193,14 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 		parse_handler_subplan_param_list->GetDXLColRefArray();
 	dxl_colref_array->AddRef();
 
-	CDXLNode *dxl_subplan_test_expr =
+	gpos::Ref<CDXLNode> dxl_subplan_test_expr =
 		parse_handler_subplan_test_expr->GetDXLTestExpr();
 	if (nullptr != dxl_subplan_test_expr)
 	{
 		dxl_subplan_test_expr->AddRef();
 	}
-	CDXLScalarSubPlan *dxl_op =
-		(CDXLScalarSubPlan *) CDXLOperatorFactory::MakeDXLSubPlan(
+	gpos::Ref<CDXLScalarSubPlan> dxl_op =
+		(gpos::Ref<CDXLScalarSubPlan>) CDXLOperatorFactory::MakeDXLSubPlan(
 			m_parse_handler_mgr->GetDXLMemoryManager(), m_mdid_first_col,
 			dxl_colref_array, m_dxl_subplan_type, dxl_subplan_test_expr);
 

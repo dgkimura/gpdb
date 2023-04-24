@@ -19,13 +19,13 @@ using namespace gpmd;
 
 
 // conversion function
-CScalarIsDistinctFrom *
-CScalarIsDistinctFrom::PopConvert(COperator *pop)
+gpos::Ref<CScalarIsDistinctFrom>
+CScalarIsDistinctFrom::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarIsDistinctFrom == pop->Eopid());
 
-	return dynamic_cast<CScalarIsDistinctFrom *>(pop);
+	return dynamic_cast<gpos::Ref<CScalarIsDistinctFrom> >(pop);
 }
 
 // perform boolean expression evaluation
@@ -52,11 +52,12 @@ CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
 }
 
 BOOL
-CScalarIsDistinctFrom::Matches(COperator *pop) const
+CScalarIsDistinctFrom::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIsDistinctFrom *popIDF = CScalarIsDistinctFrom::PopConvert(pop);
+		gpos::Ref<CScalarIsDistinctFrom> popIDF =
+			CScalarIsDistinctFrom::PopConvert(pop);
 
 		// match if operator mdids are identical
 		return MdIdOp()->Equals(popIDF->MdIdOp());
@@ -66,11 +67,11 @@ CScalarIsDistinctFrom::Matches(COperator *pop) const
 }
 
 // get commuted scalar IDF operator
-CScalarCmp *
+gpos::Ref<CScalarCmp>
 CScalarIsDistinctFrom::PopCommutedOp(CMemoryPool *mp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = PmdidCommuteOp(md_accessor, this);
+	gpos::Ref<IMDId> mdid = PmdidCommuteOp(md_accessor, this);
 	if (nullptr != mdid && mdid->IsValid())
 	{
 		return GPOS_NEW(mp)

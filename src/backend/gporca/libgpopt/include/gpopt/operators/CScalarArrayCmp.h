@@ -44,7 +44,7 @@ public:
 
 private:
 	// compare operator mdid
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// comparison operator name
 	const CWStringConst *m_pscOp;
@@ -62,7 +62,7 @@ public:
 	CScalarArrayCmp(const CScalarArrayCmp &) = delete;
 
 	// ctor
-	CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
+	CScalarArrayCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 					const CWStringConst *pstrOp, EArrCmpType earrcmpt);
 
 	// dtor
@@ -99,7 +99,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -109,7 +109,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -119,23 +119,23 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayCmp *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarArrayCmp>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayCmp == pop->Eopid());
 
-		return dynamic_cast<CScalarArrayCmp *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarArrayCmp> >(pop);
 	}
 
 	// name of the comparison operator
 	const CWStringConst *Pstr() const;
 
 	// operator mdid
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
@@ -144,8 +144,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// expand array comparison expression into a conjunctive/disjunctive expression
-	static CExpression *PexprExpand(CMemoryPool *mp,
-									CExpression *pexprArrayCmp);
+	static gpos::Ref<CExpression> PexprExpand(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprArrayCmp);
 
 };	// class CScalarArrayCmp
 

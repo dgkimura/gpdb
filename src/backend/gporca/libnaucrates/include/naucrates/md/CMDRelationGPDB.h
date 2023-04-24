@@ -52,7 +52,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -99,13 +99,13 @@ private:
 	IMdIdArray *m_mdid_check_constraint_array;
 
 	// partition constraint
-	CDXLNode *m_mdpart_constraint;
+	gpos::Ref<CDXLNode> m_mdpart_constraint;
 
 	// number of system columns
 	ULONG m_system_columns;
 
 	// oid of foreign server if this is a foreign relation
-	IMDId *m_foreign_server;
+	gpos::Ref<IMDId> m_foreign_server;
 
 	// mapping of column position to positions excluding dropped columns
 	UlongToUlongMap *m_colpos_nondrop_colpos_map;
@@ -124,18 +124,16 @@ public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
 
 	// ctor
-	CMDRelationGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					BOOL is_temp_table, Erelstoragetype rel_storage_type,
-					Ereldistrpolicy rel_distr_policy,
-					CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
-					IMdIdArray *distr_opfamilies,
-					ULongPtrArray *partition_cols_array,
-					CharPtrArray *str_part_types_array,
-					IMdIdArray *partition_oids, BOOL convert_hash_to_random,
-					ULongPtr2dArray *keyset_array,
-					CMDIndexInfoArray *md_index_info_array,
-					IMdIdArray *mdid_check_constraint_array,
-					CDXLNode *mdpart_constraint, IMDId *foreign_server);
+	CMDRelationGPDB(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+		BOOL is_temp_table, Erelstoragetype rel_storage_type,
+		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
+		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
+		ULongPtrArray *partition_cols_array, CharPtrArray *str_part_types_array,
+		IMdIdArray *partition_oids, BOOL convert_hash_to_random,
+		ULongPtr2dArray *keyset_array, CMDIndexInfoArray *md_index_info_array,
+		IMdIdArray *mdid_check_constraint_array,
+		gpos::Ref<CDXLNode> mdpart_constraint, gpos::Ref<IMDId> foreign_server);
 
 	// dtor
 	~CMDRelationGPDB() override;
@@ -148,7 +146,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -187,7 +185,7 @@ public:
 	ULONG SystemColumnsCount() const override;
 
 	// retrieve the column at the given position
-	const IMDColumn *GetMdCol(ULONG pos) const override;
+	const gpos::Ref<IMDColumn> GetMdCol(ULONG pos) const override;
 
 	// number of key sets
 	ULONG KeySetCount() const override;
@@ -199,9 +197,9 @@ public:
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	const IMDColumn *GetDistrColAt(ULONG pos) const override;
+	const gpos::Ref<IMDColumn> GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// return true if a hash distributed table needs to be considered as random
 	BOOL ConvertHashToRandom() const override;
@@ -213,7 +211,7 @@ public:
 	ULONG PartColumnCount() const override;
 
 	// retrieve the partition key column at the given position
-	const IMDColumn *PartColAt(ULONG pos) const override;
+	const gpos::Ref<IMDColumn> PartColAt(ULONG pos) const override;
 
 	// retrieve list of partition types
 	CharPtrArray *GetPartitionTypes() const override;
@@ -225,7 +223,7 @@ public:
 	ULONG IndexCount() const override;
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *IndexMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> IndexMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -234,15 +232,15 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const override;
 
 	// part constraint
-	CDXLNode *MDPartConstraint() const override;
+	gpos::Ref<CDXLNode> MDPartConstraint() const override;
 
 	// child partition oids
 	IMdIdArray *ChildPartitionMdids() const override;
 
-	IMDId *ForeignServer() const override;
+	gpos::Ref<IMDId> ForeignServer() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

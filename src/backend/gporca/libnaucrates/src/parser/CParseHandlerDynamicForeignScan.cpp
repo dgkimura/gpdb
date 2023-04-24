@@ -160,13 +160,14 @@ CParseHandlerDynamicForeignScan::EndElement(
 
 
 	// set table descriptor
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	IMdIdArray *mdid_partitions_array =
 		partition_mdids_parse_handler->GetMdIdArray();
 	mdid_partitions_array->AddRef();
-	CDXLPhysicalDynamicForeignScan *dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLPhysicalDynamicForeignScan> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalDynamicForeignScan(m_mp, table_descr, mdid_partitions_array,
 									   m_selector_ids, m_foreign_server_oid);
 

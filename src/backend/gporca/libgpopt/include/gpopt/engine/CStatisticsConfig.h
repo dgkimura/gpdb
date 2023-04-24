@@ -94,13 +94,13 @@ public:
 	}
 
 	// add the information about the column with the missing statistics
-	void AddMissingStatsColumn(CMDIdColStats *pmdidCol);
+	void AddMissingStatsColumn(gpos::Ref<CMDIdColStats> pmdidCol);
 
 	// collect the missing statistics columns
 	void CollectMissingStatsColumns(IMdIdArray *pdrgmdid);
 
 	// generate default optimizer configurations
-	static CStatisticsConfig *
+	static gpos::Ref<CStatisticsConfig>
 	PstatsconfDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CStatisticsConfig(

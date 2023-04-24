@@ -58,15 +58,15 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	virtual void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CReqdPropPlan *prpp,
+								 gpos::Ref<CReqdPropPlan> prpp,
 								 CExpressionArray *pdrgpexpr,
-								 CExpression *pexpr) = 0;
+								 gpos::Ref<CExpression> pexpr) = 0;
 
 	// hash function
 	virtual ULONG HashValue() const = 0;
 
 	// extract columns used by the property
-	virtual CColRefSet *PcrsUsed(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp) const = 0;
 
 	// property type
 	virtual EPropSpecType Epst() const = 0;

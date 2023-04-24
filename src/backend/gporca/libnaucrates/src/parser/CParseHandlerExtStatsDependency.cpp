@@ -47,7 +47,7 @@ CParseHandlerExtStatsDependency::~CParseHandlerExtStatsDependency()
 //		The dependency constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDDependency *
+gpos::Ref<CMDDependency>
 CParseHandlerExtStatsDependency::GetDependencyAt() const
 {
 	return m_dependency;

@@ -36,10 +36,10 @@ class CScalarArray : public CScalar
 {
 private:
 	// element type id
-	IMDId *m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// array type id
-	IMDId *m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// is array multidimensional
 	BOOL m_fMultiDimensional;
@@ -51,12 +51,13 @@ public:
 	CScalarArray(const CScalarArray &) = delete;
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid, IMDId *array_type_mdid,
-				 BOOL is_multidimenstional);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional);
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid, IMDId *array_type_mdid,
-				 BOOL is_multidimenstional, CScalarConstArray *pdrgPconst);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional,
+				 CScalarConstArray *pdrgPconst);
 
 	// dtor
 	~CScalarArray() override;
@@ -80,7 +81,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -90,7 +91,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
 							   UlongToColRefMap *,	//colref_mapping,
 							   BOOL					//must_exist
@@ -100,26 +101,26 @@ public:
 	}
 
 	// conversion function
-	static CScalarArray *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CScalarArray>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArray == pop->Eopid());
 
-		return dynamic_cast<CScalarArray *>(pop);
+		return dynamic_cast<gpos::Ref<CScalarArray> >(pop);
 	}
 
 	// element type id
-	IMDId *PmdidElem() const;
+	gpos::Ref<IMDId> PmdidElem() const;
 
 	// array type id
-	IMDId *PmdidArray() const;
+	gpos::Ref<IMDId> PmdidArray() const;
 
 	// is array multi-dimensional
 	BOOL FMultiDimensional() const;
 
 	// type of expression's result
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// CScalarConst array
 	CScalarConstArray *PdrgPconst() const;

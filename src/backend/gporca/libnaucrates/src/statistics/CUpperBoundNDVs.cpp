@@ -33,12 +33,12 @@ CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(
 {
 	BOOL mapping_not_found = false;
 
-	CColRefSet *column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefSetIter column_refset_iter(*m_column_refset);
 	while (column_refset_iter.Advance() && !mapping_not_found)
 	{
 		ULONG colid = column_refset_iter.Pcr()->Id();
-		CColRef *column_ref = colid_to_colref_map->Find(&colid);
+		gpos::Ref<CColRef> column_ref = colid_to_colref_map->Find(&colid);
 		if (nullptr != column_ref)
 		{
 			column_refset_copy->Include(column_ref);

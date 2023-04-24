@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Construct a logical get operator node given its table descriptor rtable entry
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp, CDXLTableDescr *table_descr)
+CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp,
+							   gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLLogical(mp), m_dxl_table_descr(table_descr)
 {
 }
@@ -81,7 +82,7 @@ CDXLLogicalGet::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr *
+gpos::Ref<CDXLTableDescr>
 CDXLLogicalGet::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -98,7 +99,7 @@ CDXLLogicalGet::GetDXLTableDescr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *	 //dxlnode
+							   const gpos::Ref<CDXLNode>  //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -147,8 +148,8 @@ CDXLLogicalGet::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGet::AssertValid(const CDXLNode *,  //dxlnode
-							BOOL			   // validate_children
+CDXLLogicalGet::AssertValid(const gpos::Ref<CDXLNode>,	//dxlnode
+							BOOL						// validate_children
 ) const
 {
 	// assert validity of table descriptor

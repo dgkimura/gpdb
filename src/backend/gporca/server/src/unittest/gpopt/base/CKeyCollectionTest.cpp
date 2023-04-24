@@ -56,10 +56,10 @@ CKeyCollectionTest::EresUnittest_Basics()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
@@ -75,14 +75,14 @@ CKeyCollectionTest::EresUnittest_Basics()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	CKeyCollection *pkc = GPOS_NEW(mp) CKeyCollection(mp);
+	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
 	const ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *colref =
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 		pcrs->Include(colref);
 	}
@@ -118,7 +118,7 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
@@ -134,19 +134,19 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	CKeyCollection *pkc = GPOS_NEW(mp) CKeyCollection(mp);
+	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
-	CColRefSet *pcrs0 = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrs1 = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrs2 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs0 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs1 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs2 = GPOS_NEW(mp) CColRefSet(mp);
 
 	const ULONG num_cols = 10;
 	const ULONG ulLen1 = 3;
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
-		CColRef *colref =
+		gpos::Ref<CColRef> colref =
 			col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 		pcrs0->Include(colref);
 
@@ -176,14 +176,14 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	CColRefArray *pdrgpcrSubsumed = pkc->PdrgpcrTrim(mp, colref_array);
 	GPOS_ASSERT(colref_array->Size() >= pdrgpcrSubsumed->Size());
 
-	CColRefSet *pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsSubsumed->Include(colref_array);
 
 #ifdef GPOS_DEBUG
 	const ULONG ulLenSubsumed = pdrgpcrSubsumed->Size();
 	for (ULONG ul = 0; ul < ulLenSubsumed; ul++)
 	{
-		CColRef *colref = (*pdrgpcrSubsumed)[ul];
+		gpos::Ref<CColRef> colref = (*pdrgpcrSubsumed)[ul];
 		GPOS_ASSERT(pcrsSubsumed->FMember(colref));
 	}
 #endif	// GPOS_DEBUG

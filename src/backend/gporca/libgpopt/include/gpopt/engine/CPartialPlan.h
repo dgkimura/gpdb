@@ -43,19 +43,19 @@ class CPartialPlan : public CRefCount<CPartialPlan>
 {
 private:
 	// root group expression
-	CGroupExpression *m_pgexpr;
+	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// required plan properties of root operator
-	CReqdPropPlan *m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// cost context of known child plan -- can be null if no child plans are known
-	CCostContext *m_pccChild;
+	gpos::Ref<CCostContext> m_pccChild;
 
 	// index of known child plan
 	ULONG m_ulChildIndex;
 
 	// extract costing info from children
-	void ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
+	void ExtractChildrenCostingInfo(CMemoryPool *mp, gpos::Ref<ICostModel> pcm,
 									CExpressionHandle &exprhdl,
 									ICostModel::SCostingInfo *pci);
 
@@ -64,28 +64,29 @@ public:
 	CPartialPlan(const CPartialPlan &) = delete;
 
 	// ctor
-	CPartialPlan(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
-				 CCostContext *pccChild, ULONG child_index);
+	CPartialPlan(gpos::Ref<CGroupExpression> pgexpr,
+				 gpos::Ref<CReqdPropPlan> prpp,
+				 gpos::Ref<CCostContext> pccChild, ULONG child_index);
 
 	// dtor
 	~CPartialPlan() override;
 
 	// group expression accessor
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// plan properties accessor
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp;
 	}
 
 	// child cost context accessor
-	CCostContext *
+	gpos::Ref<CCostContext>
 	PccChild() const
 	{
 		return m_pccChild;
@@ -102,10 +103,11 @@ public:
 	CCost CostCompute(CMemoryPool *mp);
 
 	// hash function used for cost bounding
-	static ULONG HashValue(const CPartialPlan *ppp);
+	static ULONG HashValue(const gpos::Ref<CPartialPlan> ppp);
 
 	// equality function used for for cost bounding
-	static BOOL Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd);
+	static BOOL Equals(const gpos::Ref<CPartialPlan> pppFst,
+					   const gpos::Ref<CPartialPlan> pppSnd);
 
 };	// class CPartialPlan
 }  // namespace gpopt

@@ -52,24 +52,25 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 gpos::Ref<CReqdPropPlan> prppInput,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulDistrReq) override;
 
 	// conversion function
-	static CPhysicalInnerNLJoin *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalInnerNLJoin>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalInnerNLJoin *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalInnerNLJoin> >(pop);
 	}
 
 

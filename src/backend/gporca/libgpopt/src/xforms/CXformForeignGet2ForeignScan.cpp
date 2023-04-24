@@ -59,21 +59,22 @@ CXformForeignGet2ForeignScan::Exfp(CExpressionHandle &	//exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformForeignGet2ForeignScan::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformForeignGet2ForeignScan::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalForeignGet *popGet = CLogicalForeignGet::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalForeignGet> popGet =
+		CLogicalForeignGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
@@ -82,7 +83,7 @@ CXformForeignGet2ForeignScan::Transform(CXformContext *pxfctxt,
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalForeignScan(mp, pname, ptabdesc, pdrgpcrOutput));
 

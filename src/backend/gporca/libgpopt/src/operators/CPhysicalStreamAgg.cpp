@@ -65,11 +65,11 @@ CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
 	const ULONG size = pdrgpcrOrder->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRef *colref = (*pdrgpcrOrder)[ul];
+		gpos::Ref<CColRef> colref = (*pdrgpcrOrder)[ul];
 
 		// TODO: 12/21/2011 - ; this seems broken: a colref must not embed
 		// a pointer to a cached object
-		gpmd::IMDId *mdid =
+		gpos::Ref<gpmd::IMDId> mdid =
 			colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 		mdid->AddRef();
 
@@ -103,8 +103,9 @@ CPhysicalStreamAgg::~CPhysicalStreamAgg()
 //		can be created
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
+gpos::Ref<COrderSpec>
+CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
+								gpos::Ref<COrderSpec> posRequired,
 								CColRefArray *pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != posRequired);
@@ -116,11 +117,11 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 	}
 
 	// create a set of required sort columns
-	CColRefSet *pcrsReqd = posRequired->PcrsUsed(mp);
+	gpos::Ref<CColRefSet> pcrsReqd = posRequired->PcrsUsed(mp);
 
-	COrderSpec *pos = nullptr;
+	gpos::Ref<COrderSpec> pos = nullptr;
 
-	CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrGrp);
+	gpos::Ref<CColRefSet> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrGrp);
 	if (pcrsGrpCols->ContainsAll(pcrsReqd))
 	{
 		// required order columns are included in grouping columns, we can
@@ -131,8 +132,9 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 		const ULONG ulReqdSortCols = posRequired->UlSortColumns();
 		for (ULONG ul = 0; ul < ulReqdSortCols; ul++)
 		{
-			CColRef *colref = const_cast<CColRef *>(posRequired->Pcr(ul));
-			IMDId *mdid = posRequired->GetMdIdSortOp(ul);
+			gpos::Ref<CColRef> colref =
+				const_cast<gpos::Ref<CColRef> >(posRequired->Pcr(ul));
+			gpos::Ref<IMDId> mdid = posRequired->GetMdIdSortOp(ul);
 			COrderSpec::ENullTreatment ent = posRequired->Ent(ul);
 			mdid->AddRef();
 			pos->Append(mdid, colref, ent);
@@ -142,10 +144,10 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 		const ULONG size = pdrgpcrGrp->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CColRef *colref = (*pdrgpcrGrp)[ul];
+			gpos::Ref<CColRef> colref = (*pdrgpcrGrp)[ul];
 			if (!pcrsReqd->FMember(colref))
 			{
-				IMDId *mdid =
+				gpos::Ref<IMDId> mdid =
 					colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 				mdid->AddRef();
 				pos->Append(mdid, colref, COrderSpec::EntLast);
@@ -166,10 +168,10 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 COrderSpec *posRequired,
+										 gpos::Ref<COrderSpec> posRequired,
 										 ULONG
 #ifdef GPOS_DEBUG
 											 child_index
@@ -179,7 +181,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	COrderSpec *pos = PosCovering(mp, posRequired, pdrgpcrGrp);
+	gpos::Ref<COrderSpec> pos = PosCovering(mp, posRequired, pdrgpcrGrp);
 	if (nullptr == pos)
 	{
 		// failed to find a covering order spec, use local order spec
@@ -188,14 +190,14 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	}
 
 	// extract sort columns from order spec
-	CColRefSet *pcrs = pos->PcrsUsed(mp);
+	gpos::Ref<CColRefSet> pcrs = pos->PcrsUsed(mp);
 
 	// get key collection of the relational child
-	CKeyCollection *pkc = exprhdl.DeriveKeyCollection(0);
+	gpos::Ref<CKeyCollection> pkc = exprhdl.DeriveKeyCollection(0);
 
 	if (nullptr != pkc && pkc->FKey(pcrs, false /*fExactMatch*/))
 	{
-		CColRefSet *pcrsReqd = posRequired->PcrsUsed(m_mp);
+		gpos::Ref<CColRefSet> pcrsReqd = posRequired->PcrsUsed(m_mp);
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrsReqd, exprhdl);
 		pcrsReqd->Release();
 
@@ -222,7 +224,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::Ref<COrderSpec>
 CPhysicalStreamAgg::PosDerive(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
@@ -240,13 +242,13 @@ CPhysicalStreamAgg::PosDerive(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalStreamAgg::EpetOrder(CExpressionHandle &exprhdl,
-							  const CEnfdOrder *peo) const
+							  const gpos::Ref<CEnfdOrder> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// get the order delivered by the stream agg node
-	COrderSpec *pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
+	gpos::Ref<COrderSpec> pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
 	if (peo->FCompatible(pos))
 	{
 		// required order will be established by the stream agg operator

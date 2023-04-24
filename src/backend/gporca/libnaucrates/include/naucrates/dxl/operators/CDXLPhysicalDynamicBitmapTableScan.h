@@ -45,7 +45,7 @@ public:
 
 	// ctor
 	CDXLPhysicalDynamicBitmapTableScan(CMemoryPool *mp,
-									   CDXLTableDescr *table_descr,
+									   gpos::Ref<CDXLTableDescr> table_descr,
 									   IMdIdArray *part_mdids,
 									   ULongPtrArray *selector_ids)
 		: CDXLPhysicalAbstractBitmapScan(mp, table_descr),
@@ -78,17 +78,18 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDynamicBitmapTableScan *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLPhysicalDynamicBitmapTableScan>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDynamicBitmapTableScan ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalDynamicBitmapTableScan *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLPhysicalDynamicBitmapTableScan> >(
+			dxl_op);
 	}
 
 };	// class CDXLPhysicalDynamicBitmapTableScan

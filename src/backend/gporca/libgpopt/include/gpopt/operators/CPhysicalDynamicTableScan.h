@@ -33,8 +33,9 @@ public:
 
 	// ctors
 	CPhysicalDynamicTableScan(CMemoryPool *mp, const CName *pnameAlias,
-							  CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-							  ULONG scan_id, CColRefArray *pdrgpcrOutput,
+							  gpos::Ref<CTableDescriptor> ptabdesc,
+							  ULONG ulOriginOpId, ULONG scan_id,
+							  CColRefArray *pdrgpcrOutput,
 							  CColRef2dArray *pdrgpdrgpcrParts,
 							  IMdIdArray *partition_mdids,
 							  ColRefToUlongMapArray *root_col_mapping_per_part);
@@ -54,24 +55,25 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// statistics derivation during costing
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CReqdPropPlan *prpplan,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CReqdPropPlan> prpplan,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CPhysicalDynamicTableScan *
-	PopConvert(COperator *pop)
+	static gpos::Ref<CPhysicalDynamicTableScan>
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicTableScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalDynamicTableScan *>(pop);
+		return dynamic_cast<gpos::Ref<CPhysicalDynamicTableScan> >(pop);
 	}
 
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 };	// class CPhysicalDynamicTableScan

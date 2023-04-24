@@ -100,13 +100,13 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 									ptroutput->GetCTEProducerDXLArray());
 
 		// setup a file-based provider
-		CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
 		pmdp->AddRef();
 
 		// we need to use an auto pointer for the cache here to ensure
 		// deleting memory of cached objects when we throw
 		CAutoP<CMDAccessor::MDCache> apcache;
-		apcache = CCacheFactory::CreateCache<gpopt::IMDCacheObject *,
+		apcache = CCacheFactory::CreateCache<gpos::Ref<gpopt::IMDCacheObject>,
 											 gpopt::CMDKey *>(
 			true,  // fUnique
 			0 /* unlimited cache quota */, CMDKey::UlHashMDKey,
@@ -122,11 +122,12 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		CAutoTraceFlag atfPrintPlan(EopttracePrintPlan, true);
 		CAutoTraceFlag atfTest(EtraceTest, true);
 
-		COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig(
-			CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
-			CStatisticsConfig::PstatsconfDefault(mp),
-			CCTEConfig::PcteconfDefault(mp), ICostModel::PcmDefault(mp),
-			CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
+		gpos::Ref<COptimizerConfig> optimizer_config =
+			GPOS_NEW(mp) COptimizerConfig(
+				CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+				CStatisticsConfig::PstatsconfDefault(mp),
+				CCTEConfig::PcteconfDefault(mp), ICostModel::PcmDefault(mp),
+				CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
 
 		// setup opt ctx
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -135,7 +136,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		// translate DXL Tree -> Expr Tree
 		CTranslatorDXLToExpr *pdxltr =
 			GPOS_NEW(mp) CTranslatorDXLToExpr(mp, &mda);
-		CExpression *pexprTranslated = pdxltr->PexprTranslateQuery(
+		gpos::Ref<CExpression> pexprTranslated = pdxltr->PexprTranslateQuery(
 			ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 			ptroutput->GetCTEProducerDXLArray());
 
@@ -155,7 +156,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 		eng.Optimize();
 
-		CExpression *pexprPlan = eng.PexprExtractPlan();
+		gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 		// translate plan into DXL
 		IntPtrArray *pdrgpiSegments = GPOS_NEW(mp) IntPtrArray(mp);
@@ -169,7 +170,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		}
 
 		CTranslatorExprToDXL ptrexprtodxl(mp, &mda, pdrgpiSegments);
-		CDXLNode *pdxlnPlan = ptrexprtodxl.PdxlnTranslate(
+		gpos::Ref<CDXLNode> pdxlnPlan = ptrexprtodxl.PdxlnTranslate(
 			pexprPlan, pqc->PdrgPcr(), pqc->Pdrgpmdname());
 		GPOS_ASSERT(nullptr != pdxlnPlan);
 

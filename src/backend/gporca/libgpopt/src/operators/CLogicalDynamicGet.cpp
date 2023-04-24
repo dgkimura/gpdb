@@ -53,11 +53,11 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicGet::CLogicalDynamicGet(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids,
-	CConstraint *partition_cnstrs_disj, BOOL static_pruned,
-	IMdIdArray *foreign_server_mdids)
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
+	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
+	IMdIdArray *partition_mdids, gpos::Ref<CConstraint> partition_cnstrs_disj,
+	BOOL static_pruned, IMdIdArray *foreign_server_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_partition_cnstrs_disj(partition_cnstrs_disj),
@@ -78,7 +78,7 @@ CLogicalDynamicGet::CLogicalDynamicGet(
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
-									   CTableDescriptor *ptabdesc,
+									   gpos::Ref<CTableDescriptor> ptabdesc,
 									   ULONG ulPartIndex,
 									   IMdIdArray *partition_mdids,
 									   IMdIdArray *foreign_server_mdids)
@@ -132,7 +132,7 @@ CLogicalDynamicGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicGet::Matches(COperator *pop) const
+CLogicalDynamicGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicScan(this, pop);
 }
@@ -145,7 +145,7 @@ CLogicalDynamicGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
@@ -167,7 +167,7 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	m_ptabdesc->AddRef();
 	m_partition_mdids->AddRef();
 
-	CConstraint *partition_cnstrs_disj = nullptr;
+	gpos::Ref<CConstraint> partition_cnstrs_disj = nullptr;
 
 	if (m_partition_cnstrs_disj)
 	{
@@ -276,19 +276,19 @@ CLogicalDynamicGet::OsPrint(IOstream &os) const
 //		Load up statistics from metadata
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IStatisticsArray *	 // not used
 ) const
 {
-	CExpression *expr = nullptr;
+	gpos::Ref<CExpression> expr = nullptr;
 	if (m_partition_cnstrs_disj)
 	{
 		expr = m_partition_cnstrs_disj->PexprScalar(mp);
 	}
-	IStatistics *stats = PstatsDeriveFilter(mp, exprhdl, expr);
+	gpos::Ref<IStatistics> stats = PstatsDeriveFilter(mp, exprhdl, expr);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 	CUpperBoundNDVs *upper_bound_NDVs =
 		GPOS_NEW(mp) CUpperBoundNDVs(pcrs, stats->Rows());
 	CStatistics::CastStats(stats)->AddCardUpperBound(upper_bound_NDVs);
@@ -304,15 +304,16 @@ CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive stats from base table using filters on partition and/or index columns
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CExpression *pexprFilter) const
+									   gpos::Ref<CExpression> pexprFilter) const
 {
 	GPOS_ASSERT(COperator::EopLogicalDynamicGet == exprhdl.Pop()->Eopid());
-	CLogicalDynamicGet *dyn_get = CLogicalDynamicGet::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalDynamicGet> dyn_get =
+		CLogicalDynamicGet::PopConvert(exprhdl.Pop());
 
-	CColRefSet *pcrsStat = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsStat = GPOS_NEW(mp) CColRefSet(mp);
 
 	if (nullptr != pexprFilter)
 	{
@@ -326,8 +327,9 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		pcrsStat->Include(m_pcrsDist);
 	}
 
-	CStatistics *pstatsFullTable = dynamic_cast<CStatistics *>(
-		PstatsBaseTable(mp, exprhdl, m_ptabdesc, pcrsStat));
+	gpos::Ref<CStatistics> pstatsFullTable =
+		dynamic_cast<gpos::Ref<CStatistics> >(
+			PstatsBaseTable(mp, exprhdl, m_ptabdesc, pcrsStat));
 
 	pcrsStat->Release();
 
@@ -336,14 +338,15 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		return pstatsFullTable;
 	}
 
-	CExpression *pexprFilterNew;
+	gpos::Ref<CExpression> pexprFilterNew;
 	if (dyn_get->FStaticPruned())
 	{
 		// Static pruned Dynamic Table Scan uses the CExpression of
 		// selected partitions' combined constraints as the filter to
 		// derive stats
 		pexprFilter->Release();
-		CConstraint *cnstrDisj = dyn_get->GetPartitionConstraintsDisj();
+		gpos::Ref<CConstraint> cnstrDisj =
+			dyn_get->GetPartitionConstraintsDisj();
 		if (cnstrDisj)
 		{
 			pexprFilterNew = cnstrDisj->PexprScalar(mp);
@@ -364,13 +367,14 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		pexprFilterNew = pexprFilter;
 	}
 
-	CStatsPred *pred_stats = CStatsPredUtils::ExtractPredStats(
+	gpos::Ref<CStatsPred> pred_stats = CStatsPredUtils::ExtractPredStats(
 		mp, pexprFilterNew, nullptr /*outer_refs*/
 	);
 	pexprFilterNew->Release();
 
-	IStatistics *result_stats = CFilterStatsProcessor::MakeStatsFilter(
-		mp, pstatsFullTable, pred_stats, true /* do_cap_NDVs */);
+	gpos::Ref<IStatistics> result_stats =
+		CFilterStatsProcessor::MakeStatsFilter(mp, pstatsFullTable, pred_stats,
+											   true /* do_cap_NDVs */);
 	pred_stats->Release();
 	pstatsFullTable->Release();
 
@@ -383,7 +387,7 @@ CLogicalDynamicGet::ContainsForeignParts() const
 {
 	for (ULONG ul = 0; ul < m_foreign_server_mdids->Size(); ++ul)
 	{
-		IMDId *foreign_server_mdid = (*m_foreign_server_mdids)[ul];
+		gpos::Ref<IMDId> foreign_server_mdid = (*m_foreign_server_mdids)[ul];
 		if (foreign_server_mdid->IsValid())
 		{
 			return true;

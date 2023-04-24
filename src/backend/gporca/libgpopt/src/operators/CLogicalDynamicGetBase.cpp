@@ -62,8 +62,9 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicGetBase::CLogicalDynamicGetBase(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG scan_id, CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
+	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
 	IMdIdArray *partition_mdids)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
@@ -94,11 +95,10 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalDynamicGetBase::CLogicalDynamicGetBase(CMemoryPool *mp,
-											   const CName *pnameAlias,
-											   CTableDescriptor *ptabdesc,
-											   ULONG scan_id,
-											   IMdIdArray *partition_mdids)
+CLogicalDynamicGetBase::CLogicalDynamicGetBase(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
+	IMdIdArray *partition_mdids)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -150,12 +150,12 @@ CLogicalDynamicGetBase::~CLogicalDynamicGetBase()
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CLogicalDynamicGetBase::DeriveOutputColumns(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -169,7 +169,7 @@ CLogicalDynamicGetBase::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::Ref<CKeyCollection>
 CLogicalDynamicGetBase::DeriveKeyCollection(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 ) const
@@ -188,7 +188,7 @@ CLogicalDynamicGetBase::DeriveKeyCollection(CMemoryPool *mp,
 //		Derive constraint property
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::Ref<CPropConstraint>
 CLogicalDynamicGetBase::DerivePropertyConstraint(CMemoryPool *mp,
 												 CExpressionHandle &  // exprhdl
 ) const
@@ -204,16 +204,16 @@ CLogicalDynamicGetBase::DerivePropertyConstraint(CMemoryPool *mp,
 //		Derive partition consumer info
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::Ref<CPartInfo>
 CLogicalDynamicGetBase::DerivePartitionInfo(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 ) const
 {
-	IMDId *mdid = m_ptabdesc->MDId();
+	gpos::Ref<IMDId> mdid = m_ptabdesc->MDId();
 	mdid->AddRef();
 	m_pdrgpdrgpcrPart->AddRef();
 
-	CPartInfo *ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
+	gpos::Ref<CPartInfo> ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 	ppartinfo->AddPartConsumer(mp, m_scan_id, mdid, m_pdrgpdrgpcrPart);
 
 	return ppartinfo;
@@ -230,8 +230,8 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 	ColRefToUlongMapArray *part_maps = GPOS_NEW(mp) ColRefToUlongMapArray(mp);
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel = mda->RetrieveRel(part_mdid);
+		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
+		const gpos::Ref<IMDRelation> partrel = mda->RetrieveRel(part_mdid);
 
 		GPOS_ASSERT(nullptr != partrel);
 
@@ -239,12 +239,12 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 
 		for (ULONG i = 0; i < root_cols->Size(); ++i)
 		{
-			CColRef *root_colref = (*root_cols)[i];
+			gpos::Ref<CColRef> root_colref = (*root_cols)[i];
 
 			BOOL found_mapping = false;
 			for (ULONG j = 0, idx = 0; j < partrel->ColumnCount(); ++j, ++idx)
 			{
-				const IMDColumn *coldesc = partrel->GetMdCol(j);
+				const gpos::Ref<IMDColumn> coldesc = partrel->GetMdCol(j);
 				const CWStringConst *colname = coldesc->Mdname().GetMDName();
 
 				if (coldesc->IsDropped())

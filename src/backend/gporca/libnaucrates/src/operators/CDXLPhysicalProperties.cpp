@@ -23,7 +23,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalProperties::CDXLPhysicalProperties(CDXLOperatorCost *cost)
+CDXLPhysicalProperties::CDXLPhysicalProperties(gpos::Ref<CDXLOperatorCost> cost)
 	: CDXLProperties(), m_operator_cost_dxl(cost)
 {
 }
@@ -73,7 +73,7 @@ CDXLPhysicalProperties::SerializePropertiesToDXL(
 //		Return cost of operator
 //
 //---------------------------------------------------------------------------
-CDXLOperatorCost *
+gpos::Ref<CDXLOperatorCost>
 CDXLPhysicalProperties::GetDXLOperatorCost() const
 {
 	return m_operator_cost_dxl;

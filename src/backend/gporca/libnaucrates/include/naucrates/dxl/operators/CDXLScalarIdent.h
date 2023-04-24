@@ -34,13 +34,13 @@ class CDXLScalarIdent : public CDXLScalar
 {
 private:
 	// column reference
-	CDXLColRef *m_dxl_colref;
+	gpos::Ref<CDXLColRef> m_dxl_colref;
 
 public:
 	CDXLScalarIdent(CDXLScalarIdent &) = delete;
 
 	// ctor/dtor
-	CDXLScalarIdent(CMemoryPool *, CDXLColRef *);
+	CDXLScalarIdent(CMemoryPool *, gpos::Ref<CDXLColRef>);
 
 	~CDXLScalarIdent() override;
 
@@ -51,24 +51,24 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// accessors
-	const CDXLColRef *GetDXLColRef() const;
+	const gpos::Ref<CDXLColRef> GetDXLColRef() const;
 
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	INT TypeModifier() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
-	static CDXLScalarIdent *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarIdent>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarIdent == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarIdent *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarIdent> >(dxl_op);
 	}
 
 	// does the operator return a boolean result
@@ -76,7 +76,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

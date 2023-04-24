@@ -28,8 +28,9 @@ using namespace gpdxl;
 //		Constructs a scalar FuncExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-									   IMDId *mdid_return_type,
+CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_func,
+									   gpos::Ref<IMDId> mdid_return_type,
 									   INT return_type_modifier, BOOL fRetSet,
 									   BOOL funcvariadic)
 	: CDXLScalar(mp),
@@ -94,7 +95,7 @@ CDXLScalarFuncExpr::GetOpNameStr() const
 //		Returns function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarFuncExpr::FuncMdId() const
 {
 	return m_func_mdid;
@@ -108,7 +109,7 @@ CDXLScalarFuncExpr::FuncMdId() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarFuncExpr::ReturnTypeMdId() const
 {
 	return m_return_type_mdid;
@@ -157,7 +158,7 @@ CDXLScalarFuncExpr::IsFuncVariadic() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarFuncExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+								   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -195,7 +196,8 @@ CDXLScalarFuncExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	gpos::Ref<IMDId> mdid =
+		md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -210,12 +212,12 @@ CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarFuncExpr::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarFuncExpr::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

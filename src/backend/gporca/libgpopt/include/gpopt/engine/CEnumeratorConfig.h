@@ -33,7 +33,7 @@ using namespace gpos;
 class CExpression;
 
 // type definition of plan checker
-using FnPlanChecker = BOOL(CExpression *);
+using FnPlanChecker = BOOL(gpos::Ref<CExpression>);
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -296,7 +296,7 @@ public:
 
 	// check given plan using PlanChecker function
 	BOOL
-	FCheckPlan(CExpression *pexpr) const
+	FCheckPlan(gpos::Ref<CExpression> pexpr) const
 	{
 		GPOS_ASSERT(nullptr != pexpr);
 
@@ -326,7 +326,7 @@ public:
 									 DOUBLE *pdY, ULONG size);
 
 	// generate default enumerator configurations
-	static CEnumeratorConfig *
+	static gpos::Ref<CEnumeratorConfig>
 	PecDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp)
@@ -334,7 +334,7 @@ public:
 	}
 
 	// generate enumerator configuration for a given plan id
-	static CEnumeratorConfig *
+	static gpos::Ref<CEnumeratorConfig>
 	GetEnumeratorCfg(CMemoryPool *mp, ULLONG plan_id)
 	{
 		return GPOS_NEW(mp) CEnumeratorConfig(mp, plan_id, 0 /*ullSamples*/);

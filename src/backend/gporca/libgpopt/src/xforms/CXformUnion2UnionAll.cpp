@@ -47,8 +47,9 @@ CXformUnion2UnionAll::CXformUnion2UnionAll(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformUnion2UnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -57,7 +58,7 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnion *popUnion = CLogicalUnion::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalUnion> popUnion = CLogicalUnion::PopConvert(pexpr->Pop());
 	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
@@ -66,7 +67,7 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -75,17 +76,17 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpdrgpcrInput->AddRef();
 
 	// assemble new logical operator
-	CExpression *pexprUnionAll = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
 		pdrgpexpr);
 
 	pdrgpcrOutput->AddRef();
 
-	CExpression *pexprProjList =
+	gpos::Ref<CExpression> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 
-	CExpression *pexprAgg = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAgg = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrOutput,
 								   COperator::EgbaggtypeGlobal /*egbaggtype*/),

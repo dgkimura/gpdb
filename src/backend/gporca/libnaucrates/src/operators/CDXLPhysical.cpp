@@ -63,14 +63,15 @@ CDXLPhysical::GetDXLOperatorType() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysical::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLPhysical::AssertValid(const gpos::Ref<CDXLNode> node,
+						  BOOL validate_children) const
 {
 	GPOS_ASSERT(nullptr != node);
 
 	GPOS_ASSERT(2 <= node->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*node)[0];
-	CDXLNode *filter_dxlnode = (*node)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*node)[0];
+	gpos::Ref<CDXLNode> filter_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());

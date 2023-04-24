@@ -34,7 +34,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalScan::CPhysicalScan(CMemoryPool *mp, const CName *pnameAlias,
-							 CTableDescriptor *ptabdesc,
+							 gpos::Ref<CTableDescriptor> ptabdesc,
 							 CColRefArray *pdrgpcrOutput)
 	: CPhysical(mp),
 	  m_pnameAlias(pnameAlias),
@@ -105,13 +105,13 @@ CPhysicalScan::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
-								 CColRefSet *pcrsRequired,
+								 gpos::Ref<CColRefSet> pcrsRequired,
 								 ULONG	// ulOptReq
 ) const
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	BOOL result = pcrs->ContainsAll(pcrsRequired);
@@ -131,7 +131,7 @@ CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalScan::EpetOrder(CExpressionHandle &,  // exprhdl
-						 const CEnfdOrder *
+						 const gpos::Ref<CEnfdOrder>
 #ifdef GPOS_DEBUG
 							 peo
 #endif	// GPOS_DEBUG
@@ -151,7 +151,7 @@ CPhysicalScan::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::Ref<CDistributionSpec>
 CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	BOOL fIndexOrBitmapScan =
@@ -182,12 +182,12 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		//
 		// This way the equiv spec stays incomplete only as long as it needs to be.
 
-		CExpression *pexprIndexPred = exprhdl.PexprScalarExactChild(
+		gpos::Ref<CExpression> pexprIndexPred = exprhdl.PexprScalarExactChild(
 			0 /*child_index*/, true /*error_on_null_return*/);
 
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			CDistributionSpecHashed::PdsConvert(m_pds);
-		CDistributionSpecHashed *pdshashedEquiv =
+		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv =
 			CDistributionSpecHashed::TryToCompleteEquivSpec(
 				mp, pdshashed, pexprIndexPred, exprhdl.DeriveOuterReferences());
 
@@ -199,7 +199,7 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 			{
 				pdshashed->Opfamilies()->AddRef();
 			}
-			CDistributionSpecHashed *pdshashedResult =
+			gpos::Ref<CDistributionSpecHashed> pdshashedResult =
 				GPOS_NEW(mp) CDistributionSpecHashed(
 					pdrgpexprHashed, pdshashed->FNullsColocated(),
 					pdshashedEquiv, pdshashed->Opfamilies());
@@ -224,7 +224,7 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalScan::EpetDistribution(CExpressionHandle & /*exprhdl*/,
-								const CEnfdDistribution *ped) const
+								const gpos::Ref<CEnfdDistribution> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
@@ -253,8 +253,9 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr == m_pstatsBaseTable);
 
-	CColRefSet *pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsWidth = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::Ref<CColRefSet> pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsWidth =
+		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_pstatsBaseTable =
@@ -274,13 +275,13 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalScan *
-CPhysicalScan::PopConvert(COperator *pop)
+gpos::Ref<CPhysicalScan>
+CPhysicalScan::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop));
 
-	return dynamic_cast<CPhysicalScan *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalScan> >(pop);
 }
 
 

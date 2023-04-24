@@ -38,7 +38,7 @@ public:
 	CDXLScalarSubqueryAny(CDXLScalarSubqueryAny &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryAny(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CDXLScalarSubqueryAny(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 						  CMDName *mdname, ULONG colid);
 
 	// ident accessors
@@ -48,13 +48,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarSubqueryAny *
-	Cast(CDXLOperator *dxl_op)
+	static gpos::Ref<CDXLScalarSubqueryAny>
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSubqueryAny *>(dxl_op);
+		return dynamic_cast<gpos::Ref<CDXLScalarSubqueryAny> >(dxl_op);
 	}
 
 	// does the operator return a boolean result

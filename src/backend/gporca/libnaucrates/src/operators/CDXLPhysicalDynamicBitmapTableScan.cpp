@@ -57,7 +57,7 @@ CDXLPhysicalDynamicBitmapTableScan::~CDXLPhysicalDynamicBitmapTableScan()
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const CDXLNode *node) const
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

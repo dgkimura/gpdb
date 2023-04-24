@@ -65,28 +65,28 @@ private:
 	CMemoryPool *m_mp;
 
 	// operator class
-	COperator *m_pop;
+	gpos::Ref<COperator> m_pop;
 
 	// array of children
 	CExpressionArray *m_pdrgpexpr;
 
 	// derived relational properties
-	CDrvdPropRelational *m_pdprel;
+	gpos::Ref<CDrvdPropRelational> m_pdprel;
 
 	// derived stats
-	IStatistics *m_pstats;
+	gpos::Ref<IStatistics> m_pstats;
 
 	// required plan properties
-	CReqdPropPlan *m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// derived physical properties
-	CDrvdPropPlan *m_pdpplan;
+	gpos::Ref<CDrvdPropPlan> m_pdpplan;
 
 	// derived scalar properties
-	CDrvdPropScalar *m_pdpscalar;
+	gpos::Ref<CDrvdPropScalar> m_pdpscalar;
 
 	// group reference to Memo
-	CGroupExpression *m_pgexpr;
+	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// cost of physical expression node when copied out of the memo
 	CCost m_cost;
@@ -98,7 +98,7 @@ private:
 	ULONG m_ulOriginGrpExprId;
 
 	// get expression's derived property given its type
-	CDrvdProp *Pdp(const CDrvdProp::EPropType ept) const;
+	gpos::Ref<CDrvdProp> Pdp(const CDrvdProp::EPropType ept) const;
 
 #ifdef GPOS_DEBUG
 
@@ -111,10 +111,10 @@ private:
 #endif	// GPOS_DEBUG
 
 	// check if the distributions of all children are compatible
-	BOOL FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidChildrenDistribution(gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// copy group properties and stats to expression
-	void CopyGroupPropsAndStats(IStatistics *input_stats);
+	void CopyGroupPropsAndStats(gpos::Ref<IStatistics> input_stats);
 
 public:
 	CExpression(const CExpression &) = delete;
@@ -122,33 +122,39 @@ public:
 	// ctor's with different arity
 
 	// ctor for leaf nodes
-	CExpression(CMemoryPool *mp, COperator *pop,
-				CGroupExpression *pgexpr = nullptr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CGroupExpression> pgexpr = nullptr);
 
 	// ctor for unary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexpr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexpr);
 
 	// ctor for binary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexprChildFirst,
-				CExpression *pexprChildSecond);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexprChildFirst,
+				gpos::Ref<CExpression> pexprChildSecond);
 
 	// ctor for ternary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexprChildFirst,
-				CExpression *pexprChildSecond, CExpression *pexprChildThird);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexprChildFirst,
+				gpos::Ref<CExpression> pexprChildSecond,
+				gpos::Ref<CExpression> pexprChildThird);
 
 	// ctor n-ary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpressionArray *pdrgpexpr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				CExpressionArray *pdrgpexpr);
 
 	// ctor for n-ary expression with origin group expression
-	CExpression(CMemoryPool *mp, COperator *pop, CGroupExpression *pgexpr,
-				CExpressionArray *pdrgpexpr, CReqdPropPlan *prpp,
-				IStatistics *input_stats, CCost cost);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CGroupExpression> pgexpr, CExpressionArray *pdrgpexpr,
+				gpos::Ref<CReqdPropPlan> prpp,
+				gpos::Ref<IStatistics> input_stats, CCost cost);
 
 	// dtor
 	~CExpression() override;
 
 	// shorthand to access children
-	CExpression *
+	gpos::Ref<CExpression>
 	operator[](ULONG ulPos) const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpexpr);
@@ -163,7 +169,7 @@ public:
 	}
 
 	// accessor for operator
-	COperator *
+	gpos::Ref<COperator>
 	Pop() const
 	{
 		GPOS_ASSERT(nullptr != m_pop);
@@ -178,27 +184,27 @@ public:
 	}
 
 	// accessor for origin group expression
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// accessor for computed required plan props
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp;
 	}
 
-	CDrvdPropRelational *GetDrvdPropRelational() const;
+	gpos::Ref<CDrvdPropRelational> GetDrvdPropRelational() const;
 
-	CDrvdPropPlan *GetDrvdPropPlan() const;
+	gpos::Ref<CDrvdPropPlan> GetDrvdPropPlan() const;
 
-	CDrvdPropScalar *GetDrvdPropScalar() const;
+	gpos::Ref<CDrvdPropScalar> GetDrvdPropScalar() const;
 
 	// get derived statistics object
-	const IStatistics *
+	const gpos::Ref<IStatistics>
 	Pstats() const
 	{
 		return m_pstats;
@@ -217,11 +223,11 @@ public:
 	// Derive all properties immediately. The suitable derived property is
 	// determined internally. To derive properties on an on-demand bases, use
 	// DeriveXXX() methods.
-	CDrvdProp *PdpDerive(CDrvdPropCtxt *pdpctxt = nullptr);
+	gpos::Ref<CDrvdProp> PdpDerive(gpos::Ref<CDrvdPropCtxt> pdpctxt = nullptr);
 
 	// derive statistics
-	IStatistics *PstatsDerive(CReqdPropRelational *prprel,
-							  IStatisticsArray *stats_ctxt);
+	gpos::Ref<IStatistics> PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
+										IStatisticsArray *stats_ctxt);
 
 	// reset a derived property
 	void ResetDerivedProperty(CDrvdProp::EPropType ept);
@@ -243,25 +249,25 @@ public:
 								BOOL fLast = true) const;
 
 	// match with group expression
-	BOOL FMatchPattern(CGroupExpression *pgexpr) const;
+	BOOL FMatchPattern(gpos::Ref<CGroupExpression> pgexpr) const;
 
 	// return a copy of the expression with remapped columns
-	CExpression *PexprCopyWithRemappedColumns(CMemoryPool *mp,
-											  UlongToColRefMap *colref_mapping,
-											  BOOL must_exist) const;
+	gpos::Ref<CExpression> PexprCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) const;
 
 	// compare entire expression rooted here
-	BOOL Matches(CExpression *pexpr) const;
+	BOOL Matches(gpos::Ref<CExpression> pexpr) const;
 
 #ifdef GPOS_DEBUG
 	// match against given pattern
-	BOOL FMatchPattern(CExpression *pexpr) const;
+	BOOL FMatchPattern(gpos::Ref<CExpression> pexpr) const;
 
 	// match children against given pattern
-	BOOL FMatchPatternChildren(CExpression *pexpr) const;
+	BOOL FMatchPatternChildren(gpos::Ref<CExpression> pexpr) const;
 
 	// compare entire expression rooted here
-	BOOL FMatchDebug(CExpression *pexpr) const;
+	BOOL FMatchDebug(gpos::Ref<CExpression> pexpr) const;
 
 	// debug print; for interactive debugging sessions only
 	// prints expression properties as well
@@ -269,40 +275,41 @@ public:
 #endif	// GPOS_DEBUG
 
 	// check if the expression satisfies given required properties
-	BOOL FValidPlan(const CReqdPropPlan *prpp, CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
+					gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// static hash function
-	static ULONG HashValue(const CExpression *pexpr);
+	static ULONG HashValue(const gpos::Ref<CExpression> pexpr);
 
 	// static hash function
-	static ULONG UlHashDedup(const CExpression *pexpr);
+	static ULONG UlHashDedup(const gpos::Ref<CExpression> pexpr);
 
 	// rehydrate expression from a given cost context and child expressions
-	static CExpression *PexprRehydrate(CMemoryPool *mp, CCostContext *pcc,
-									   CExpressionArray *pdrgpexpr,
-									   CDrvdPropCtxtPlan *pdpctxtplan);
+	static gpos::Ref<CExpression> PexprRehydrate(
+		CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
+		CExpressionArray *pdrgpexpr, gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// Relational property accessors - derived as needed
-	CColRefSet *DeriveOuterReferences();
-	CColRefSet *DeriveOutputColumns();
-	CColRefSet *DeriveNotNullColumns();
-	CColRefSet *DeriveCorrelatedApplyColumns();
-	CKeyCollection *DeriveKeyCollection();
-	CPropConstraint *DerivePropertyConstraint();
+	gpos::Ref<CColRefSet> DeriveOuterReferences();
+	gpos::Ref<CColRefSet> DeriveOutputColumns();
+	gpos::Ref<CColRefSet> DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns();
+	gpos::Ref<CKeyCollection> DeriveKeyCollection();
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint();
 	CMaxCard DeriveMaxCard();
 	ULONG DeriveJoinDepth();
-	CFunctionProp *DeriveFunctionProperties();
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties();
 	CFunctionalDependencyArray *DeriveFunctionalDependencies();
-	CPartInfo *DerivePartitionInfo();
-	CTableDescriptor *DeriveTableDescriptor();
+	gpos::Ref<CPartInfo> DerivePartitionInfo();
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor();
 
 	// Scalar property accessors - derived as needed
-	CColRefSet *DeriveDefinedColumns();
-	CColRefSet *DeriveUsedColumns();
-	CColRefSet *DeriveSetReturningFunctionColumns();
+	gpos::Ref<CColRefSet> DeriveDefinedColumns();
+	gpos::Ref<CColRefSet> DeriveUsedColumns();
+	gpos::Ref<CColRefSet> DeriveSetReturningFunctionColumns();
 	BOOL DeriveHasSubquery();
-	CPartInfo *DeriveScalarPartitionInfo();
-	CFunctionProp *DeriveScalarFunctionProperties();
+	gpos::Ref<CPartInfo> DeriveScalarPartitionInfo();
+	gpos::Ref<CFunctionProp> DeriveScalarFunctionProperties();
 	BOOL DeriveHasNonScalarFunction();
 	ULONG DeriveTotalDistinctAggs();
 	BOOL DeriveHasMultipleDistinctAggs();

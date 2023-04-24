@@ -41,7 +41,8 @@ CXformDynamicGet2DynamicTableScan::CXformDynamicGet2DynamicTableScan(
 CXform::EXformPromise
 CXformDynamicGet2DynamicTableScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(exprhdl.Pop());
+	gpos::Ref<CLogicalDynamicGet> popGet =
+		CLogicalDynamicGet::PopConvert(exprhdl.Pop());
 	// Do not run if contains foreign partitions, instead run CXformExpandDynamicGetWithForeignPartitions
 	if (popGet->ContainsForeignParts())
 	{
@@ -60,21 +61,22 @@ CXformDynamicGet2DynamicTableScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
-											 CXformResult *pxfres,
-											 CExpression *pexpr) const
+CXformDynamicGet2DynamicTableScan::Transform(gpos::Ref<CXformContext> pxfctxt,
+											 gpos::Ref<CXformResult> pxfres,
+											 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(pexpr->Pop());
+	gpos::Ref<CLogicalDynamicGet> popGet =
+		CLogicalDynamicGet::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
@@ -89,7 +91,7 @@ CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
 	popGet->GetRootColMappingPerPart()->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalDynamicTableScan(
 				mp, pname, ptabdesc, popGet->UlOpId(), popGet->ScanId(),
 				pdrgpcrOutput, pdrgpdrgpcrPart, popGet->GetPartitionMdids(),

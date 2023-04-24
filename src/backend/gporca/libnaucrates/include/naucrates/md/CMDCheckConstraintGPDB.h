@@ -44,30 +44,31 @@ private:
 	CMemoryPool *m_mp;
 
 	// check constraint mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// check constraint name
 	CMDName *m_mdname;
 
 	// relation mdid
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// the DXL representation of the check constraint
-	CDXLNode *m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
 
 public:
 	// ctor
-	CMDCheckConstraintGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *rel_mdid, CDXLNode *dxlnode);
+	CMDCheckConstraintGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, gpos::Ref<IMDId> rel_mdid,
+						   gpos::Ref<CDXLNode> dxlnode);
 
 	// dtor
 	~CMDCheckConstraintGPDB() override;
 
 	// check constraint mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const override
 	{
 		return m_mdid;
@@ -81,7 +82,7 @@ public:
 	}
 
 	// mdid of the relation
-	IMDId *
+	gpos::Ref<IMDId>
 	GetRelMdId() const override
 	{
 		return m_rel_mdid;
@@ -95,7 +96,7 @@ public:
 	}
 
 	// the scalar expression of the check constraint
-	CExpression *GetCheckConstraintExpr(
+	gpos::Ref<CExpression> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CColRefArray *colref_array) const override;
 

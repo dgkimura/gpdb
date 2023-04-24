@@ -53,14 +53,14 @@ CAutoRefTest::EresUnittest_Basics()
 
 	// assignment
 	CAutoRef<CElem> aelem;
-	CElem *pelem = GPOS_NEW(mp) CElem(0);
+	gpos::Ref<CElem> pelem = GPOS_NEW(mp) CElem(0);
 	aelem = pelem;
 
 	GPOS_ASSERT(aelem->m_ul == pelem->m_ul);
 	GPOS_ASSERT(&aelem->m_ul == &pelem->m_ul);
 
 #ifdef GPOS_DEBUG
-	CElem *pelem2 = &(*pelem);
+	gpos::Ref<CElem> pelem2 = &(*pelem);
 	GPOS_ASSERT(pelem2 == pelem);
 #endif	// GPOS_DEBUG
 

@@ -47,7 +47,8 @@ public:
 	CDXLDatumInt8(const CDXLDatumInt8 &) = delete;
 
 	// ctor
-	CDXLDatumInt8(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null, LINT val);
+	CDXLDatumInt8(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, BOOL is_null,
+				  LINT val);
 
 	// dtor
 	~CDXLDatumInt8() override = default;
@@ -66,13 +67,13 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumInt8 *
-	Cast(CDXLDatum *dxl_datum)
+	static gpos::Ref<CDXLDatumInt8>
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumInt8 == dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumInt8 *>(dxl_datum);
+		return dynamic_cast<gpos::Ref<CDXLDatumInt8> >(dxl_datum);
 	}
 };
 }  // namespace gpdxl

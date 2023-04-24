@@ -575,9 +575,10 @@ CCostModelParamsGPDB::OsPrint(IOstream &os) const
 }
 
 BOOL
-CCostModelParamsGPDB::Equals(ICostModelParams *pcm) const
+CCostModelParamsGPDB::Equals(gpos::Ref<ICostModelParams> pcm) const
 {
-	CCostModelParamsGPDB *pcmgOther = dynamic_cast<CCostModelParamsGPDB *>(pcm);
+	gpos::Ref<CCostModelParamsGPDB> pcmgOther =
+		dynamic_cast<gpos::Ref<CCostModelParamsGPDB> >(pcm);
 	if (nullptr == pcmgOther)
 	{
 		return false;
