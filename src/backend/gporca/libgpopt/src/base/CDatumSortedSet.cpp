@@ -22,7 +22,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 	const ULONG ulArrayExprArity = CUtils::UlScalarArrayArity(pexprArray);
 	GPOS_ASSERT(0 < ulArrayExprArity);
 
-	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
+	gpos::Ref<IDatumArray> aprngdatum = GPOS_NEW(mp) IDatumArray(mp);
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
 		gpos::Ref<CScalarConst> popScConst =
@@ -40,16 +40,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 	aprngdatum->Sort(
 		[](const gpos::Ref<IDatum> &lhs, const gpos::Ref<IDatum> &rhs) {
 			const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
-			if (pcomp->Equals(lhs, rhs))
-			{
-				return 0;
-			}
-			else if (pcomp->IsLessThan(lhs, rhs))
-			{
-				return -1;
-			}
-
-			return 1;
+			return pcomp->IsLessThan(lhs, rhs);
 		});
 
 	// de-duplicate

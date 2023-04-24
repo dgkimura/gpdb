@@ -268,8 +268,8 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(
 	}
 
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
-	gpos::CAutoRef<CDatumSortedSet> apdatumsortedset(
-		GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp));
+	gpos::Ref<CDatumSortedSet> apdatumsortedset =
+		GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp);
 	// construct ranges representing IN or NOT IN
 	gpos::Ref<CRangeArray> prgrng = GPOS_NEW(mp) CRangeArray(mp);
 

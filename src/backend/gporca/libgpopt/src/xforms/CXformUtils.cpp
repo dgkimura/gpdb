@@ -3851,17 +3851,7 @@ CXformUtils::PdrgpdrgpexprSortedPrjElemsArray(
 			CScalarProjectElement::PopConvert(pexprPrjElemSnd->Pop())
 				->Pcr()
 				->Id();
-		if (ulIdFst < ulIdSnd)
-		{
-			return -1;
-		}
-
-		if (ulIdFst > ulIdSnd)
-		{
-			return 1;
-		}
-
-		return 0;
+		return ulIdFst < ulIdSnd;
 	});
 
 	return pdrgpdrgpexprPrjElems;

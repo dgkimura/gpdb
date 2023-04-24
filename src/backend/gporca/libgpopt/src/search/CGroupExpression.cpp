@@ -77,16 +77,7 @@ CGroupExpression::CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
 		m_pdrgpgroupSorted->AppendArray(pdrgpgroup);
 		m_pdrgpgroupSorted->Sort([](const gpos::WeakRef<CGroup> &lhs,
 									const gpos::WeakRef<CGroup> &rhs) {
-			if (lhs->Id() == rhs->Id())
-			{
-				return 0;
-			}
-			else if (lhs->Id() < rhs->Id())
-			{
-				return -1;
-			}
-
-			return 1;
+			return lhs->Id() < rhs->Id();
 		});
 
 		//GPOS_ASSERT(m_pdrgpgroupSorted->IsSorted());

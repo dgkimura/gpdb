@@ -816,17 +816,7 @@ CFilterStatsProcessor::MakeHistArrayCmpAnyFilter(
 	{
 		points->Sort(
 			[](const gpos::Ref<CPoint> &p1, const gpos::Ref<CPoint> &p2) {
-				if (p1->Equals(p2))
-				{
-					return 0;
-				}
-				else if (p1->IsLessThan(p2))
-				{
-					return -1;
-				}
-
-				GPOS_ASSERT(p1->IsGreaterThan(p2));
-				return 1;
+				return p1->IsLessThan(p2);
 			});
 	}
 

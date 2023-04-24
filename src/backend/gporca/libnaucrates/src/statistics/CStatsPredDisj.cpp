@@ -64,7 +64,7 @@ CStatsPredDisj::Sort() const
 		// sort the filters on column ids
 		m_disj_pred_stats_array->Sort([](const gpos::Ref<CStatsPred> &lhs,
 										 const gpos::Ref<CStatsPred> &rhs) {
-			return (INT) lhs->GetColId() - (INT) rhs->GetColId();
+			return (INT) lhs->GetColId() < (INT) rhs->GetColId();
 		});
 	}
 }
