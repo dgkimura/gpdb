@@ -88,7 +88,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// return locally used columns
@@ -120,7 +120,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubquery == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarSubquery> >(pop);
+		return gpos::dyn_cast<CScalarSubquery>(pop);
 	}
 
 	// print

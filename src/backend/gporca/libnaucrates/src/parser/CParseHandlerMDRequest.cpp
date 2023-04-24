@@ -44,8 +44,6 @@ CParseHandlerMDRequest::CParseHandlerMDRequest(
 //---------------------------------------------------------------------------
 CParseHandlerMDRequest::~CParseHandlerMDRequest()
 {
-	SafeRelease(m_mdid_array);
-	SafeRelease(m_mdtype_request_array);
 }
 
 
@@ -159,7 +157,7 @@ CParseHandlerMDRequest::GetParseHandlerType() const
 //		Parsed array of mdids
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerMDRequest::GetMdIdArray() const
 {
 	return m_mdid_array;

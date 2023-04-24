@@ -92,7 +92,7 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -117,12 +117,11 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(
 	// decorrelate Gb's relational child
 	(*pexprGb)[0]->ResetDerivedProperties();
 	gpos::Ref<CExpression> pexprInner = nullptr;
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	if (!CDecorrelator::FProcess(mp, (*pexprGb)[0], false /*fEqualityOnly*/,
 								 &pexprInner, pdrgpexpr,
 								 pexprOuter->DeriveOutputColumns()))
 	{
-		pdrgpexpr->Release();
 		return;
 	}
 
@@ -131,26 +130,26 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(
 		CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 	// join outer child with Gb's decorrelated child
-	pexprOuter->AddRef();
+
 	gpos::Ref<CExpression> pexprInnerJoin =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
 								 pexprOuter, pexprInner, pexprPredicate);
 
 	// create grouping columns from the output of outer child
-	CColRefArray *pdrgpcrKey = nullptr;
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> pdrgpcrKey = nullptr;
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKey);
-	pdrgpcrKey->Release();	// key is not used here
+	// key is not used here
 
 	gpos::Ref<CLogicalGbAgg> popGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/);
 	gpos::Ref<CExpression> pexprPrjList = (*pexprGb)[1];
-	pexprPrjList->AddRef();
+
 	gpos::Ref<CExpression> pexprNewGb =
 		GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprInnerJoin, pexprPrjList);
 
 	// add Apply predicate in a top Select node
-	pexprScalar->AddRef();
+
 	gpos::Ref<CExpression> pexprSelect =
 		CUtils::PexprLogicalSelect(mp, pexprNewGb, pexprScalar);
 

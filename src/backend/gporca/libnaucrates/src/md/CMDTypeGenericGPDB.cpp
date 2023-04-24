@@ -97,7 +97,7 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	m_mdid->AddRef();
+
 	m_datum_null = GPOS_NEW(m_mp) CDatumGenericGPDB(
 		m_mp, m_mdid, default_type_modifier, nullptr /*pba*/, 0 /*length*/,
 		true /*constNull*/, 0 /*lValue */, 0 /*dValue */);
@@ -113,27 +113,8 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 //---------------------------------------------------------------------------
 CMDTypeGenericGPDB::~CMDTypeGenericGPDB()
 {
-	m_mdid->Release();
-	SafeRelease(m_distr_opfamily);
-	SafeRelease(m_legacy_distr_opfamily);
-	SafeRelease(m_part_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	SafeRelease(m_mdid_base_relation);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_datum_null->Release();
 }
 
 
@@ -267,7 +248,7 @@ CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 		double_value = dxl_datum->GetDoubleMapping();
 	}
 
-	m_mdid->AddRef();
+
 	return GPOS_NEW(m_mp) CDatumGenericGPDB(
 		m_mp, m_mdid, dxl_datum->TypeModifier(), dxl_datum->GetByteArray(),
 		dxl_datum->Length(), dxl_datum->IsNull(), lint_value, double_value);
@@ -285,7 +266,6 @@ gpos::Ref<IDatum>
 CMDTypeGenericGPDB::GetDatumForDXLDatum(
 	CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const
 {
-	m_mdid->AddRef();
 	gpos::Ref<CDXLDatumGeneric> dxl_datum_generic =
 		CDXLDatumGeneric::Cast(const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
 
@@ -318,9 +298,8 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(
 gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
-	m_mdid->AddRef();
 	gpos::Ref<CDatumGenericGPDB> datum_generic =
-		dynamic_cast<gpos::Ref<CDatumGenericGPDB> >(datum);
+		gpos::dyn_cast<CDatumGenericGPDB>(datum);
 	ULONG length = 0;
 	BYTE *pba = nullptr;
 	if (!datum_generic->IsNull())
@@ -464,7 +443,6 @@ CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp,
 gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const gpos::Ref<IMDType> md_type = md_accessor->RetrieveType(m_mdid);
 	return CreateDXLDatumVal(mp, m_mdid, md_type, default_type_modifier,

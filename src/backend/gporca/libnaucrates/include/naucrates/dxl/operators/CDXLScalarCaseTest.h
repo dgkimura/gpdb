@@ -14,10 +14,10 @@
 #define GPDXL_CDXLScalarCaseTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -69,7 +69,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCaseTest == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarCaseTest> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarCaseTest>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

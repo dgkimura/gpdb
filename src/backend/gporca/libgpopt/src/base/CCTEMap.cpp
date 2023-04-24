@@ -45,7 +45,6 @@ CCTEMap::CCTEMap(CMemoryPool *mp) : m_mp(mp), m_phmcm(nullptr)
 //---------------------------------------------------------------------------
 CCTEMap::~CCTEMap()
 {
-	m_phmcm->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -63,7 +62,6 @@ CCTEMap::Insert(ULONG ulCteId, ECteType ect, gpos::Ref<CDrvdPropPlan> pdpplan)
 
 	if (nullptr != pdpplan)
 	{
-		pdpplan->AddRef();
 	}
 
 	gpos::Ref<CCTEMapEntry> pcme =
@@ -296,7 +294,7 @@ CCTEMap::FSatisfies(const gpos::Ref<CCTEReq> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 	// every CTE marked as "Required" must be in the current map
-	ULongPtrArray *pdrgpul = pcter->PdrgpulRequired();
+	gpos::Ref<ULongPtrArray> pdrgpul = pcter->PdrgpulRequired();
 	const ULONG ulReqd = pdrgpul->Size();
 	for (ULONG ul = 0; ul < ulReqd; ul++)
 	{
@@ -335,12 +333,12 @@ CCTEMap::FSatisfies(const gpos::Ref<CCTEReq> pcter) const
 //		Return producer ids that are in this map but not in the given requirement
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CCTEMap::PdrgpulAdditionalProducers(CMemoryPool *mp,
 									const gpos::Ref<CCTEReq> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
-	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())

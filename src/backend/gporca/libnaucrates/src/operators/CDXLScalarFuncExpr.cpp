@@ -54,8 +54,6 @@ CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarFuncExpr::~CDXLScalarFuncExpr()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

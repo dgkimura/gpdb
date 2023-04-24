@@ -56,8 +56,6 @@ CPartialPlan::CPartialPlan(gpos::Ref<CGroupExpression> pgexpr,
 //---------------------------------------------------------------------------
 CPartialPlan::~CPartialPlan()
 {
-	m_prpp->Release();
-	SafeRelease(m_pccChild);
 }
 
 //---------------------------------------------------------------------------
@@ -167,14 +165,14 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 	exprhdl.InitReqdProps(m_prpp);
 
 	// create array of child derived properties
-	CDrvdPropArray *pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
+	gpos::Ref<CDrvdPropArray> pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
 	const ULONG arity = m_pgexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		// compute required columns of the n-th child
 		exprhdl.ComputeChildReqdCols(ul, pdrgpdp);
 	}
-	pdrgpdp->Release();
+
 
 	gpos::Ref<IStatistics> stats = m_pgexpr->Pgroup()->Pstats();
 	if (nullptr == stats)
@@ -183,7 +181,7 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 				   GPOS_WSZ_LIT("CPartialPlan"));
 	}
 
-	stats->AddRef();
+
 	ICostModel::SCostingInfo ci(mp, exprhdl.UlNonScalarChildren(),
 								GPOS_NEW(mp) ICostModel::CCostingStats(stats));
 

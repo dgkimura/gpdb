@@ -64,7 +64,7 @@ CColumnDescriptorTest::EresUnittest_Basic()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -80,7 +80,7 @@ CColumnDescriptorTest::EresUnittest_Basic()
 
 	GPOS_ASSERT(1 == pcdesc->AttrNum());
 
-	pcdesc->Release();
+
 
 	return GPOS_OK;
 }

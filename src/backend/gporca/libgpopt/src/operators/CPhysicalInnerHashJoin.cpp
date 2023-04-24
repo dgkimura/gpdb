@@ -31,9 +31,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalInnerHashJoin::CPhysicalInnerHashJoin(
-	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-	BOOL is_null_aware, CXform::EXformId origin_xform)
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+	gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+	gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware,
+	CXform::EXformId origin_xform)
 	: CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
 						hash_opfamilies, is_null_aware, origin_xform)
 {
@@ -74,11 +75,10 @@ CPhysicalInnerHashJoin::PdshashedCreateMatching(
 	// create a new spec with input and the output spec as equivalents, as you don't want to lose
 	// the already existing equivalent specs of pdshashed
 	// NB: The matching spec is added at the beginning.
-	pdshashedMatching->Pdrgpexpr()->AddRef();
-	pdshashed->AddRef();
+
+
 	if (nullptr != pdshashedMatching->Opfamilies())
 	{
-		pdshashedMatching->Opfamilies()->AddRef();
 	}
 	gpos::Ref<CDistributionSpecHashed> pdsHashedMatchingEquivalents =
 		GPOS_NEW(mp) CDistributionSpecHashed(
@@ -86,7 +86,7 @@ CPhysicalInnerHashJoin::PdshashedCreateMatching(
 			pdshashedMatching->FNullsColocated(),
 			pdshashed,	// matching distribution spec is equivalent to passed distribution spec
 			pdshashedMatching->Opfamilies());
-	pdshashedMatching->Release();
+
 	return pdsHashedMatchingEquivalents;
 }
 
@@ -165,7 +165,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter(
 	}
 
 	// otherwise, pass-through inner distribution
-	pdsInner->AddRef();
+
 	return pdsInner;
 }
 
@@ -226,7 +226,7 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
 		// if outer is universal, pass through inner distribution
-		pdsInner->AddRef();
+
 		return pdsInner;
 	}
 
@@ -257,7 +257,7 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 	}
 
 	// otherwise, pass through outer distribution
-	pdsOuter->AddRef();
+
 	return pdsOuter;
 }
 
@@ -265,7 +265,7 @@ gpos::Ref<CPartitionPropagationSpec>
 CPhysicalInnerHashJoin::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
-	CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	return PppsRequiredForJoins(mp, exprhdl, pppsRequired, child_index,
 								pdrgpdpCtxt, ulOptReq);

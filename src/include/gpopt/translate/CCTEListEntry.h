@@ -90,12 +90,11 @@ public:
 
 	// ctor: multiple CTEs
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-				  CDXLNodeArray *dxlnodes);
+				  gpos::Ref<CDXLNodeArray> dxlnodes);
 
 	// dtor
-	~CCTEListEntry() override
-	{
-		m_cte_info->Release();
+	~CCTEListEntry() override{
+
 	};
 
 	// the query level

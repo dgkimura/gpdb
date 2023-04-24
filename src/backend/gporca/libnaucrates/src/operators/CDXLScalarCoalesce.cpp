@@ -44,7 +44,6 @@ CDXLScalarCoalesce::CDXLScalarCoalesce(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCoalesce::~CDXLScalarCoalesce()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

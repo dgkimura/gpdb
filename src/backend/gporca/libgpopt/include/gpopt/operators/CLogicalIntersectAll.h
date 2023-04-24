@@ -35,8 +35,8 @@ public:
 	// ctor
 	explicit CLogicalIntersectAll(CMemoryPool *mp);
 
-	CLogicalIntersectAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-						 CColRef2dArray *pdrgpdrgpcrInput);
+	CLogicalIntersectAll(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+						 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalIntersectAll() override;
@@ -64,7 +64,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
@@ -108,7 +108,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -121,13 +121,14 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIntersectAll == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalIntersectAll> >(pop);
+		return gpos::dyn_cast<CLogicalIntersectAll>(pop);
 	}
 
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CColRef2dArray *pdrgpdrgpcrInput, CColRefSetArray *output_colrefsets);
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput,
+		gpos::Ref<CColRefSetArray> output_colrefsets);
 
 };	// class CLogicalIntersectAll
 

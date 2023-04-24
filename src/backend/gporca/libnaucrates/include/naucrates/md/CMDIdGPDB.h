@@ -128,7 +128,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != mdid);
 
-		return dynamic_cast<const gpos::Ref<CMDIdGPDB> >(mdid);
+		return gpos::dyn_cast<CMDIdGPDB>(mdid);
 	}
 
 	gpos::Ref<IMDId>

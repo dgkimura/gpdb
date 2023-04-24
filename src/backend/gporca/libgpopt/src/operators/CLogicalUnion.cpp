@@ -42,8 +42,9 @@ CLogicalUnion::CLogicalUnion(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalUnion::CLogicalUnion(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							 CColRef2dArray *pdrgpdrgpcrInput)
+CLogicalUnion::CLogicalUnion(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> pdrgpcrOutput,
+							 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 }
@@ -68,13 +69,13 @@ CLogicalUnion::~CLogicalUnion() = default;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalUnion::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalUnion::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::Ref<CColRefArray> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalUnion(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
@@ -111,10 +112,10 @@ CLogicalUnion::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUnion2UnionAll);
 	return xform_set;
 }
@@ -129,7 +130,7 @@ CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
@@ -140,7 +141,8 @@ CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CLogicalUnionAll::PstatsDeriveUnionAll(mp, exprhdl);
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 
 	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsUnionAll,
@@ -150,8 +152,8 @@ CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	);
 
 	// clean up
-	pdrgpulComputedCols->Release();
-	pstatsUnionAll->Release();
+
+
 
 	return stats;
 }

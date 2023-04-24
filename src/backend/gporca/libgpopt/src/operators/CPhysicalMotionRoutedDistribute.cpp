@@ -48,8 +48,6 @@ CPhysicalMotionRoutedDistribute::CPhysicalMotionRoutedDistribute(
 //---------------------------------------------------------------------------
 CPhysicalMotionRoutedDistribute::~CPhysicalMotionRoutedDistribute()
 {
-	m_pdsRouted->Release();
-	m_pcrsRequiredLocal->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -86,8 +84,8 @@ gpos::Ref<CColRefSet>
 CPhysicalMotionRoutedDistribute::PcrsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
-	CDrvdPropArray *,  // pdrgpdpCtxt
-	ULONG			   // ulOptReq
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -98,7 +96,7 @@ CPhysicalMotionRoutedDistribute::PcrsRequired(
 
 	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
-	pcrs->Release();
+
 
 	return pcrsChildReqd;
 }
@@ -146,16 +144,17 @@ CPhysicalMotionRoutedDistribute::EpetOrder(CExpressionHandle &,	 // exprhdl
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalMotionRoutedDistribute::PosRequired(CMemoryPool *mp,
-											 CExpressionHandle &,	 // exprhdl
-											 gpos::Ref<COrderSpec>,	 //posInput
-											 ULONG
+CPhysicalMotionRoutedDistribute::PosRequired(
+	CMemoryPool *mp,
+	CExpressionHandle &,	// exprhdl
+	gpos::Ref<COrderSpec>,	//posInput
+	ULONG
 #ifdef GPOS_DEBUG
-												 child_index
+		child_index
 #endif	// GPOS_DEBUG
-											 ,
-											 CDrvdPropArray *,	// pdrgpdpCtxt
-											 ULONG				// ulOptReq
+	,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -211,7 +210,7 @@ CPhysicalMotionRoutedDistribute::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRoutedDistribute == pop->Eopid());
 
-	return dynamic_cast<gpos::Ref<CPhysicalMotionRoutedDistribute> >(pop);
+	return gpos::dyn_cast<CPhysicalMotionRoutedDistribute>(pop);
 }
 
 // EOF

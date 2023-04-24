@@ -29,7 +29,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
 CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(
-	CMemoryPool *mp, UlongToColRefMap *colid_to_colref_map) const
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colid_to_colref_map) const
 {
 	BOOL mapping_not_found = false;
 
@@ -55,7 +55,7 @@ CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(
 			CUpperBoundNDVs(column_refset_copy, UpperBoundNDVs());
 	}
 
-	column_refset_copy->Release();
+
 
 	return nullptr;
 }
@@ -73,7 +73,6 @@ CUpperBoundNDVs *
 CUpperBoundNDVs::CopyUpperBoundNDVs(CMemoryPool *mp,
 									CDouble upper_bound_ndv) const
 {
-	m_column_refset->AddRef();
 	CUpperBoundNDVs *ndv_copy =
 		GPOS_NEW(mp) CUpperBoundNDVs(m_column_refset, upper_bound_ndv);
 

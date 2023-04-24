@@ -96,7 +96,7 @@ CScalar::FHasSubquery(CExpressionHandle &exprhdl)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberConjunction(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -157,7 +157,7 @@ CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberDisjunction(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -242,7 +242,7 @@ CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAnyNullChild(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 
@@ -269,7 +269,7 @@ CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAllNullChildren(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 
@@ -305,7 +305,7 @@ CScalar::EberEvaluate(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar)
 	GPOS_ASSERT(pop->FScalar());
 
 	const ULONG arity = pexprScalar->Arity();
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	if (!CUtils::FSubquery(pop))
 	{
@@ -319,7 +319,7 @@ CScalar::EberEvaluate(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar)
 	}
 
 	EBoolEvalResult eber = PopConvert(pop)->Eber(pdrgpulChildren);
-	SafeRelease(pdrgpulChildren);
+
 
 	return eber;
 }
@@ -385,7 +385,7 @@ CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 			GPOS_ASSERT(nullptr != ppartinfoChild);
 			gpos::Ref<CPartInfo> ppartinfoCombined =
 				CPartInfo::PpartinfoCombine(mp, ppartinfo, ppartinfoChild);
-			ppartinfo->Release();
+
 			ppartinfo = ppartinfoCombined;
 		}
 	}

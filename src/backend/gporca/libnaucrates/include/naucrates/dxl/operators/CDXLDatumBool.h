@@ -19,9 +19,9 @@
 #define GPDXL_CDXLDatumBool_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -78,7 +78,7 @@ public:
 		GPOS_ASSERT(CDXLDatum::CDXLDatum::EdxldatumBool ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<gpos::Ref<CDXLDatumBool> >(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumBool>(dxl_datum);
 	}
 };
 }  // namespace gpdxl

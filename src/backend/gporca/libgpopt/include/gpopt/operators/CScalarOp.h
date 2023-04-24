@@ -63,8 +63,6 @@ public:
 	// dtor
 	~CScalarOp() override
 	{
-		m_mdid_op->Release();
-		SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrOp);
 	}
 
@@ -100,9 +98,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -115,14 +113,15 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarOp == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarOp> >(pop);
+		return gpos::dyn_cast<CScalarOp>(pop);
 	}
 
 	// helper function
 	static BOOL FCommutative(const gpos::Ref<IMDId> pcmdidOtherOp);
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// name of the scalar operator
 	const CWStringConst *Pstr() const;

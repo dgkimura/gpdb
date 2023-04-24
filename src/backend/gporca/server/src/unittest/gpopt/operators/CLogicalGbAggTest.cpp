@@ -47,13 +47,13 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CLogicalGbAgg> pGlobalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeGlobal);
 
-	CXformSet *xfset = pGlobalGbAgg->PxfsCandidates(mp);
+	gpos::Ref<CXformSet> xfset = pGlobalGbAgg->PxfsCandidates(mp);
 
 	// allow xform split agg on "global" aggregate
 	GPOS_ASSERT(xfset->Get(CXform::ExfSplitGbAgg));
@@ -61,7 +61,7 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	{
 		test_passed = false;
 	}
-	xfset->Release();
+
 
 	gpos::Ref<CLogicalGbAgg> pLocalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeLocal);
@@ -73,7 +73,7 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	{
 		test_passed = false;
 	}
-	xfset->Release();
+
 
 	gpos::Ref<CLogicalGbAgg> pIntermediateGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeIntermediate,
@@ -87,11 +87,8 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	{
 		test_passed = false;
 	}
-	xfset->Release();
 
-	pLocalGbAgg->Release();
-	pGlobalGbAgg->Release();
-	pIntermediateGbAgg->Release();
+
 
 	return test_passed ? GPOS_OK : GPOS_FAILED;
 }

@@ -35,30 +35,31 @@ private:
 	gpos::Ref<CColRefSet> m_pcrsMinimalGrpCols;
 
 	// construct order spec on grouping column so that it covers required order spec
-	static gpos::Ref<COrderSpec> PosCovering(CMemoryPool *mp,
-											 gpos::Ref<COrderSpec> posRequired,
-											 CColRefArray *pdrgpcrGrp);
+	static gpos::Ref<COrderSpec> PosCovering(
+		CMemoryPool *mp, gpos::Ref<COrderSpec> posRequired,
+		gpos::Ref<CColRefArray> pdrgpcrGrp);
 
 protected:
 	// compute required sort columns of the n-th child
 	gpos::Ref<COrderSpec> PosRequiredStreamAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<COrderSpec> posRequired, ULONG child_index,
-		CColRefArray *pdrgpcrGrp) const;
+		gpos::Ref<CColRefArray> pdrgpcrGrp) const;
 
 	// initialize the order spec using the given array of columns
-	void InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder);
+	void InitOrderSpec(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOrder);
 
 public:
 	CPhysicalStreamAgg(const CPhysicalStreamAgg &) = delete;
 
 	// ctor
 	CPhysicalStreamAgg(
-		CMemoryPool *mp, CColRefArray *colref_array,
-		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		gpos::Ref<CColRefArray>
+			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-		CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-		CLogicalGbAgg::EAggStage aggStage,
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
+		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 		BOOL should_enforce_distribution = true
 		// should_enforce_distribution should be set to false if
 		// 'local' and 'global' splits don't need to have different
@@ -92,8 +93,8 @@ public:
 	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				gpos::Ref<COrderSpec> posRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
-				ULONG			   //ulOptReq
+				gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+				ULONG						//ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,
@@ -129,7 +130,7 @@ public:
 		GPOS_ASSERT(EopPhysicalStreamAgg == pop->Eopid() ||
 					EopPhysicalStreamAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalStreamAgg> >(pop);
+		return gpos::dyn_cast<CPhysicalStreamAgg>(pop);
 	}
 
 };	// class CPhysicalStreamAgg

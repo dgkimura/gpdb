@@ -45,7 +45,6 @@ CParseHandlerCTEList::CParseHandlerCTEList(
 //---------------------------------------------------------------------------
 CParseHandlerCTEList::~CParseHandlerCTEList()
 {
-	SafeRelease(m_dxl_array);
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +129,7 @@ CParseHandlerCTEList::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerLogicalCTEProducer *>((*this)[ul]);
 		gpos::Ref<CDXLNode> dxlnode_cte =
 			cte_producer_parse_handler->CreateDXLNode();
-		dxlnode_cte->AddRef();
+
 		m_dxl_array->Append(dxlnode_cte);
 	}
 

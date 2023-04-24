@@ -78,7 +78,7 @@ CStatsPredPoint::PreprocessDatum(CMemoryPool *mp,
 		datum->IsNull())
 	{
 		// we do not pad datum for comparison against computed columns
-		datum->AddRef();
+
 		return datum;
 	}
 

@@ -60,9 +60,6 @@ CMDAggregateGPDB::CMDAggregateGPDB(
 //---------------------------------------------------------------------------
 CMDAggregateGPDB::~CMDAggregateGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_intermediate->Release();
-	m_mdid_type_result->Release();
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }

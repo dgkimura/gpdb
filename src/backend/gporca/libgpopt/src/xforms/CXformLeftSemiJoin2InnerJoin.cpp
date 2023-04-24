@@ -99,7 +99,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -109,9 +109,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+
 
 	// construct grouping columns by collecting used columns in the join predicate
 	// that come from join's inner child
@@ -128,7 +126,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	{
 		// grouping columns do not cover a key on the inner side,
 		// we need to create a group by on inner side
-		CColRefArray *colref_array = pcrsGb->Pdrgpcr(mp);
+		gpos::Ref<CColRefArray> colref_array = pcrsGb->Pdrgpcr(mp);
 		gpos::Ref<CExpression> pexprGb = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CLogicalGbAgg(
@@ -142,7 +140,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
 													pexprScalar);
 
-	pcrsGb->Release();
+
 	pxfres->Add(pexprInnerJoin);
 }
 

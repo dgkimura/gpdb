@@ -30,10 +30,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalHashAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
 					   fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/,
 					   fMultiStage, isAggFromSplitDQA, aggStage,
@@ -53,7 +54,6 @@ CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::~CPhysicalHashAggDeduplicate()
 {
-	m_pdrgpcrKeys->Release();
 }
 
 //---------------------------------------------------------------------------

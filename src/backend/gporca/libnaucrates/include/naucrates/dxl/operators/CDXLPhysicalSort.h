@@ -15,9 +15,9 @@
 #define GPDXL_CDXLPhysicalSort_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 // indices of sort node elements in the children array
@@ -69,7 +69,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSort == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalSort> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSort>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

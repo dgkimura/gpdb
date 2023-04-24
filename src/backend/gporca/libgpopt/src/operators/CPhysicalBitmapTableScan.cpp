@@ -34,7 +34,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(
 	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameTableAlias, CColRefArray *pdrgpcrOutput)
+	const CName *pnameTableAlias, gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameTableAlias, ptabdesc, pdrgpcrOutput),
 	  m_ulOriginOpId(ulOriginOpId)
 {

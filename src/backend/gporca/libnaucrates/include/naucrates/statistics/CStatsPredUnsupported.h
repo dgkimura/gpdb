@@ -77,7 +77,7 @@ public:
 		GPOS_ASSERT(CStatsPred::EsptUnsupported ==
 					pred_stats->GetPredStatsType());
 
-		return dynamic_cast<gpos::Ref<CStatsPredUnsupported> >(pred_stats);
+		return gpos::dyn_cast<CStatsPredUnsupported>(pred_stats);
 	}
 
 };	// class CStatsPredUnsupported

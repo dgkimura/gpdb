@@ -52,7 +52,6 @@ CDebugCounter::CDebugCounter(CMemoryPool *mp)
 
 CDebugCounter::~CDebugCounter()
 {
-	SafeRelease(m_hashmap);
 	m_hashmap = NULL;
 }
 
@@ -170,7 +169,7 @@ CDebugCounter::NextQry(const char *next_qry_name)
 		}
 
 		// clear the hash map for the next query by allocating a new, empty one in its stead
-		m_instance->m_hashmap->Release();
+
 		m_instance->m_hashmap =
 			GPOS_NEW(m_instance->m_mp) CounterKeyToValueMap(m_instance->m_mp);
 	}
@@ -214,7 +213,6 @@ CDebugCounter::InsertOrUpdateCounter(gpos::Ref<SDebugCounterKey> key,
 	{
 		// we updated the key in-place, delete the extra
 		// key that was used for searching
-		key->Release();
 	}
 	else
 	{

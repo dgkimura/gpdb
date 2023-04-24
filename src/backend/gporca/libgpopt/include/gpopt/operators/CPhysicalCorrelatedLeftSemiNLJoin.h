@@ -31,7 +31,7 @@ class CPhysicalCorrelatedLeftSemiNLJoin : public CPhysicalLeftSemiNLJoin
 {
 private:
 	// columns from inner child used in correlated execution
-	CColRefArray *m_pdrgpcrInner;
+	gpos::Ref<CColRefArray> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -42,7 +42,7 @@ public:
 
 	// ctor
 	CPhysicalCorrelatedLeftSemiNLJoin(CMemoryPool *mp,
-									  CColRefArray *pdrgpcrInner,
+									  gpos::Ref<CColRefArray> pdrgpcrInner,
 									  EOperatorId eopidOriginSubq)
 		: CPhysicalLeftSemiNLJoin(mp),
 		  m_pdrgpcrInner(pdrgpcrInner),
@@ -57,7 +57,6 @@ public:
 	// dtor
 	~CPhysicalCorrelatedLeftSemiNLJoin() override
 	{
-		m_pdrgpcrInner->Release();
 	}
 
 	// ident accessors
@@ -89,11 +88,11 @@ public:
 	}
 
 	// distribution matching type
-	CEnfdDistribution::EDistributionMatching
-	Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-		ULONG,					   // child_index
-		CDrvdPropArray *,		   //pdrgpdpCtxt
-		ULONG					   // ulOptReq
+	CEnfdDistribution::EDistributionMatching Edm(
+		gpos::Ref<CReqdPropPlan>,	// prppInput
+		ULONG,						// child_index
+		gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+		ULONG						// ulOptReq
 		) override
 	{
 		return CEnfdDistribution::EdmSatisfy;
@@ -102,7 +101,7 @@ public:
 	gpos::Ref<CEnfdDistribution>
 	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) override
 	{
 		return PedCorrelatedJoin(mp, exprhdl, prppInput, child_index,
 								 pdrgpdpCtxt, ulOptReq);
@@ -114,7 +113,7 @@ public:
 				CExpressionHandle &,		   // exprhdl,
 				gpos::Ref<CDistributionSpec>,  // pdsRequired,
 				ULONG,						   // child_index,
-				CDrvdPropArray *,			   // pdrgpdpCtxt,
+				gpos::Ref<CDrvdPropArray>,	   // pdrgpdpCtxt,
 				ULONG						   //ulOptReq
 	) const override
 	{
@@ -129,7 +128,8 @@ public:
 	gpos::Ref<CRewindabilitySpec>
 	PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-				CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override
+				gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+				ULONG ulOptReq) const override
 	{
 		return PrsRequiredCorrelatedJoin(mp, exprhdl, prsRequired, child_index,
 										 pdrgpdpCtxt, ulOptReq);
@@ -143,7 +143,7 @@ public:
 	}
 
 	// return required inner columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrInner() const override
 	{
 		return m_pdrgpcrInner;
@@ -174,7 +174,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalCorrelatedLeftSemiNLJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalCorrelatedLeftSemiNLJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalCorrelatedLeftSemiNLJoin>(pop);
 	}
 
 };	// class CPhysicalCorrelatedLeftSemiNLJoin

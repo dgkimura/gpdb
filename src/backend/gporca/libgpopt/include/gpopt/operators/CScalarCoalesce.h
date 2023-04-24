@@ -82,9 +82,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -92,7 +92,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const override
 	{
 		// Coalesce returns the first not-null child,
 		// if all children are Null, then Coalesce must return Null
@@ -106,7 +106,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCoalesce == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarCoalesce> >(pop);
+		return gpos::dyn_cast<CScalarCoalesce>(pop);
 	}
 
 };	// class CScalarCoalesce

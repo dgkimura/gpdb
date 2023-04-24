@@ -22,7 +22,8 @@ CLimitStatsProcessor::CalcLimitStats(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *colid_histogram = input_stats->CopyHistograms(mp);
+	gpos::Ref<UlongToHistogramMap> colid_histogram =
+		input_stats->CopyHistograms(mp);
 
 	CDouble limit_rows = CStatistics::MinRows;
 	if (!input_stats->IsEmpty())

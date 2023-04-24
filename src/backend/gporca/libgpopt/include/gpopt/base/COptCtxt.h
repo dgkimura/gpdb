@@ -78,7 +78,7 @@ private:
 	gpos::Ref<CCTEInfo> m_pcteinfo;
 
 	// system columns required in query output
-	CColRefArray *m_pdrgpcrSystemCols;
+	gpos::Ref<CColRefArray> m_pdrgpcrSystemCols;
 
 	// optimizer configurations
 	gpos::Ref<COptimizerConfig> m_optimizer_config;
@@ -100,7 +100,7 @@ private:
 	BOOL m_has_replicated_tables;
 
 	// does this plan have a direct dispatchable filter
-	CExpressionArray *m_direct_dispatchable_filters;
+	gpos::Ref<CExpressionArray> m_direct_dispatchable_filters;
 
 	// mappings of dynamic scan -> partition indexes (after static elimination)
 	// this is mainetained here to avoid dependencies on optimization order
@@ -182,7 +182,6 @@ public:
 	AddDirectDispatchableFilterCandidate(
 		gpos::Ref<CExpression> filter_expression)
 	{
-		filter_expression->AddRef();
 		m_direct_dispatchable_filters->Append(filter_expression);
 	}
 
@@ -204,7 +203,7 @@ public:
 		return m_has_replicated_tables;
 	}
 
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	GetDirectDispatchableFilters() const
 	{
 		return m_direct_dispatchable_filters;
@@ -278,7 +277,7 @@ public:
 	}
 
 	// required system columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSystemCols() const
 	{
 		return m_pdrgpcrSystemCols;
@@ -298,11 +297,11 @@ public:
 
 	// set required system columns
 	void
-	SetReqdSystemCols(CColRefArray *pdrgpcrSystemCols)
+	SetReqdSystemCols(gpos::Ref<CColRefArray> pdrgpcrSystemCols)
 	{
 		GPOS_ASSERT(nullptr != pdrgpcrSystemCols);
 
-		SafeRelease(m_pdrgpcrSystemCols);
+
 		m_pdrgpcrSystemCols = pdrgpcrSystemCols;
 	}
 

@@ -60,14 +60,14 @@ private:
 		gpos::Ref<IMDId> m_mdid;
 
 		// partition keys
-		CPartKeysArray *m_pdrgppartkeys;
+		gpos::Ref<CPartKeysArray> m_pdrgppartkeys;
 
 	public:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
 
 		// ctor
 		CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
-					   CPartKeysArray *pdrgppartkeys);
+					   gpos::Ref<CPartKeysArray> pdrgppartkeys);
 
 		// dtor
 		~CPartInfoEntry() override;
@@ -83,7 +83,7 @@ private:
 		// part keys to this entry, using the existing keys and the given hashmap
 		gpos::Ref<CPartInfoEntry> PpartinfoentryAddRemappedKeys(
 			CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-			UlongToColRefMap *colref_mapping);
+			gpos::Ref<UlongToColRefMap> colref_mapping);
 
 		// mdid of partition table
 		virtual gpos::Ref<IMDId>
@@ -93,7 +93,7 @@ private:
 		}
 
 		// partition keys of partition table
-		virtual CPartKeysArray *
+		virtual gpos::Ref<CPartKeysArray>
 		Pdrgppartkeys() const
 		{
 			return m_pdrgppartkeys;
@@ -107,14 +107,13 @@ private:
 
 	};	// CPartInfoEntry
 
-	using CPartInfoEntryArray =
-		CDynamicPtrArray<CPartInfoEntry, CleanupRelease>;
+	using CPartInfoEntryArray = gpos::Vector<gpos::Ref<CPartInfoEntry>>;
 
 	// partition table consumers
-	CPartInfoEntryArray *m_pdrgppartentries;
+	gpos::Ref<CPartInfoEntryArray> m_pdrgppartentries;
 
 	// private ctor
-	explicit CPartInfo(CPartInfoEntryArray *pdrgppartentries);
+	explicit CPartInfo(gpos::Ref<CPartInfoEntryArray> pdrgppartentries);
 
 public:
 	CPartInfo(const CPartInfo &) = delete;
@@ -134,7 +133,7 @@ public:
 
 	// add part table consumer
 	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id, gpos::Ref<IMDId> mdid,
-						 CColRef2dArray *pdrgpdrgpcrPart);
+						 gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart);
 
 	// scan id of the entry at the given position
 	ULONG ScanId(ULONG ulPos) const;
@@ -143,18 +142,18 @@ public:
 	gpos::Ref<IMDId> GetRelMdId(ULONG ulPos) const;
 
 	// part keys of the entry at the given position
-	CPartKeysArray *Pdrgppartkeys(ULONG ulPos) const;
+	gpos::Ref<CPartKeysArray> Pdrgppartkeys(ULONG ulPos) const;
 
 	// check if part info contains given scan id
 	BOOL FContainsScanId(ULONG scan_id) const;
 
 	// part keys of the entry with the given scan id
-	CPartKeysArray *PdrgppartkeysByScanId(ULONG scan_id) const;
+	gpos::Ref<CPartKeysArray> PdrgppartkeysByScanId(ULONG scan_id) const;
 
 	// return a new part info object with an additional set of remapped keys
 	gpos::Ref<CPartInfo> PpartinfoWithRemappedKeys(
-		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
-		CColRefArray *pdrgpcrDest) const;
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrSrc,
+		gpos::Ref<CColRefArray> pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;

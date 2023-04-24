@@ -45,10 +45,10 @@ CLogicalLeftSemiJoin::CLogicalLeftSemiJoin(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalLeftSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinSemiJoinSwap);
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinAntiSemiJoinSwap);
@@ -122,10 +122,9 @@ CLogicalLeftSemiJoin::DeriveMaxCard(CMemoryPool *,	// mp
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp,
-								   CStatsPredJoinArray *join_preds_stats,
-								   gpos::Ref<IStatistics> outer_stats,
-								   gpos::Ref<IStatistics> inner_side_stats)
+CLogicalLeftSemiJoin::PstatsDerive(
+	CMemoryPool *mp, gpos::Ref<CStatsPredJoinArray> join_preds_stats,
+	gpos::Ref<IStatistics> outer_stats, gpos::Ref<IStatistics> inner_side_stats)
 {
 	return outer_stats->CalcLSJoinStats(mp, inner_side_stats, join_preds_stats);
 }
@@ -141,19 +140,19 @@ CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   IStatisticsArray *  // not used
+								   gpos::Ref<IStatisticsArray>	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
 	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*semi-join*/);
 	gpos::Ref<IStatistics> pstatsSemiJoin =
 		PstatsDerive(mp, join_preds_stats, outer_stats, inner_side_stats);
 
-	join_preds_stats->Release();
+
 
 	return pstatsSemiJoin;
 }

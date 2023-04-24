@@ -74,7 +74,7 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalUpdate> popUpdate =
@@ -84,15 +84,15 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popUpdate->Ptabdesc();
-	CColRefArray *pdrgpcrDelete = popUpdate->PdrgpcrDelete();
-	CColRefArray *pdrgpcrInsert = popUpdate->PdrgpcrInsert();
+	gpos::Ref<CColRefArray> pdrgpcrDelete = popUpdate->PdrgpcrDelete();
+	gpos::Ref<CColRefArray> pdrgpcrInsert = popUpdate->PdrgpcrInsert();
 	gpos::Ref<CColRef> pcrCtid = popUpdate->PcrCtid();
 	gpos::Ref<CColRef> pcrSegmentId = popUpdate->PcrSegmentId();
 	BOOL fSplit = popUpdate->FSplit();
 
 	// child of update operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 	// generate the action column and split operator
 	gpos::Ref<COptCtxt> poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
@@ -105,8 +105,6 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprSplit = nullptr;
 	if (fSplit)
 	{
-		pdrgpcrDelete->AddRef();
-		pdrgpcrInsert->AddRef();
 		gpos::Ref<CExpression> pexprProjElem = GPOS_NEW(mp) CExpression(
 			mp, GPOS_NEW(mp) CScalarProjectElement(mp, pcrAction),
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarDMLAction(mp)));
@@ -143,7 +141,7 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CExpression> pexprDML = nullptr;
 	// create logical DML
-	ptabdesc->AddRef();
+
 	if (fSplit)
 	{
 		gpos::Ref<CBitSet> pbsModified =
@@ -160,7 +158,7 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 				pbsModified->ExchangeSet(ul);
 			}
 		}
-		pdrgpcrDelete->AddRef();
+
 		pexprDML = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CLogicalDML(mp, CLogicalDML::EdmlUpdate, ptabdesc,
@@ -170,7 +168,6 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 	else
 	{
-		pdrgpcrInsert->AddRef();
 		pexprDML = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CLogicalDML(mp, CLogicalDML::EdmlUpdate, ptabdesc,

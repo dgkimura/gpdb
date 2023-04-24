@@ -81,7 +81,7 @@ CDXLPhysicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize children nodes
 
-	const CDXLNodeArray *dxl_array = node->GetChildDXLNodeArray();
+	const gpos::Ref<CDXLNodeArray> dxl_array = node->GetChildDXLNodeArray();
 
 	GPOS_ASSERT(4 == node->Arity());
 	// serialize the first two children: target-list and plan

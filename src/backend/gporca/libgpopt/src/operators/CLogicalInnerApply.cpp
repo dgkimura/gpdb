@@ -41,7 +41,7 @@ CLogicalInnerApply::CLogicalInnerApply(CMemoryPool *mp) : CLogicalApply(mp)
 //
 //---------------------------------------------------------------------------
 CLogicalInnerApply::CLogicalInnerApply(CMemoryPool *mp,
-									   CColRefArray *pdrgpcrInner,
+									   gpos::Ref<CColRefArray> pdrgpcrInner,
 									   EOperatorId eopidOriginSubq)
 	: CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
 {
@@ -84,10 +84,10 @@ CLogicalInnerApply::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalInnerApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfInnerApply2InnerJoin);
 	(void) xform_set->ExchangeSet(
@@ -107,11 +107,11 @@ CLogicalInnerApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalInnerApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalInnerApply::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::Ref<CColRefArray> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalInnerApply(mp, pdrgpcrInner, m_eopidOriginSubq);

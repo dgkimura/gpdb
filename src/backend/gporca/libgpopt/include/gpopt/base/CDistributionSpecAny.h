@@ -83,8 +83,8 @@ public:
 		CMemoryPool *,			   // mp
 		CExpressionHandle &,	   // exprhdl: gives access to child properties
 		gpos::Ref<CReqdPropPlan>,  // prpp
-		CExpressionArray *,		   // pdrgpexpr
-		gpos::Ref<CExpression>	   // pexpr
+		gpos::Ref<CExpressionArray>,  // pdrgpexpr
+		gpos::Ref<CExpression>		  // pexpr
 		) override
 	{
 		GPOS_ASSERT(!"attempt to enforce ANY distribution");
@@ -119,7 +119,7 @@ public:
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtAny == pds->Edt());
 
-		return dynamic_cast<gpos::Ref<CDistributionSpecAny> >(pds);
+		return gpos::dyn_cast<CDistributionSpecAny>(pds);
 	}
 
 	// retrieve the physical operator requesting this distribution spec

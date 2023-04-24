@@ -144,7 +144,7 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 											 prpp
 #endif	// GPOS_DEBUG
 										 ,
-										 CExpressionArray *pdrgpexpr,
+										 gpos::Ref<CExpressionArray> pdrgpexpr,
 										 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -209,7 +209,7 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 	}
 
 	// add a distribution enforcer
-	pexpr->AddRef();
+
 	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRandom(mp, random_dist_spec), pexpr);
 	pdrgpexpr->Append(pexprMotion);

@@ -50,7 +50,6 @@ CScalarCoalesce::CScalarCoalesce(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 //---------------------------------------------------------------------------
 CScalarCoalesce::~CScalarCoalesce()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -35,7 +35,7 @@ private:
 	gpos::Ref<IMDId> m_mdid;
 
 	// filter expressions corresponding to various levels
-	CExpressionArray *m_pdrgpexprFilters;
+	gpos::Ref<CExpressionArray> m_pdrgpexprFilters;
 
 public:
 	CLogicalPartitionSelector(const CLogicalPartitionSelector &) = delete;
@@ -44,7 +44,7 @@ public:
 	explicit CLogicalPartitionSelector(CMemoryPool *mp);
 
 	CLogicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
-							  CExpressionArray *pdrgpexprFilters);
+							  gpos::Ref<CExpressionArray> pdrgpexprFilters);
 
 	// dtor
 	~CLogicalPartitionSelector() override;
@@ -100,7 +100,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection>
@@ -162,7 +162,7 @@ public:
 	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 //stats_ctxt
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		return PstatsPassThruOuter(exprhdl);
@@ -186,7 +186,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalPartitionSelector == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalPartitionSelector> >(pop);
+		return gpos::dyn_cast<CLogicalPartitionSelector>(pop);
 	}
 
 	// debug print

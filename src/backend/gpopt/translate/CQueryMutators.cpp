@@ -579,7 +579,7 @@ CQueryMutators::GetTargetEntryForAggExpr(CMemoryPool *mp,
 			GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, aggref->aggfnoid);
 		const gpos::Ref<IMDAggregate> md_agg =
 			md_accessor->RetrieveAgg(agg_mdid);
-		agg_mdid->Release();
+
 
 		const CWStringConst *str = md_agg->Mdname().GetMDName();
 		name = CTranslatorUtils::CreateMultiByteCharStringFromWCString(
@@ -1568,7 +1568,7 @@ CQueryMutators::RunWindowProjListMutator(Node *node,
 			CMDIdGPDB(IMDId::EmdidGeneral, window_func->winfnoid);
 		const CWStringConst *str =
 			CMDAccessorUtils::PstrWindowFuncName(context->m_mda, mdid_func);
-		mdid_func->Release();
+
 
 		TargetEntry *target_entry = gpdb::MakeTargetEntry(
 			(Expr *) window_func, (AttrNumber) resno,

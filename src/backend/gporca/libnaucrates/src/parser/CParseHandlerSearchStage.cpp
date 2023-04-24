@@ -51,7 +51,6 @@ CParseHandlerSearchStage::CParseHandlerSearchStage(
 //---------------------------------------------------------------------------
 CParseHandlerSearchStage::~CParseHandlerSearchStage()
 {
-	SafeRelease(m_xforms);
 }
 
 

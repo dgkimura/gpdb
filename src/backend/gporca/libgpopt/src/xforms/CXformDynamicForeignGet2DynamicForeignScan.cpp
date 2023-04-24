@@ -66,7 +66,7 @@ CXformDynamicForeignGet2DynamicForeignScan::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalDynamicForeignGet> popGet =
@@ -77,18 +77,16 @@ CXformDynamicForeignGet2DynamicForeignScan::Transform(
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
-	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
+
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popGet->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 
-	pdrgpcrOutput->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = popGet->PdrgpdrgpcrPart();
-	pdrgpdrgpcrPart->AddRef();
 
-	popGet->GetPartitionMdids()->AddRef();
-	popGet->GetRootColMappingPerPart()->AddRef();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = popGet->PdrgpdrgpcrPart();
+
+
 
 	// create alternative expression
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(

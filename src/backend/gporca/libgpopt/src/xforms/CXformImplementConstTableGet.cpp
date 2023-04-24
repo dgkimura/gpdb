@@ -49,7 +49,7 @@ CXformImplementConstTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalConstTableGet> popConstTableGet =
@@ -57,14 +57,16 @@ CXformImplementConstTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	CColumnDescriptorArray *pdrgpcoldesc = popConstTableGet->Pdrgpcoldesc();
-	pdrgpcoldesc->AddRef();
+	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc =
+		popConstTableGet->Pdrgpcoldesc();
 
-	IDatum2dArray *pdrgpdrgpdatum = popConstTableGet->Pdrgpdrgpdatum();
-	pdrgpdrgpdatum->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popConstTableGet->PdrgpcrOutput();
-	pdrgpcrOutput->AddRef();
+	gpos::Ref<IDatum2dArray> pdrgpdrgpdatum =
+		popConstTableGet->Pdrgpdrgpdatum();
+
+
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popConstTableGet->PdrgpcrOutput();
+
 
 	// create alternative expression
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)

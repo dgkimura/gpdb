@@ -93,7 +93,7 @@ public:
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptLike == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<gpos::Ref<CStatsPredLike> >(pred_stats);
+		return gpos::dyn_cast<CStatsPredLike>(pred_stats);
 	}
 
 };	// class CStatsPredLike

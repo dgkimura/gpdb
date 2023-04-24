@@ -36,15 +36,16 @@ private:
 	gpos::Ref<CDXLNode> m_query_dxl;
 
 	// array of DXL nodes that represent the query output
-	CDXLNodeArray *m_query_output;
+	gpos::Ref<CDXLNodeArray> m_query_output;
 
 	// CTE list
-	CDXLNodeArray *m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 public:
 	// ctor
-	CQueryToDXLResult(gpos::Ref<CDXLNode> query, CDXLNodeArray *query_output,
-					  CDXLNodeArray *cte_producers);
+	CQueryToDXLResult(gpos::Ref<CDXLNode> query,
+					  gpos::Ref<CDXLNodeArray> query_output,
+					  gpos::Ref<CDXLNodeArray> cte_producers);
 
 	// dtor
 	~CQueryToDXLResult();
@@ -53,10 +54,10 @@ public:
 	const gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// return the array of output columns
-	const CDXLNodeArray *GetOutputColumnsDXLArray() const;
+	const gpos::Ref<CDXLNodeArray> GetOutputColumnsDXLArray() const;
 
 	// return the array of CTEs
-	const CDXLNodeArray *GetCTEProducerDXLArray() const;
+	const gpos::Ref<CDXLNodeArray> GetCTEProducerDXLArray() const;
 };
 }  // namespace gpdxl
 

@@ -35,7 +35,6 @@ CParseHandlerExtStatsNDistinctList::CParseHandlerExtStatsNDistinctList(
 
 CParseHandlerExtStatsNDistinctList::~CParseHandlerExtStatsNDistinctList()
 {
-	m_ndistincts->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -46,7 +45,7 @@ CParseHandlerExtStatsNDistinctList::~CParseHandlerExtStatsNDistinctList()
 //		The ndinstincts constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDNDistinctArray *
+gpos::Ref<CMDNDistinctArray>
 CParseHandlerExtStatsNDistinctList::GetNDistinctList() const
 {
 	return m_ndistincts;
@@ -127,7 +126,7 @@ CParseHandlerExtStatsNDistinctList::EndElement(
 
 		gpos::Ref<CMDNDistinct> dep =
 			parse_handler_ext_stats_dep->GetNDistinctAt();
-		dep->AddRef();
+
 
 		m_ndistincts->Append(dep);
 	}

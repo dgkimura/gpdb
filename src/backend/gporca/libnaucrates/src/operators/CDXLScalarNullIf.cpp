@@ -45,8 +45,6 @@ CDXLScalarNullIf::CDXLScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 //---------------------------------------------------------------------------
 CDXLScalarNullIf::~CDXLScalarNullIf()
 {
-	m_mdid_op->Release();
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

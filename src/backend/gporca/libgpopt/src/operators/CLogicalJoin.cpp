@@ -62,7 +62,7 @@ CLogicalJoin::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   IStatisticsArray *stats_ctxt) const
+						   gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CJoinStatsProcessor::DeriveJoinStats(mp, exprhdl, stats_ctxt);
 }

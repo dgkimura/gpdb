@@ -74,7 +74,7 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// we add-ref the logical child since the resulting expression must re-use it
-	pexprOuter->AddRef();
+
 
 	gpos::Ref<CExpression> pexprNewOuter = nullptr;
 	gpos::Ref<CExpression> pexprResidualScalar = nullptr;
@@ -86,9 +86,6 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 	if (!sh.FProcess(pexprOuter, pexprScalar, esqctxt, &pexprNewOuter,
 					 &pexprResidualScalar))
 	{
-		SafeRelease(pexprNewOuter);
-		SafeRelease(pexprResidualScalar);
-
 		return nullptr;
 	}
 
@@ -110,7 +107,7 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 
 			case COperator::EopLogicalGbAgg:
 				popGbAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-				popGbAgg->Pdrgpcr()->AddRef();
+
 				pexprResult = CUtils::PexprLogicalGbAgg(
 					mp, popGbAgg->Pdrgpcr(), pexprNewOuter, pexprResidualScalar,
 					popGbAgg->Egbaggtype());
@@ -118,9 +115,9 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 
 			case COperator::EopLogicalSequenceProject:
 				popSeqPrj = CLogicalSequenceProject::PopConvert(pexpr->Pop());
-				popSeqPrj->Pds()->AddRef();
-				popSeqPrj->Pdrgpos()->AddRef();
-				popSeqPrj->Pdrgpwf()->AddRef();
+
+
+
 				pexprResult = CUtils::PexprLogicalSequenceProject(
 					mp, popSeqPrj->Pds(), popSeqPrj->Pdrgpos(),
 					popSeqPrj->Pdrgpwf(), pexprNewOuter, pexprResidualScalar);
@@ -140,12 +137,12 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 	// normalize resulting expression
 	gpos::Ref<CExpression> pexprNormalized =
 		CNormalizer::PexprNormalize(mp, pexprResult);
-	pexprResult->Release();
+
 
 	// pull up projections
 	gpos::Ref<CExpression> pexprPullUpProjections =
 		CNormalizer::PexprPullUpProjections(mp, pexprNormalized);
-	pexprNormalized->Release();
+
 
 	return pexprPullUpProjections;
 }
@@ -183,7 +180,7 @@ CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
 								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	Transform(pxfctxt, pxfres, pexpr, false /*fEnforceCorrelatedApply*/);

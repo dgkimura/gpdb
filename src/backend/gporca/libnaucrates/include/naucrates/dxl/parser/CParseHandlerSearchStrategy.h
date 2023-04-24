@@ -33,7 +33,7 @@ class CParseHandlerSearchStrategy : public CParseHandlerBase
 {
 private:
 	// search stages
-	CSearchStageArray *m_search_stage_array;
+	gpos::Ref<CSearchStageArray> m_search_stage_array;
 
 	// process the start of an element
 	void StartElement(
@@ -62,7 +62,7 @@ public:
 	~CParseHandlerSearchStrategy() override;
 
 	// returns the dxl representation of search stages
-	CSearchStageArray *
+	gpos::Ref<CSearchStageArray>
 	GetSearchStageArray()
 	{
 		return m_search_stage_array;

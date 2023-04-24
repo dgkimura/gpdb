@@ -53,9 +53,9 @@ public:
 
 	// ctor
 	CPhysicalInnerHashJoin(CMemoryPool *mp,
-						   CExpressionArray *pdrgpexprOuterKeys,
-						   CExpressionArray *pdrgpexprInnerKeys,
-						   IMdIdArray *hash_opfamilies,
+						   gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+						   gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+						   gpos::Ref<IMdIdArray> hash_opfamilies,
 						   BOOL is_null_aware = true,
 						   CXform::EXformId origin_xform = CXform::ExfSentinel);
 
@@ -83,7 +83,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalInnerHashJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalInnerHashJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalInnerHashJoin>(pop);
 	}
 
 	// derive distribution
@@ -93,7 +93,7 @@ public:
 	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;

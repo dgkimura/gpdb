@@ -54,10 +54,10 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index keys
-	ULongPtrArray *m_index_key_cols_array;
+	gpos::Ref<ULongPtrArray> m_index_key_cols_array;
 
 	// included columns
-	ULongPtrArray *m_included_cols_array;
+	gpos::Ref<ULongPtrArray> m_included_cols_array;
 
 	// child index oids parse handler
 	CParseHandlerBase *m_child_indexes_parse_handler;

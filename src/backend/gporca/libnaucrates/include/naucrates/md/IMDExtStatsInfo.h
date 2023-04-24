@@ -40,7 +40,7 @@ public:
 		return EmdtExtStatsInfo;
 	}
 
-	virtual CMDExtStatsInfoArray *GetExtStatInfoArray() const = 0;
+	virtual gpos::Ref<CMDExtStatsInfoArray> GetExtStatInfoArray() const = 0;
 };
 }  // namespace gpmd
 

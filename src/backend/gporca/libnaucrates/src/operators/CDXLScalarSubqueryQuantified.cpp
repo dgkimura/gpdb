@@ -50,7 +50,6 @@ CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::~CDXLScalarSubqueryQuantified()
 {
-	m_scalar_op_mdid->Release();
 	GPOS_DELETE(m_scalar_op_mdname);
 }
 

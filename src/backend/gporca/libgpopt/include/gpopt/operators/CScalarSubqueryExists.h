@@ -62,7 +62,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryExists == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarSubqueryExists> >(pop);
+		return gpos::dyn_cast<CScalarSubqueryExists>(pop);
 	}
 
 };	// class CScalarSubqueryExists

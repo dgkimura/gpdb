@@ -48,7 +48,6 @@ CParseHandlerTableDescr::CParseHandlerTableDescr(
 //---------------------------------------------------------------------------
 CParseHandlerTableDescr::~CParseHandlerTableDescr()
 {
-	SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------
@@ -138,9 +137,9 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,	 // element_uri,
 
 	GPOS_ASSERT(nullptr != col_descr_parse_handler->GetDXLColumnDescrArray());
 
-	CDXLColDescrArray *dxl_column_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_column_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
-	dxl_column_descr_array->AddRef();
+
 	m_dxl_table_descr->SetColumnDescriptors(dxl_column_descr_array);
 
 	// deactivate handler

@@ -52,12 +52,12 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	// Distribution key set of inner GET must be subset of inner columns used in
 	// the left outer join condition, but doesn't need to be equal.
 	BOOL fCanOuterIndexApply = pcrsInnerRefs->ContainsAll(pcrsDist);
-	pcrsInnerRefs->Release();
+
 	if (fCanOuterIndexApply)
 	{
 		gpos::Ref<CColRefSet> pcrsEquivPredInner = GPOS_NEW(mp) CColRefSet(mp);
 		// extract array of join predicates from join condition expression
-		CExpressionArray *pdrgpexpr =
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
@@ -78,8 +78,6 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 			}
 		}
 		fCanOuterIndexApply = pcrsEquivPredInner->ContainsAll(pcrsDist);
-		pcrsEquivPredInner->Release();
-		pdrgpexpr->Release();
 	}
 
 	return fCanOuterIndexApply;
@@ -107,7 +105,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -209,7 +207,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 						(*pexprCurrInnerChild)[0]->DeriveOutputColumns());
 					BOOL joinPredUsesProjectedColumns =
 						(0 < joinPredUsedCols->Size());
-					joinPredUsedCols->Release();
+
 
 					if (joinPredUsesProjectedColumns)
 					{
@@ -242,7 +240,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 							// if there are multiple groupbys, then check the intersection of their grouping cols
 							groupingCols->Intersection(
 								groupingColsToCheck.Value());
-							SafeRelease(groupingColsToCheck.Value());
+
 							groupingColsToCheck = groupingCols;
 
 							if (0 == groupingCols->Size())
@@ -309,7 +307,6 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 		// In the "if" case above, CPredicateUtils::PexprConjunction does an AddRef on
 		// pexprAllPredicates and returns a new expression. Here, we just do the AddRef,
 		// since CreateHomogeneousIndexApplyAlternatives consumes a ref on pexprAllPredicates.
-		pexprAllPredicates->AddRef();
 	}
 
 	// determine the set of nodes that need to be copied from pexprInner to the alternative
@@ -337,7 +334,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 	{
 		// It is a left outer join, but we can't do outer index apply,
 		// stop transforming and return immediately.
-		pexprAllPredicates->Release();
+
 		return;
 	}
 
@@ -348,6 +345,4 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 		ptabdescInner, pxfres,
 		(m_generateBitmapPlans ? IMDIndex::EmdindBitmap
 							   : IMDIndex::EmdindBtree));
-
-	SafeRelease(pexprAllPredicates);
 }

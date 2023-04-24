@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarSubquery_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubquery == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarSubquery> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubquery>(dxl_op);
 	}
 
 	// does the operator return a boolean result

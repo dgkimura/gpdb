@@ -124,13 +124,13 @@ public:
 									   CExpressionHandle &exprhdl,
 									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
-									   CDrvdPropArray *pdrgpdpCtxt,
+									   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CCTEReq> pcter, ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
@@ -138,20 +138,20 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
@@ -216,14 +216,14 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalLimit == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLimit> >(pop);
+		return gpos::dyn_cast<CPhysicalLimit>(pop);
 	}
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 };	// class CPhysicalLimit

@@ -34,16 +34,17 @@ class CConstraintConjunction : public CConstraint
 {
 private:
 	// array of constraints
-	CConstraintArray *m_pdrgpcnstr;
+	gpos::Ref<CConstraintArray> m_pdrgpcnstr;
 
 	// mapping colref -> array of child constraints
-	ColRefToConstraintArrayMap *m_phmcolconstr;
+	gpos::Ref<ColRefToConstraintArrayMap> m_phmcolconstr;
 
 public:
 	CConstraintConjunction(const CConstraintConjunction &) = delete;
 
 	// ctor
-	CConstraintConjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+	CConstraintConjunction(CMemoryPool *mp,
+						   gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 	// dtor
 	~CConstraintConjunction() override;
@@ -56,7 +57,7 @@ public:
 	}
 
 	// all constraints in conjunction
-	CConstraintArray *
+	gpos::Ref<CConstraintArray>
 	Pdrgpcnstr() const
 	{
 		return m_pdrgpcnstr;
@@ -73,7 +74,7 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// return constraint on a given column

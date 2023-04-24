@@ -33,7 +33,6 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 		}
 		else
 		{
-			datum->AddRef();
 			aprngdatum->Append(datum);
 		}
 	}
@@ -42,14 +41,14 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 	// de-duplicate
 	const ULONG ulRangeArrayArity = aprngdatum->Size();
 	gpos::Ref<IDatum> pdatumPrev = (*aprngdatum)[0];
-	pdatumPrev->AddRef();
+
 	Append(pdatumPrev);
 	for (ULONG ul = 1; ul < ulRangeArrayArity; ul++)
 	{
 		if (!pcomp->Equals((*aprngdatum)[ul], pdatumPrev))
 		{
 			pdatumPrev = (*aprngdatum)[ul];
-			pdatumPrev->AddRef();
+
 			Append(pdatumPrev);
 		}
 	}

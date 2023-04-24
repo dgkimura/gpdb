@@ -13,8 +13,8 @@
 namespace gpopt
 {
 CPhysicalParallelUnionAll::CPhysicalParallelUnionAll(
-	CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrInput)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CPhysicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
 	  m_pdrgpds(GPOS_NEW(mp) CStrictHashedDistributions(mp, pdrgpcrOutput,
 														pdrgpdrgpcrInput))
@@ -43,20 +43,21 @@ CPhysicalParallelUnionAll::SzId() const
 gpos::Ref<CDistributionSpec>
 CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 									   gpos::Ref<CDistributionSpec>,
-									   ULONG child_index, CDrvdPropArray *,
+									   ULONG child_index,
+									   gpos::Ref<CDrvdPropArray>,
 									   ULONG ulOptReq) const
 {
 	if (0 == ulOptReq)
 	{
 		gpos::Ref<CDistributionSpec> pdsChild = (*m_pdrgpds)[child_index];
-		pdsChild->AddRef();
+
 		return pdsChild;
 	}
 	else
 	{
-		CColRefArray *pdrgpcrChildInputColumns =
+		gpos::Ref<CColRefArray> pdrgpcrChildInputColumns =
 			(*PdrgpdrgpcrInput())[child_index];
-		CExpressionArray *pdrgpexprFakeRequestedColumns =
+		gpos::Ref<CExpressionArray> pdrgpexprFakeRequestedColumns =
 			GPOS_NEW(mp) CExpressionArray(mp);
 
 		gpos::Ref<CColRef> pcrFirstColumn = (*pdrgpcrChildInputColumns)[0];
@@ -69,11 +70,11 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 	}
 }
 
-CEnfdDistribution::EDistributionMatching
-CPhysicalParallelUnionAll::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-							   ULONG,					  // child_index
-							   CDrvdPropArray *,		  //pdrgpdpCtxt
-							   ULONG					  // ulOptReq
+CEnfdDistribution::EDistributionMatching CPhysicalParallelUnionAll::Edm(
+	gpos::Ref<CReqdPropPlan>,	// prppInput
+	ULONG,						// child_index
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;
@@ -81,6 +82,5 @@ CPhysicalParallelUnionAll::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
 
 CPhysicalParallelUnionAll::~CPhysicalParallelUnionAll()
 {
-	m_pdrgpds->Release();
 }
 }  // namespace gpopt

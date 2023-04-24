@@ -105,7 +105,7 @@ private:
 	static CMemoryPool *m_mp;
 
 	// construct an array of segment ids
-	static gpdxl::IntPtrArray *PdrgpiSegments(CMemoryPool *mp);
+	static gpos::Ref<gpdxl::IntPtrArray> PdrgpiSegments(CMemoryPool *mp);
 
 	// generate minidump file name from passed file name
 	static CHAR *SzMinidumpFileName(CMemoryPool *mp, const CHAR *file_name);
@@ -347,11 +347,11 @@ public:
 	// generate a select expression with an array compare
 	static gpos::Ref<CExpression> PexprLogicalSelectArrayCmp(
 		CMemoryPool *mp, CScalarArrayCmp::EArrCmpType earrcmptype,
-		IMDType::ECmpType ecmptype, const IntPtrArray *pdrgpiVals);
+		IMDType::ECmpType ecmptype, const gpos::Ref<IntPtrArray> pdrgpiVals);
 
 	// generate an n-ary join expression
 	static gpos::Ref<CExpression> PexprLogicalNAryJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr);
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// generate an n-ary join expression using given array of relation names
 	static gpos::Ref<CExpression> PexprLogicalNAryJoin(CMemoryPool *mp,
@@ -479,7 +479,7 @@ public:
 
 	// generate a logical sequence expression
 	static gpos::Ref<CExpression> PexprLogicalSequence(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr);
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// generate a logical sequence expression
 	static gpos::Ref<CExpression> PexprLogicalSequence(CMemoryPool *mp);
@@ -499,15 +499,14 @@ public:
 	static gpos::Ref<CExpression> PexprTwoWindowFunctions(CMemoryPool *mp);
 
 	// generate a dynamic array of join expressions
-	static CExpressionJoinsArray *PdrgpexprJoins(CMemoryPool *mp,
-												 CWStringConst *pstrRel,
-												 ULONG *pulRel, ULONG ulRels,
-												 BOOL fCrossProduct);
+	static gpos::Ref<CExpressionJoinsArray> PdrgpexprJoins(
+		CMemoryPool *mp, CWStringConst *pstrRel, ULONG *pulRel, ULONG ulRels,
+		BOOL fCrossProduct);
 
 	// generate a query context from an array of required column references
 	static CQueryContext *PqcGenerate(CMemoryPool *mp,
 									  gpos::Ref<CExpression> pexpr,
-									  CColRefArray *colref_array);
+									  gpos::Ref<CColRefArray> colref_array);
 
 	// generate a dummy query context for testing
 	static CQueryContext *PqcGenerate(CMemoryPool *mp,
@@ -526,7 +525,7 @@ public:
 	static void EqualityPredicate(CMemoryPool *mp,
 								  gpos::Ref<CColRefSet> pcrsLeft,
 								  gpos::Ref<CColRefSet> pcrsRight,
-								  CExpressionArray *pdrgpexpr);
+								  gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// int2 point
 	static gpos::Ref<CPoint> PpointInt2(CMemoryPool *mp, INT i);
@@ -723,9 +722,8 @@ public:
 	static ULONG UlSegments(gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// create Equivalence Class based on the breakpoints
-	static CColRefSetArray *createEquivalenceClasses(CMemoryPool *mp,
-													 gpos::Ref<CColRefSet> pcrs,
-													 const INT setBoundary[]);
+	static gpos::Ref<CColRefSetArray> createEquivalenceClasses(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs, const INT setBoundary[]);
 };	// class CTestUtils
 
 
@@ -778,12 +776,12 @@ CTestUtils::PexprJoinPartitioned(CMemoryPool *mp, BOOL fOuterPartitioned)
 	// extract first partition key
 	gpos::Ref<CLogicalGet> popGetPartitioned =
 		CLogicalGet::PopConvert(pexprGetPartitioned->Pop());
-	const CColRef2dArray *pdrgpdrgpcr =
+	const gpos::Ref<CColRef2dArray> pdrgpdrgpcr =
 		popGetPartitioned->PdrgpdrgpcrPartColumns();
 
 	GPOS_ASSERT(pdrgpdrgpcr != nullptr);
 	GPOS_ASSERT(0 < pdrgpdrgpcr->Size());
-	CColRefArray *colref_array = (*pdrgpdrgpcr)[0];
+	gpos::Ref<CColRefArray> colref_array = (*pdrgpdrgpcr)[0];
 	GPOS_ASSERT(1 == colref_array->Size());
 	gpos::Ref<CColRef> pcrPartKey = (*colref_array)[0];
 
@@ -897,7 +895,7 @@ CTestUtils::PexprLogicalApplyWithOuterRef(CMemoryPool *mp)
 	GPOS_ASSERT(1 == pcrsOuterRef->Size());
 	gpos::Ref<CColRef> colref = pcrsOuterRef->PcrFirst();
 
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	colref_array->Append(colref);
 	gpos::Ref<COperator> pop =
 		GPOS_NEW(mp) T(mp, colref_array, COperator::EopScalarSubquery);

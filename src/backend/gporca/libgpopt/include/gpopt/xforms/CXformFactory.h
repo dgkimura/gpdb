@@ -45,10 +45,10 @@ private:
 	XformNameToXformMap *m_phmszxform;
 
 	// bitset of exploration xforms
-	CXformSet *m_pxfsExploration;
+	gpos::Ref<CXformSet> m_pxfsExploration;
 
 	// bitset of implementation xforms
-	CXformSet *m_pxfsImplementation;
+	gpos::Ref<CXformSet> m_pxfsImplementation;
 
 	// ensure that xforms are inserted in order
 	ULONG m_lastAddedOrSkippedXformId;
@@ -86,14 +86,14 @@ public:
 	gpos::Ref<CXform> Pxf(const CHAR *szXformName) const;
 
 	// accessor of exploration xforms
-	CXformSet *
+	gpos::Ref<CXformSet>
 	PxfsExploration() const
 	{
 		return m_pxfsExploration;
 	}
 
 	// accessor of implementation xforms
-	CXformSet *
+	gpos::Ref<CXformSet>
 	PxfsImplementation() const
 	{
 		return m_pxfsImplementation;

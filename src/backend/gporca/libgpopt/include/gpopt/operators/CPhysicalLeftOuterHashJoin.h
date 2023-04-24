@@ -38,9 +38,9 @@ public:
 
 	// ctor
 	CPhysicalLeftOuterHashJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-		BOOL is_null_aware = true,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+		gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+		gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware = true,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
@@ -71,7 +71,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalLeftOuterHashJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLeftOuterHashJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalLeftOuterHashJoin>(pop);
 	}
 
 

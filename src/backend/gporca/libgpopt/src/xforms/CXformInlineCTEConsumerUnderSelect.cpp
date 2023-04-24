@@ -72,7 +72,7 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CExpression> pexprConsumer = (*pexpr)[0];
@@ -102,15 +102,15 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 	// inline consumer
 	GPOS_ASSERT(nullptr != popConsumer->Phmulcr());
 	gpos::Ref<CExpression> pexprInlinedConsumer = popConsumer->PexprInlined();
-	pexprInlinedConsumer->AddRef();
-	pexprScalar->AddRef();
+
+
 
 	gpos::Ref<CExpression> pexprSelect =
 		CUtils::PexprLogicalSelect(mp, pexprInlinedConsumer, pexprScalar);
 
 	gpos::Ref<CExpression> pexprNormalized =
 		CNormalizer::PexprNormalize(mp, pexprSelect);
-	pexprSelect->Release();
+
 
 	// add alternative to xform result
 	pxfres->Add(pexprNormalized);

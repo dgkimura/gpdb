@@ -88,7 +88,7 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -98,12 +98,10 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
 
-	CColRefArray *pdrgpcrKeys = nullptr;
-	CColRefArray *pdrgpcrGrouping =
+
+	gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrGrouping =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
 

@@ -33,9 +33,9 @@ public:
 
 	// ctor
 	CPhysicalLeftSemiHashJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-		BOOL is_null_aware = true,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+		gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+		gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware = true,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
@@ -66,7 +66,7 @@ public:
 	{
 		GPOS_ASSERT(EopPhysicalLeftSemiHashJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalLeftSemiHashJoin> >(pop);
+		return gpos::dyn_cast<CPhysicalLeftSemiHashJoin>(pop);
 	}
 
 

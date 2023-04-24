@@ -68,7 +68,6 @@ CEnumeratorConfig::~CEnumeratorConfig()
 {
 	GPOS_DELETE_ARRAY(m_pdX);
 	GPOS_DELETE_ARRAY(m_pdY);
-	m_pdrgpsp->Release();
 }
 
 

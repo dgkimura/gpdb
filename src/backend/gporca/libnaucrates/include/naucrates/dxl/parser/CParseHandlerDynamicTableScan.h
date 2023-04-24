@@ -36,7 +36,7 @@ class CDXLPhysicalDynamicTableScan;
 class CParseHandlerDynamicTableScan : public CParseHandlerPhysicalOp
 {
 private:
-	ULongPtrArray *m_selector_ids;
+	gpos::Ref<ULongPtrArray> m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

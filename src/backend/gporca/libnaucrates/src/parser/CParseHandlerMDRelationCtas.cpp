@@ -173,22 +173,22 @@ CParseHandlerMDRelationCtas::EndElement(const XMLCh *const,	 // element_uri,
 	GPOS_ASSERT(nullptr != opfamilies_parse_handler->GetMdIdArray());
 	GPOS_ASSERT(nullptr != opclasses_parse_handler->GetMdIdArray());
 
-	CMDColumnArray *md_col_array = md_cols_parse_handler->GetMdColArray();
+	gpos::Ref<CMDColumnArray> md_col_array =
+		md_cols_parse_handler->GetMdColArray();
 	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 
-	md_col_array->AddRef();
-	dxl_ctas_storage_options->AddRef();
 
-	IMdIdArray *distr_opfamilies =
+
+	gpos::Ref<IMdIdArray> distr_opfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opfamilies_parse_handler)
 			->GetMdIdArray();
-	distr_opfamilies->AddRef();
 
-	IMdIdArray *distr_opclasses =
+
+	gpos::Ref<IMdIdArray> distr_opclasses =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opclasses_parse_handler)
 			->GetMdIdArray();
-	distr_opclasses->AddRef();
+
 
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationCtasGPDB(

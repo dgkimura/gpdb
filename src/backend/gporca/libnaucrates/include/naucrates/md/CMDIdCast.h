@@ -115,7 +115,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 
-		return dynamic_cast<const gpos::Ref<CMDIdCast> >(mdid);
+		return gpos::dyn_cast<CMDIdCast>(mdid);
 	}
 
 	// make a copy in the given memory pool

@@ -14,9 +14,9 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 // indices of partition selector elements in the children array
@@ -52,7 +52,7 @@ private:
 	// scan id
 	ULONG m_scan_id;
 
-	ULongPtrArray *m_parts;
+	gpos::Ref<ULongPtrArray> m_parts;
 
 public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;
@@ -60,7 +60,7 @@ public:
 	// ctor
 	CDXLPhysicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel,
 								  ULONG selector_id, ULONG scan_id,
-								  ULongPtrArray *parts);
+								  gpos::Ref<ULongPtrArray> parts);
 
 	// dtor
 	~CDXLPhysicalPartitionSelector() override;
@@ -92,7 +92,7 @@ public:
 		return m_scan_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	Partitions() const
 	{
 		return m_parts;
@@ -117,7 +117,7 @@ public:
 		GPOS_ASSERT(EdxlopPhysicalPartitionSelector ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalPartitionSelector> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalPartitionSelector>(dxl_op);
 	}
 };
 }  // namespace gpdxl

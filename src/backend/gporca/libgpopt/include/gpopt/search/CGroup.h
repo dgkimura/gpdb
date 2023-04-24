@@ -167,13 +167,13 @@ private:
 	BOOL m_fScalar;
 
 	// join keys for outer child (only for scalar groups) (used by hash & merge joins)
-	CExpressionArray *m_pdrgpexprJoinKeysOuter;
+	gpos::Ref<CExpressionArray> m_pdrgpexprJoinKeysOuter;
 
 	// join keys for inner child (only for scalar groups) (used by hash & merge joins)
-	CExpressionArray *m_pdrgpexprJoinKeysInner;
+	gpos::Ref<CExpressionArray> m_pdrgpexprJoinKeysInner;
 
 	// join op families (only for scalar groups) (used by hash & merge joins)
-	IMdIdArray *m_join_opfamilies;
+	gpos::Ref<IMdIdArray> m_join_opfamilies;
 
 	// list of group expressions
 	CList<CGroupExpression> m_listGExprs;
@@ -201,10 +201,10 @@ private:
 	gpos::Ref<CGroup> m_pgroupDuplicate;
 
 	// map of processed links
-	LinkMap *m_plinkmap;
+	gpos::Ref<LinkMap> m_plinkmap;
 
 	// map of computed stats during costing
-	OptCtxtToIStatisticsMap *m_pstatsmap;
+	gpos::Ref<OptCtxtToIStatisticsMap> m_pstatsmap;
 
 	// hashtable of optimization contexts
 	ShtOC m_sht;
@@ -213,7 +213,7 @@ private:
 	ULONG m_ulGExprs;
 
 	// map of cost lower bounds
-	ReqdPropPlanToCostMap *m_pcostmap;
+	gpos::Ref<ReqdPropPlanToCostMap> m_pcostmap;
 
 	// number of optimization contexts
 	ULONG_PTR m_ulpOptCtxts;
@@ -258,9 +258,9 @@ private:
 	void SetState(EState estNewState);
 
 	// set hash join keys
-	void SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-					 CExpressionArray *pdrgpexprInner,
-					 IMdIdArray *join_opfamilies);
+	void SetJoinKeys(gpos::Ref<CExpressionArray> pdrgpexprOuter,
+					 gpos::Ref<CExpressionArray> pdrgpexprInner,
+					 gpos::Ref<IMdIdArray> join_opfamilies);
 
 	// insert new group expression
 	void Insert(gpos::Ref<CGroupExpression> pgexpr);
@@ -290,8 +290,8 @@ private:
 	static CLogical::EStatPromise EspDerive(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		gpos::Ref<CGroupExpression> pgexpr,
-		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt,
-		BOOL fDeriveChildStats);
+		gpos::Ref<CReqdPropRelational> prprel,
+		gpos::Ref<IStatisticsArray> stats_ctxt, BOOL fDeriveChildStats);
 
 	// reset computed stats
 	void ResetStats();
@@ -320,7 +320,7 @@ private:
 	gpos::Ref<CGroupExpression> PgexprBestPromise(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		gpos::Ref<CReqdPropRelational> prprelInput,
-		IStatisticsArray *stats_ctxt);
+		gpos::Ref<IStatisticsArray> stats_ctxt);
 
 public:
 	CGroup(const CGroup &) = delete;
@@ -369,21 +369,21 @@ public:
 	}
 
 	// join keys of outer child
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprJoinKeysOuter() const
 	{
 		return m_pdrgpexprJoinKeysOuter;
 	}
 
 	// join keys of inner child
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprJoinKeysInner() const
 	{
 		return m_pdrgpexprJoinKeysInner;
 	}
 
 	// join op families
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	JoinOpfamilies() const
 	{
 		return m_join_opfamilies;
@@ -567,7 +567,8 @@ public:
 	// derive statistics recursively on group
 	gpos::Ref<IStatistics> PstatsRecursiveDerive(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt);
+		gpos::Ref<CReqdPropRelational> prprel,
+		gpos::Ref<IStatisticsArray> stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
 	gpos::Ref<CGroupExpression> PgexprBestPromise(
@@ -595,12 +596,12 @@ public:
 	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput);
 
 	// matching of pairs of arrays of groups
-	static BOOL FMatchGroups(CGroupArray *pdrgpgroupFst,
-							 CGroupArray *pdrgpgroupSnd);
+	static BOOL FMatchGroups(gpos::Ref<CGroupArray> pdrgpgroupFst,
+							 gpos::Ref<CGroupArray> pdrgpgroupSnd);
 
 	// matching of pairs of arrays of groups while skipping scalar groups
-	static BOOL FMatchNonScalarGroups(CGroupArray *pdrgpgroupFst,
-									  CGroupArray *pdrgpgroupSnd);
+	static BOOL FMatchNonScalarGroups(gpos::Ref<CGroupArray> pdrgpgroupFst,
+									  gpos::Ref<CGroupArray> pdrgpgroupSnd);
 
 	// determine if a pair of groups are duplicates
 	static BOOL FDuplicateGroups(gpos::Ref<CGroup> pgroupFst,

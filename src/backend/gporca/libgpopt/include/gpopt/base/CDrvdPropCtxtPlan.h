@@ -36,7 +36,7 @@ class CDrvdPropCtxtPlan : public CDrvdPropCtxt
 {
 private:
 	// map of CTE id to producer plan properties
-	UlongToDrvdPropPlanMap *m_phmulpdpCTEs;
+	gpos::Ref<UlongToDrvdPropPlanMap> m_phmulpdpCTEs;
 
 	// if true, a call to AddProps updates the CTE.
 	BOOL m_fUpdateCTEMap;
@@ -83,7 +83,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<gpos::Ref<CDrvdPropCtxtPlan> >(pdpctxt);
+		return gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtPlan

@@ -31,7 +31,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTEConsumer::CDXLLogicalCTEConsumer(
-	CMemoryPool *mp, ULONG id, ULongPtrArray *output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::Ref<ULongPtrArray> output_colids_array)
 	: CDXLLogical(mp), m_id(id), m_output_colids_array(output_colids_array)
 {
 	GPOS_ASSERT(nullptr != output_colids_array);
@@ -47,7 +47,6 @@ CDXLLogicalCTEConsumer::CDXLLogicalCTEConsumer(
 //---------------------------------------------------------------------------
 CDXLLogicalCTEConsumer::~CDXLLogicalCTEConsumer()
 {
-	m_output_colids_array->Release();
 }
 
 //---------------------------------------------------------------------------

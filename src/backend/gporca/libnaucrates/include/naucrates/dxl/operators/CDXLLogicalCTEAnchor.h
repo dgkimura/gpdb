@@ -12,9 +12,9 @@
 #define GPDXL_CDXLLogicalCTEAnchor_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTEAnchor == dxl_op->GetDXLOperator());
-		return dynamic_cast<gpos::Ref<CDXLLogicalCTEAnchor> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTEAnchor>(dxl_op);
 	}
 };
 }  // namespace gpdxl

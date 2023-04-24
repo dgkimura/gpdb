@@ -35,7 +35,6 @@ CParseHandlerExtStatsDependencies::CParseHandlerExtStatsDependencies(
 
 CParseHandlerExtStatsDependencies::~CParseHandlerExtStatsDependencies()
 {
-	m_dependencies->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -46,7 +45,7 @@ CParseHandlerExtStatsDependencies::~CParseHandlerExtStatsDependencies()
 //		The dependencies constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CMDDependencyArray *
+gpos::Ref<CMDDependencyArray>
 CParseHandlerExtStatsDependencies::GetDependencies() const
 {
 	return m_dependencies;
@@ -128,7 +127,7 @@ CParseHandlerExtStatsDependencies::EndElement(
 
 		gpos::Ref<CMDDependency> dep =
 			parse_handler_ext_stats_dep->GetDependencyAt();
-		dep->AddRef();
+
 
 		m_dependencies->Append(dep);
 	}

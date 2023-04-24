@@ -76,7 +76,7 @@ CXformSelect2IndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -95,7 +95,7 @@ CXformSelect2IndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::Ref<CExpressionArray> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
@@ -127,9 +127,6 @@ CXformSelect2IndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 			pxfres->Add(pexprIndexGet);
 		}
 	}
-
-	pcrsReqd->Release();
-	pdrgpexpr->Release();
 }
 
 // EOF

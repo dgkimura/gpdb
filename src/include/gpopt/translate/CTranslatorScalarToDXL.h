@@ -86,7 +86,7 @@ private:
 	HMUlCTEListEntry *m_cte_entries;
 
 	// list of CTE producers shared among the logical and scalar translators
-	CDXLNodeArray *m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	static EdxlBoolExprType EdxlbooltypeFromGPDBBoolType(BoolExprType);
 
@@ -248,7 +248,7 @@ public:
 	CTranslatorScalarToDXL(CContextQueryToDXL *context,
 						   CMDAccessor *md_accessor, ULONG query_level,
 						   HMUlCTEListEntry *cte_entries,
-						   CDXLNodeArray *cte_dxlnode_array);
+						   gpos::Ref<CDXLNodeArray> cte_dxlnode_array);
 
 	// set the caller type
 	void

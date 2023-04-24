@@ -82,7 +82,7 @@ public:
 	virtual gpos::Ref<IMDId> GetResultTypeMdid() const = 0;
 
 	// output argument types
-	virtual IMdIdArray *OutputArgTypesMdidArray() const = 0;
+	virtual gpos::Ref<IMdIdArray> OutputArgTypesMdidArray() const = 0;
 };
 
 }  // namespace gpmd

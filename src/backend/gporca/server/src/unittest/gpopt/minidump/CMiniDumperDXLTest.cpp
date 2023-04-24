@@ -101,7 +101,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 
 		// setup a file-based provider
 		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-		pmdp->AddRef();
+
 
 		// we need to use an auto pointer for the cache here to ensure
 		// deleting memory of cached objects when we throw
@@ -140,8 +140,8 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 			ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 			ptroutput->GetCTEProducerDXLArray());
 
-		gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
-		gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
+		gpos::Ref<gpdxl::ULongPtrArray> pdrgul = pdxltr->PdrgpulOutputColRefs();
+		gpos::Ref<gpmd::CMDNameArray> pdrgpmdname = pdxltr->Pdrgpmdname();
 
 		ULONG ulSegments = GPOPT_TEST_SEGMENTS;
 		CQueryContext *pqc = CQueryContext::PqcGenerate(
@@ -159,7 +159,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 		// translate plan into DXL
-		IntPtrArray *pdrgpiSegments = GPOS_NEW(mp) IntPtrArray(mp);
+		gpos::Ref<IntPtrArray> pdrgpiSegments = GPOS_NEW(mp) IntPtrArray(mp);
 
 
 		GPOS_ASSERT(0 < ulSegments);

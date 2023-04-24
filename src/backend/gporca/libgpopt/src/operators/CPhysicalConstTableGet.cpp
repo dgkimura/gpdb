@@ -32,8 +32,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalConstTableGet::CPhysicalConstTableGet(
-	CMemoryPool *mp, CColumnDescriptorArray *pdrgpcoldesc,
-	IDatum2dArray *pdrgpdrgpdatum, CColRefArray *pdrgpcrOutput)
+	CMemoryPool *mp, gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc,
+	gpos::Ref<IDatum2dArray> pdrgpdrgpdatum,
+	gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysical(mp),
 	  m_pdrgpcoldesc(pdrgpcoldesc),
 	  m_pdrgpdrgpdatum(pdrgpdrgpdatum),
@@ -52,9 +53,6 @@ CPhysicalConstTableGet::CPhysicalConstTableGet(
 //---------------------------------------------------------------------------
 CPhysicalConstTableGet::~CPhysicalConstTableGet()
 {
-	m_pdrgpcoldesc->Release();
-	m_pdrgpdrgpdatum->Release();
-	m_pdrgpcrOutput->Release();
 }
 
 
@@ -96,8 +94,8 @@ CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,			 // mp,
 									 CExpressionHandle &,	 // exprhdl,
 									 gpos::Ref<CColRefSet>,	 // pcrsRequired,
 									 ULONG,					 // child_index,
-									 CDrvdPropArray *,		 // pdrgpdpCtxt
-									 ULONG					 // ulOptReq
+									 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+									 ULONG						 // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -114,12 +112,12 @@ CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,			 // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalConstTableGet::PosRequired(CMemoryPool *,			// mp,
-									CExpressionHandle &,	// exprhdl,
-									gpos::Ref<COrderSpec>,	// posRequired,
-									ULONG,					// child_index,
-									CDrvdPropArray *,		// pdrgpdpCtxt
-									ULONG					// ulOptReq
+CPhysicalConstTableGet::PosRequired(CMemoryPool *,				// mp,
+									CExpressionHandle &,		// exprhdl,
+									gpos::Ref<COrderSpec>,		// posRequired,
+									ULONG,						// child_index,
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -140,7 +138,7 @@ CPhysicalConstTableGet::PdsRequired(
 	CExpressionHandle &,		   // exprhdl,
 	gpos::Ref<CDistributionSpec>,  // pdsRequired,
 	ULONG,						   //child_index
-	CDrvdPropArray *,			   // pdrgpdpCtxt
+	gpos::Ref<CDrvdPropArray>,	   // pdrgpdpCtxt
 	ULONG						   // ulOptReq
 ) const
 {
@@ -163,7 +161,7 @@ CPhysicalConstTableGet::PrsRequired(
 	CExpressionHandle &,			// exprhdl,
 	gpos::Ref<CRewindabilitySpec>,	// prsRequired,
 	ULONG,							// child_index,
-	CDrvdPropArray *,				// pdrgpdpCtxt
+	gpos::Ref<CDrvdPropArray>,		// pdrgpdpCtxt
 	ULONG							// ulOptReq
 ) const
 {
@@ -180,12 +178,12 @@ CPhysicalConstTableGet::PrsRequired(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalConstTableGet::PcteRequired(CMemoryPool *,		   //mp,
-									 CExpressionHandle &,  //exprhdl,
-									 gpos::Ref<CCTEReq>,   //pcter,
-									 ULONG,				   //child_index,
-									 CDrvdPropArray *,	   //pdrgpdpCtxt,
-									 ULONG				   //ulOptReq
+CPhysicalConstTableGet::PcteRequired(CMemoryPool *,				 //mp,
+									 CExpressionHandle &,		 //exprhdl,
+									 gpos::Ref<CCTEReq>,		 //pcter,
+									 ULONG,						 //child_index,
+									 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+									 ULONG						 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -213,7 +211,7 @@ CPhysicalConstTableGet::FProvidesReqdCols(CExpressionHandle &,	// exprhdl,
 
 	BOOL result = pcrs->ContainsAll(pcrsRequired);
 
-	pcrs->Release();
+
 
 	return result;
 }
@@ -350,7 +348,7 @@ CPhysicalConstTableGet::OsPrint(IOstream &os) const
 				os << "; ";
 			}
 			os << "(";
-			IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
+			gpos::Ref<IDatumArray> pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
 
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)

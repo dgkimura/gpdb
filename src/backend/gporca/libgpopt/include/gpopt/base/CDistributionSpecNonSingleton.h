@@ -77,7 +77,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdPropPlan> prpp,
-						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// return distribution partitioning type
@@ -105,7 +105,7 @@ public:
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtNonSingleton == pds->Edt());
 
-		return dynamic_cast<gpos::Ref<CDistributionSpecNonSingleton> >(pds);
+		return gpos::dyn_cast<CDistributionSpecNonSingleton>(pds);
 	}
 
 };	// class CDistributionSpecNonSingleton

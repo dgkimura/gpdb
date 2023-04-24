@@ -60,7 +60,7 @@ public:
 		gpos::Ref<CExpression> pexpr);
 
 	// add explicit casting to equality operations between compatible types
-	static CExpressionArray *PdrgpexprCastEquality(
+	static gpos::Ref<CExpressionArray> PdrgpexprCastEquality(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// helper to add explicit casting to left child of given equality predicate

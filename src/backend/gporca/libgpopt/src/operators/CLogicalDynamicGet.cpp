@@ -55,9 +55,11 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp)
 CLogicalDynamicGet::CLogicalDynamicGet(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids, gpos::Ref<CConstraint> partition_cnstrs_disj,
-	BOOL static_pruned, IMdIdArray *foreign_server_mdids)
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<CConstraint> partition_cnstrs_disj, BOOL static_pruned,
+	gpos::Ref<IMdIdArray> foreign_server_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_partition_cnstrs_disj(partition_cnstrs_disj),
@@ -77,11 +79,11 @@ CLogicalDynamicGet::CLogicalDynamicGet(
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
-									   gpos::Ref<CTableDescriptor> ptabdesc,
-									   ULONG ulPartIndex,
-									   IMdIdArray *partition_mdids,
-									   IMdIdArray *foreign_server_mdids)
+CLogicalDynamicGet::CLogicalDynamicGet(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<IMdIdArray> foreign_server_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
 							 partition_mdids),
 	  m_foreign_server_mdids(foreign_server_mdids)
@@ -99,8 +101,6 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CLogicalDynamicGet::~CLogicalDynamicGet()
 {
-	SafeRelease(m_partition_cnstrs_disj);
-	SafeRelease(m_foreign_server_mdids);
 }
 
 //---------------------------------------------------------------------------
@@ -146,11 +146,11 @@ CLogicalDynamicGet::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalDynamicGet::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -161,11 +161,11 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput,
 											 colref_mapping, must_exist);
 	}
-	CColRef2dArray *pdrgpdrgpcrPart =
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart =
 		PdrgpdrgpcrCreatePartCols(mp, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
-	m_ptabdesc->AddRef();
-	m_partition_mdids->AddRef();
+
+
 
 	gpos::Ref<CConstraint> partition_cnstrs_disj = nullptr;
 
@@ -178,7 +178,6 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 
 	if (m_foreign_server_mdids)
 	{
-		m_foreign_server_mdids->AddRef();
 	}
 
 	return GPOS_NEW(mp) CLogicalDynamicGet(
@@ -222,10 +221,10 @@ CLogicalDynamicGet::DeriveMaxCard(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDynamicGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDynamicGet2DynamicTableScan);
 	(void) xform_set->ExchangeSet(
 		CXform::ExfExpandDynamicGetWithForeignPartitions);
@@ -278,7 +277,7 @@ CLogicalDynamicGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	gpos::Ref<CExpression> expr = nullptr;
@@ -317,7 +316,6 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 
 	if (nullptr != pexprFilter)
 	{
-		pexprFilter->AddRef();
 		pcrsStat->Include(pexprFilter->DeriveUsedColumns());
 	}
 
@@ -327,11 +325,10 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		pcrsStat->Include(m_pcrsDist);
 	}
 
-	gpos::Ref<CStatistics> pstatsFullTable =
-		dynamic_cast<gpos::Ref<CStatistics> >(
-			PstatsBaseTable(mp, exprhdl, m_ptabdesc, pcrsStat));
+	gpos::Ref<CStatistics> pstatsFullTable = gpos::dyn_cast<CStatistics>(
+		PstatsBaseTable(mp, exprhdl, m_ptabdesc, pcrsStat));
 
-	pcrsStat->Release();
+
 
 	if (nullptr == pexprFilter || pexprFilter->DeriveHasSubquery())
 	{
@@ -344,13 +341,12 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		// Static pruned Dynamic Table Scan uses the CExpression of
 		// selected partitions' combined constraints as the filter to
 		// derive stats
-		pexprFilter->Release();
+
 		gpos::Ref<CConstraint> cnstrDisj =
 			dyn_get->GetPartitionConstraintsDisj();
 		if (cnstrDisj)
 		{
 			pexprFilterNew = cnstrDisj->PexprScalar(mp);
-			pexprFilterNew->AddRef();
 		}
 		else
 		{
@@ -370,13 +366,13 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 	gpos::Ref<CStatsPred> pred_stats = CStatsPredUtils::ExtractPredStats(
 		mp, pexprFilterNew, nullptr /*outer_refs*/
 	);
-	pexprFilterNew->Release();
+
 
 	gpos::Ref<IStatistics> result_stats =
 		CFilterStatsProcessor::MakeStatsFilter(mp, pstatsFullTable, pred_stats,
 											   true /* do_cap_NDVs */);
-	pred_stats->Release();
-	pstatsFullTable->Release();
+
+
 
 	return result_stats;
 }

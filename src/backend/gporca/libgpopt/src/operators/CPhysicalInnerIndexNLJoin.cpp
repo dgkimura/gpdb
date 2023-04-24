@@ -34,7 +34,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
-	CMemoryPool *mp, CColRefArray *colref_array,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 	gpos::Ref<CExpression> origJoinPred)
 	: CPhysicalInnerNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
@@ -43,7 +43,6 @@ CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
 	GPOS_ASSERT(nullptr != colref_array);
 	if (nullptr != origJoinPred)
 	{
-		origJoinPred->AddRef();
 	}
 }
 
@@ -58,8 +57,6 @@ CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
 //---------------------------------------------------------------------------
 CPhysicalInnerIndexNLJoin::~CPhysicalInnerIndexNLJoin()
 {
-	m_pdrgpcrOuterRefs->Release();
-	SafeRelease(m_origJoinPred);
 }
 
 
@@ -96,7 +93,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalInnerIndexNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::Ref<CDistributionSpec>,  //pdsRequired,
-	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED,
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 	ULONG  // ulOptReq
 ) const
 {
@@ -110,7 +108,8 @@ CPhysicalInnerIndexNLJoin::PdsRequired(
 gpos::Ref<CEnfdDistribution>
 CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::Ref<CReqdPropPlan> prppInput,
-							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+							   ULONG child_index,
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							   ULONG ulDistrReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -157,7 +156,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		if (pdshashed->HasCompleteEquivSpec(mp))
 		{
 			// request hashed distribution from outer
-			pdshashedEquiv->Pdrgpexpr()->AddRef();
+
 			gpos::Ref<CDistributionSpecHashed> pdsHashedRequired = GPOS_NEW(mp)
 				CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
 										pdshashedEquiv->FNullsColocated());

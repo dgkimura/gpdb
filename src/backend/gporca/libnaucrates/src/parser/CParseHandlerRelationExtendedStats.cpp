@@ -126,7 +126,7 @@ CParseHandlerRelationExtendedStats::EndElement(
 				   str->GetBuffer());
 	}
 
-	CMDExtStatsInfoArray *extstatsinfo_array =
+	gpos::Ref<CMDExtStatsInfoArray> extstatsinfo_array =
 		GPOS_NEW(m_mp) CMDExtStatsInfoArray(m_mp);
 
 
@@ -136,7 +136,7 @@ CParseHandlerRelationExtendedStats::EndElement(
 			dynamic_cast<CParseHandlerExtStatsInfo *>((*this)[ul]);
 		gpos::Ref<CMDExtStatsInfo> info =
 			parse_handler_ext_stats_info->GetInfo();
-		info->AddRef();
+
 
 		extstatsinfo_array->Append(info);
 	}

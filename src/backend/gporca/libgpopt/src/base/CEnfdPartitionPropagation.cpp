@@ -49,7 +49,6 @@ CEnfdPartitionPropagation::CEnfdPartitionPropagation(
 //---------------------------------------------------------------------------
 CEnfdPartitionPropagation::~CEnfdPartitionPropagation()
 {
-	m_ppps->Release();
 }
 
 

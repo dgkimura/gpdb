@@ -60,12 +60,6 @@ COptimizerConfig::COptimizerConfig(gpos::Ref<CEnumeratorConfig> pec,
 //---------------------------------------------------------------------------
 COptimizerConfig::~COptimizerConfig()
 {
-	m_enumerator_cfg->Release();
-	m_stats_conf->Release();
-	m_cte_conf->Release();
-	m_cost_model->Release();
-	m_hint->Release();
-	m_window_oids->Release();
 }
 
 //---------------------------------------------------------------------------

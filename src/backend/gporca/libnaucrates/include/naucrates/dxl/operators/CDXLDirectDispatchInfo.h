@@ -41,7 +41,7 @@ class CDXLDirectDispatchInfo : public CRefCount<CDXLDirectDispatchInfo>
 {
 private:
 	// constants for determining segments to dispatch to
-	CDXLDatum2dArray *m_dispatch_identifer_datum_array;
+	gpos::Ref<CDXLDatum2dArray> m_dispatch_identifer_datum_array;
 
 	// true indicates m_dispatch_identifer_datum_array contains raw
 	// gp_segment_id values rather than hashable datums
@@ -52,7 +52,7 @@ public:
 
 	// ctor
 	explicit CDXLDirectDispatchInfo(
-		CDXLDatum2dArray *dispatch_identifer_datum_array,
+		gpos::Ref<CDXLDatum2dArray> dispatch_identifer_datum_array,
 		BOOL contains_raw_values);
 
 	// dtor
@@ -65,7 +65,7 @@ public:
 	}
 
 	// accessor to array of datums
-	CDXLDatum2dArray *
+	gpos::Ref<CDXLDatum2dArray>
 	GetDispatchIdentifierDatumArray() const
 	{
 		return m_dispatch_identifer_datum_array;

@@ -13,12 +13,12 @@
 #define GPDXL_CDXLPhysicalDynamicIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -41,9 +41,9 @@ private:
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;
 
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicIndexScan(CDXLPhysicalDynamicIndexScan &) = delete;
@@ -62,8 +62,8 @@ public:
 								 gpos::Ref<CDXLTableDescr> table_descr,
 								 gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 								 EdxlIndexScanDirection idx_scan_direction,
-								 IMdIdArray *part_mdids,
-								 ULongPtrArray *selector_ids);
+								 gpos::Ref<IMdIdArray> part_mdids,
+								 gpos::Ref<ULongPtrArray> selector_ids);
 
 	//dtor
 	~CDXLPhysicalDynamicIndexScan() override;
@@ -83,9 +83,9 @@ public:
 	// scan direction
 	EdxlIndexScanDirection GetIndexScanDir() const;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -102,7 +102,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDynamicIndexScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalDynamicIndexScan> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalDynamicIndexScan>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

@@ -48,7 +48,6 @@ CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::~CDXLScalarSortCol()
 {
-	m_mdid_sort_op->Release();
 	GPOS_DELETE(m_sort_op_name_str);
 }
 

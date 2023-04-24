@@ -90,15 +90,14 @@ CBindingTest::EresUnittest_Basic()
 	// set up MD providers
 	gpos::Ref<CMDProviderMemory> pmdp =
 		GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
-	pmdp->AddRef();
 
-	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
-	CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+
+	const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
+	gpos::Ref<CMDProviderArray> pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
 	pdrgpmdp->Append(pmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
 	{
-		pmdp->AddRef();
 		pdrgpmdp->Append(pmdp);
 	}
 
@@ -118,8 +117,8 @@ CBindingTest::EresUnittest_Basic()
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
-	gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
-	gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
+	gpos::Ref<gpdxl::ULongPtrArray> pdrgul = pdxltr->PdrgpulOutputColRefs();
+	gpos::Ref<gpmd::CMDNameArray> pdrgpmdname = pdxltr->Pdrgpmdname();
 
 	CQueryContext *pqc = CQueryContext::PqcGenerate(
 		mp, pexprTranslated, pdrgul, pdrgpmdname, true /*fDeriveStats*/);
@@ -133,7 +132,7 @@ CBindingTest::EresUnittest_Basic()
 	gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
-	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();
+	gpos::Ref<UlongPtrArray> number_of_bindings = eng.GetNumberOfBindings();
 	ULONG search_stage = 0;
 	ULONG bindings_for_xform = (ULONG)(
 		*number_of_bindings)[search_stage][CXform::ExfJoin2IndexGetApply];
@@ -146,13 +145,13 @@ CBindingTest::EresUnittest_Basic()
 	}
 
 	// clean up
-	pexprPlan->Release();
-	pdrgpmdp->Release();
+
+
 	GPOS_DELETE(pqc);
 	GPOS_DELETE(pdxlmd);
 	GPOS_DELETE(pdxltr);
-	pexprTranslated->Release();
-	pmdp->Release();
+
+
 
 	return eres;
 }

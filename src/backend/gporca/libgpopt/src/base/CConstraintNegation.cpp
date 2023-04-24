@@ -31,8 +31,6 @@ CConstraintNegation::CConstraintNegation(CMemoryPool *mp,
 	: CConstraint(mp, pcnstr->PcrsUsed()), m_pcnstr(pcnstr)
 {
 	GPOS_ASSERT(nullptr != pcnstr);
-
-	m_pcrsUsed->AddRef();
 }
 
 //---------------------------------------------------------------------------
@@ -45,7 +43,6 @@ CConstraintNegation::CConstraintNegation(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CConstraintNegation::~CConstraintNegation()
 {
-	m_pcnstr->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -58,7 +55,8 @@ CConstraintNegation::~CConstraintNegation()
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
 CConstraintNegation::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CConstraint> pcnstr =
 		m_pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping, must_exist);
@@ -148,7 +146,6 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 			gpos::Ref<CConstraintNegation> pcn =
 				(gpos::Ref<CConstraintNegation>) m_pcnstr;
 			m_pexprScalar = pcn->PcnstrChild()->PexprScalar(mp);
-			m_pexprScalar->AddRef();
 		}
 		else if (EctInterval == ect)
 		{
@@ -156,13 +153,11 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 				(gpos::Ref<CConstraintInterval>) m_pcnstr;
 			gpos::Ref<CConstraintInterval> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);
-			m_pexprScalar->AddRef();
-			pciComp->Release();
 		}
 		else
 		{
 			gpos::Ref<CExpression> pexpr = m_pcnstr->PexprScalar(mp);
-			pexpr->AddRef();
+
 			m_pexprScalar = CUtils::PexprNegate(mp, pexpr);
 		}
 	}

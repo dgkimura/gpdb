@@ -96,12 +96,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// promise level for stat derivation
 	EStatPromise
@@ -123,12 +123,12 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiJoin == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalLeftSemiJoin> >(pop);
+		return gpos::dyn_cast<CLogicalLeftSemiJoin>(pop);
 	}
 
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
-		CMemoryPool *mp, CStatsPredJoinArray *join_preds_stats,
+		CMemoryPool *mp, gpos::Ref<CStatsPredJoinArray> join_preds_stats,
 		gpos::Ref<IStatistics> outer_stats,
 		gpos::Ref<IStatistics> inner_side_stats);
 

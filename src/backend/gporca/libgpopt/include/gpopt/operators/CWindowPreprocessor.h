@@ -32,12 +32,12 @@ class CWindowPreprocessor
 private:
 	// iterate over project elements and split them elements between Distinct Aggs
 	// list, and Others list
-	static void SplitPrjList(CMemoryPool *mp,
-							 gpos::Ref<CExpression> pexprSeqPrj,
-							 CExpressionArray **ppdrgpexprDistinctAggsPrjElems,
-							 CExpressionArray **ppdrgpexprOtherPrjElems,
-							 gpopt::COrderSpecArray **ppdrgposOther,
-							 gpopt::CWindowFrameArray **ppdrgpwfOther);
+	static void SplitPrjList(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj,
+		gpos::Ref<CExpressionArray> *ppdrgpexprDistinctAggsPrjElems,
+		gpos::Ref<CExpressionArray> *ppdrgpexprOtherPrjElems,
+		gpos::Ref<gpopt::COrderSpecArray> *ppdrgposOther,
+		gpos::Ref<gpopt::CWindowFrameArray> *ppdrgpwfOther);
 
 	// split given SeqPrj expression into:
 	//	- A GbAgg expression containing distinct Aggs, and
@@ -53,7 +53,8 @@ private:
 						  gpos::Ref<CExpression> *ppexprSecondConsumer);
 
 	// extract grouping columns from given expression
-	static CColRefArray *PdrgpcrGrpCols(gpos::Ref<CExpression> pexprJoinDQAs);
+	static gpos::Ref<CColRefArray> PdrgpcrGrpCols(
+		gpos::Ref<CExpression> pexprJoinDQAs);
 
 	// transform sequence project expression into an inner join expression
 	static gpos::Ref<CExpression> PexprSeqPrj2Join(

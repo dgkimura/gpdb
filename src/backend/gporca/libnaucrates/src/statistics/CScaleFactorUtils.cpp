@@ -44,17 +44,17 @@ const CDouble CScaleFactorUtils::InvalidScaleFactor(0.0);
 //		join preds
 //
 //---------------------------------------------------------------------------
-CScaleFactorUtils::OIDPairToScaleFactorArrayMap *
+gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
 CScaleFactorUtils::GenerateScaleFactorMap(
-	CMemoryPool *mp, SJoinConditionArray *join_conds_scale_factors,
-	CDoubleArray *independent_join_preds)
+	CMemoryPool *mp, gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
+	gpos::Ref<CDoubleArray> independent_join_preds)
 {
 	GPOS_ASSERT(join_conds_scale_factors != nullptr);
 
 	// create a hashmap of size 7 as we don't anticipate many join conditions here. Creating a larger map
 	// would be wasted memory.
-	CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-		GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
+	gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
+		scale_factor_hashmap = GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
 
 	// If a dist col = dist col predicate exists, it needs to be the first element in the scale factor array
 	// so that the predicate does not get damped, and any following predicate will be damped accordingly.
@@ -66,7 +66,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 	{
 		CDouble local_scale_factor =
 			(*(*join_conds_scale_factors)[ul]).m_scale_factor;
-		IMdIdArray *oid_pair = (*(*join_conds_scale_factors)[ul]).m_oid_pair;
+		gpos::Ref<IMdIdArray> oid_pair =
+			(*(*join_conds_scale_factors)[ul]).m_oid_pair;
 		BOOL both_dist_keys = (*(*join_conds_scale_factors)[ul]).m_dist_keys;
 
 		if (oid_pair != nullptr && oid_pair->Size() == 2)
@@ -74,7 +75,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 			// the array of scale factors in the order of damping
 			// i.e. the scale_factor_array[0] is not damped, and any subsequent
 			// element in the array is damped by the nth_root.
-			CDoubleArray *scale_factor_array =
+			gpos::Ref<CDoubleArray> scale_factor_array =
 				scale_factor_hashmap->Find(oid_pair);
 
 			// no predicates have been added, so create the scale factor array
@@ -83,7 +84,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 				scale_factor_array = GPOS_NEW(mp) CDoubleArray(mp);
 				scale_factor_array->Append(GPOS_NEW(mp)
 											   CDouble(local_scale_factor));
-				oid_pair->AddRef();
+
 				scale_factor_hashmap->Insert(oid_pair, scale_factor_array);
 				if (both_dist_keys)
 				{
@@ -99,7 +100,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 					// it is a dist key pred and none exist yet in the scale_factor array
 					// so add it here as the first element in the scale factor array
 					GPOS_ASSERT(scale_factor_array);
-					CDoubleArray *new_scale_factor_array =
+					gpos::Ref<CDoubleArray> new_scale_factor_array =
 						GPOS_NEW(mp) CDoubleArray(mp);
 					// add the dist key pred as the first predicate
 					new_scale_factor_array->Append(
@@ -153,8 +154,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
-	OIDPairToScaleFactorArrayMap *scale_factor_hashmap,
-	CDoubleArray *independent_join_preds)
+	gpos::Ref<OIDPairToScaleFactorArrayMap> scale_factor_hashmap,
+	gpos::Ref<CDoubleArray> independent_join_preds)
 {
 	CDouble cumulative_scale_factor(1.0);
 
@@ -163,7 +164,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 	// calculate damping using new sqrt algorithm
 	while (iter.Advance())
 	{
-		const CDoubleArray *scale_factor_array = iter.Value();
+		const gpos::Ref<CDoubleArray> scale_factor_array = iter.Value();
 
 		// damp the join preds if they are on the same tables (ex: t1.a = t2.a AND t1.b = t2.b)
 		for (ULONG ul = 0; ul < scale_factor_array->Size(); ul++)
@@ -200,7 +201,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 CDouble
 CScaleFactorUtils::CumulativeJoinScaleFactor(
 	CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-	SJoinConditionArray *join_conds_scale_factors,
+	gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
 	CDouble limit_for_result_scale_factor)
 {
 	GPOS_ASSERT(nullptr != stats_config);
@@ -261,10 +262,11 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 	else
 	{
 		// save the join preds that are not simple equalities in a different array
-		CDoubleArray *independent_join_preds = GPOS_NEW(mp) CDoubleArray(mp);
+		gpos::Ref<CDoubleArray> independent_join_preds =
+			GPOS_NEW(mp) CDoubleArray(mp);
 		// create the map of sorted join preds
-		CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-			CScaleFactorUtils::GenerateScaleFactorMap(
+		gpos::Ref<CScaleFactorUtils::OIDPairToScaleFactorArrayMap>
+			scale_factor_hashmap = CScaleFactorUtils::GenerateScaleFactorMap(
 				mp, join_conds_scale_factors, independent_join_preds);
 
 		cumulative_scale_factor =
@@ -286,9 +288,6 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 		// cannot exceed the cardinality of the larger of the tables.
 		cumulative_scale_factor = std::min(cumulative_scale_factor.Get(),
 										   limit_for_result_scale_factor.Get());
-
-		independent_join_preds->Release();
-		scale_factor_hashmap->Release();
 	}
 
 	return cumulative_scale_factor;
@@ -371,7 +370,7 @@ CScaleFactorUtils::DampedGroupByScaleFactor(
 //
 //---------------------------------------------------------------------------
 void
-CScaleFactorUtils::SortScalingFactor(CDoubleArray *scale_factors,
+CScaleFactorUtils::SortScalingFactor(gpos::Ref<CDoubleArray> scale_factors,
 									 BOOL is_descending)
 {
 	GPOS_ASSERT(nullptr != scale_factors);
@@ -496,7 +495,7 @@ CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 	const gpos::Ref<CStatisticsConfig> stats_config,
-	CDoubleArray *scale_factors)
+	gpos::Ref<CDoubleArray> scale_factors)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);
@@ -537,7 +536,7 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeDisj(
 	const gpos::Ref<CStatisticsConfig> stats_config,
-	CDoubleArray *scale_factors, CDouble total_rows)
+	gpos::Ref<CDoubleArray> scale_factors, CDouble total_rows)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);

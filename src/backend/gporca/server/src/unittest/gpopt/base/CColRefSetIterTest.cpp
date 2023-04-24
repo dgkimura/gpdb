@@ -57,7 +57,7 @@ CColRefSetIterTest::EresUnittest_Basics()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -106,7 +106,7 @@ CColRefSetIterTest::EresUnittest_Basics()
 	GPOS_ASSERT(num_cols == count);
 	GPOS_ASSERT(!((BOOL) crsi));
 
-	pcrs->Release();
+
 
 	return GPOS_OK;
 }

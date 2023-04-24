@@ -51,12 +51,13 @@ private:
 	// optimize query in the given query context
 	static gpos::Ref<CExpression> PexprOptimize(
 		CMemoryPool *mp, CQueryContext *pqc,
-		CSearchStageArray *search_stage_array);
+		gpos::Ref<CSearchStageArray> search_stage_array);
 
 	// translate an optimizer expression into a DXL tree
 	static gpos::Ref<CDXLNode> CreateDXLNode(
 		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexpr,
-		CColRefArray *colref_array, CMDNameArray *pdrgpmdname, ULONG ulHosts);
+		gpos::Ref<CColRefArray> colref_array,
+		gpos::Ref<CMDNameArray> pdrgpmdname, ULONG ulHosts);
 
 	// helper function to print query expression
 	static void PrintQuery(CMemoryPool *mp,
@@ -86,13 +87,13 @@ public:
 		const gpos::Ref<CDXLNode> query,
 		const CDXLNodeArray
 			*query_output_dxlnode_array,  // required output columns
-		const CDXLNodeArray *cte_producers,
+		const gpos::Ref<CDXLNodeArray> cte_producers,
 		gpos::Ref<IConstExprEvaluator>
 			pceeval,		// constant expression evaluator
 		ULONG ulHosts,		// number of hosts (data nodes) in the system
 		ULONG ulSessionId,	// session id used for logging and minidumps
 		ULONG ulCmdId,		// command id used for logging and minidumps
-		CSearchStageArray *search_stage_array,	// search strategy
+		gpos::Ref<CSearchStageArray> search_stage_array,  // search strategy
 		gpos::Ref<COptimizerConfig>
 			optimizer_config,  // optimizer configurations
 		const CHAR *szMinidumpFileName =

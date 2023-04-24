@@ -47,7 +47,6 @@ CScalarConst::CScalarConst(CMemoryPool *mp, gpos::Ref<IDatum> datum)
 //---------------------------------------------------------------------------
 CScalarConst::~CScalarConst()
 {
-	m_pdatum->Release();
 }
 
 
@@ -188,8 +187,8 @@ CScalarConst::PopExtractFromConstOrCastConst(gpos::Ref<CExpression> pexpr)
 //		Perform boolean expression evaluation
 //
 //---------------------------------------------------------------------------
-CScalar::EBoolEvalResult
-CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
+CScalar::EBoolEvalResult CScalarConst::Eber(
+	gpos::Ref<ULongPtrArray>  //pdrgpulChildren
 ) const
 {
 	if (m_pdatum->IsNull())
@@ -199,8 +198,7 @@ CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
 
 	if (IMDType::EtiBool == m_pdatum->GetDatumType())
 	{
-		gpos::Ref<IDatumBool> pdatumBool =
-			dynamic_cast<gpos::Ref<IDatumBool> >(m_pdatum);
+		gpos::Ref<IDatumBool> pdatumBool = gpos::dyn_cast<IDatumBool>(m_pdatum);
 		if (pdatumBool->GetValue())
 		{
 			return EberTrue;

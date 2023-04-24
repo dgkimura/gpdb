@@ -42,9 +42,9 @@ CLogicalIntersectAll::CLogicalIntersectAll(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIntersectAll::CLogicalIntersectAll(CMemoryPool *mp,
-										   CColRefArray *pdrgpcrOutput,
-										   CColRef2dArray *pdrgpdrgpcrInput)
+CLogicalIntersectAll::CLogicalIntersectAll(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 }
@@ -98,11 +98,12 @@ CLogicalIntersectAll::DeriveMaxCard(CMemoryPool *,	// mp
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalIntersectAll::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::Ref<CColRefArray> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp)
@@ -134,10 +135,10 @@ CLogicalIntersectAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfIntersectAll2LeftSemiJoin);
 
 	return xform_set;
@@ -154,8 +155,9 @@ CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	CColRef2dArray *pdrgpdrgpcrInput,
-	CColRefSetArray *output_colrefsets	// output of relational children
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput,
+	gpos::Ref<CColRefSetArray>
+		output_colrefsets  // output of relational children
 )
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
@@ -170,7 +172,7 @@ CLogicalIntersectAll::PstatsDerive(
 	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is a semi-join
@@ -179,8 +181,8 @@ CLogicalIntersectAll::PstatsDerive(
 		mp, join_preds_stats, outer_stats, inner_side_stats);
 
 	// clean up
-	pexprScCond->Release();
-	join_preds_stats->Release();
+
+
 
 	return pstatsSemiJoin;
 }
@@ -195,12 +197,13 @@ CLogicalIntersectAll::PstatsDerive(
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   IStatisticsArray *  // not used
+								   gpos::Ref<IStatisticsArray>	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 
-	CColRefSetArray *output_colrefsets = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::Ref<CColRefSetArray> output_colrefsets =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -212,7 +215,7 @@ CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
 
 	// clean up
-	output_colrefsets->Release();
+
 
 	return stats;
 }

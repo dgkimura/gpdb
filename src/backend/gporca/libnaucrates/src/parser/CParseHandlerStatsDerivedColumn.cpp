@@ -53,7 +53,6 @@ CParseHandlerStatsDerivedColumn::CParseHandlerStatsDerivedColumn(
 //---------------------------------------------------------------------------
 CParseHandlerStatsDerivedColumn::~CParseHandlerStatsDerivedColumn()
 {
-	m_dxl_stats_derived_col->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -167,7 +166,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 				   str->GetBuffer());
 	}
 
-	CDXLBucketArray *dxl_stats_bucket_array =
+	gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) CDXLBucketArray(m_mp);
 
 	const ULONG num_of_buckets = this->Length();
@@ -178,7 +177,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[idx]);
 		gpos::Ref<CDXLBucket> dxl_bucket =
 			col_stats_bucket_parse_handler->GetDXLBucketAt();
-		dxl_bucket->AddRef();
+
 		dxl_stats_bucket_array->Append(dxl_bucket);
 	}
 

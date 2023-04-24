@@ -57,19 +57,19 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index key columns
-	ULongPtrArray *m_index_key_cols_array;
+	gpos::Ref<ULongPtrArray> m_index_key_cols_array;
 
 	// included columns
-	ULongPtrArray *m_included_cols_array;
+	gpos::Ref<ULongPtrArray> m_included_cols_array;
 
 	// operator families for each index key
-	IMdIdArray *m_mdid_opfamilies_array;
+	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
 
 	// Child index oids
-	IMdIdArray *m_child_index_oids;
+	gpos::Ref<IMdIdArray> m_child_index_oids;
 
 public:
 	CMDIndexGPDB(const CMDIndexGPDB &) = delete;
@@ -78,10 +78,10 @@ public:
 	CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
 				 EmdindexType index_type, gpos::Ref<IMDId> mdid_item_type,
-				 ULongPtrArray *index_key_cols_array,
-				 ULongPtrArray *included_cols_array,
-				 IMdIdArray *mdid_opfamilies_array,
-				 IMdIdArray *child_index_oids);
+				 gpos::Ref<ULongPtrArray> index_key_cols_array,
+				 gpos::Ref<ULongPtrArray> included_cols_array,
+				 gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+				 gpos::Ref<IMdIdArray> child_index_oids);
 
 	// dtor
 	~CMDIndexGPDB() override;
@@ -138,7 +138,7 @@ public:
 					  ULONG key_pos) const override;
 
 	// child index oids
-	IMdIdArray *ChildIndexMdids() const override;
+	gpos::Ref<IMdIdArray> ChildIndexMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the MD index

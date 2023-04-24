@@ -224,16 +224,17 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	CDXLColDescrArray *dxl_col_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
-	dxl_col_descr_array->AddRef();
+
 
 	gpos::Ref<CDXLCtasStorageOptions> ctas_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
-	ctas_options->AddRef();
 
-	IMdIdArray *opclasses_array = opclasses_parse_handler->GetMdIdArray();
-	opclasses_array->AddRef();
+
+	gpos::Ref<IMdIdArray> opclasses_array =
+		opclasses_parse_handler->GetMdIdArray();
+
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLPhysicalCTAS(

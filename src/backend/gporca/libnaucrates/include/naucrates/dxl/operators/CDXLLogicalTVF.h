@@ -13,11 +13,11 @@
 #define GPDXL_CDXLLogicalTVF_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -43,7 +43,7 @@ private:
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	CDXLColDescrArray *m_dxl_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_dxl_col_descr_array;
 
 public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;
@@ -51,7 +51,7 @@ public:
 	// ctor/dtor
 	CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 				   gpos::Ref<IMDId> mdid_return_type, CMDName *mdname,
-				   CDXLColDescrArray *pdrgdxlcd);
+				   gpos::Ref<CDXLColDescrArray> pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 
@@ -86,7 +86,7 @@ public:
 	ULONG Arity() const;
 
 	// return the array of column descriptors
-	const CDXLColDescrArray *
+	const gpos::Ref<CDXLColDescrArray>
 	GetDXLColumnDescrArray() const
 	{
 		return m_dxl_col_descr_array;
@@ -109,7 +109,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalTVF == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalTVF> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalTVF>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

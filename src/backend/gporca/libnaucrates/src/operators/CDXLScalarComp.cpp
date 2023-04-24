@@ -46,7 +46,6 @@ CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 //---------------------------------------------------------------------------
 CDXLScalarComp::~CDXLScalarComp()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_comparison_operator_name);
 }
 

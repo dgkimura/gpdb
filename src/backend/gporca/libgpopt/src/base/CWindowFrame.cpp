@@ -115,9 +115,6 @@ CWindowFrame::CWindowFrame()
 //---------------------------------------------------------------------------
 CWindowFrame::~CWindowFrame()
 {
-	SafeRelease(m_pexprLeading);
-	SafeRelease(m_pexprTrailing);
-	SafeRelease(m_pcrsUsed);
 }
 
 
@@ -180,13 +177,12 @@ CWindowFrame::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CWindowFrame>
-CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
-										 UlongToColRefMap *colref_mapping,
-										 BOOL must_exist)
+CWindowFrame::PwfCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	if (this == &m_wfEmpty)
 	{
-		this->AddRef();
 		return this;
 	}
 
@@ -258,8 +254,8 @@ CWindowFrame::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Equals(const CWindowFrameArray *pdrgpwfFirst,
-					 const CWindowFrameArray *pdrgpwfSecond)
+CWindowFrame::Equals(const gpos::Ref<CWindowFrameArray> pdrgpwfFirst,
+					 const gpos::Ref<CWindowFrameArray> pdrgpwfSecond)
 {
 	if (nullptr == pdrgpwfFirst || nullptr == pdrgpwfSecond)
 	{
@@ -291,7 +287,8 @@ CWindowFrame::Equals(const CWindowFrameArray *pdrgpwfFirst,
 //
 //---------------------------------------------------------------------------
 ULONG
-CWindowFrame::HashValue(const CWindowFrameArray *pdrgpwf, ULONG ulMaxSize)
+CWindowFrame::HashValue(const gpos::Ref<CWindowFrameArray> pdrgpwf,
+						ULONG ulMaxSize)
 {
 	GPOS_ASSERT(nullptr != pdrgpwf);
 	const ULONG size = std::min(ulMaxSize, pdrgpwf->Size());
@@ -314,7 +311,7 @@ CWindowFrame::HashValue(const CWindowFrameArray *pdrgpwf, ULONG ulMaxSize)
 //
 //---------------------------------------------------------------------------
 IOstream &
-CWindowFrame::OsPrint(IOstream &os, const CWindowFrameArray *pdrgpwf)
+CWindowFrame::OsPrint(IOstream &os, const gpos::Ref<CWindowFrameArray> pdrgpwf)
 {
 	os << "[";
 	const ULONG size = pdrgpwf->Size();

@@ -106,7 +106,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -117,8 +117,9 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CColRefSet> pcrsLOJUsed =
 		pexprLOJScalarChild->DeriveUsedColumns();
-	CExpressionArray *pdrgpexprLOJChildren = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprNAryJoinChildren =
+	gpos::Ref<CExpressionArray> pdrgpexprLOJChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprNAryJoinChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
 	const ULONG arity = pexprNAryJoin->Arity();
@@ -128,7 +129,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
 		gpos::Ref<CColRefSet> pcrsOutput = pexprChild->DeriveOutputColumns();
-		pexprChild->AddRef();
+
 		if (!pcrsOutput->IsDisjoint(pcrsLOJUsed))
 		{
 			pdrgpexprLOJChildren->Append(pexprChild);
@@ -142,8 +143,8 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	if (pdrgpexprLOJChildren->Size() == 0)
 	{
 		// cannot create a valid LOJ; bail
-		pdrgpexprLOJChildren->Release();
-		pdrgpexprNAryJoinChildren->Release();
+
+
 		return;
 	}
 
@@ -164,9 +165,9 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	// continue with rest of LOJ inner and scalar children
-	pexprLOJInnerChild->AddRef();
+
 	pdrgpexprLOJChildren->Append(pexprLOJInnerChild);
-	pexprLOJScalarChild->AddRef();
+
 	pdrgpexprLOJChildren->Append(pexprLOJScalarChild);
 
 	// build new LOJ
@@ -175,7 +176,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// add new NAry join children
 	pdrgpexprNAryJoinChildren->Append(pexprLOJNew);
-	pexprNAryJoinScalarChild->AddRef();
+
 	pdrgpexprNAryJoinChildren->Append(pexprNAryJoinScalarChild);
 
 	if (3 > pdrgpexprNAryJoinChildren->Size())
@@ -201,7 +202,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 		//           |    +--B
 		//           +--C
 
-		pdrgpexprNAryJoinChildren->Release();
+
 		return;
 	}
 
@@ -212,7 +213,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// normalize resulting expression and add it to xform results
 	gpos::Ref<CExpression> pexprResult =
 		CNormalizer::PexprNormalize(mp, pexprNAryJoinNew);
-	pexprNAryJoinNew->Release();
+
 
 	pxfres->Add(pexprResult);
 }

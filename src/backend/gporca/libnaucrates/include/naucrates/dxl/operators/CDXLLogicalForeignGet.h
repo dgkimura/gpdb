@@ -14,9 +14,9 @@
 #define GPDXL_CDXLLogicalForeignGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogicalGet.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalForeignGet == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalForeignGet> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalForeignGet>(dxl_op);
 	}
 };
 }  // namespace gpdxl

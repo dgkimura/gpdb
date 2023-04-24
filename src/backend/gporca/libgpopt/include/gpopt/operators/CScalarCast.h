@@ -56,8 +56,6 @@ public:
 	// dtor
 	~CScalarCast() override
 	{
-		m_func_mdid->Release();
-		m_return_type_mdid->Release();
 	}
 
 
@@ -102,9 +100,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -119,7 +117,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}
@@ -131,7 +129,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCast == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarCast> >(pop);
+		return gpos::dyn_cast<CScalarCast>(pop);
 	}
 
 };	// class CScalarCast

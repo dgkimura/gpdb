@@ -31,13 +31,15 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::CDXLLogicalCTAS(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
-	CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
+	CMDName *mdname_rel, gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
 	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	ULongPtrArray *distr_column_pos_array, IMdIdArray *distr_opfamilies,
-	IMdIdArray *distr_opclasses, BOOL is_temporary,
+	gpos::Ref<ULongPtrArray> distr_column_pos_array,
+	gpos::Ref<IMdIdArray> distr_opfamilies,
+	gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
 	IMDRelation::Erelstoragetype rel_storage_type,
-	ULongPtrArray *src_colids_array, IntPtrArray *vartypemod_array)
+	gpos::Ref<ULongPtrArray> src_colids_array,
+	gpos::Ref<IntPtrArray> vartypemod_array)
 	: CDXLLogical(mp),
 	  m_mdid(mdid),
 	  m_mdname_schema(mdname_schema),
@@ -80,16 +82,8 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::~CDXLLogicalCTAS()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname_rel);
-	m_col_descr_array->Release();
-	m_dxl_ctas_storage_option->Release();
-	SafeRelease(m_distr_column_pos_array);
-	m_src_colids_array->Release();
-	m_vartypemod_array->Release();
-	m_distr_opfamilies->Release();
-	m_distr_opclasses->Release();
 }
 
 //---------------------------------------------------------------------------

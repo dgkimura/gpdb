@@ -88,7 +88,7 @@ public:
 	void
 	AppendEnforcers(
 		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prpp,
-		CExpressionArray *pdrgpexpr,		// array of enforcer expressions
+		gpos::Ref<CExpressionArray> pdrgpexpr,	// array of enforcer expressions
 		gpos::Ref<CExpression> pexprChild,	// leaf in the target group where
 											// enforcers will be added
 		CEnfdProp::EPropEnforcingType epet, CExpressionHandle &exprhdl) const

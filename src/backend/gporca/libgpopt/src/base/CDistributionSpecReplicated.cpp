@@ -101,25 +101,24 @@ CDistributionSpecReplicated::FSatisfies(
 
 		// a replicated distribution satisfies any non-singleton one,
 		// as well as singleton distributions that are not coordinator-only
-		return !(
-			EdtSingleton == pdss->Edt() &&
-			(dynamic_cast<const gpos::Ref<CDistributionSpecSingleton> >(pdss))
-				->FOnCoordinator());
+		return !(EdtSingleton == pdss->Edt() &&
+				 (gpos::dyn_cast<CDistributionSpecSingleton>(pdss))
+					 ->FOnCoordinator());
 	}
 
 	return false;
 }
 
 void
-CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
-											 CExpressionHandle &,  // exprhdl
-											 gpos::Ref<CReqdPropPlan>
+CDistributionSpecReplicated::AppendEnforcers(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
-												 prpp
+		prpp
 #endif	// GPOS_DEBUG
-											 ,
-											 CExpressionArray *pdrgpexpr,
-											 gpos::Ref<CExpression> pexpr)
+	,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -137,7 +136,7 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 		return;
 	}
 
-	pexpr->AddRef();
+
 	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalMotionBroadcast(mp, m_ignore_broadcast_threshold),

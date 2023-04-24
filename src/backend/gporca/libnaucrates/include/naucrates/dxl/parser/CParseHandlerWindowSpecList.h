@@ -35,7 +35,7 @@ class CParseHandlerWindowSpecList : public CParseHandlerBase
 {
 private:
 	// list of window specifications
-	CDXLWindowSpecArray *m_window_spec_array;
+	gpos::Ref<CDXLWindowSpecArray> m_window_spec_array;
 
 	// process the start of an element
 	void StartElement(
@@ -61,7 +61,7 @@ public:
 								CParseHandlerBase *pph);
 
 	// list of window keys
-	CDXLWindowSpecArray *
+	gpos::Ref<CDXLWindowSpecArray>
 	GetDxlWindowSpecArray() const
 	{
 		return m_window_spec_array;

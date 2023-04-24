@@ -80,7 +80,7 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -89,11 +89,11 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(arity >= 3);
 
 	// Make an expression array with all the atoms (the logical children)
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+
 		pdrgpexpr->Append(pexprChild);
 	}
 
@@ -104,9 +104,9 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CLogicalNAryJoin> naryJoin =
 		CLogicalNAryJoin::PopConvert(pexpr->Pop());
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
-	CExpressionArray *innerJoinPreds = nullptr;
-	CExpressionArray *onPreds = GPOS_NEW(mp) CExpressionArray(mp);
-	ULongPtrArray *childPredIndexes = nullptr;
+	gpos::Ref<CExpressionArray> innerJoinPreds = nullptr;
+	gpos::Ref<CExpressionArray> onPreds = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<ULongPtrArray> childPredIndexes = nullptr;
 
 	if (nullptr != CScalarNAryJoinPredList::PopConvert(pexprScalar->Pop()))
 	{
@@ -115,13 +115,11 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 		for (ULONG ul = 1; ul < pexprScalar->Arity(); ul++)
 		{
-			(*pexprScalar)[ul]->AddRef();
 			onPreds->Append((*pexprScalar)[ul]);
 		}
 
 		childPredIndexes = naryJoin->GetLojChildPredIndexes();
 		GPOS_ASSERT(nullptr != childPredIndexes);
-		childPredIndexes->AddRef();
 	}
 	else
 	{
@@ -130,7 +128,7 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CColRefSet> outerRefs = pexpr->DeriveOuterReferences();
 
-	outerRefs->AddRef();
+
 
 	// create join order using dynamic programming v2, record topk results in jodp
 	CJoinOrderDPv2 jodp(mp, pdrgpexpr, innerJoinPreds, onPreds,
@@ -145,7 +143,7 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 		gpos::Ref<CExpression> pexprNormalized =
 			CNormalizer::PexprNormalize(mp, nextJoinOrder);
 
-		nextJoinOrder->Release();
+
 		pxfres->Add(pexprNormalized);
 	}
 }

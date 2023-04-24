@@ -33,9 +33,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CJoinOrderGreedy::CJoinOrderGreedy(CMemoryPool *pmp,
-								   CExpressionArray *pdrgpexprComponents,
-								   CExpressionArray *pdrgpexprConjuncts)
+CJoinOrderGreedy::CJoinOrderGreedy(
+	CMemoryPool *pmp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+	gpos::Ref<CExpressionArray> pdrgpexprConjuncts)
 	: CJoinOrder(pmp, pdrgpexprComponents, pdrgpexprConjuncts,
 				 true /* m_include_loj_childs */),
 	  m_pcompResult(nullptr)
@@ -60,7 +60,6 @@ CJoinOrderGreedy::CJoinOrderGreedy(CMemoryPool *pmp,
 //---------------------------------------------------------------------------
 CJoinOrderGreedy::~CJoinOrderGreedy()
 {
-	SafeRelease(m_pcompResult);
 }
 
 
@@ -92,7 +91,6 @@ CJoinOrderGreedy::GetStartingJoins()
 			// exclude cross joins to be considered as late as possible in the join order
 			if (CUtils::FCrossJoin(compTemp->m_pexpr))
 			{
-				compTemp->Release();
 				continue;
 			}
 			DeriveStats(compTemp->m_pexpr);
@@ -102,17 +100,15 @@ CJoinOrderGreedy::GetStartingJoins()
 				ul1Counter = ul1;
 				ul2Counter = ul2;
 				dMinRows = dRows;
-				compTemp->AddRef();
-				SafeRelease(pcompBest);
+
+
 				pcompBest = compTemp;
 			}
-			compTemp->Release();
 		}
 	}
 
 	if ((ul1Counter == 0) && (ul2Counter == 0))
 	{
-		pcompBest->Release();
 		return nullptr;
 	}
 
@@ -192,8 +188,8 @@ CJoinOrderGreedy::PexprExpand()
 		if (gpos::ulong_max == best_comp_idx)
 		{
 			// could not pick a component to create the join tree
-			unused_components_set->Release();
-			candidate_comp_set->Release();
+
+
 			return nullptr;
 		}
 		else
@@ -201,14 +197,14 @@ CJoinOrderGreedy::PexprExpand()
 			// remove the best component from the unused component set
 			unused_components_set->ExchangeClear(best_comp_idx);
 		}
-		candidate_comp_set->Release();
+
 		GPOS_ASSERT(gpos::ulong_max != best_comp_idx);
 	}
-	unused_components_set->Release();
+
 	GPOS_ASSERT(nullptr != m_pcompResult->m_pexpr);
 
 	gpos::Ref<CExpression> pexprResult = m_pcompResult->m_pexpr;
-	pexprResult->AddRef();
+
 
 	return pexprResult;
 }
@@ -249,11 +245,10 @@ CJoinOrderGreedy::PickBestJoin(gpos::Ref<CBitSet> candidate_comp_set)
 			dMinRows = dRows;
 			best_comp_idx = iter.Bit();
 			pcompBestComponent = pcompCurrent;
-			pcompTemp->AddRef();
-			SafeRelease(pcompBest);
+
+
 			pcompBest = pcompTemp;
 		}
-		pcompTemp->Release();
 	}
 
 	// component could not be found
@@ -266,7 +261,7 @@ CJoinOrderGreedy::PickBestJoin(gpos::Ref<CBitSet> candidate_comp_set)
 	GPOS_ASSERT(nullptr != pcompBest);
 	GPOS_ASSERT(!pcompBestComponent->m_fUsed);
 	pcompBestComponent->m_fUsed = true;
-	m_pcompResult->Release();
+
 	m_pcompResult = pcompBest;
 	MarkUsedEdges(m_pcompResult);
 

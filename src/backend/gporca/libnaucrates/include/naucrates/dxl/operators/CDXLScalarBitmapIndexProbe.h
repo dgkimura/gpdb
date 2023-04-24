@@ -13,9 +13,9 @@
 #define GPDXL_CDXLScalarBitmapIndexProbe_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -91,7 +91,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarBitmapIndexProbe == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarBitmapIndexProbe> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarBitmapIndexProbe>(dxl_op);
 	}
 
 };	// class CDXLScalarBitmapIndexProbe

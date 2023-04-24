@@ -35,7 +35,7 @@ class CParseHandlerMDRelationCtas : public CParseHandlerMDRelation
 {
 private:
 	// vartypemod list
-	IntPtrArray *m_vartypemod_array;
+	gpos::Ref<IntPtrArray> m_vartypemod_array;
 
 	// process the start of an element
 	void StartElement(

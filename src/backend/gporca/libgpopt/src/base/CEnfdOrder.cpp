@@ -50,7 +50,6 @@ CEnfdOrder::CEnfdOrder(gpos::Ref<COrderSpec> pos, EOrderMatching eom)
 //---------------------------------------------------------------------------
 CEnfdOrder::~CEnfdOrder()
 {
-	SafeRelease(m_pos);
 }
 
 

@@ -39,9 +39,11 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
+	const CName *pnameAlias, ULONG scan_id,
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
 						   pdrgpcrOutput, pdrgpdrgpcrParts, partition_mdids,
 						   root_col_mapping_per_part)
@@ -73,7 +75,8 @@ CPhysicalDynamicBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<IStatistics>
 CPhysicalDynamicBitmapTableScan::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::Ref<CReqdPropPlan> prpplan, IStatisticsArray *stats_ctxt) const
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
@@ -97,9 +100,7 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive(
 			mp, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs,
 			stats_ctxt);
 
-	pstatsBaseTable->Release();
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+
 
 	return stats;
 }

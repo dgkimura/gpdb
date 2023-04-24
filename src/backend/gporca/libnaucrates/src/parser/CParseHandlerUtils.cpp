@@ -34,7 +34,7 @@ CParseHandlerUtils::SetProperties(gpos::Ref<CDXLNode> dxlnode,
 	// set physical properties
 	gpos::Ref<CDXLPhysicalProperties> dxl_properties =
 		prop_parse_handler->GetProperties();
-	dxl_properties->AddRef();
+
 	dxlnode->SetProperties(dxl_properties);
 
 	// set the statistical information
@@ -42,7 +42,6 @@ CParseHandlerUtils::SetProperties(gpos::Ref<CDXLNode> dxlnode,
 		prop_parse_handler->GetDxlStatsDrvdRelation();
 	if (nullptr != dxl_stats_derived_relation)
 	{
-		dxl_stats_derived_relation->AddRef();
 		dxl_properties->SetStats(dxl_stats_derived_relation);
 	}
 }

@@ -45,7 +45,6 @@ CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(
 //---------------------------------------------------------------------------
 CDXLScalarBitmapIndexProbe::~CDXLScalarBitmapIndexProbe()
 {
-	m_dxl_index_descr->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -49,8 +49,6 @@ CPhysicalSort::CPhysicalSort(CMemoryPool *mp, gpos::Ref<COrderSpec> pos)
 //---------------------------------------------------------------------------
 CPhysicalSort::~CPhysicalSort()
 {
-	m_pos->Release();
-	m_pcrsSort->Release();
 }
 
 
@@ -87,8 +85,8 @@ gpos::Ref<CColRefSet>
 CPhysicalSort::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CColRefSet> pcrsRequired,
 							ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -97,7 +95,7 @@ CPhysicalSort::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	pcrs->Union(pcrsRequired);
 	gpos::Ref<CColRefSet> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
-	pcrs->Release();
+
 
 	return pcrsChildReqd;
 }
@@ -120,8 +118,8 @@ CPhysicalSort::PosRequired(CMemoryPool *mp,
 							   child_index
 #endif	// GPOS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -144,8 +142,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalSort::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   gpos::Ref<CDistributionSpec> pdsRequired,
 						   ULONG child_index,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -170,8 +168,8 @@ CPhysicalSort::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   child_index
 #endif	// GPOPS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -213,8 +211,8 @@ CPhysicalSort::PcteRequired(CMemoryPool *,		  //mp,
 								child_index
 #endif
 							,
-							CDrvdPropArray *,  //pdrgpdpCtxt,
-							ULONG			   //ulOptReq
+							gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+							ULONG						//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -252,7 +250,6 @@ CPhysicalSort::PosDerive(CMemoryPool *,		  // mp
 						 CExpressionHandle &  // exprhdl
 ) const
 {
-	m_pos->AddRef();
 	return m_pos;
 }
 

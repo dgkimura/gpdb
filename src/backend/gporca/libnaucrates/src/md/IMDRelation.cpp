@@ -86,7 +86,7 @@ IMDRelation::GetStorageTypeStr(IMDRelation::Erelstoragetype rel_storage_type)
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-IMDRelation::ColumnsToStr(CMemoryPool *mp, ULongPtrArray *colid_array)
+IMDRelation::ColumnsToStr(CMemoryPool *mp, gpos::Ref<ULongPtrArray> colid_array)
 {
 	CWStringDynamic *str = GPOS_NEW(mp) CWStringDynamic(mp);
 

@@ -39,7 +39,7 @@ public:
 
 	// ctor
 	CLogicalLeftSemiCorrelatedApplyIn(CMemoryPool *mp,
-									  CColRefArray *pdrgpcrInner,
+									  gpos::Ref<CColRefArray> pdrgpcrInner,
 									  EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -60,7 +60,7 @@ public:
 	}
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// return true if operator is a correlated apply
 	BOOL
@@ -71,7 +71,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
@@ -81,7 +81,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiCorrelatedApplyIn == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalLeftSemiCorrelatedApplyIn> >(pop);
+		return gpos::dyn_cast<CLogicalLeftSemiCorrelatedApplyIn>(pop);
 	}
 
 };	// class CLogicalLeftSemiCorrelatedApplyIn

@@ -78,14 +78,14 @@ private:
 	gpos::Ref<CReqdProp> m_prp;
 
 	// array of children's derived stats
-	IStatisticsArray *m_pdrgpstat;
+	gpos::Ref<IStatisticsArray> m_pdrgpstat;
 
 	// array of children's required properties
 	CReqdPropArray *m_pdrgprp;
 
 	// return an array of stats objects starting from the first stats object referenced by child
-	IStatisticsArray *PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
-										 ULONG child_index);
+	gpos::Ref<IStatisticsArray> PdrgpstatOuterRefs(
+		gpos::Ref<IStatisticsArray> statistics_array, ULONG child_index);
 
 	// check if stats are derived for attached expression and its children
 	BOOL FStatsDerived() const;
@@ -97,7 +97,7 @@ private:
 	BOOL FAttachedToLeafPattern() const;
 
 	// stat derivation at root operator where handle is attached
-	void DeriveRootStats(IStatisticsArray *stats_ctxt);
+	void DeriveRootStats(gpos::Ref<IStatisticsArray> stats_ctxt);
 
 public:
 	CExpressionHandle(const CExpressionHandle &) = delete;
@@ -121,7 +121,7 @@ public:
 	void DeriveProps(gpos::Ref<CDrvdPropCtxt> pdpctxt);
 
 	// recursive stats derivation
-	void DeriveStats(IStatisticsArray *stats_ctxt,
+	void DeriveStats(gpos::Ref<IStatisticsArray> stats_ctxt,
 					 BOOL fComputeRootStats = true);
 
 	// stats derivation for attached cost context
@@ -130,7 +130,7 @@ public:
 	// stats derivation using given properties and context
 	void DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 					 gpos::Ref<CReqdPropRelational> prprel,
-					 IStatisticsArray *stats_ctxt) const;
+					 gpos::Ref<IStatisticsArray> stats_ctxt) const;
 
 	// derive the properties of the plan carried by attached cost context,
 	// using default CDrvdPropCtxtPlan
@@ -140,14 +140,16 @@ public:
 	void InitReqdProps(gpos::Ref<CReqdProp> prpInput);
 
 	// compute required properties of the n-th child
-	void ComputeChildReqdProps(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+	void ComputeChildReqdProps(ULONG child_index,
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							   ULONG ulOptReq);
 
 	// copy required properties of the n-th child
 	void CopyChildReqdProps(ULONG child_index, gpos::Ref<CReqdProp> prp);
 
 	// compute required columns of the n-th child
-	void ComputeChildReqdCols(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt);
+	void ComputeChildReqdCols(ULONG child_index,
+							  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required properties computation of all children
 	void ComputeReqdProps(gpos::Ref<CReqdProp> prpInput, ULONG ulOptReq);
@@ -322,8 +324,8 @@ public:
 	gpos::Ref<CFunctionProp> DeriveFunctionProperties() const;
 	gpos::Ref<CFunctionProp> DeriveFunctionProperties(ULONG child_index) const;
 
-	CFunctionalDependencyArray *Pdrgpfd() const;
-	CFunctionalDependencyArray *Pdrgpfd(ULONG child_index) const;
+	gpos::Ref<CFunctionalDependencyArray> Pdrgpfd() const;
+	gpos::Ref<CFunctionalDependencyArray> Pdrgpfd(ULONG child_index) const;
 
 	gpos::Ref<CPartInfo> DerivePartitionInfo() const;
 	gpos::Ref<CPartInfo> DerivePartitionInfo(ULONG child_index) const;

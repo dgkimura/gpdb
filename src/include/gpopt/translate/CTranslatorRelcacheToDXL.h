@@ -214,26 +214,25 @@ private:
 		CDouble hist_freq);
 
 	// histogram to array of dxl buckets
-	static CDXLBucketArray *TransformHistogramToDXLBucketArray(
+	static gpos::Ref<CDXLBucketArray> TransformHistogramToDXLBucketArray(
 		CMemoryPool *mp, const gpos::Ref<IMDType> md_type,
 		const CHistogram *hist);
 
 	// transform stats from pg_stats form to optimizer's preferred form
-	static CDXLBucketArray *TransformStatsToDXLBucketArray(
+	static gpos::Ref<CDXLBucketArray> TransformStatsToDXLBucketArray(
 		CMemoryPool *mp, OID att_type, CDouble num_distinct, CDouble null_freq,
 		const Datum *mcv_values, const float4 *mcv_frequencies,
 		ULONG num_mcv_values, const Datum *hist_values, ULONG num_hist_values);
 
 	// get partition keys and types for a relation
 	static void RetrievePartKeysAndTypes(CMemoryPool *mp, Relation rel, OID oid,
-										 ULongPtrArray **part_keys,
-										 CharPtrArray **part_types);
+										 gpos::Ref<ULongPtrArray> *part_keys,
+										 gpos::Ref<CharPtrArray> *part_types);
 
 	// get keysets for relation
-	static ULongPtr2dArray *RetrieveRelKeysets(CMemoryPool *mp, OID oid,
-											   BOOL should_add_default_keys,
-											   BOOL is_partitioned,
-											   ULONG *attno_mapping);
+	static gpos::Ref<ULongPtr2dArray> RetrieveRelKeysets(
+		CMemoryPool *mp, OID oid, BOOL should_add_default_keys,
+		BOOL is_partitioned, ULONG *attno_mapping);
 
 	// storage type for a relation
 	static IMDRelation::Erelstoragetype RetrieveRelStorageType(Relation rel);
@@ -243,9 +242,8 @@ private:
 									 CDouble *null_freq);
 
 	// get the relation columns
-	static CMDColumnArray *RetrieveRelColumns(CMemoryPool *mp,
-											  CMDAccessor *md_accessor,
-											  Relation rel);
+	static gpos::Ref<CMDColumnArray> RetrieveRelColumns(
+		CMemoryPool *mp, CMDAccessor *md_accessor, Relation rel);
 
 	// return the dxl representation of the column's default value
 	static gpos::Ref<CDXLNode> GetDefaultColumnValue(CMemoryPool *mp,
@@ -255,20 +253,20 @@ private:
 
 
 	// get the distribution columns
-	static ULongPtrArray *RetrieveRelDistributionCols(
-		CMemoryPool *mp, GpPolicy *gp_policy, CMDColumnArray *mdcol_array,
-		ULONG size);
+	static gpos::Ref<ULongPtrArray> RetrieveRelDistributionCols(
+		CMemoryPool *mp, GpPolicy *gp_policy,
+		gpos::Ref<CMDColumnArray> mdcol_array, ULONG size);
 
 	// construct a mapping GPDB attnos -> position in the column array
 	static ULONG *ConstructAttnoMapping(CMemoryPool *mp,
-										CMDColumnArray *mdcol_array,
+										gpos::Ref<CMDColumnArray> mdcol_array,
 										ULONG max_cols);
 
 	// check if index is supported
 	static BOOL IsIndexSupported(Relation index_rel);
 
 	// compute the array of included columns
-	static ULongPtrArray *ComputeIncludedCols(
+	static gpos::Ref<ULongPtrArray> ComputeIncludedCols(
 		CMemoryPool *mp, const gpos::Ref<IMDRelation> md_rel);
 
 	// is given level included in the default partitions
@@ -278,28 +276,31 @@ private:
 	static gpos::Ref<CMDPartConstraintGPDB> RetrievePartConstraintForIndex(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		const gpos::Ref<IMDRelation> md_rel, Node *part_constraint,
-		ULongPtrArray *level_with_default_part_array, BOOL is_unbounded);
+		gpos::Ref<ULongPtrArray> level_with_default_part_array,
+		BOOL is_unbounded);
 
 	// retrieve part constraint for relation
 	static gpos::Ref<CDXLNode> RetrievePartConstraintForRel(
 		CMemoryPool *mp, CMDAccessor *md_accessor, Relation rel,
-		CMDColumnArray *mdcol_array);
+		gpos::Ref<CMDColumnArray> mdcol_array);
 
 	// retrieve part constraint from a GPDB node
 	static gpos::Ref<CMDPartConstraintGPDB> RetrievePartConstraintFromNode(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CDXLColDescrArray *dxl_col_descr_array, Node *part_constraint,
-		ULongPtrArray *level_with_default_part_array, BOOL is_unbounded);
+		gpos::Ref<CDXLColDescrArray> dxl_col_descr_array, Node *part_constraint,
+		gpos::Ref<ULongPtrArray> level_with_default_part_array,
+		BOOL is_unbounded);
 
 	// return relation name
 	static CMDName *GetRelName(CMemoryPool *mp, Relation rel);
 
 	// return the index info list defined on the given relation
-	static CMDIndexInfoArray *RetrieveRelIndexInfo(CMemoryPool *mp,
-												   Relation rel);
+	static gpos::Ref<CMDIndexInfoArray> RetrieveRelIndexInfo(CMemoryPool *mp,
+															 Relation rel);
 
 	// return the check constraints defined on the relation with the given oid
-	static IMdIdArray *RetrieveRelCheckConstraints(CMemoryPool *mp, OID oid);
+	static gpos::Ref<IMdIdArray> RetrieveRelCheckConstraints(CMemoryPool *mp,
+															 OID oid);
 
 	// does relation type have system columns
 	static BOOL RelHasSystemColumns(char rel_kind);
@@ -308,17 +309,18 @@ private:
 	static ULONG GetComparisonType(IMDType::ECmpType cmp_type);
 
 	// retrieve the opfamilies mdids for the given scalar op
-	static IMdIdArray *RetrieveScOpOpFamilies(CMemoryPool *mp,
-											  gpos::Ref<IMDId> mdid_scalar_op);
+	static gpos::Ref<IMdIdArray> RetrieveScOpOpFamilies(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid_scalar_op);
 
 	// retrieve the opfamilies mdids for the given index
-	static IMdIdArray *RetrieveIndexOpFamilies(CMemoryPool *mp,
-											   gpos::Ref<IMDId> mdid_index);
+	static gpos::Ref<IMdIdArray> RetrieveIndexOpFamilies(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid_index);
 
-	static IMdIdArray *RetrieveRelDistributionOpFamilies(CMemoryPool *mp,
-														 GpPolicy *policy);
+	static gpos::Ref<IMdIdArray> RetrieveRelDistributionOpFamilies(
+		CMemoryPool *mp, GpPolicy *policy);
 
-	static IMdIdArray *RetrieveIndexPartitions(CMemoryPool *mp, OID rel_oid);
+	static gpos::Ref<IMdIdArray> RetrieveIndexPartitions(CMemoryPool *mp,
+														 OID rel_oid);
 
 	static IMDRelation::Erelstoragetype RetrieveStorageTypeForPartitionedTable(
 		Relation rel);
@@ -341,7 +343,8 @@ public:
 											  gpos::Ref<IMDId> mdid);
 
 	// add system columns (oid, tid, xmin, etc) in table descriptors
-	static void AddSystemColumns(CMemoryPool *mp, CMDColumnArray *mdcol_array,
+	static void AddSystemColumns(CMemoryPool *mp,
+								 gpos::Ref<CMDColumnArray> mdcol_array,
 								 Relation rel);
 
 	// retrieve an index from the relcache

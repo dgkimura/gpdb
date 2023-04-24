@@ -99,7 +99,6 @@ private:
 		// dtor
 		~CCTEMapEntry() override
 		{
-			SafeRelease(m_pdpplan);
 		}
 
 		// cte id
@@ -163,7 +162,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// cte map
-	UlongToCTEMapEntryMap *m_phmcm;
+	gpos::Ref<UlongToCTEMapEntryMap> m_phmcm;
 
 	// lookup info for given cte id
 	gpos::Ref<CCTEMapEntry> PcmeLookup(ULONG ulCteId) const;
@@ -207,7 +206,7 @@ public:
 	BOOL FSatisfies(const gpos::Ref<CCTEReq> pcter) const;
 
 	// return producer ids that are in this map but not in the given requirement
-	ULongPtrArray *PdrgpulAdditionalProducers(
+	gpos::Ref<ULongPtrArray> PdrgpulAdditionalProducers(
 		CMemoryPool *mp, const gpos::Ref<CCTEReq> pcter) const;
 
 	// print function

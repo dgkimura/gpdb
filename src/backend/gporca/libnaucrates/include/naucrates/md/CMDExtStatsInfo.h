@@ -70,7 +70,6 @@ public:
 	~CMDExtStatsInfo() override
 	{
 		GPOS_DELETE(m_stat_name);
-		m_keys->Release();
 	}
 
 	CWStringDynamic *KeysToStr(CMemoryPool *mp);
@@ -99,7 +98,7 @@ public:
 };
 
 
-using CMDExtStatsInfoArray = CDynamicPtrArray<CMDExtStatsInfo, CleanupRelease>;
+using CMDExtStatsInfoArray = gpos::Vector<gpos::Ref<CMDExtStatsInfo>>;
 
 }  // namespace gpmd
 

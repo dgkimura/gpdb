@@ -34,7 +34,7 @@ private:
 
 	static gpos::Ref<CExpression> JoinPruningTreeTraversal(
 		CMemoryPool *mp, const gpos::Ref<CExpression> pexpr,
-		CExpressionArray *pdrgpexpr,
+		gpos::Ref<CExpressionArray> pdrgpexpr,
 		const gpos::Ref<CColRefSet> childs_output_columns);
 
 	static gpos::Ref<CExpression> PexprCheckLeftOuterJoinPruningConditions(

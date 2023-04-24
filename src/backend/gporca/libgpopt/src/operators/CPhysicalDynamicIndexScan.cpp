@@ -37,10 +37,10 @@ using namespace gpopt;
 CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 	CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, CColRefArray *pdrgpcrOutput, ULONG scan_id,
-	CColRef2dArray *pdrgpdrgpcrPart, gpos::Ref<COrderSpec> pos,
-	IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
+	const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	ULONG scan_id, gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<COrderSpec> pos, gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
 						   pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids,
 						   root_col_mapping_per_part),
@@ -62,8 +62,6 @@ CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 //---------------------------------------------------------------------------
 CPhysicalDynamicIndexScan::~CPhysicalDynamicIndexScan()
 {
-	m_pindexdesc->Release();
-	m_pos->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -164,10 +162,10 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CReqdPropPlan> prpplan,
-										IStatisticsArray *stats_ctxt) const
+CPhysicalDynamicIndexScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
@@ -192,9 +190,7 @@ CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 			mp, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs,
 			stats_ctxt);
 
-	pstatsBaseTable->Release();
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+
 
 	return stats;
 }

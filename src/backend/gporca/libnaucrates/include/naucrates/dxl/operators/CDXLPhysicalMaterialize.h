@@ -13,11 +13,10 @@
 #define GPDXL_CDXLPhysicalMaterialize_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLSpoolInfo.h"
-
-
 namespace gpdxl
 {
 // indices of materialize elements in the children array
@@ -90,7 +89,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalMaterialize == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalMaterialize> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalMaterialize>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

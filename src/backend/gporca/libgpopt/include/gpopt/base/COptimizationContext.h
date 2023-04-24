@@ -38,8 +38,7 @@ class CDrvdPropPlan;
 using OPTCTXT_PTR = gpos::Ref<COptimizationContext>;
 
 // array of optimization contexts
-using COptimizationContextArray =
-	CDynamicPtrArray<COptimizationContext, CleanupRelease>;
+using COptimizationContextArray = gpos::Vector<gpos::Ref<COptimizationContext>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -84,7 +83,7 @@ private:
 	gpos::Ref<CReqdPropRelational> m_prprel{nullptr};
 
 	// stats of previously optimized expressions
-	IStatisticsArray *m_pdrgpstatCtxt{nullptr};
+	gpos::Ref<IStatisticsArray> m_pdrgpstatCtxt{nullptr};
 
 	// index of search stage where context is generated
 	ULONG m_ulSearchStageIndex{0};
@@ -196,7 +195,7 @@ public:
 	}
 
 	// stats of previously optimized expressions
-	IStatisticsArray *
+	gpos::Ref<IStatisticsArray>
 	Pdrgpstat() const
 	{
 		return m_pdrgpstatCtxt;
@@ -262,7 +261,7 @@ public:
 	BOOL
 	operator==(const COptimizationContext &oc) const
 	{
-		return oc.Matches(this);
+		return oc.Matches(SharedFromThis());
 	}
 
 	// debug print
@@ -328,8 +327,9 @@ public:
 						  ULONG ulSearchStages);
 
 	// compare array of contexts based on context ids
-	static BOOL FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-								 COptimizationContextArray *pdrgpocSnd);
+	static BOOL FEqualContextIds(
+		gpos::Ref<COptimizationContextArray> pdrgpocFst,
+		gpos::Ref<COptimizationContextArray> pdrgpocSnd);
 
 	// compute required properties to CTE producer based on plan properties of CTE consumer
 	static gpos::Ref<CReqdPropPlan> PrppCTEProducer(

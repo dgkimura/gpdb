@@ -70,7 +70,7 @@ CBucketTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -179,11 +179,8 @@ CBucketTest::EresUnittest_CBucketInt4()
 	GPOS_RTL_ASSERT_MSG(pbucket3->IsBefore(pbucket4),
 						"[1,2] must be before (2,4)");
 
-	point1->Release();
-	point2->Release();
-	point3->Release();
-	point4->Release();
-	point10->Release();
+
+
 	GPOS_DELETE(bucket1);
 	GPOS_DELETE(bucket2);
 	GPOS_DELETE(bucket3);
@@ -220,8 +217,7 @@ CBucketTest::EresUnittest_CBucketBool()
 	GPOS_RTL_ASSERT_MSG(CDouble(0.0) == bucket->GetOverlapPercentage(p2),
 						"overlap must 0.0");
 
-	p1->Release();
-	p2->Release();
+
 
 	GPOS_DELETE(bucket);
 
@@ -252,7 +248,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	// new bucket [1, 10) must contain 9
 	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 9);
 	GPOS_RTL_ASSERT(bucket2->Contains(point2));
-	point2->Release();
+
 
 	// new bucket's frequency and distinct values must be lesser than original
 	GPOS_RTL_ASSERT(bucket2->GetFrequency() < bucket1->GetFrequency());
@@ -268,7 +264,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	GPOS_RTL_ASSERT(pbucket4->GetNumDistinct() < 2.0);
 
 	// clean up
-	point1->Release();
+
 	GPOS_DELETE(bucket1);
 	GPOS_DELETE(bucket2);
 	GPOS_DELETE(pbucket3);

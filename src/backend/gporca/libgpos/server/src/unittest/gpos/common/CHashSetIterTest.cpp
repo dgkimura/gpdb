@@ -76,7 +76,7 @@ CHashSetIterTest::EresUnittest_Basic()
 		GPOS_ASSERT(pdrgpulValues->Equals(pdrgpulIterValues.Value()));
 	}
 
-	ps->Release();
+
 
 	return GPOS_OK;
 }

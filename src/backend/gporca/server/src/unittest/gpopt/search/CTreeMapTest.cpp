@@ -119,7 +119,6 @@ CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::~CNode()
 {
-	SafeRelease(m_pdrgpnd);
 }
 
 
@@ -311,8 +310,6 @@ CTreeMapTest::EresUnittest_Unrank()
 		oss << "=== tree rank: " << ulRank << " ===" << std::endl;
 		BOOL fFlag = true;
 		gpos::Ref<CNode> pnd = ptmap->PrUnrank(mp, &fFlag, ulRank);
-
-		pnd->Release();
 	}
 
 	GPOS_TRACE(str.GetBuffer());
@@ -340,7 +337,7 @@ CTreeMapTest::EresUnittest_Memo()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	CEngine *peng = nullptr;
@@ -409,16 +406,14 @@ CTreeMapTest::EresUnittest_Memo()
 					GPOS_RESET_EX;
 				}
 				GPOS_CATCH_END;
-				SafeRelease(pexprAlt);
-				SafeRelease(pdpctxtplan);
 			}
 		}
 	}
 
 	// clean up
-	SafeRelease(pexprPlan);
+
 	GPOS_DELETE(pqc);
-	SafeRelease(pexpr);
+
 	GPOS_DELETE(peng);
 
 	return GPOS_OK;

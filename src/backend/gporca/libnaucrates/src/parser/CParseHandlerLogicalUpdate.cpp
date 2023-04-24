@@ -139,7 +139,7 @@ CParseHandlerLogicalUpdate::EndElement(const XMLCh *const,	// element_uri,
 
 	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
+
 
 	m_dxl_node = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalUpdate(

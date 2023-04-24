@@ -72,7 +72,7 @@ CCardinalityTestUtils::PbucketSingletonBoolVal(CMemoryPool *mp, BOOL fValue,
 	gpos::Ref<CPoint> ppLower = CTestUtils::PpointBool(mp, fValue);
 
 	// lower bound is also upper bound
-	ppLower->AddRef();
+
 	return GPOS_NEW(mp) CBucket(ppLower, ppLower, true /* fClosedUpper */,
 								true /* fClosedUpper */, frequency, 1.0);
 }
@@ -84,7 +84,7 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 									   CDouble num_NDV_remain)
 {
 	// generate histogram of the form [0, 100), [100, 200), [200, 300) ...
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < num_of_buckets; idx++)
 	{
 		INT iLower = INT(idx * 100);
@@ -120,7 +120,7 @@ CHistogram *
 CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < 9; idx++)
 	{
 		INT iLower = INT(idx * 10);
@@ -144,7 +144,7 @@ CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 CHistogram *
 CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 {
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	CBucket *pbucketFalse =
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, false, 0.1);
 	CBucket *pbucketTrue =
@@ -192,7 +192,7 @@ CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 
 	gpos::Ref<IDatum> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(datum);
-	dxl_datum->Release();
+
 
 	return point;
 }

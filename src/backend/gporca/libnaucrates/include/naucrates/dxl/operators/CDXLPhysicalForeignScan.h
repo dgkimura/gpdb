@@ -13,10 +13,10 @@
 #define GPDXL_CDXLPhysicalForeignScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalTableScan.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalForeignScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalForeignScan> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalForeignScan>(dxl_op);
 	}
 };
 }  // namespace gpdxl

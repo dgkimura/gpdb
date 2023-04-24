@@ -31,7 +31,7 @@ class CStatsPredConj : public CStatsPred
 {
 private:
 	// array of filters
-	CStatsPredPtrArry *m_conj_pred_stats_array;
+	gpos::Ref<CStatsPredPtrArry> m_conj_pred_stats_array;
 
 public:
 	CStatsPredConj &operator=(CStatsPredConj &) = delete;
@@ -39,12 +39,11 @@ public:
 	CStatsPredConj(const CStatsPredConj &) = delete;
 
 	// ctor
-	explicit CStatsPredConj(CStatsPredPtrArry *pdrgpstatspred);
+	explicit CStatsPredConj(gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// dtor
 	~CStatsPredConj() override
 	{
-		m_conj_pred_stats_array->Release();
 	}
 
 	// the column identifier on which the predicates are on
@@ -57,7 +56,7 @@ public:
 		return m_conj_pred_stats_array->Size();
 	}
 
-	CStatsPredPtrArry *
+	gpos::Ref<CStatsPredPtrArry>
 	GetConjPredStatsArray() const
 	{
 		return m_conj_pred_stats_array;
@@ -83,7 +82,7 @@ public:
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<gpos::Ref<CStatsPredConj> >(pred_stats);
+		return gpos::dyn_cast<CStatsPredConj>(pred_stats);
 	}
 
 };	// class CStatsPredConj

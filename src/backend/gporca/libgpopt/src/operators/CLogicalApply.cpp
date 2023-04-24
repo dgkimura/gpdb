@@ -43,7 +43,8 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalApply::CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+CLogicalApply::CLogicalApply(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> pdrgpcrInner,
 							 EOperatorId eopidOriginSubq)
 	: CLogical(mp),
 	  m_pdrgpcrInner(pdrgpcrInner),
@@ -62,7 +63,6 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
 //---------------------------------------------------------------------------
 CLogicalApply::~CLogicalApply()
 {
-	SafeRelease(m_pdrgpcrInner);
 }
 
 
@@ -93,7 +93,7 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsStat =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
-	pcrsUsed->Release();
+
 
 	return pcrsStat;
 }
@@ -111,7 +111,7 @@ CLogicalApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CColRefArray *pdrgpcrInner =
+		gpos::Ref<CColRefArray> pdrgpcrInner =
 			CLogicalApply::PopConvert(pop)->PdrgPcrInner();
 		if (nullptr == m_pdrgpcrInner || nullptr == pdrgpcrInner)
 		{

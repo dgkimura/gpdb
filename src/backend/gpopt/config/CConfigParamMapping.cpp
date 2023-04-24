@@ -361,14 +361,12 @@ CConfigParamMapping::PackConfigParamInBitset(
 	{
 		gpos::Ref<CBitSet> nl_join_bitset = CXform::PbsNLJoinXforms(mp);
 		traceflag_bitset->Union(nl_join_bitset);
-		nl_join_bitset->Release();
 	}
 
 	if (!optimizer_enable_indexjoin)
 	{
 		gpos::Ref<CBitSet> index_join_bitset = CXform::PbsIndexJoinXforms(mp);
 		traceflag_bitset->Union(index_join_bitset);
-		index_join_bitset->Release();
 	}
 
 	// disable bitmap scan if the corresponding GUC is turned off
@@ -377,7 +375,6 @@ CConfigParamMapping::PackConfigParamInBitset(
 		gpos::Ref<CBitSet> bitmap_index_bitset =
 			CXform::PbsBitmapIndexXforms(mp);
 		traceflag_bitset->Union(bitmap_index_bitset);
-		bitmap_index_bitset->Release();
 	}
 
 	// disable outerjoin to unionall transformation if GUC is turned off
@@ -399,7 +396,6 @@ CConfigParamMapping::PackConfigParamInBitset(
 		// disable hash-join if the corresponding GUC is turned off
 		gpos::Ref<CBitSet> hash_join_bitste = CXform::PbsHashJoinXforms(mp);
 		traceflag_bitset->Union(hash_join_bitste);
-		hash_join_bitste->Release();
 	}
 
 	if (!optimizer_enable_dynamictablescan)
@@ -474,7 +470,7 @@ CConfigParamMapping::PackConfigParamInBitset(
 			break;
 	}
 	traceflag_bitset->Union(join_heuristic_bitset);
-	join_heuristic_bitset->Release();
+
 
 	// disable join associativity transform if the corresponding GUC
 	// is turned off independent of the join order algorithm chosen

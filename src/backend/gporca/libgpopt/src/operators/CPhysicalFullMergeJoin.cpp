@@ -27,9 +27,9 @@ using namespace gpopt;
 
 // ctor
 CPhysicalFullMergeJoin::CPhysicalFullMergeJoin(
-	CMemoryPool *mp, CExpressionArray *outer_merge_clauses,
-	CExpressionArray *inner_merge_clauses, IMdIdArray *, BOOL,
-	CXform::EXformId origin_xform)
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> outer_merge_clauses,
+	gpos::Ref<CExpressionArray> inner_merge_clauses, gpos::Ref<IMdIdArray>,
+	BOOL, CXform::EXformId origin_xform)
 	: CPhysicalJoin(mp, origin_xform),
 	  m_outer_merge_clauses(outer_merge_clauses),
 	  m_inner_merge_clauses(inner_merge_clauses)
@@ -50,8 +50,6 @@ CPhysicalFullMergeJoin::CPhysicalFullMergeJoin(
 // dtor
 CPhysicalFullMergeJoin::~CPhysicalFullMergeJoin()
 {
-	m_outer_merge_clauses->Release();
-	m_inner_merge_clauses->Release();
 }
 
 gpos::Ref<CDistributionSpec>
@@ -59,7 +57,7 @@ CPhysicalFullMergeJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::Ref<CDistributionSpec> pdsRequired GPOS_UNUSED,
 	ULONG child_index GPOS_UNUSED,
-	CDrvdPropArray *,  //pdrgpdpCtxt,
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
 	ULONG ulOptReq GPOS_UNUSED) const
 {
 	GPOS_RAISE(
@@ -73,7 +71,7 @@ gpos::Ref<CEnfdDistribution>
 CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CReqdPropPlan> prppInput,
 							ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+							gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 							ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -100,7 +98,7 @@ CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		nulls_collocated = false;
 	}
 
-	CExpressionArray *clauses =
+	gpos::Ref<CExpressionArray> clauses =
 		(child_index == 0) ? m_outer_merge_clauses : m_inner_merge_clauses;
 
 	// TODO: Handle matching/ equivalent distribution spec (e.g using pdsRequired)
@@ -108,9 +106,10 @@ CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		std::min((ULONG) GPOPT_MAX_HASH_DIST_REQUESTS, clauses->Size());
 	if (ulOptReq < num_hash_reqs)
 	{
-		CExpressionArray *pdrgpexprCurrent = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::Ref<CExpressionArray> pdrgpexprCurrent =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		gpos::Ref<CExpression> expr = (*clauses)[ulOptReq];
-		expr->AddRef();
+
 		pdrgpexprCurrent->Append(expr);
 
 		gpos::Ref<CDistributionSpecHashed> pds = GPOS_NEW(mp)
@@ -119,7 +118,6 @@ CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 	else if (ulOptReq == num_hash_reqs)
 	{
-		clauses->AddRef();
 		gpos::Ref<CDistributionSpecHashed> pds =
 			GPOS_NEW(mp) CDistributionSpecHashed(clauses, nulls_collocated);
 		return GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
@@ -138,8 +136,8 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 									CExpressionHandle &,	//exprhdl,
 									gpos::Ref<COrderSpec>,	//posInput
 									ULONG child_index,
-									CDrvdPropArray *,  //pdrgpdpCtxt
-									ULONG			   //ulOptReq
+									gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+									ULONG						//ulOptReq
 ) const
 {
 	// Merge joins require their input to be sorted on corresponsing join clauses. Without
@@ -149,7 +147,7 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 
 	gpos::Ref<COrderSpec> os = GPOS_NEW(mp) COrderSpec(mp);
 
-	CExpressionArray *clauses;
+	gpos::Ref<CExpressionArray> clauses;
 	if (child_index == 0)
 	{
 		clauses = m_outer_merge_clauses;
@@ -179,7 +177,7 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 		// are rejected from merge clauses.
 		gpos::Ref<gpmd::IMDId> mdid =
 			colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
-		mdid->AddRef();
+
 		os->Append(mdid, colref, COrderSpec::EntLast);
 	}
 
@@ -191,8 +189,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalFullMergeJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CRewindabilitySpec> prsRequired,
 									ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
-									ULONG			   // ulOptReq
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -231,11 +229,11 @@ CPhysicalFullMergeJoin::EpetOrder(CExpressionHandle &,
 	return CEnfdProp::EpetRequired;
 }
 
-CEnfdDistribution::EDistributionMatching
-CPhysicalFullMergeJoin::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-							ULONG,					   // child_index,
-							CDrvdPropArray *,		   // pdrgpdpCtxt,
-							ULONG					   // ulOptReq
+CEnfdDistribution::EDistributionMatching CPhysicalFullMergeJoin::Edm(
+	gpos::Ref<CReqdPropPlan>,	// prppInput
+	ULONG,						// child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt,
+	ULONG						// ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;
@@ -272,8 +270,8 @@ CPhysicalFullMergeJoin::PdsDerive(CMemoryPool *mp,
 				pdshashedInner->Copy(mp, false /* fNullsCollocated*/);
 			gpos::Ref<CDistributionSpecHashed> pdsCombined =
 				pdsDeriveOuter->Combine(mp, pdsDeriveInner);
-			pdsDeriveOuter->Release();
-			pdsDeriveInner->Release();
+
+
 			return pdsCombined;
 		}
 		else
@@ -288,6 +286,6 @@ CPhysicalFullMergeJoin::PdsDerive(CMemoryPool *mp,
 				CDistributionSpec::EdtUniversal == pdsOuter->Edt());
 
 	// otherwise, pass through outer distribution
-	pdsOuter->AddRef();
+
 	return pdsOuter;
 }

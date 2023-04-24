@@ -49,7 +49,6 @@ CParseHandlerStatsBound::CParseHandlerStatsBound(
 //---------------------------------------------------------------------------
 CParseHandlerStatsBound::~CParseHandlerStatsBound()
 {
-	m_dxl_datum->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -130,7 +130,7 @@ private:
 	// CTAS distribution policy
 	GpPolicy *m_distribution_policy;
 
-	UlongToUlongMap *m_part_selector_to_param_map;
+	gpos::Ref<UlongToUlongMap> m_part_selector_to_param_map;
 
 	// hash map of the queryid (of DML query) and the target relation index
 	HMUlIndex *m_used_rte_indexes;

@@ -58,7 +58,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// test cases
@@ -84,7 +84,8 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		str.Reset();
 
 		gpos::Ref<CExpression> pexprResult = nullptr;
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		gpos::Ref<CColRefSet> outerRefs = pexpr->DeriveOuterReferences();
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
@@ -106,10 +107,6 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
-
-		pexprResult->Release();
-		pexprResidual->Release();
-		pexpr->Release();
 	}
 
 	return GPOS_OK;

@@ -18,10 +18,10 @@
 #define GPDXL_CDXLLogicalSetOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
-
 namespace gpdxl
 {
 enum EdxlSetOpType
@@ -50,10 +50,10 @@ private:
 	EdxlSetOpType m_set_operation_dxl_type;
 
 	// list of output column descriptors
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// array of input colid arrays
-	ULongPtr2dArray *m_input_colids_arrays;
+	gpos::Ref<ULongPtr2dArray> m_input_colids_arrays;
 
 	// do the columns need to be casted accross inputs
 	BOOL m_cast_across_input_req;
@@ -63,7 +63,8 @@ public:
 
 	// ctor
 	CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-					 CDXLColDescrArray *pdrgdxlcd, ULongPtr2dArray *array_2D,
+					 gpos::Ref<CDXLColDescrArray> pdrgdxlcd,
+					 gpos::Ref<ULongPtr2dArray> array_2D,
 					 BOOL fCastAcrossInput);
 
 	// dtor
@@ -83,7 +84,7 @@ public:
 	}
 
 	// array of output columns
-	const CDXLColDescrArray *
+	const gpos::Ref<CDXLColDescrArray>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -111,7 +112,7 @@ public:
 	}
 
 	// column array of the input at a given position
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetInputColIdArrayAt(ULONG idx) const
 	{
 		GPOS_ASSERT(idx < ChildCount());
@@ -140,7 +141,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalSetOp == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalSetOp> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalSetOp>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

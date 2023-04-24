@@ -49,7 +49,6 @@ CParseHandlerColDescr::CParseHandlerColDescr(
 
 CParseHandlerColDescr::~CParseHandlerColDescr()
 {
-	SafeRelease(m_dxl_column_descr_array);
 }
 
 //---------------------------------------------------------------------------
@@ -60,7 +59,7 @@ CParseHandlerColDescr::~CParseHandlerColDescr()
 //		Returns the array of column descriptors.
 //
 //---------------------------------------------------------------------------
-CDXLColDescrArray *
+gpos::Ref<CDXLColDescrArray>
 CParseHandlerColDescr::GetDXLColumnDescrArray()
 {
 	return m_dxl_column_descr_array;

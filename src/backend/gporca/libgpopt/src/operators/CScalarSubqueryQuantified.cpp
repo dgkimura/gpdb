@@ -55,7 +55,6 @@ CScalarSubqueryQuantified::CScalarSubqueryQuantified(
 //---------------------------------------------------------------------------
 CScalarSubqueryQuantified::~CScalarSubqueryQuantified()
 {
-	m_scalar_op_mdid->Release();
 	GPOS_DELETE(m_pstrScalarOp);
 }
 
@@ -189,7 +188,7 @@ CScalarSubqueryQuantified::PpartinfoDerive(CMemoryPool *,  // mp,
 {
 	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
-	ppartinfoChild->AddRef();
+
 	return ppartinfoChild;
 }
 

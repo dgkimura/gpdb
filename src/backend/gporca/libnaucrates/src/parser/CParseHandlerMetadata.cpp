@@ -52,9 +52,6 @@ CParseHandlerMetadata::CParseHandlerMetadata(
 //---------------------------------------------------------------------------
 CParseHandlerMetadata::~CParseHandlerMetadata()
 {
-	SafeRelease(m_mdid_cached_obj_array);
-	SafeRelease(m_mdid_array);
-	SafeRelease(m_system_id_array);
 }
 
 //---------------------------------------------------------------------------
@@ -80,7 +77,7 @@ CParseHandlerMetadata::GetParseHandlerType() const
 //		Returns the list of metadata objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMDCacheObjectArray *
+gpos::Ref<IMDCacheObjectArray>
 CParseHandlerMetadata::GetMdIdCachedObjArray()
 {
 	return m_mdid_cached_obj_array;
@@ -94,7 +91,7 @@ CParseHandlerMetadata::GetMdIdCachedObjArray()
 //		Returns the list of metadata ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerMetadata::GetMdIdArray()
 {
 	return m_mdid_array;
@@ -108,7 +105,7 @@ CParseHandlerMetadata::GetMdIdArray()
 //		Returns the list of metadata source system ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::Ref<CSystemIdArray>
 CParseHandlerMetadata::GetSysidPtrArray()
 {
 	return m_system_id_array;
@@ -211,7 +208,7 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 
 		gpos::Ref<IMDCacheObject> imdobj =
 			metadata_obj_parse_handler->GetImdObj();
-		imdobj->AddRef();
+
 		m_mdid_cached_obj_array->Append(imdobj);
 	}
 
@@ -226,7 +223,7 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 //		Parse a list of source system ids
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::Ref<CSystemIdArray>
 CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 										Edxltoken dxl_token_attr,
 										Edxltoken dxl_token_element)
@@ -241,7 +238,8 @@ CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 		return nullptr;
 	}
 
-	CSystemIdArray *src_sys_id_array = GPOS_NEW(m_mp) CSystemIdArray(m_mp);
+	gpos::Ref<CSystemIdArray> src_sys_id_array =
+		GPOS_NEW(m_mp) CSystemIdArray(m_mp);
 
 	// extract separate system ids
 	XMLStringTokenizer xml_str_tokenizer(

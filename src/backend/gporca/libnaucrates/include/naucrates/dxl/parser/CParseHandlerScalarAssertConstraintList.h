@@ -42,7 +42,7 @@ private:
 	gpos::Ref<CDXLScalarAssertConstraint> m_dxl_op_assert_constraint;
 
 	// array of assert constraint nodes parsed so far
-	CDXLNodeArray *m_dxlnode_assert_constraints_parsed_array;
+	gpos::Ref<CDXLNodeArray> m_dxlnode_assert_constraints_parsed_array;
 
 	// process the start of an element
 	void StartElement(

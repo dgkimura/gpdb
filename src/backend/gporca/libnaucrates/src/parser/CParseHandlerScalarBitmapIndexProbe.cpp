@@ -121,7 +121,7 @@ CParseHandlerScalarBitmapIndexProbe::EndElement(
 
 	gpos::Ref<CDXLIndexDescr> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
-	dxl_index_descr->AddRef();
+
 
 	gpos::Ref<CDXLScalar> dxl_op =
 		GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, dxl_index_descr);

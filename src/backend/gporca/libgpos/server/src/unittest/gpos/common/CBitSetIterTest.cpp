@@ -80,7 +80,7 @@ CBitSetIterTest::EresUnittest_Basics()
 
 	GPOS_ASSERT(!((BOOL) bsi));
 
-	pbs->Release();
+
 
 	return GPOS_OK;
 }

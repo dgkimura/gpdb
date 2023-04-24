@@ -38,10 +38,10 @@ class CPropConstraint : public CRefCount<CPropConstraint>,
 {
 private:
 	// array of equivalence classes
-	CColRefSetArray *m_pdrgpcrs;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrs;
 
 	// mapping from column to equivalence class
-	ColRefToColRefSetMap *m_phmcrcrs;
+	gpos::Ref<ColRefToColRefSetMap> m_phmcrcrs;
 
 	// constraint
 	gpos::Ref<CConstraint> m_pcnstr;
@@ -53,14 +53,14 @@ public:
 	CPropConstraint(const CPropConstraint &) = delete;
 
 	// ctor
-	CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+	CPropConstraint(CMemoryPool *mp, gpos::Ref<CColRefSetArray> pdrgpcrs,
 					gpos::Ref<CConstraint> pcnstr);
 
 	// dtor
 	~CPropConstraint() override;
 
 	// equivalence classes
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 	PdrgpcrsEquivClasses() const
 	{
 		return m_pdrgpcrs;

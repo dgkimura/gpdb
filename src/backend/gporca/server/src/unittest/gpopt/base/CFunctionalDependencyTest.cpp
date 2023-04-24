@@ -52,7 +52,7 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -82,28 +82,28 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 		pcrsRight->Include(colref);
 	}
 
-	pcrsLeft->AddRef();
-	pcrsRight->AddRef();
+
+
 	gpos::Ref<CFunctionalDependency> pfdFst =
 		GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
-	pcrsLeft->AddRef();
-	pcrsRight->AddRef();
+
+
 	gpos::Ref<CFunctionalDependency> pfdSnd =
 		GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
 	GPOS_ASSERT(pfdFst->Equals(pfdSnd));
 	GPOS_ASSERT(pfdFst->HashValue() == pfdSnd->HashValue());
 
-	CFunctionalDependencyArray *pdrgpfd =
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
-	pfdFst->AddRef();
+
 	pdrgpfd->Append(pfdFst);
-	pfdSnd->AddRef();
+
 	pdrgpfd->Append(pfdSnd);
 	GPOS_ASSERT(CFunctionalDependency::Equals(pdrgpfd, pdrgpfd));
 
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CFunctionalDependency::PdrgpcrKeys(mp, pdrgpfd);
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
@@ -116,14 +116,7 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	CAutoTrace at(mp);
 	at.Os() << "FD1:" << *pfdFst << std::endl << "FD2:" << *pfdSnd << std::endl;
 
-	pfdFst->Release();
-	pfdSnd->Release();
-	pcrsLeft->Release();
-	pcrsRight->Release();
-	pdrgpfd->Release();
-	colref_array->Release();
-	pcrs->Release();
-	pcrsKeys->Release();
+
 
 	return GPOS_OK;
 }

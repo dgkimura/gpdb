@@ -45,7 +45,6 @@ CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarMinMax::~CDXLScalarMinMax()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

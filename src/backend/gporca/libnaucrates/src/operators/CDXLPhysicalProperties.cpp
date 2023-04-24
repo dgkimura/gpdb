@@ -38,7 +38,6 @@ CDXLPhysicalProperties::CDXLPhysicalProperties(gpos::Ref<CDXLOperatorCost> cost)
 //---------------------------------------------------------------------------
 CDXLPhysicalProperties::~CDXLPhysicalProperties()
 {
-	SafeRelease(m_operator_cost_dxl);
 }
 
 //---------------------------------------------------------------------------

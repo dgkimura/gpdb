@@ -612,12 +612,13 @@ private:
 		RangeTblEntry *pRTEHashFuncCal);
 
 	// hash a DXL datum with GPDB's hash function
-	ULONG GetDXLDatumGPDBHash(CDXLDatumArray *dxl_datum_array,
+	ULONG GetDXLDatumGPDBHash(gpos::Ref<CDXLDatumArray> dxl_datum_array,
 							  RangeTblEntry *pRTEHashFuncCal);
 
 	// translate nest loop colrefs to GPDB nestparams
 	static List *TranslateNestLoopParamList(
-		CDXLColRefArray *pdrgdxlcrOuterRefs, CDXLTranslateContext *dxltrctxLeft,
+		gpos::Ref<CDXLColRefArray> pdrgdxlcrOuterRefs,
+		CDXLTranslateContext *dxltrctxLeft,
 		CDXLTranslateContext *dxltrctxRight);
 };
 }  // namespace gpdxl

@@ -182,7 +182,7 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 			dynamic_cast<CParseHandlerTableDescr *>((*this)[child_index++]);
 		gpos::Ref<CDXLTableDescr> table_descr =
 			table_descr_parse_handler->GetDXLTableDescr();
-		table_descr->AddRef();
+
 		m_dxl_op->SetDXLTableDesc(table_descr);
 	}
 	CParseHandlerProjList *proj_list_parse_handler =

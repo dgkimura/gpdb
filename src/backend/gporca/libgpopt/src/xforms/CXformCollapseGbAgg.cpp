@@ -92,7 +92,7 @@ CXformCollapseGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -132,17 +132,17 @@ CXformCollapseGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 		GPOS_NEW(mp) CColRefSet(mp, popBottomGbAgg->Pdrgpcr());
 	GPOS_ASSERT(pcrsBottomGrpCols->ContainsAll(pcrsTopGrpCols));
 
-	pcrsTopGrpCols->Release();
-	pcrsBottomGrpCols->Release();
+
+
 #endif	// GPOS_DEBUG
 
-	pexprChild->AddRef();
+
 	gpos::Ref<CExpression> pexprSelect = CUtils::PexprLogicalSelect(
 		mp, pexprChild,
 		CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/));
 
-	popTopGbAgg->AddRef();
-	pexprTopProjectList->AddRef();
+
+
 	gpos::Ref<CExpression> pexprGbAggNew = GPOS_NEW(mp)
 		CExpression(mp, popTopGbAgg, pexprSelect, pexprTopProjectList);
 

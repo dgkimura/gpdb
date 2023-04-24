@@ -38,7 +38,7 @@ protected:
 	BOOL m_static_pruned{false};
 
 	// Indexes correspond to partitions
-	IMdIdArray *m_foreign_server_mdids{nullptr};
+	gpos::Ref<IMdIdArray> m_foreign_server_mdids{nullptr};
 
 public:
 	CLogicalDynamicGet(const CLogicalDynamicGet &) = delete;
@@ -48,15 +48,16 @@ public:
 
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
-					   CColRefArray *pdrgpcrOutput,
-					   CColRef2dArray *pdrgpdrgpcrPart,
-					   IMdIdArray *partition_mdids,
+					   gpos::Ref<CColRefArray> pdrgpcrOutput,
+					   gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+					   gpos::Ref<IMdIdArray> partition_mdids,
 					   gpos::Ref<CConstraint> partition_cnstrs_disj,
-					   BOOL static_pruned, IMdIdArray *foreign_server_mdids);
+					   BOOL static_pruned,
+					   gpos::Ref<IMdIdArray> foreign_server_mdids);
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulPartIndex,
-					   IMdIdArray *partition_mdids,
-					   IMdIdArray *foreign_server_mdids);
+					   gpos::Ref<IMdIdArray> partition_mdids,
+					   gpos::Ref<IMdIdArray> foreign_server_mdids);
 
 	// dtor
 	~CLogicalDynamicGet() override;
@@ -103,7 +104,7 @@ public:
 
 	// returns mdid list containing foreign server mdids corresponding to partititons in m_partition_mdids.
 	// Mdid is marked as invalid (0) if not a foreign partition
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	ForeignServerMdIds() const
 	{
 		return m_foreign_server_mdids;
@@ -111,7 +112,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -163,7 +164,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Statistics
@@ -172,7 +173,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// derive stats from base table using filters on partition and/or index columns
 	gpos::Ref<IStatistics> PstatsDeriveFilter(
@@ -197,7 +198,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalDynamicGet> >(pop);
+		return gpos::dyn_cast<CLogicalDynamicGet>(pop);
 	}
 
 	// debug print

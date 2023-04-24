@@ -54,7 +54,7 @@ CXformRightOuterJoin2HashJoinTest::EresUnittest_Transform()
 	CMemoryPool *mp = amp.Pmp();
 
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
@@ -74,10 +74,7 @@ CXformRightOuterJoin2HashJoinTest::EresUnittest_Transform()
 
 	(void) xform->Transform(context, result, pLogicalRightOuterJoin);
 
-	pLogicalRightOuterJoin->Release();
-	xform->Release();
-	context->Release();
-	result->Release();
+
 
 	return GPOS_OK;
 }

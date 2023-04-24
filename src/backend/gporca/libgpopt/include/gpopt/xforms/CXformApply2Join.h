@@ -72,17 +72,16 @@ private:
 		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
 		gpos::Ref<CExpression> pexprScalar = (*pexprApply)[2];
 
-		pexprOuter->AddRef();
-		pexprInner->AddRef();
-		pexprScalar->AddRef();
+
+
 		gpos::Ref<CExpression> pexprResult = nullptr;
 
 		TApply *popApply = TApply::PopConvert(pexprApply->Pop());
-		CColRefArray *colref_array = popApply->PdrgPcrInner();
+		gpos::Ref<CColRefArray> colref_array = popApply->PdrgPcrInner();
 		GPOS_ASSERT(nullptr != colref_array);
 		GPOS_ASSERT(1 == colref_array->Size());
 
-		colref_array->AddRef();
+
 		COperator::EOperatorId eopidSubq = popApply->EopidOriginSubq();
 		COperator::EOperatorId op_id = pexprApply->Pop()->Eopid();
 		switch (op_id)
@@ -135,7 +134,7 @@ protected:
 	static BOOL
 	FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexprApply,
 				 gpos::Ref<CExpression> *ppexprInner,
-				 CExpressionArray **ppdrgpexpr)
+				 gpos::Ref<CExpressionArray> *ppdrgpexpr)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 		GPOS_ASSERT(nullptr != ppexprInner);
@@ -146,7 +145,7 @@ protected:
 		gpos::Ref<CExpression> pexprPredicateOrig = (*pexprApply)[2];
 
 		// add original predicate to array
-		pexprPredicateOrig->AddRef();
+
 		(*ppdrgpexpr)->Append(pexprPredicateOrig);
 
 		// since properties of inner child have been copied from
@@ -160,7 +159,7 @@ protected:
 				*ppdrgpexpr, (*pexprApply)[0]->DeriveOutputColumns()))
 		{
 			// decorrelation filed
-			(*ppdrgpexpr)->Release();
+
 			return false;
 		}
 
@@ -171,8 +170,6 @@ protected:
 			!CPredicateUtils::FValidSemiJoinCorrelations(
 				mp, (*pexprApply)[0], (*ppexprInner), (*ppdrgpexpr)))
 		{
-			(*ppdrgpexpr)->Release();
-
 			return false;
 		}
 
@@ -195,7 +192,7 @@ protected:
 		}
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		CExpressionArray *pdrgpexpr = nullptr;
+		gpos::Ref<CExpressionArray> pdrgpexpr = nullptr;
 		gpos::Ref<CExpression> pexprInner = nullptr;
 		if (!FDecorrelate(mp, pexprApply, &pexprInner, &pdrgpexpr))
 		{
@@ -207,7 +204,7 @@ protected:
 
 		// build substitute
 		GPOS_ASSERT(nullptr != pexprInner);
-		(*pexprApply)[0]->AddRef();
+
 		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
 		gpos::Ref<CExpression> pexprPredicate =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
@@ -218,7 +215,7 @@ protected:
 									 pexprOuter, pexprInner, pexprPredicate);
 		gpos::Ref<CExpression> pexprNormalized =
 			CNormalizer::PexprNormalize(mp, pexprResult);
-		pexprResult->Release();
+
 
 		// add alternative to results
 		pxfres->Add(pexprNormalized);
@@ -244,9 +241,9 @@ protected:
 		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
 		gpos::Ref<CExpression> pexprInner = (*pexprApply)[1];
 		gpos::Ref<CExpression> pexprPred = (*pexprApply)[2];
-		pexprOuter->AddRef();
-		pexprInner->AddRef();
-		pexprPred->AddRef();
+
+
+
 		gpos::Ref<CExpression> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator

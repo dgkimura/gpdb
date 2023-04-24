@@ -59,7 +59,6 @@ CReqdPropRelational::CReqdPropRelational(gpos::Ref<CColRefSet> pcrs)
 //---------------------------------------------------------------------------
 CReqdPropRelational::~CReqdPropRelational()
 {
-	SafeRelease(m_pcrsStat);
 }
 
 //---------------------------------------------------------------------------
@@ -73,8 +72,8 @@ CReqdPropRelational::~CReqdPropRelational()
 void
 CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 )
 {
 	GPOS_CHECK_ABORT;
@@ -99,7 +98,7 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CReqdPropRelational>
 CReqdPropRelational::GetReqdRelationalProps(gpos::Ref<CReqdProp> prp)
 {
-	return dynamic_cast<gpos::Ref<CReqdPropRelational> >(prp);
+	return gpos::dyn_cast<CReqdPropRelational>(prp);
 }
 
 

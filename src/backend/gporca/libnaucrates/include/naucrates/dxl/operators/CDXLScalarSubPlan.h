@@ -13,10 +13,10 @@
 #define GPDXL_CDXLScalarSubPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -55,7 +55,7 @@ private:
 	gpos::Ref<IMDId> m_first_col_type_mdid;
 
 	// array of outer column references
-	CDXLColRefArray *m_dxl_colref_array;
+	gpos::Ref<CDXLColRefArray> m_dxl_colref_array;
 
 	// subplan type
 	EdxlSubPlanType m_dxl_subplan_type;
@@ -71,7 +71,7 @@ public:
 
 	// ctor/dtor
 	CDXLScalarSubPlan(CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
-					  CDXLColRefArray *dxl_colref_array,
+					  gpos::Ref<CDXLColRefArray> dxl_colref_array,
 					  EdxlSubPlanType dxl_subplan_type,
 					  gpos::Ref<CDXLNode> dxlnode_test_expr,
 					  BOOL outer_param = false);
@@ -92,7 +92,7 @@ public:
 	gpos::Ref<IMDId> GetFirstColTypeMdId() const;
 
 	// outer references
-	const CDXLColRefArray *
+	const gpos::Ref<CDXLColRefArray>
 	GetDxlOuterColRefsArray() const
 	{
 		return m_dxl_colref_array;
@@ -129,7 +129,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubPlan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarSubPlan> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubPlan>(dxl_op);
 	}
 
 	// does the operator return a boolean result

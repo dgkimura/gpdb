@@ -28,8 +28,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalConstTable::CDXLLogicalConstTable(
-	CMemoryPool *mp, CDXLColDescrArray *col_descr_array,
-	CDXLDatum2dArray *const_tuples_datum_array)
+	CMemoryPool *mp, gpos::Ref<CDXLColDescrArray> col_descr_array,
+	gpos::Ref<CDXLDatum2dArray> const_tuples_datum_array)
 	: CDXLLogical(mp),
 	  m_col_descr_array(col_descr_array),
 	  m_const_tuples_datum_array(const_tuples_datum_array)
@@ -41,7 +41,8 @@ CDXLLogicalConstTable::CDXLLogicalConstTable(
 	const ULONG length = const_tuples_datum_array->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		CDXLDatumArray *pdrgpdxldatum = (*const_tuples_datum_array)[idx];
+		gpos::Ref<CDXLDatumArray> pdrgpdxldatum =
+			(*const_tuples_datum_array)[idx];
 		GPOS_ASSERT(pdrgpdxldatum->Size() == col_descr_array->Size());
 	}
 #endif
@@ -57,8 +58,6 @@ CDXLLogicalConstTable::CDXLLogicalConstTable(
 //---------------------------------------------------------------------------
 CDXLLogicalConstTable::~CDXLLogicalConstTable()
 {
-	m_col_descr_array->Release();
-	m_const_tuples_datum_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -164,7 +163,7 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 		xml_serializer->OpenElement(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			pstrElemNameConstTuple);
-		CDXLDatumArray *pdrgpdxldatum =
+		gpos::Ref<CDXLDatumArray> pdrgpdxldatum =
 			(*m_const_tuples_datum_array)[tuple_idx];
 
 		const ULONG num_of_cols = pdrgpdxldatum->Size();

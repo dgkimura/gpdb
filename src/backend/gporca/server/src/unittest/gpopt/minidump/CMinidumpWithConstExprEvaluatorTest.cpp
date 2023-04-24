@@ -107,7 +107,7 @@ CMinidumpWithConstExprEvaluatorTest::
 		false,	  // fTestSpacePruning
 		nullptr,  // szMDFilePath
 		pceeval);
-	pceeval->Release();
+
 
 	return eres;
 }

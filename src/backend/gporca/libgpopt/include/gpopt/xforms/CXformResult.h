@@ -32,7 +32,7 @@ class CXformResult : public CRefCount<CXformResult>,
 {
 private:
 	// set of alternatives
-	CExpressionArray *m_pdrgpexpr;
+	gpos::Ref<CExpressionArray> m_pdrgpexpr;
 
 	// cursor for retrieval
 	ULONG m_ulExpr;
@@ -47,7 +47,7 @@ public:
 	~CXformResult() override;
 
 	// accessor
-	inline CExpressionArray *
+	inline gpos::Ref<CExpressionArray>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr;

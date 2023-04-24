@@ -32,7 +32,7 @@ private:
 	CDouble m_degree;
 
 	// from attnos values
-	IntPtrArray *m_from_attnos;
+	gpos::Ref<IntPtrArray> m_from_attnos;
 
 	INT m_to_attno;
 

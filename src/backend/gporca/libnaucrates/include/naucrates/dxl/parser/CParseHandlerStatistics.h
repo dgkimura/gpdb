@@ -37,7 +37,7 @@ class CParseHandlerStatistics : public CParseHandlerBase
 {
 private:
 	// list of derived table statistics
-	CDXLStatsDerivedRelationArray *m_dxl_stats_derived_rel_array;
+	gpos::Ref<CDXLStatsDerivedRelationArray> m_dxl_stats_derived_rel_array;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return the list of statistics objects
-	CDXLStatsDerivedRelationArray *GetStatsDerivedRelDXLArray() const;
+	gpos::Ref<CDXLStatsDerivedRelationArray> GetStatsDerivedRelDXLArray() const;
 };
 }  // namespace gpdxl
 

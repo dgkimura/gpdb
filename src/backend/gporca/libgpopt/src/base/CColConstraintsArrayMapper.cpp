@@ -7,7 +7,7 @@
 
 using namespace gpopt;
 
-CConstraintArray *
+gpos::Ref<CConstraintArray>
 CColConstraintsArrayMapper::PdrgPcnstrLookup(gpos::Ref<CColRef> colref)
 {
 	const BOOL fExclusive = true;
@@ -16,12 +16,11 @@ CColConstraintsArrayMapper::PdrgPcnstrLookup(gpos::Ref<CColRef> colref)
 }
 
 CColConstraintsArrayMapper::CColConstraintsArrayMapper(
-	gpos::CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+	gpos::CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr)
 	: m_mp(mp), m_pdrgpcnstr(pdrgpcnstr)
 {
 }
 
 CColConstraintsArrayMapper::~CColConstraintsArrayMapper()
 {
-	m_pdrgpcnstr->Release();
 }

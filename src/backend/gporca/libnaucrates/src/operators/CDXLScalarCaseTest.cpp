@@ -44,7 +44,6 @@ CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCaseTest::~CDXLScalarCaseTest()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

@@ -38,8 +38,8 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp)
 //		Construct a DXL Logical group by node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp,
-									   ULongPtrArray *pdrgpulGrpColIds)
+CDXLLogicalGroupBy::CDXLLogicalGroupBy(
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> pdrgpulGrpColIds)
 	: CDXLLogical(mp), m_grouping_colid_array(pdrgpulGrpColIds)
 {
 	GPOS_ASSERT(nullptr != pdrgpulGrpColIds);
@@ -55,7 +55,6 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalGroupBy::~CDXLLogicalGroupBy()
 {
-	SafeRelease(m_grouping_colid_array);
 }
 
 //---------------------------------------------------------------------------
@@ -95,7 +94,8 @@ CDXLLogicalGroupBy::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGroupBy::SetGroupingColumns(ULongPtrArray *grouping_colid_array)
+CDXLLogicalGroupBy::SetGroupingColumns(
+	gpos::Ref<ULongPtrArray> grouping_colid_array)
 {
 	GPOS_ASSERT(nullptr != grouping_colid_array);
 	m_grouping_colid_array = grouping_colid_array;
@@ -109,7 +109,7 @@ CDXLLogicalGroupBy::SetGroupingColumns(ULongPtrArray *grouping_colid_array)
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CDXLLogicalGroupBy::GetGroupingColidArray() const
 {
 	return m_grouping_colid_array;

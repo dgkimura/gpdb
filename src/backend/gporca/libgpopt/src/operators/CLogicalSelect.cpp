@@ -44,7 +44,6 @@ CLogicalSelect::CLogicalSelect(CMemoryPool *mp,
 
 CLogicalSelect::~CLogicalSelect()
 {
-	m_phmPexprPartPred->Release();
 }
 //---------------------------------------------------------------------------
 //	@function:
@@ -86,10 +85,10 @@ CLogicalSelect::DeriveKeyCollection(CMemoryPool *,	// mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalSelect::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSelect2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfRemoveSubqDistinct);
@@ -142,7 +141,7 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 IStatisticsArray *stats_ctxt) const
+							 gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
@@ -150,7 +149,7 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (exprhdl.DeriveHasSubquery(1))
 	{
 		// in case of subquery in select predicate, we return child stats
-		child_stats->AddRef();
+
 		return child_stats;
 	}
 
@@ -170,14 +169,14 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	CPredicateUtils::SeparateOuterRefs(mp, pexprPredicate, outer_refs,
 									   &local_expr, &expr_with_outer_refs);
-	pexprPredicate->Release();
+
 
 	gpos::Ref<IStatistics> stats =
 		CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
 			mp, exprhdl, child_stats, local_expr, expr_with_outer_refs,
 			stats_ctxt);
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+
+
 
 	return stats;
 }

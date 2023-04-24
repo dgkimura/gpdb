@@ -47,7 +47,6 @@ CDXLPhysicalAgg::CDXLPhysicalAgg(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalAgg::~CDXLPhysicalAgg()
 {
-	SafeRelease(m_grouping_colids_array);
 }
 
 
@@ -130,7 +129,7 @@ CDXLPhysicalAgg::GetAggStrategyNameStr() const
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CDXLPhysicalAgg::GetGroupingColidArray() const
 {
 	return m_grouping_colids_array;
@@ -146,7 +145,7 @@ CDXLPhysicalAgg::GetGroupingColidArray() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::SetGroupingCols(ULongPtrArray *grouping_colids_array)
+CDXLPhysicalAgg::SetGroupingCols(gpos::Ref<ULongPtrArray> grouping_colids_array)
 {
 	GPOS_ASSERT(nullptr != grouping_colids_array);
 	m_grouping_colids_array = grouping_colids_array;

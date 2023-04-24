@@ -61,7 +61,7 @@ private:
 
 	// arrays of internal nodes
 	using CTreeNodeArray = CDynamicPtrArray<CTreeNode, CleanupNULL>;
-	using CTreeNode2dArray = CDynamicPtrArray<CTreeNodeArray, CleanupRelease>;
+	using CTreeNode2dArray = gpos::Vector<gpos::Ref<CTreeNodeArray>>;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -152,7 +152,7 @@ private:
 		const T *m_value;
 
 		// array of children arrays
-		CTreeNode2dArray *m_pdrgdrgptn;
+		gpos::Ref<CTreeNode2dArray> m_pdrgdrgptn;
 
 		// number of trees rooted in this node
 		ULLONG m_ullCount;
@@ -190,7 +190,7 @@ private:
 			GPOS_CHECK_STACK_SIZE;
 			GPOS_ASSERT(ullRank < UllCount(ulChild));
 
-			CTreeNodeArray *pdrgptn = (*m_pdrgdrgptn)[ulChild];
+			gpos::Ref<CTreeNodeArray> pdrgptn = (*m_pdrgdrgptn)[ulChild];
 			ULONG ulCandidates = pdrgptn->Size();
 
 			CTreeNode *ptn = nullptr;
@@ -230,7 +230,6 @@ private:
 		// dtor
 		~CTreeNode()
 		{
-			m_pdrgdrgptn->Release();
 		}
 
 		// add child alternative
@@ -245,7 +244,8 @@ private:
 			ULONG length = m_pdrgdrgptn->Size();
 			for (ULONG ul = length; ul <= ulPos; ul++)
 			{
-				CTreeNodeArray *pdrg = GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
+				gpos::Ref<CTreeNodeArray> pdrg =
+					GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
 				m_pdrgdrgptn->Append(pdrg);
 			}
 
@@ -253,7 +253,7 @@ private:
 			ptn->m_ulIncoming++;
 
 			// insert to appropriate array
-			CTreeNodeArray *pdrg = (*m_pdrgdrgptn)[ulPos];
+			gpos::Ref<CTreeNodeArray> pdrg = (*m_pdrgdrgptn)[ulPos];
 			GPOS_ASSERT(nullptr != pdrg);
 			pdrg->Append(ptn);
 		}
@@ -412,10 +412,10 @@ private:
 		CHashMap<STreeLink, BOOL, STreeLink::HashValue, STreeLink::Equals,
 				 CleanupDelete<STreeLink>, CleanupDelete<BOOL>>;
 
-	TMap *m_ptmap;
+	gpos::Ref<TMap> m_ptmap;
 
 	// map of nodes to outgoing links
-	LinkMap *m_plinkmap;
+	gpos::Ref<LinkMap> m_plinkmap;
 
 	// recursive count starting in given node
 	ULLONG UllCount(CTreeNode *ptn);
@@ -464,9 +464,6 @@ public:
 	// dtor
 	~CTreeMap()
 	{
-		m_ptmap->Release();
-		m_plinkmap->Release();
-
 		GPOS_DELETE(m_ptnRoot);
 	}
 

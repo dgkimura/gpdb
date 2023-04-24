@@ -75,7 +75,7 @@ CMemo::~CMemo()
 	while (nullptr != pgroup)
 	{
 		gpos::Ref<CGroup> pgroupNext = m_listGroups.Next(pgroup);
-		pgroup->Release();
+
 
 		pgroup = pgroupNext;
 	}
@@ -134,7 +134,7 @@ CMemo::Add(gpos::Ref<CGroup> pgroup,
 	GPOS_ASSERT(nullptr != pdp);
 
 	ULONG id = m_aul++;
-	pdp->AddRef();
+
 #ifdef GPOS_DEBUG
 	gpos::Ref<CGroupExpression> pgexpr = nullptr;
 #endif	// GPOS_DEBUG
@@ -275,7 +275,6 @@ CMemo::PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
 	if (nullptr == pgexpr->Pgroup() && fNewGroup)
 	{
 		fNewGroup = false;
-		pgroupTarget->Release();
 	}
 
 	// if a new scalar group is added, we materialize a scalar expression
@@ -344,7 +343,7 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::Ref<CGroup> pgroupRoot,
 		return nullptr;
 	}
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	// Get the length of groups for the best group expression
 	// i.e. given the best expression is
 	// 0: CScalarCmp (>=) [ 1 7 ]
@@ -395,14 +394,13 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::Ref<CGroup> pgroupRoot,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	pgexprBest->Pop()->AddRef();
+
 
 	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 	if (poc != nullptr)
 	{
 		GPOS_ASSERT(!pgroupRoot->FScalar());
 		prpp = poc->Prpp();
-		prpp->AddRef();
 	}
 	gpos::Ref<CExpression> pexpr = GPOS_NEW(mp) CExpression(
 		mp, pgexprBest->Pop(), pgexprBest, pdrgpexpr, prpp, stats, cost);

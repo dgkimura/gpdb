@@ -44,7 +44,6 @@ CDXLScalarConstValue::CDXLScalarConstValue(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarConstValue::~CDXLScalarConstValue()
 {
-	m_dxl_datum->Release();
 }
 
 

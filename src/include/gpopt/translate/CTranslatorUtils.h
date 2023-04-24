@@ -48,7 +48,7 @@ namespace gpopt
 class CMDAccessor;
 
 // dynamic array of bitsets
-using CBitSetArray = CDynamicPtrArray<CBitSet, CleanupRelease>;
+using CBitSetArray = gpos::Vector<gpos::Ref<CBitSet>>;
 }  // namespace gpopt
 
 namespace gpdxl
@@ -83,44 +83,46 @@ private:
 	// from either a plain GROUP BY or one set in a list of grouping sets
 	static gpos::Ref<CBitSet> CreateAttnoSetForGroupingSet(
 		CMemoryPool *mp, List *group_elems, ULONG num_cols,
-		UlongToUlongMap *group_col_pos, gpos::Ref<CBitSet> group_cols,
+		gpos::Ref<UlongToUlongMap> group_col_pos, gpos::Ref<CBitSet> group_cols,
 		bool use_group_clause);
 
 	// check if the given mdid array contains any of the polymorphic
 	// types (ANYELEMENT, ANYARRAY)
-	static BOOL ContainsPolymorphicTypes(IMdIdArray *mdid_array);
+	static BOOL ContainsPolymorphicTypes(gpos::Ref<IMdIdArray> mdid_array);
 
 	// resolve polymorphic types in the given array of type ids, replacing
 	// them with the actual types obtained from the query
-	static IMdIdArray *ResolvePolymorphicTypes(CMemoryPool *mp,
-											   IMdIdArray *return_arg_mdids,
-											   List *input_arg_types,
-											   FuncExpr *funcexpr);
+	static gpos::Ref<IMdIdArray> ResolvePolymorphicTypes(
+		CMemoryPool *mp, gpos::Ref<IMdIdArray> return_arg_mdids,
+		List *input_arg_types, FuncExpr *funcexpr);
 
 	// update grouping col position mappings
-	static void UpdateGrpColMapping(CMemoryPool *mp,
-									UlongToUlongMap *grouping_col_to_pos_map,
-									gpos::Ref<CBitSet> group_cols,
-									ULONG sort_group_ref);
+	static void UpdateGrpColMapping(
+		CMemoryPool *mp, gpos::Ref<UlongToUlongMap> grouping_col_to_pos_map,
+		gpos::Ref<CBitSet> group_cols, ULONG sort_group_ref);
 
 	// create a set of grouping sets for a rollup
-	static CBitSetArray *CreateGroupingSetsForRollup(
+	static gpos::Ref<CBitSetArray> CreateGroupingSetsForRollup(
 		CMemoryPool *mp, const GroupingSet *grouping_set, ULONG num_cols,
-		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols,
+		gpos::Ref<UlongToUlongMap> group_col_pos);
 
 	// create a set of grouping sets for a cube
-	static CBitSetArray *CreateGroupingSetsForCube(
+	static gpos::Ref<CBitSetArray> CreateGroupingSetsForCube(
 		CMemoryPool *mp, const GroupingSet *grouping_set, ULONG num_cols,
-		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols,
+		gpos::Ref<UlongToUlongMap> group_col_pos);
 
 	// create a set of grouping sets for a grouping sets subclause
-	static CBitSetArray *CreateGroupingSetsForSets(
+	static gpos::Ref<CBitSetArray> CreateGroupingSetsForSets(
 		CMemoryPool *mp, const GroupingSet *grouping_set_node, ULONG num_cols,
-		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols,
+		gpos::Ref<UlongToUlongMap> group_col_pos);
 
-	static CBitSetArray *CreateGroupingSetsForSimple(
+	static gpos::Ref<CBitSetArray> CreateGroupingSetsForSimple(
 		CMemoryPool *mp, const GroupingSet *grouping_set_node, ULONG num_cols,
-		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols,
+		gpos::Ref<UlongToUlongMap> group_col_pos);
 
 public:
 	struct SCmptypeStrategy
@@ -167,27 +169,27 @@ public:
 		const RangeTblEntry *rte);
 
 	// get column descriptors from a record type
-	static CDXLColDescrArray *GetColumnDescriptorsFromRecord(
+	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromRecord(
 		CMemoryPool *mp, CIdGenerator *id_generator, List *col_names,
 		List *col_types, List *col_type_modifiers);
 
 	// get column descriptors from a record type
-	static CDXLColDescrArray *GetColumnDescriptorsFromRecord(
+	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromRecord(
 		CMemoryPool *mp, CIdGenerator *id_generator, List *col_names,
-		IMdIdArray *out_arg_types);
+		gpos::Ref<IMdIdArray> out_arg_types);
 
 	// get column descriptor from a base type
-	static CDXLColDescrArray *GetColumnDescriptorsFromBase(
+	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromBase(
 		CMemoryPool *mp, CIdGenerator *id_generator,
 		gpos::Ref<IMDId> mdid_return_type, INT type_modifier, CMDName *md_name);
 
 	// get column descriptors from a composite type
-	static CDXLColDescrArray *GetColumnDescriptorsFromComposite(
+	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromComposite(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
 		const gpos::Ref<IMDType> md_type);
 
 	// expand a composite type into an array of IMDColumns
-	static CMDColumnArray *ExpandCompositeType(
+	static gpos::Ref<CMDColumnArray> ExpandCompositeType(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		const gpos::Ref<IMDType> md_type);
 
@@ -196,9 +198,9 @@ public:
 
 	// construct a dynamic array of sets of column attnos corresponding
 	// to the group by clause
-	static CBitSetArray *GetColumnAttnosForGroupBy(
+	static gpos::Ref<CBitSetArray> GetColumnAttnosForGroupBy(
 		CMemoryPool *mp, List *group_clause, List *grouping_set_list,
-		ULONG num_cols, UlongToUlongMap *group_col_pos,
+		ULONG num_cols, gpos::Ref<UlongToUlongMap> group_col_pos,
 		gpos::Ref<CBitSet> group_cold);
 
 	// return a copy of the query with constant of unknown type being coerced
@@ -209,22 +211,21 @@ public:
 	static OID GetTargetListReturnTypeOid(List *target_list, ULONG col_pos);
 
 	// construct an array of DXL column identifiers for a target list
-	static ULongPtrArray *GenerateColIds(CMemoryPool *mp, List *target_list,
-										 IMdIdArray *input_mdids,
-										 ULongPtrArray *input_nums,
-										 const BOOL *is_outer_ref,
-										 CIdGenerator *colid_generator);
+	static gpos::Ref<ULongPtrArray> GenerateColIds(
+		CMemoryPool *mp, List *target_list, gpos::Ref<IMdIdArray> input_mdids,
+		gpos::Ref<ULongPtrArray> input_nums, const BOOL *is_outer_ref,
+		CIdGenerator *colid_generator);
 
 	// construct an array of DXL column descriptors for a target list
 	// using the column ids in the given array
-	static CDXLColDescrArray *GetDXLColumnDescrArray(CMemoryPool *mp,
-													 List *target_list,
-													 ULongPtrArray *colids,
-													 BOOL keep_res_junked);
+	static gpos::Ref<CDXLColDescrArray> GetDXLColumnDescrArray(
+		CMemoryPool *mp, List *target_list, gpos::Ref<ULongPtrArray> colids,
+		BOOL keep_res_junked);
 
 	// return the positions of the target list entries included in the output
-	static ULongPtrArray *GetPosInTargetList(CMemoryPool *mp, List *target_list,
-											 BOOL keep_res_junked);
+	static gpos::Ref<ULongPtrArray> GetPosInTargetList(CMemoryPool *mp,
+													   List *target_list,
+													   BOOL keep_res_junked);
 
 	// construct a column descriptor from the given target entry, column identifier and position in the output
 	static gpos::Ref<CDXLColDescr> GetColumnDescrAt(CMemoryPool *mp,
@@ -238,16 +239,18 @@ public:
 
 	// construct a list of colids corresponding to the given target list
 	// using the given attno->colid map
-	static ULongPtrArray *GetOutputColIdsArray(
-		CMemoryPool *mp, List *target_list, IntToUlongMap *attno_to_colid_map);
+	static gpos::Ref<ULongPtrArray> GetOutputColIdsArray(
+		CMemoryPool *mp, List *target_list,
+		gpos::Ref<IntToUlongMap> attno_to_colid_map);
 
 	// construct an array of column ids for the given group by set
-	static ULongPtrArray *GetGroupingColidArray(
+	static gpos::Ref<ULongPtrArray> GetGroupingColidArray(
 		CMemoryPool *mp, gpos::Ref<CBitSet> group_by_cols,
-		IntToUlongMap *sort_group_cols_to_colid_map);
+		gpos::Ref<IntToUlongMap> sort_group_cols_to_colid_map);
 
 	// return the Colid of column with given index
-	static ULONG GetColId(INT index, IntToUlongMap *index_to_colid_map);
+	static ULONG GetColId(INT index,
+						  gpos::Ref<IntToUlongMap> index_to_colid_map);
 
 	// return the corresponding ColId for the given varno, varattno and querylevel
 	static ULONG GetColId(ULONG query_level, INT varno, INT var_attno,
@@ -293,7 +296,7 @@ public:
 
 	// convert a list of column ids to a list of attribute numbers using
 	// the provided context with mappings
-	static List *ConvertColidToAttnos(ULongPtrArray *pdrgpul,
+	static List *ConvertColidToAttnos(gpos::Ref<ULongPtrArray> pdrgpul,
 									  CDXLTranslateContext *dxl_translate_ctxt);
 
 	// parse string value into a Long Integer
@@ -310,9 +313,9 @@ public:
 	// create a multi-byte character string from a wide character string
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
 
-	static UlongToUlongMap *MakeNewToOldColMapping(CMemoryPool *mp,
-												   ULongPtrArray *old_colids,
-												   ULongPtrArray *new_colids);
+	static gpos::Ref<UlongToUlongMap> MakeNewToOldColMapping(
+		CMemoryPool *mp, gpos::Ref<ULongPtrArray> old_colids,
+		gpos::Ref<ULongPtrArray> new_colids);
 
 	// check if the given tree contains a subquery
 	static BOOL HasSubquery(Node *node);

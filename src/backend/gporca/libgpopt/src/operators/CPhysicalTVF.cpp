@@ -34,7 +34,7 @@ using namespace gpopt;
 CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 						   gpos::Ref<IMDId> mdid_return_type,
 						   CWStringConst *str,
-						   CColumnDescriptorArray *pdrgpcoldesc,
+						   gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc,
 						   gpos::Ref<CColRefSet> pcrsOutput)
 	: CPhysical(mp),
 	  m_func_mdid(mdid_func),
@@ -70,10 +70,6 @@ CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 //---------------------------------------------------------------------------
 CPhysicalTVF::~CPhysicalTVF()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
-	m_pdrgpcoldesc->Release();
-	m_pcrsOutput->Release();
 	GPOS_DELETE(m_pstr);
 }
 
@@ -125,12 +121,12 @@ CPhysicalTVF::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalTVF::PcrsRequired(CMemoryPool *,		   // mp,
-						   CExpressionHandle &,	   // exprhdl,
-						   gpos::Ref<CColRefSet>,  // pcrsRequired,
-						   ULONG,				   // child_index,
-						   CDrvdPropArray *,	   // pdrgpdpCtxt
-						   ULONG				   // ulOptReq
+CPhysicalTVF::PcrsRequired(CMemoryPool *,			   // mp,
+						   CExpressionHandle &,		   // exprhdl,
+						   gpos::Ref<CColRefSet>,	   // pcrsRequired,
+						   ULONG,					   // child_index,
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");
@@ -146,12 +142,12 @@ CPhysicalTVF::PcrsRequired(CMemoryPool *,		   // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalTVF::PosRequired(CMemoryPool *,		  // mp,
-						  CExpressionHandle &,	  // exprhdl,
-						  gpos::Ref<COrderSpec>,  // posRequired,
-						  ULONG,				  // child_index,
-						  CDrvdPropArray *,		  // pdrgpdpCtxt
-						  ULONG					  // ulOptReq
+CPhysicalTVF::PosRequired(CMemoryPool *,			  // mp,
+						  CExpressionHandle &,		  // exprhdl,
+						  gpos::Ref<COrderSpec>,	  // posRequired,
+						  ULONG,					  // child_index,
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");
@@ -171,7 +167,7 @@ CPhysicalTVF::PdsRequired(CMemoryPool *,				 // mp,
 						  CExpressionHandle &,			 // exprhdl,
 						  gpos::Ref<CDistributionSpec>,	 // pdsRequired,
 						  ULONG,						 //child_index
-						  CDrvdPropArray *,				 // pdrgpdpCtxt
+						  gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
 						  ULONG							 // ulOptReq
 ) const
 {
@@ -192,7 +188,7 @@ CPhysicalTVF::PrsRequired(CMemoryPool *,				  // mp,
 						  CExpressionHandle &,			  // exprhdl,
 						  gpos::Ref<CRewindabilitySpec>,  // prsRequired,
 						  ULONG,						  // child_index,
-						  CDrvdPropArray *,				  // pdrgpdpCtxt
+						  gpos::Ref<CDrvdPropArray>,	  // pdrgpdpCtxt
 						  ULONG							  // ulOptReq
 ) const
 {
@@ -209,12 +205,12 @@ CPhysicalTVF::PrsRequired(CMemoryPool *,				  // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalTVF::PcteRequired(CMemoryPool *,		 //mp,
-						   CExpressionHandle &,	 //exprhdl,
-						   gpos::Ref<CCTEReq>,	 //pcter,
-						   ULONG,				 //child_index,
-						   CDrvdPropArray *,	 //pdrgpdpCtxt,
-						   ULONG				 //ulOptReq
+CPhysicalTVF::PcteRequired(CMemoryPool *,			   //mp,
+						   CExpressionHandle &,		   //exprhdl,
+						   gpos::Ref<CCTEReq>,		   //pcter,
+						   ULONG,					   //child_index,
+						   gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+						   ULONG					   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");

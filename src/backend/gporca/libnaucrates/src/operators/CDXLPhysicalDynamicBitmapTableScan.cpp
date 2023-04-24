@@ -35,7 +35,7 @@ CDXLPhysicalDynamicBitmapTableScan::GetOpNameStr() const
 	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalDynamicBitmapTableScan);
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CDXLPhysicalDynamicBitmapTableScan::GetParts() const
 {
 	return m_part_mdids;
@@ -43,8 +43,6 @@ CDXLPhysicalDynamicBitmapTableScan::GetParts() const
 
 CDXLPhysicalDynamicBitmapTableScan::~CDXLPhysicalDynamicBitmapTableScan()
 {
-	m_part_mdids->Release();
-	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------

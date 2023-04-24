@@ -447,7 +447,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	}
 
 	// cleanup
-	root_dxl_node->Release();
+
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;
@@ -490,10 +490,11 @@ CParseHandlerTest::EresParseAndSerializeQuery(CMemoryPool *mp,
 
 	gpos::Ref<CDXLNode> root_dxlnode =
 		const_cast<gpos::Ref<CDXLNode> >(pq2dxlresult->CreateDXLNode());
-	CDXLNodeArray *dxl_array =
-		const_cast<CDXLNodeArray *>(pq2dxlresult->GetOutputColumnsDXLArray());
-	CDXLNodeArray *cte_producers =
-		const_cast<CDXLNodeArray *>(pq2dxlresult->GetCTEProducerDXLArray());
+	gpos::Ref<CDXLNodeArray> dxl_array = const_cast<gpos::Ref<CDXLNodeArray> >(
+		pq2dxlresult->GetOutputColumnsDXLArray());
+	gpos::Ref<CDXLNodeArray> cte_producers =
+		const_cast<gpos::Ref<CDXLNodeArray> >(
+			pq2dxlresult->GetCTEProducerDXLArray());
 
 	CWStringDynamic wstrQuery(mp);
 	COstreamString osQuery(&wstrQuery);
@@ -547,7 +548,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	IMDCacheObjectArray *mdcache_obj_array =
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array =
 		CDXLUtils::ParseDXLToIMDObjectArray(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
@@ -570,7 +571,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 		GPOS_ASSERT(false);
 	}
 
-	mdcache_obj_array->Release();
+
 	GPOS_DELETE(metadata_str);
 	GPOS_DELETE_ARRAY(dxl_string);
 
@@ -623,7 +624,7 @@ CParseHandlerTest::EresParseAndSerializeMDRequest(CMemoryPool *mp,
 
 	GPOS_ASSERT(strExpected.Equals(&str));
 
-	pmdr->Release();
+
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;
@@ -646,7 +647,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 {
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -669,14 +670,13 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 	}
 
 	// parse the statistics objects
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, dxl_string,
 												  szValidationPath);
-	CStatisticsArray *statistics_array =
+	gpos::Ref<CStatisticsArray> statistics_array =
 		CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 			mp, &mda, dxl_derived_rel_stats_array);
 
-	dxl_derived_rel_stats_array->Release();
 
 
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -701,7 +701,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	GPOS_ASSERT(dstrExpected.Equals(statistics_str));
 
-	statistics_array->Release();
+
 
 	GPOS_DELETE_ARRAY(dxl_string);
 	GPOS_DELETE(statistics_str);
@@ -760,7 +760,7 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr(CMemoryPool *mp,
 	}
 
 	// cleanup
-	root_dxl_node->Release();
+
 	GPOS_DELETE(scalar_expr_str);
 	GPOS_DELETE_ARRAY(dxl_string);
 

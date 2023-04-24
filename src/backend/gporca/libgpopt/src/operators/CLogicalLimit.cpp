@@ -64,7 +64,6 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp, gpos::Ref<COrderSpec> pos,
 	GPOS_ASSERT(nullptr != pos);
 	gpos::Ref<CColRefSet> pcrsSort = m_pos->PcrsUsed(mp);
 	m_pcrsLocalUsed->Include(pcrsSort);
-	pcrsSort->Release();
 }
 
 
@@ -78,7 +77,6 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp, gpos::Ref<COrderSpec> pos,
 //---------------------------------------------------------------------------
 CLogicalLimit::~CLogicalLimit()
 {
-	SafeRelease(m_pos);
 }
 
 
@@ -136,9 +134,9 @@ CLogicalLimit::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalLimit::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalLimit::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<COrderSpec> pos =
 		m_pos->PosCopyWithRemappedColumns(mp, colref_mapping, must_exist);
@@ -178,7 +176,7 @@ CLogicalLimit::DeriveOuterReferences(CMemoryPool *mp,
 	gpos::Ref<CColRefSet> pcrsSort = m_pos->PcrsUsed(mp);
 	gpos::Ref<CColRefSet> outer_refs =
 		CLogical::DeriveOuterReferences(mp, exprhdl, pcrsSort);
-	pcrsSort->Release();
+
 
 	return outer_refs;
 }
@@ -206,7 +204,7 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 		gpos::Ref<CScalarConst> popScalarConst =
 			CScalarConst::PopConvert(pexprCount->Pop());
 		gpos::Ref<IDatumInt8> pdatumInt8 =
-			dynamic_cast<gpos::Ref<IDatumInt8> >(popScalarConst->GetDatum());
+			gpos::dyn_cast<IDatumInt8> > (popScalarConst - GetDatum());
 
 		return CMaxCard(pdatumInt8->Value());
 	}
@@ -224,10 +222,10 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalLimit::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfImplementLimit);
 	(void) xform_set->ExchangeSet(CXform::ExfSplitLimit);
@@ -258,7 +256,7 @@ CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsStat =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
-	pcrsUsed->Release();
+
 
 	return pcrsStat;
 }
@@ -306,7 +304,7 @@ CLogicalLimit::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
@@ -316,12 +314,11 @@ CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (child_stats->Rows() <= dRowsMax)
 	{
-		child_stats->AddRef();
 		return child_stats;
 	}
 
 	return CLimitStatsProcessor::CalcLimitStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), dRowsMax);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), dRowsMax);
 }
 
 // EOF

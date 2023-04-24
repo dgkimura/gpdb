@@ -45,15 +45,13 @@ public:
 	CPhysicalDynamicIndexScan(const CPhysicalDynamicIndexScan &) = delete;
 
 	// ctors
-	CPhysicalDynamicIndexScan(CMemoryPool *mp,
-							  gpos::Ref<CIndexDescriptor> pindexdesc,
-							  gpos::Ref<CTableDescriptor> ptabdesc,
-							  ULONG ulOriginOpId, const CName *pnameAlias,
-							  CColRefArray *pdrgpcrOutput, ULONG scan_id,
-							  CColRef2dArray *pdrgpdrgpcrPart,
-							  gpos::Ref<COrderSpec> pos,
-							  IMdIdArray *partition_mdids,
-							  ColRefToUlongMapArray *root_col_mapping_per_part);
+	CPhysicalDynamicIndexScan(
+		CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
+		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+		const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
+		ULONG scan_id, gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+		gpos::Ref<COrderSpec> pos, gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// dtor
 	~CPhysicalDynamicIndexScan() override;
@@ -96,7 +94,6 @@ public:
 			  CExpressionHandle &  //exprhdl
 	) const override
 	{
-		m_pos->AddRef();
 		return m_pos;
 	}
 
@@ -116,7 +113,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicIndexScan == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalDynamicIndexScan> >(pop);
+		return gpos::dyn_cast<CPhysicalDynamicIndexScan>(pop);
 	}
 
 	// debug print
@@ -126,7 +123,7 @@ public:
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prpplan,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 };	// class CPhysicalDynamicIndexScan
 

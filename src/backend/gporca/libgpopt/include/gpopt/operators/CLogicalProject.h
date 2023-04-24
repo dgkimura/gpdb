@@ -31,15 +31,15 @@ class CLogicalProject : public CLogicalUnary
 {
 private:
 	// return equivalence class from scalar ident project element
-	static CColRefSetArray *PdrgpcrsEquivClassFromScIdent(
+	static gpos::Ref<CColRefSetArray> PdrgpcrsEquivClassFromScIdent(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
 		gpos::Ref<CColRefSet> not_null_columns);
 
 	// extract constraint from scalar constant project element
-	static void ExtractConstraintFromScConst(CMemoryPool *mp,
-											 gpos::Ref<CExpression> pexprPrEl,
-											 CConstraintArray *pdrgpcnstr,
-											 CColRefSetArray *pdrgpcrs);
+	static void ExtractConstraintFromScConst(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
+		gpos::Ref<CConstraintArray> pdrgpcnstr,
+		gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 public:
 	CLogicalProject(const CLogicalProject &) = delete;
@@ -88,12 +88,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalProject == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalProject> >(pop);
+		return gpos::dyn_cast<CLogicalProject>(pop);
 	}
 
 };	// class CLogicalProject

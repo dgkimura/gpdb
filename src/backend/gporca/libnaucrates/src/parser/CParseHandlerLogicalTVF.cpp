@@ -145,11 +145,11 @@ CParseHandlerLogicalTVF::EndElement(const XMLCh *const,	 // element_uri,
 	GPOS_ASSERT(nullptr != col_descr_parse_handler);
 
 	// get column descriptors
-	CDXLColDescrArray *cold_descr_dxl_array =
+	gpos::Ref<CDXLColDescrArray> cold_descr_dxl_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	GPOS_ASSERT(nullptr != cold_descr_dxl_array);
 
-	cold_descr_dxl_array->AddRef();
+
 	gpos::Ref<CDXLLogicalTVF> lg_tvf_op = GPOS_NEW(m_mp) CDXLLogicalTVF(
 		m_mp, m_func_mdid, m_return_type_mdid, m_mdname, cold_descr_dxl_array);
 

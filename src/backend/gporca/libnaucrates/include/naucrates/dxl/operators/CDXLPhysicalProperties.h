@@ -12,10 +12,10 @@
 #define GPDXL_CDXLPhysicalProperties_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorCost.h"
 #include "naucrates/dxl/operators/CDXLProperties.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -65,7 +65,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_properties);
 		GPOS_ASSERT(EdxlpropertyPhysical ==
 					dxl_properties->GetDXLPropertyType());
-		return dynamic_cast<gpos::Ref<CDXLPhysicalProperties> >(dxl_properties);
+		return gpos::dyn_cast<CDXLPhysicalProperties>(dxl_properties);
 	}
 };
 

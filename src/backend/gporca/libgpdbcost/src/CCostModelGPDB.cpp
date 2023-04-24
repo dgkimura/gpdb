@@ -13,6 +13,8 @@
 
 #include <limits>
 
+#include "gpos/common/Casting.h"
+
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/COrderSpec.h"
@@ -93,7 +95,6 @@ CCostModelGPDB::DRowsPerHost(CDouble dRowsTotal) const
 //---------------------------------------------------------------------------
 CCostModelGPDB::~CCostModelGPDB()
 {
-	m_cost_model_params->Release();
 }
 
 
@@ -307,8 +308,7 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			if (fFilterParent)
 			{
 				gpos::Ref<CPhysicalPartitionSelector> ps =
-					dynamic_cast<gpos::Ref<CPhysicalPartitionSelector> >(
-						popChild);
+					gpos::dyn_cast<CPhysicalPartitionSelector>(popChild);
 
 				if (ps)
 				{
@@ -316,7 +316,7 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 					scanOp = exprhdl.PopGrandchild(ul, 0, &grandchildContext);
 					gpos::Ref<CPhysicalDynamicScan> scan =
-						dynamic_cast<gpos::Ref<CPhysicalDynamicScan> >(scanOp);
+						gpos::dyn_cast<CPhysicalDynamicScan>(scanOp);
 
 					if (scan && scan->ScanId() == ps->ScanId() &&
 						grandchildContext)
@@ -1079,8 +1079,6 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				skew_ratio = CDouble(std::min(dPenalizeHJSkewUpperLimit.Get(),
 											  skew_ratio.Get()));
 			}
-
-			columns->Release();
 		}
 	}
 
@@ -1530,7 +1528,7 @@ CCostModelGPDB::CostSequenceProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const DOUBLE dWidthOuter = pci->GetWidth()[0];
 
 	ULONG ulSortCols = 0;
-	COrderSpecArray *pdrgpos =
+	gpos::Ref<COrderSpecArray> pdrgpos =
 		CPhysicalSequenceProject::PopConvert(exprhdl.Pop())->Pdrgpos();
 	const ULONG ulOrderSpecs = pdrgpos->Size();
 	for (ULONG ul = 0; ul < ulOrderSpecs; ul++)
@@ -1883,7 +1881,7 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		}
 	}
 
-	pcrsLocalUsed->Release();
+
 
 	return result;
 }
@@ -2053,7 +2051,9 @@ CCostModelGPDB::Cost(
 	COperator::EOperatorId op_id = exprhdl.Pop()->Eopid();
 	if (op_id == COperator::EopPhysicalComputeScalar)
 	{
-		return CostComputeScalar(m_mp, exprhdl, pci, m_cost_model_params, this);
+		return CostComputeScalar(
+			m_mp, exprhdl, pci, m_cost_model_params,
+			gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()));
 	}
 	if (FUnary(op_id))
 	{
@@ -2073,89 +2073,123 @@ CCostModelGPDB::Cost(
 		case COperator::EopPhysicalDynamicForeignScan:
 
 		{
-			return CostScan(m_mp, exprhdl, this, pci);
+			return CostScan(m_mp, exprhdl,
+							gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							pci);
 		}
 
 		case COperator::EopPhysicalFilter:
 		{
-			return CostFilter(m_mp, exprhdl, this, pci);
+			return CostFilter(m_mp, exprhdl,
+							  gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							  pci);
 		}
 
 		case COperator::EopPhysicalIndexOnlyScan:
 		{
-			return CostIndexOnlyScan(m_mp, exprhdl, this, pci);
+			return CostIndexOnlyScan(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalIndexScan:
 		case COperator::EopPhysicalDynamicIndexScan:
 		{
-			return CostIndexScan(m_mp, exprhdl, this, pci);
+			return CostIndexScan(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalBitmapTableScan:
 		case COperator::EopPhysicalDynamicBitmapTableScan:
 		{
-			return CostBitmapTableScan(m_mp, exprhdl, this, pci);
+			return CostBitmapTableScan(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalSequenceProject:
 		{
-			return CostSequenceProject(m_mp, exprhdl, this, pci);
+			return CostSequenceProject(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalCTEProducer:
 		{
-			return CostCTEProducer(m_mp, exprhdl, this, pci);
+			return CostCTEProducer(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 		case COperator::EopPhysicalCTEConsumer:
 		{
-			return CostCTEConsumer(m_mp, exprhdl, this, pci);
+			return CostCTEConsumer(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 		case COperator::EopPhysicalConstTableGet:
 		{
-			return CostConstTableGet(m_mp, exprhdl, this, pci);
+			return CostConstTableGet(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 		case COperator::EopPhysicalDML:
 		{
-			return CostDML(m_mp, exprhdl, this, pci);
+			return CostDML(m_mp, exprhdl,
+						   gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+						   pci);
 		}
 
 		case COperator::EopPhysicalHashAgg:
 		case COperator::EopPhysicalHashAggDeduplicate:
 		{
-			return CostHashAgg(m_mp, exprhdl, this, pci);
+			return CostHashAgg(m_mp, exprhdl,
+							   gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							   pci);
 		}
 
 		case COperator::EopPhysicalScalarAgg:
 		{
-			return CostScalarAgg(m_mp, exprhdl, this, pci);
+			return CostScalarAgg(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalStreamAgg:
 		case COperator::EopPhysicalStreamAggDeduplicate:
 		{
-			return CostStreamAgg(m_mp, exprhdl, this, pci);
+			return CostStreamAgg(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalSequence:
 		{
-			return CostSequence(m_mp, exprhdl, this, pci);
+			return CostSequence(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalSort:
 		{
-			return CostSort(m_mp, exprhdl, this, pci);
+			return CostSort(m_mp, exprhdl,
+							gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							pci);
 		}
 
 		case COperator::EopPhysicalTVF:
 		{
-			return CostTVF(m_mp, exprhdl, this, pci);
+			return CostTVF(m_mp, exprhdl,
+						   gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+						   pci);
 		}
 
 		case COperator::EopPhysicalSerialUnionAll:
 		case COperator::EopPhysicalParallelUnionAll:
 		{
-			return CostUnionAll(m_mp, exprhdl, this, pci);
+			return CostUnionAll(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalInnerHashJoin:
@@ -2165,13 +2199,17 @@ CCostModelGPDB::Cost(
 		case COperator::EopPhysicalLeftOuterHashJoin:
 		case COperator::EopPhysicalRightOuterHashJoin:
 		{
-			return CostHashJoin(m_mp, exprhdl, this, pci);
+			return CostHashJoin(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalInnerIndexNLJoin:
 		case COperator::EopPhysicalLeftOuterIndexNLJoin:
 		{
-			return CostIndexNLJoin(m_mp, exprhdl, this, pci);
+			return CostIndexNLJoin(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 
 		case COperator::EopPhysicalMotionGather:
@@ -2180,7 +2218,9 @@ CCostModelGPDB::Cost(
 		case COperator::EopPhysicalMotionRandom:
 		case COperator::EopPhysicalMotionRoutedDistribute:
 		{
-			return CostMotion(m_mp, exprhdl, this, pci);
+			return CostMotion(m_mp, exprhdl,
+							  gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							  pci);
 		}
 
 		case COperator::EopPhysicalInnerNLJoin:
@@ -2195,12 +2235,16 @@ CCostModelGPDB::Cost(
 		case COperator::EopPhysicalCorrelatedLeftAntiSemiNLJoin:
 		case COperator::EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin:
 		{
-			return CostNLJoin(m_mp, exprhdl, this, pci);
+			return CostNLJoin(m_mp, exprhdl,
+							  gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+							  pci);
 		}
 
 		case COperator::EopPhysicalFullMergeJoin:
 		{
-			return CostMergeJoin(m_mp, exprhdl, this, pci);
+			return CostMergeJoin(
+				m_mp, exprhdl, gpos::dyn_cast<CCostModelGPDB>(SharedFromThis()),
+				pci);
 		}
 	}
 }

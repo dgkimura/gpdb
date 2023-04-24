@@ -74,7 +74,7 @@ public:
 	static GPOS_RESULT EresUnittest_CheckConstraint();
 	static GPOS_RESULT EresUnittest_Cast();
 	static GPOS_RESULT EresUnittest_ScCmp();
-	static GPOS_RESULT EresUnittest_PrematureMDIdRelease();
+
 
 };	// class CMDAccessorTest
 }  // namespace gpopt

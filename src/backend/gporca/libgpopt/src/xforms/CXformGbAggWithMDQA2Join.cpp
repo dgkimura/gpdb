@@ -102,7 +102,7 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
 	gpos::Ref<CColRefSet> pcrsChildOutput = pexprChild->DeriveOutputColumns();
-	CColRefArray *pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on child expression
 	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
@@ -116,8 +116,8 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp,
 	pcteinfo->IncrementConsumers(ulCTEId);
 
 	// finalize GbAgg expression by replacing its child with CTE consumer
-	pexpr->Pop()->AddRef();
-	(*pexpr)[1]->AddRef();
+
+
 	gpos::Ref<CExpression> pexprGbAggWithConsumer =
 		GPOS_NEW(mp) CExpression(mp, pexpr->Pop(), pexprConsumer, (*pexpr)[1]);
 
@@ -125,7 +125,7 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp,
 		CXformUtils::PexprGbAggOnCTEConsumer2Join(mp, pexprGbAggWithConsumer);
 	GPOS_ASSERT(nullptr != pexprJoinDQAs);
 
-	pexprGbAggWithConsumer->Release();
+
 
 	return GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprJoinDQAs);
@@ -161,7 +161,7 @@ CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp,
 			// recursively process the resulting expression
 			gpos::Ref<CExpression> pexprResult =
 				PexprTransform(mp, pexprExpanded);
-			pexprExpanded->Release();
+
 
 			return pexprResult;
 		}
@@ -200,14 +200,15 @@ CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp,
 
 	// recursively process child expressions
 	const ULONG arity = pexpr->Arity();
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = PexprTransform(mp, (*pexpr)[ul]);
 		pdrgpexprChildren->Append(pexprChild);
 	}
 
-	pop->AddRef();
+
 	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
 }
 
@@ -228,7 +229,7 @@ CXformGbAggWithMDQA2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();

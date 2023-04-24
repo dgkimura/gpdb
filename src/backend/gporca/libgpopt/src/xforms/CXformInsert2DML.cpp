@@ -67,7 +67,7 @@ CXformInsert2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalInsert> popInsert =
@@ -77,14 +77,14 @@ CXformInsert2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popInsert->Ptabdesc();
-	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrSource = popInsert->PdrgpcrSource();
-	pdrgpcrSource->AddRef();
+
+	gpos::Ref<CColRefArray> pdrgpcrSource = popInsert->PdrgpcrSource();
+
 
 	// child of insert operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 
 	// create logical DML
 	gpos::Ref<CExpression> pexprAlt = CXformUtils::PexprLogicalDMLOverProject(

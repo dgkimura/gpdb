@@ -47,8 +47,6 @@ CParseHandlerProperties::CParseHandlerProperties(
 //---------------------------------------------------------------------------
 CParseHandlerProperties::~CParseHandlerProperties()
 {
-	SafeRelease(m_dxl_properties);
-	SafeRelease(m_dxl_stats_derived_relation);
 }
 
 //---------------------------------------------------------------------------
@@ -153,7 +151,7 @@ CParseHandlerProperties::EndElement(const XMLCh *const,	 // element_uri,
 		dynamic_cast<CParseHandlerCost *>((*this)[0]);
 
 	gpos::Ref<CDXLOperatorCost> cost = parse_handler_cost->GetDXLOperatorCost();
-	cost->AddRef();
+
 
 	if (2 == this->Length())
 	{
@@ -162,7 +160,7 @@ CParseHandlerProperties::EndElement(const XMLCh *const,	 // element_uri,
 
 		gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation =
 			parse_handler_stats->GetDxlStatsDrvdRelation();
-		dxl_stats_derived_relation->AddRef();
+
 		m_dxl_stats_derived_relation = dxl_stats_derived_relation;
 	}
 

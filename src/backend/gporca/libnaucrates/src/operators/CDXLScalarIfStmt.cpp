@@ -44,7 +44,6 @@ CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarIfStmt::~CDXLScalarIfStmt()
 {
-	m_result_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------

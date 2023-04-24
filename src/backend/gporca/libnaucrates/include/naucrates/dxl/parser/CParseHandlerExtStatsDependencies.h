@@ -29,7 +29,7 @@ class CParseHandlerExtStatsDependencies : public CParseHandlerBase
 {
 private:
 	// dependency list values
-	CMDDependencyArray *m_dependencies;
+	gpos::Ref<CMDDependencyArray> m_dependencies;
 
 	// process the start of an element
 	void StartElement(
@@ -59,7 +59,7 @@ public:
 	~CParseHandlerExtStatsDependencies() override;
 
 	// returns the constructed bucket
-	CMDDependencyArray *GetDependencies() const;
+	gpos::Ref<CMDDependencyArray> GetDependencies() const;
 };
 }  // namespace gpdxl
 

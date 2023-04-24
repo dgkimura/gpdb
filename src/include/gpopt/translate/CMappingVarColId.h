@@ -110,7 +110,6 @@ public:
 	// dtor
 	virtual ~CMappingVarColId()
 	{
-		m_gpdb_att_opt_col_mapping->Release();
 	}
 
 	// given a gpdb attribute, return a column name in optimizer world
@@ -133,16 +132,18 @@ public:
 
 	// load up column id mapping information from the array of column descriptors
 	void LoadColumns(ULONG query_level, ULONG RTE_index,
-					 const CDXLColDescrArray *column_descrs);
+					 const gpos::Ref<CDXLColDescrArray> column_descrs);
 
 	// load up mapping information from derived table columns
-	void LoadDerivedTblColumns(ULONG query_level, ULONG RTE_index,
-							   const gpdxl::CDXLNodeArray *derived_columns_dxl,
-							   List *target_list);
+	void LoadDerivedTblColumns(
+		ULONG query_level, ULONG RTE_index,
+		const gpos::Ref<gpdxl::CDXLNodeArray> derived_columns_dxl,
+		List *target_list);
 
 	// load information from CTE columns
 	void LoadCTEColumns(ULONG query_level, ULONG RTE_index,
-						const ULongPtrArray *pdrgpulCTE, List *target_list);
+						const gpos::Ref<ULongPtrArray> pdrgpulCTE,
+						List *target_list);
 
 	// load up mapping information from scalar projection list
 	void LoadProjectElements(ULONG query_level, ULONG RTE_index,
@@ -159,8 +160,9 @@ public:
 	CMappingVarColId *CopyMapColId(ULONG query_level) const;
 
 	// create a copy of the mapping replacing old col ids with new ones
-	CMappingVarColId *CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
-									 ULongPtrArray *new_colids) const;
+	CMappingVarColId *CopyRemapColId(CMemoryPool *mp,
+									 gpos::Ref<ULongPtrArray> old_colids,
+									 gpos::Ref<ULongPtrArray> new_colids) const;
 };
 }  // namespace gpdxl
 

@@ -52,8 +52,6 @@ CMDIdScCmp::CMDIdScCmp(gpos::Ref<CMDIdGPDB> left_mdid,
 //---------------------------------------------------------------------------
 CMDIdScCmp::~CMDIdScCmp()
 {
-	m_mdid_left->Release();
-	m_mdid_right->Release();
 }
 
 //---------------------------------------------------------------------------

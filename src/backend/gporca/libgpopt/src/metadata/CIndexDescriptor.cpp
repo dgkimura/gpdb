@@ -31,9 +31,9 @@ FORCE_GENERATE_DBGSTR(CIndexDescriptor);
 //---------------------------------------------------------------------------
 CIndexDescriptor::CIndexDescriptor(
 	CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex, const CName &name,
-	CColumnDescriptorArray *pdrgcoldescKeyCols,
-	CColumnDescriptorArray *pdrgcoldescIncludedCols, BOOL is_clustered,
-	IMDIndex::EmdindexType index_type)
+	gpos::Ref<CColumnDescriptorArray> pdrgcoldescKeyCols,
+	gpos::Ref<CColumnDescriptorArray> pdrgcoldescIncludedCols,
+	BOOL is_clustered, IMDIndex::EmdindexType index_type)
 	: m_pmdidIndex(pmdidIndex),
 	  m_name(mp, name),
 	  m_pdrgpcoldescKeyCols(pdrgcoldescKeyCols),
@@ -57,10 +57,6 @@ CIndexDescriptor::CIndexDescriptor(
 //---------------------------------------------------------------------------
 CIndexDescriptor::~CIndexDescriptor()
 {
-	m_pmdidIndex->Release();
-
-	m_pdrgpcoldescKeyCols->Release();
-	m_pdrgpcoldescIncludedCols->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -110,28 +106,28 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
 {
 	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());
 
-	CColumnDescriptorArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
+	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
 
-	pmdindex->MDId()->AddRef();
+
 
 	// array of index column descriptors
-	CColumnDescriptorArray *pdrgcoldescKey =
+	gpos::Ref<CColumnDescriptorArray> pdrgcoldescKey =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
 		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldesc)[ul];
-		pcoldesc->AddRef();
+
 		pdrgcoldescKey->Append(pcoldesc);
 	}
 
 	// array of included column descriptors
-	CColumnDescriptorArray *pdrgcoldescIncluded =
+	gpos::Ref<CColumnDescriptorArray> pdrgcoldescIncluded =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
 	{
 		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldesc)[ul];
-		pcoldesc->AddRef();
+
 		pdrgcoldescIncluded->Append(pcoldesc);
 	}
 

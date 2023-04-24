@@ -32,10 +32,10 @@ namespace gpopt
 {
 // cleanup function for arrays
 class CExpression;
-using CExpressionArray = CDynamicPtrArray<CExpression, CleanupRelease>;
+using CExpressionArray = gpos::Vector<gpos::Ref<CExpression>>;
 
 // array of arrays of expression pointers
-using CExpressionArrays = CDynamicPtrArray<CExpressionArray, CleanupRelease>;
+using CExpressionArrays = gpos::Vector<gpos::Ref<CExpressionArray>>;
 
 class CGroupExpression;
 class CDrvdPropPlan;
@@ -68,7 +68,7 @@ private:
 	gpos::Ref<COperator> m_pop;
 
 	// array of children
-	CExpressionArray *m_pdrgpexpr;
+	gpos::Ref<CExpressionArray> m_pdrgpexpr;
 
 	// derived relational properties
 	gpos::Ref<CDrvdPropRelational> m_pdprel;
@@ -142,11 +142,12 @@ public:
 
 	// ctor n-ary expressions
 	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
-				CExpressionArray *pdrgpexpr);
+				gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// ctor for n-ary expression with origin group expression
 	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
-				gpos::Ref<CGroupExpression> pgexpr, CExpressionArray *pdrgpexpr,
+				gpos::Ref<CGroupExpression> pgexpr,
+				gpos::Ref<CExpressionArray> pdrgpexpr,
 				gpos::Ref<CReqdPropPlan> prpp,
 				gpos::Ref<IStatistics> input_stats, CCost cost);
 
@@ -177,7 +178,7 @@ public:
 	}
 
 	// accessor of children array
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgPexpr() const
 	{
 		return m_pdrgpexpr;
@@ -227,7 +228,7 @@ public:
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
-										IStatisticsArray *stats_ctxt);
+										gpos::Ref<IStatisticsArray> stats_ctxt);
 
 	// reset a derived property
 	void ResetDerivedProperty(CDrvdProp::EPropType ept);
@@ -253,7 +254,7 @@ public:
 
 	// return a copy of the expression with remapped columns
 	gpos::Ref<CExpression> PexprCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) const;
 
 	// compare entire expression rooted here
@@ -287,7 +288,8 @@ public:
 	// rehydrate expression from a given cost context and child expressions
 	static gpos::Ref<CExpression> PexprRehydrate(
 		CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
-		CExpressionArray *pdrgpexpr, gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
+		gpos::Ref<CExpressionArray> pdrgpexpr,
+		gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// Relational property accessors - derived as needed
 	gpos::Ref<CColRefSet> DeriveOuterReferences();
@@ -299,7 +301,7 @@ public:
 	CMaxCard DeriveMaxCard();
 	ULONG DeriveJoinDepth();
 	gpos::Ref<CFunctionProp> DeriveFunctionProperties();
-	CFunctionalDependencyArray *DeriveFunctionalDependencies();
+	gpos::Ref<CFunctionalDependencyArray> DeriveFunctionalDependencies();
 	gpos::Ref<CPartInfo> DerivePartitionInfo();
 	gpos::Ref<CTableDescriptor> DeriveTableDescriptor();
 

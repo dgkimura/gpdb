@@ -71,7 +71,7 @@ CDatumTest::EresUnittest_Basics()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -130,8 +130,8 @@ CDatumTest::EresUnittest_Basics()
 			}
 
 			// cleanup
-			datum->Release();
-			pdatumCopy->Release();
+
+
 			GPOS_DELETE(pstrDatum);
 		}
 	}
@@ -253,7 +253,7 @@ CDatumTest::StatsComparisonDoubleEqualWithinEpsilon()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -275,8 +275,8 @@ CDatumTest::StatsComparisonDoubleEqualWithinEpsilon()
 
 	BOOL isEqual = datum1->StatsAreEqual(datum2);
 	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+
+
 
 	if (isEqual || !isLessThan)
 	{
@@ -302,7 +302,7 @@ CDatumTest::StatsComparisonDoubleLessThan()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -324,8 +324,8 @@ CDatumTest::StatsComparisonDoubleLessThan()
 
 	BOOL isEqual = datum1->StatsAreEqual(datum2);
 	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+
+
 
 	if (!isEqual && isLessThan)
 	{
@@ -351,7 +351,7 @@ CDatumTest::StatsComparisonIntLessThan()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -364,8 +364,8 @@ CDatumTest::StatsComparisonIntLessThan()
 		CTestUtils::m_sysidDefault, 101 /*val*/, false /*isnull*/);
 	BOOL isEqual = datum1->StatsAreEqual(datum2);
 	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+
+
 
 	if (!isEqual && isLessThan)
 	{
@@ -391,7 +391,7 @@ CDatumTest::StatsComparisonIntEqual()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -404,8 +404,8 @@ CDatumTest::StatsComparisonIntEqual()
 		CTestUtils::m_sysidDefault, 101 /*val*/, false /*isnull*/);
 	BOOL isEqual = datum1->StatsAreEqual(datum2);
 	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+
+
 
 	if (isEqual && !isLessThan)
 	{

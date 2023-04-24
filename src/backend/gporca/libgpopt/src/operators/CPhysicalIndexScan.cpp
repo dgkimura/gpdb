@@ -33,7 +33,7 @@ CPhysicalIndexScan::CPhysicalIndexScan(CMemoryPool *mp,
 									   gpos::Ref<CTableDescriptor> ptabdesc,
 									   ULONG ulOriginOpId,
 									   const CName *pnameAlias,
-									   CColRefArray *pdrgpcrOutput,
+									   gpos::Ref<CColRefArray> pdrgpcrOutput,
 									   gpos::Ref<COrderSpec> pos)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	  m_pindexdesc(pindexdesc),
@@ -55,8 +55,6 @@ CPhysicalIndexScan::CPhysicalIndexScan(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CPhysicalIndexScan::~CPhysicalIndexScan()
 {
-	m_pindexdesc->Release();
-	m_pos->Release();
 }
 
 //---------------------------------------------------------------------------

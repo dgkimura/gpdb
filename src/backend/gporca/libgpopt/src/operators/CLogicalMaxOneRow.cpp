@@ -74,10 +74,10 @@ CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfMaxOneRow2Assert);
 	return xform_set;
 }
@@ -93,7 +93,7 @@ CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalMaxOneRow::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								IStatisticsArray *	// stats_ctxt
+								gpos::Ref<IStatisticsArray>	 // stats_ctxt
 ) const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly

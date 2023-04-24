@@ -61,7 +61,7 @@ CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CLogicalForeignGet::CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
 									   gpos::Ref<CTableDescriptor> ptabdesc,
-									   CColRefArray *pdrgpcrOutput)
+									   gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CLogicalGet(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 }
@@ -96,11 +96,11 @@ CLogicalForeignGet::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalForeignGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalForeignGet::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -114,7 +114,7 @@ CLogicalForeignGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, Name());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = Ptabdesc();
-	ptabdesc->AddRef();
+
 
 	return GPOS_NEW(mp)
 		CLogicalForeignGet(mp, pnameAlias, ptabdesc, pdrgpcrOutput);
@@ -128,10 +128,10 @@ CLogicalForeignGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalForeignGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfForeignGet2ForeignScan);
 
 	return xform_set;

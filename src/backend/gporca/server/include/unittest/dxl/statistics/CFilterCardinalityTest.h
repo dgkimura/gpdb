@@ -140,12 +140,12 @@ private:
 	static gpos::Ref<CStatsPred> PstatspredConj(CMemoryPool *mp);
 
 	// generate an array of filter given a column identifier, comparison type, and array of integer point
-	static CStatsPredPtrArry *PdrgpstatspredInteger(
+	static gpos::Ref<CStatsPredPtrArry> PdrgpstatspredInteger(
 		CMemoryPool *mp, ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
 		INT *piVals, ULONG ulVals);
 
 	// create a numeric predicate on a particular column
-	static CStatsPredPtrArry *PdrgppredfilterNumeric(
+	static gpos::Ref<CStatsPredPtrArry> PdrgppredfilterNumeric(
 		CMemoryPool *mp, ULONG colid, SStatsCmpValElem statsCmpValElem);
 
 	// create a filter on a column with null values
@@ -160,8 +160,9 @@ private:
 	// compare the derived statistics with the statistics in the outputfile
 	static GPOS_RESULT EresUnittest_CStatisticsCompare(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CStatisticsArray *pdrgpstatBefore, gpos::Ref<CStatsPred> pred_stats,
-		const CHAR *szDXLOutput, BOOL fApplyTwice = false);
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore,
+		gpos::Ref<CStatsPred> pred_stats, const CHAR *szDXLOutput,
+		BOOL fApplyTwice = false);
 
 public:
 	// unittests

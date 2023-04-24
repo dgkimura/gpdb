@@ -65,17 +65,6 @@ CDrvdPropRelational::~CDrvdPropRelational()
 {
 	{
 		CAutoSuspendAbort asa;
-
-		SafeRelease(m_is_prop_derived);
-		SafeRelease(m_pcrsOutput);
-		SafeRelease(m_pcrsOuter);
-		SafeRelease(m_pcrsNotNull);
-		SafeRelease(m_pcrsCorrelatedApply);
-		SafeRelease(m_pkc);
-		SafeRelease(m_pdrgpfd);
-		SafeRelease(m_ppartinfo);
-		SafeRelease(m_ppc);
-		SafeRelease(m_pfp);
 	}
 }
 
@@ -169,7 +158,7 @@ CDrvdPropRelational::GetRelationalProperties(gpos::Ref<CDrvdProp> pdp)
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptRelational == pdp->Ept() &&
 				"This is not a relational properties container");
-	return dynamic_cast<gpos::Ref<CDrvdPropRelational> >(pdp);
+	return gpos::dyn_cast<CDrvdPropRelational>(pdp);
 }
 
 
@@ -181,7 +170,7 @@ CDrvdPropRelational::GetRelationalProperties(gpos::Ref<CDrvdProp> pdp)
 //		Helper for getting applicable FDs from child
 //
 //---------------------------------------------------------------------------
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::DeriveChildFunctionalDependencies(
 	CMemoryPool *mp, ULONG child_index, CExpressionHandle &exprhdl)
 {
@@ -189,13 +178,14 @@ CDrvdPropRelational::DeriveChildFunctionalDependencies(
 	GPOS_ASSERT(!exprhdl.FScalarChild(child_index));
 
 	// get FD's of the child
-	CFunctionalDependencyArray *pdrgpfdChild = exprhdl.Pdrgpfd(child_index);
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfdChild =
+		exprhdl.Pdrgpfd(child_index);
 
 	// get output columns of the parent
 	gpos::Ref<CColRefSet> pcrsOutput = exprhdl.DeriveOutputColumns();
 
 	// collect child FD's that are applicable to the parent
-	CFunctionalDependencyArray *pdrgpfd =
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
 	const ULONG size = pdrgpfdChild->Size();
 	for (ULONG ul = 0; ul < size; ul++)
@@ -212,13 +202,12 @@ CDrvdPropRelational::DeriveChildFunctionalDependencies(
 			if (0 < pcrsDetermined->Size())
 			{
 				// create a new FD and add it to the output array
-				pfd->PcrsKey()->AddRef();
-				pcrsDetermined->AddRef();
+
+
 				gpos::Ref<CFunctionalDependency> pfdNew = GPOS_NEW(mp)
 					CFunctionalDependency(pfd->PcrsKey(), pcrsDetermined);
 				pdrgpfd->Append(pfdNew);
 			}
-			pcrsDetermined->Release();
 		}
 	}
 
@@ -234,11 +223,11 @@ CDrvdPropRelational::DeriveChildFunctionalDependencies(
 //		Helper for deriving local FDs
 //
 //---------------------------------------------------------------------------
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::DeriveLocalFunctionalDependencies(
 	CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
-	CFunctionalDependencyArray *pdrgpfd =
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
 
 	// get local key
@@ -252,7 +241,7 @@ CDrvdPropRelational::DeriveLocalFunctionalDependencies(
 	ULONG ulKeys = pkc->Keys();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
-		CColRefArray *pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
+		gpos::Ref<CColRefArray> pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
 		gpos::Ref<CColRefSet> pcrsKey = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsKey->Include(pdrgpcrKey);
 
@@ -265,16 +254,12 @@ CDrvdPropRelational::DeriveLocalFunctionalDependencies(
 		if (0 < pcrsDetermined->Size())
 		{
 			// add FD between key and the rest of output columns
-			pcrsKey->AddRef();
-			pcrsDetermined->AddRef();
+
+
 			gpos::Ref<CFunctionalDependency> pfdLocal =
 				GPOS_NEW(mp) CFunctionalDependency(pcrsKey, pcrsDetermined);
 			pdrgpfd->Append(pfdLocal);
 		}
-
-		pcrsKey->Release();
-		pcrsDetermined->Release();
-		SafeRelease(pdrgpcrKey);
 	}
 
 	return pdrgpfd;
@@ -435,7 +420,6 @@ CDrvdPropRelational::DeriveKeyCollection(CExpressionHandle &exprhdl)
 
 			if (0 < m_pcrsOutput->Size())
 			{
-				m_pcrsOutput->AddRef();
 				m_pkc = GPOS_NEW(m_mp) CKeyCollection(m_mp, m_pcrsOutput);
 			}
 		}
@@ -445,19 +429,19 @@ CDrvdPropRelational::DeriveKeyCollection(CExpressionHandle &exprhdl)
 }
 
 // functional dependencies
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::GetFunctionalDependencies() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
 	return m_pdrgpfd;
 }
 
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::DeriveFunctionalDependencies(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPdrgpfd))
 	{
-		CFunctionalDependencyArray *pdrgpfd =
+		gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 			GPOS_NEW(m_mp) CFunctionalDependencyArray(m_mp);
 		const ULONG arity = exprhdl.Arity();
 
@@ -466,17 +450,16 @@ CDrvdPropRelational::DeriveFunctionalDependencies(CExpressionHandle &exprhdl)
 		{
 			if (!exprhdl.FScalarChild(ul))
 			{
-				CFunctionalDependencyArray *pdrgpfdChild =
+				gpos::Ref<CFunctionalDependencyArray> pdrgpfdChild =
 					DeriveChildFunctionalDependencies(m_mp, ul, exprhdl);
 				CUtils::AddRefAppend(pdrgpfd, pdrgpfdChild);
-				pdrgpfdChild->Release();
 			}
 		}
 		// add local FD's
-		CFunctionalDependencyArray *pdrgpfdLocal =
+		gpos::Ref<CFunctionalDependencyArray> pdrgpfdLocal =
 			DeriveLocalFunctionalDependencies(m_mp, exprhdl);
 		CUtils::AddRefAppend(pdrgpfd, pdrgpfdLocal);
-		pdrgpfdLocal->Release();
+
 
 		m_pdrgpfd = pdrgpfd;
 	}

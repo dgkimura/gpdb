@@ -64,12 +64,12 @@ CSearchStrategyTest::EresUnittest()
 //---------------------------------------------------------------------------
 void
 CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
-							  CSearchStageArray *search_stage_array,
+							  gpos::Ref<CSearchStageArray> search_stage_array,
 							  PfnOptimize pfnOptimize)
 {
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -79,7 +79,6 @@ CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
 						 CTestUtils::GetCostModel(mp));
 		gpos::Ref<CExpression> pexpr = pfnGenerator(mp);
 		pfnOptimize(mp, pexpr, search_stage_array);
-		pexpr->Release();
 	}
 }
 
@@ -141,14 +140,15 @@ CSearchStrategyTest::EresUnittest_Parsing()
 	CMemoryPool *mp = amp.Pmp();
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/search/strategy0.xml", nullptr);
-	CSearchStageArray *search_stage_array = pphDXL->GetSearchStageArray();
+	gpos::Ref<CSearchStageArray> search_stage_array =
+		pphDXL->GetSearchStageArray();
 	const ULONG size = search_stage_array->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CAutoTrace at(mp);
 		(*search_stage_array)[ul]->OsPrint(at.Os());
 	}
-	search_stage_array->AddRef();
+
 	Optimize(mp, CTestUtils::PexprLogicalSelectOnOuterJoin, search_stage_array,
 			 BuildMemo);
 
@@ -175,8 +175,9 @@ CSearchStrategyTest::EresUnittest_Timeout()
 	CAutoTraceFlag atf(EopttracePrintOptimizationStatistics, true);
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/search/timeout-strategy.xml", nullptr);
-	CSearchStageArray *search_stage_array = pphDXL->GetSearchStageArray();
-	search_stage_array->AddRef();
+	gpos::Ref<CSearchStageArray> search_stage_array =
+		pphDXL->GetSearchStageArray();
+
 	Optimize(mp, CTestUtils::PexprLogicalNAryJoin, search_stage_array,
 			 BuildMemo);
 
@@ -215,12 +216,13 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 //		Generate a search strategy with random xform allocation
 //
 //---------------------------------------------------------------------------
-CSearchStageArray *
+gpos::Ref<CSearchStageArray>
 CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 {
-	CSearchStageArray *search_stage_array = GPOS_NEW(mp) CSearchStageArray(mp);
-	CXformSet *pxfsFst = GPOS_NEW(mp) CXformSet(mp);
-	CXformSet *pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CSearchStageArray> search_stage_array =
+		GPOS_NEW(mp) CSearchStageArray(mp);
+	gpos::Ref<CXformSet> pxfsFst = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
 
 	// first xforms set contains essential rules to produce simple equality join plan
 	(void) pxfsFst->ExchangeSet(CXform::ExfGet2TableScan);
@@ -251,7 +253,7 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 void
 CSearchStrategyTest::BuildMemo(CMemoryPool *mp,
 							   gpos::Ref<CExpression> pexprInput,
-							   CSearchStageArray *search_stage_array)
+							   gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
 	GPOS_CHECK_ABORT;
@@ -276,7 +278,7 @@ CSearchStrategyTest::BuildMemo(CMemoryPool *mp,
 	oss << std::endl << std::endl;
 
 	GPOS_TRACE(str.GetBuffer());
-	pexprPlan->Release();
+
 	GPOS_DELETE(pqc);
 
 	GPOS_CHECK_ABORT;

@@ -46,7 +46,7 @@ CDXLPhysicalValuesScan::Cast(gpos::Ref<CDXLOperator> dxl_op)
 	GPOS_ASSERT(nullptr != dxl_op);
 	GPOS_ASSERT(EdxlopPhysicalValuesScan == dxl_op->GetDXLOperator());
 
-	return dynamic_cast<gpos::Ref<CDXLPhysicalValuesScan> >(dxl_op);
+	return gpos::dyn_cast<CDXLPhysicalValuesScan>(dxl_op);
 }
 // serialize operator in DXL format
 void

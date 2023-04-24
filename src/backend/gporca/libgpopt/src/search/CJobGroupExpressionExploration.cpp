@@ -170,14 +170,14 @@ CJobGroupExpressionExploration::ScheduleApplicableTransformations(
 
 	// get all applicable xforms
 	gpos::Ref<COperator> pop = m_pgexpr->Pop();
-	CXformSet *xform_set =
+	gpos::Ref<CXformSet> xform_set =
 		CLogical::PopConvert(pop)->PxfsCandidates(psc->GetGlobalMemoryPool());
 
 	// intersect them with required xforms and schedule jobs
 	xform_set->Intersection(CXformFactory::Pxff()->PxfsExploration());
 	xform_set->Intersection(psc->Peng()->PxfsCurrentStage());
 	ScheduleTransformations(psc, xform_set);
-	xform_set->Release();
+
 
 	SetXformsScheduled();
 }

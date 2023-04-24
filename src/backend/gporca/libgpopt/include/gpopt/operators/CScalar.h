@@ -55,18 +55,20 @@ private:
 
 protected:
 	// perform conjunction of child boolean evaluation results
-	static EBoolEvalResult EberConjunction(ULongPtrArray *pdrgpulChildren);
+	static EBoolEvalResult EberConjunction(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren);
 
 	// perform disjunction of child boolean evaluation results
-	static EBoolEvalResult EberDisjunction(ULongPtrArray *pdrgpulChildren);
+	static EBoolEvalResult EberDisjunction(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren);
 
 	// return Null if any child is Null
 	static EBoolEvalResult EberNullOnAnyNullChild(
-		ULongPtrArray *pdrgpulChildren);
+		gpos::Ref<ULongPtrArray> pdrgpulChildren);
 
 	// return Null if all children are Null
 	static EBoolEvalResult EberNullOnAllNullChildren(
-		ULongPtrArray *pdrgpulChildren);
+		gpos::Ref<ULongPtrArray> pdrgpulChildren);
 
 public:
 	CScalar(const CScalar &) = delete;
@@ -150,8 +152,7 @@ public:
 	virtual BOOL FHasScalarArrayCmp(CExpressionHandle &exprhdl);
 
 	// boolean expression evaluation
-	virtual EBoolEvalResult
-	Eber(ULongPtrArray *  // pdrgpulChildren
+	virtual EBoolEvalResult Eber(gpos::Ref<ULongPtrArray>  // pdrgpulChildren
 	) const
 	{
 		// by default, evaluation result can be false, true or NULL
@@ -169,7 +170,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FScalar());
 
-		return dynamic_cast<gpos::Ref<CScalar> >(pop);
+		return gpos::dyn_cast<CScalar>(pop);
 	}
 
 	// the type of the scalar expression

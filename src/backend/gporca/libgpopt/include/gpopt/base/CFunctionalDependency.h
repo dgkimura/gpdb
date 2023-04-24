@@ -25,7 +25,7 @@ class CFunctionalDependency;
 
 // definition of array of functional dependencies
 using CFunctionalDependencyArray =
-	CDynamicPtrArray<CFunctionalDependency, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CFunctionalDependency>>;
 
 using namespace gpos;
 
@@ -95,19 +95,19 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// hash function
-	static ULONG HashValue(const CFunctionalDependencyArray *pdrgpfd);
+	static ULONG HashValue(const gpos::Ref<CFunctionalDependencyArray> pdrgpfd);
 
 	// equality function
-	static BOOL Equals(const CFunctionalDependencyArray *pdrgpfdFst,
-					   const CFunctionalDependencyArray *pdrgpfdSnd);
+	static BOOL Equals(const gpos::Ref<CFunctionalDependencyArray> pdrgpfdFst,
+					   const gpos::Ref<CFunctionalDependencyArray> pdrgpfdSnd);
 
 	// create a set of all keys in the passed FD's array
 	static gpos::Ref<CColRefSet> PcrsKeys(
-		CMemoryPool *mp, const CFunctionalDependencyArray *pdrgpfd);
+		CMemoryPool *mp, const gpos::Ref<CFunctionalDependencyArray> pdrgpfd);
 
 	// create an array of all keys in the passed FD's array
-	static CColRefArray *PdrgpcrKeys(CMemoryPool *mp,
-									 const CFunctionalDependencyArray *pdrgpfd);
+	static gpos::Ref<CColRefArray> PdrgpcrKeys(
+		CMemoryPool *mp, const gpos::Ref<CFunctionalDependencyArray> pdrgpfd);
 
 
 };	// class CFunctionalDependency

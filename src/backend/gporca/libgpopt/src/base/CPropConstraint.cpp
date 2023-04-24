@@ -30,7 +30,8 @@ FORCE_GENERATE_DBGSTR(CPropConstraint);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+CPropConstraint::CPropConstraint(CMemoryPool *mp,
+								 gpos::Ref<CColRefSetArray> pdrgpcrs,
 								 gpos::Ref<CConstraint> pcnstr)
 	: m_pdrgpcrs(pdrgpcrs), m_phmcrcrs(nullptr), m_pcnstr(pcnstr)
 {
@@ -48,9 +49,6 @@ CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
 //---------------------------------------------------------------------------
 CPropConstraint::~CPropConstraint()
 {
-	m_pdrgpcrs->Release();
-	SafeRelease(m_phmcrcrs);
-	SafeRelease(m_pcnstr);
 }
 
 //---------------------------------------------------------------------------
@@ -79,7 +77,6 @@ CPropConstraint::InitHashMap(CMemoryPool *mp)
 		CColRefSetIter crsi(*pcrs);
 		while (crsi.Advance())
 		{
-			pcrs->AddRef();
 			BOOL fres GPOS_ASSERTS_ONLY = m_phmcrcrs->Insert(crsi.Pcr(), pcrs);
 			GPOS_ASSERT(fres);
 		}
@@ -155,8 +152,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 		pcnstrFromOuterRefs =
 			constraintsForOuterRefs->m_pcnstr->Pcnstr(mp, pcrsEquiv);
 	}
-	pcrsEquiv->Release();
-	SafeRelease(equivOuterRefs);
+
+
 
 	// combine local and outer ref constraints, if we have any, into pcnstr
 	if (nullptr == pcnstr && nullptr == pcnstrFromOuterRefs)
@@ -174,7 +171,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	{
 		// constraints from both local and outer refs, make a conjunction
 		// and store it in pcnstr
-		CConstraintArray *conjArray = GPOS_NEW(mp) CConstraintArray(mp);
+		gpos::Ref<CConstraintArray> conjArray =
+			GPOS_NEW(mp) CConstraintArray(mp);
 
 		conjArray->Append(pcnstr);
 		conjArray->Append(pcnstrFromOuterRefs);
@@ -187,11 +185,11 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	// Generate a copy of all these constraints for the current column.
 	gpos::Ref<CConstraint> pcnstrCol = pcnstr->PcnstrRemapForColumn(mp, colref);
 	gpos::Ref<CExpression> pexprScalar = pcnstrCol->PexprScalar(mp);
-	pexprScalar->AddRef();
 
-	pcnstr->Release();
+
+
 	GPOS_ASSERT(nullptr == pcnstrFromOuterRefs);
-	pcnstrCol->Release();
+
 
 	return pexprScalar;
 }

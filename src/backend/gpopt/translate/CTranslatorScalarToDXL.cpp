@@ -94,11 +94,9 @@ using namespace gpopt;
 //	@doc:
 //		Ctor
 //---------------------------------------------------------------------------
-CTranslatorScalarToDXL::CTranslatorScalarToDXL(CContextQueryToDXL *context,
-											   CMDAccessor *md_accessor,
-											   ULONG query_level,
-											   HMUlCTEListEntry *cte_entries,
-											   CDXLNodeArray *cte_dxlnode_array)
+CTranslatorScalarToDXL::CTranslatorScalarToDXL(
+	CContextQueryToDXL *context, CMDAccessor *md_accessor, ULONG query_level,
+	HMUlCTEListEntry *cte_entries, gpos::Ref<CDXLNodeArray> cte_dxlnode_array)
 	: m_context(context),
 	  m_mp(context->m_mp),
 	  m_md_accessor(md_accessor),
@@ -548,7 +546,6 @@ CTranslatorScalarToDXL::TranslateOpExprToDXL(
 
 	if (IMDType::EtiBool == md_type->GetDatumType() && 2 == num_args)
 	{
-		return_type_mdid->Release();
 		return CreateScalarCmpFromOpExpr(expr, var_colid_mapping);
 	}
 
@@ -656,7 +653,7 @@ CTranslatorScalarToDXL::CreateScalarArrayCompFromExpr(
 		CMDIdGPDB(IMDId::EmdidGeneral, scalar_array_op_expr->opno);
 	const gpos::Ref<IMDScalarOp> md_scalar_op =
 		m_md_accessor->RetrieveScOp(mdid_op);
-	mdid_op->Release();
+
 
 	const CWStringConst *op_name = md_scalar_op->Mdname().GetMDName();
 	GPOS_ASSERT(nullptr != op_name);
@@ -721,7 +718,7 @@ CTranslatorScalarToDXL::TranslateConstToDXL(CMemoryPool *mp, CMDAccessor *mda,
 	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, constant->consttype);
 	const gpos::Ref<IMDType> md_type = mda->RetrieveType(mdid);
-	mdid->Release();
+
 
 	// translate gpdb datum into a DXL datum
 	gpos::Ref<CDXLDatum> datum_dxl =
@@ -1431,7 +1428,8 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	}
 
 	// translate argtypes
-	ULongPtrArray *aggargtypes_values = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	gpos::Ref<ULongPtrArray> aggargtypes_values =
+		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	ListCell *lc;
 	ForEach(lc, aggref->aggargtypes)
 	{
@@ -1921,9 +1919,10 @@ CTranslatorScalarToDXL::CreateQuantifiedSubqueryFromSublink(
 	gpos::Ref<CDXLNode> inner_dxlnode =
 		query_to_dxl_translator->TranslateSelectQueryToDXL();
 
-	CDXLNodeArray *query_output_dxlnode_array =
+	gpos::Ref<CDXLNodeArray> query_output_dxlnode_array =
 		query_to_dxl_translator->GetQueryOutputCols();
-	CDXLNodeArray *cte_dxlnode_array = query_to_dxl_translator->GetCTEs();
+	gpos::Ref<CDXLNodeArray> cte_dxlnode_array =
+		query_to_dxl_translator->GetCTEs();
 	CUtils::AddRefAppend(m_cte_producers, cte_dxlnode_array);
 
 	if (1 != query_output_dxlnode_array->Size())
@@ -1937,7 +1936,7 @@ CTranslatorScalarToDXL::CreateQuantifiedSubqueryFromSublink(
 
 	// get dxl scalar identifier
 	gpos::Ref<CDXLScalarIdent> scalar_ident =
-		dynamic_cast<gpos::Ref<CDXLScalarIdent> >(dxl_sc_ident->GetOperator());
+		gpos::dyn_cast<CDXLScalarIdent> > (dxl_sc_ident - GetOperator());
 
 	// get the dxl column reference
 	const gpos::Ref<CDXLColRef> dxl_colref = scalar_ident->GetDXLColRef();
@@ -2006,12 +2005,13 @@ CTranslatorScalarToDXL::CreateScalarSubqueryFromSublink(
 	gpos::Ref<CDXLNode> subquery_dxlnode =
 		query_to_dxl_translator->TranslateSelectQueryToDXL();
 
-	CDXLNodeArray *query_output_dxlnode_array =
+	gpos::Ref<CDXLNodeArray> query_output_dxlnode_array =
 		query_to_dxl_translator->GetQueryOutputCols();
 
 	GPOS_ASSERT(1 == query_output_dxlnode_array->Size());
 
-	CDXLNodeArray *cte_dxlnode_array = query_to_dxl_translator->GetCTEs();
+	gpos::Ref<CDXLNodeArray> cte_dxlnode_array =
+		query_to_dxl_translator->GetCTEs();
 	CUtils::AddRefAppend(m_cte_producers, cte_dxlnode_array);
 
 	// get dxl scalar identifier
@@ -2229,7 +2229,8 @@ CTranslatorScalarToDXL::CreateExistSubqueryFromSublink(
 	gpos::Ref<CDXLNode> root_dxlnode =
 		query_to_dxl_translator->TranslateSelectQueryToDXL();
 
-	CDXLNodeArray *cte_dxlnode_array = query_to_dxl_translator->GetCTEs();
+	gpos::Ref<CDXLNodeArray> cte_dxlnode_array =
+		query_to_dxl_translator->GetCTEs();
 	CUtils::AddRefAppend(m_cte_producers, cte_dxlnode_array);
 
 	gpos::Ref<CDXLNode> dxlnode = GPOS_NEW(m_mp)
@@ -2643,8 +2644,7 @@ CTranslatorScalarToDXL::CreateIDatumFromGpdbDatum(
 	ULONG length = md_type->Length();
 	if (!md_type->IsPassedByValue() && !is_null)
 	{
-		INT len = dynamic_cast<const gpos::Ref<CMDTypeGenericGPDB> >(md_type)
-					  ->GetGPDBLength();
+		INT len = gpos::dyn_cast<CMDTypeGenericGPDB>(md_type)->GetGPDBLength();
 		length = (ULONG) gpdb::DatumSize(gpdb_datum, md_type->IsPassedByValue(),
 										 len);
 	}
@@ -2655,7 +2655,7 @@ CTranslatorScalarToDXL::CreateIDatumFromGpdbDatum(
 			mp, md_type, gpmd::default_type_modifier, is_null, length,
 			gpdb_datum);
 	gpos::Ref<IDatum> datum = md_type->GetDatumForDXLDatum(mp, datum_dxl);
-	datum_dxl->Release();
+
 	return datum;
 }
 

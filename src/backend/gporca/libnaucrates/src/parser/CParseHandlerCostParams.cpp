@@ -48,7 +48,6 @@ CParseHandlerCostParams::CParseHandlerCostParams(
 //---------------------------------------------------------------------------
 CParseHandlerCostParams::~CParseHandlerCostParams()
 {
-	SafeRelease(m_cost_model_params);
 }
 
 

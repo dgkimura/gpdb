@@ -125,14 +125,12 @@ public:
 	void
 	IncRefCount()
 	{
-		m_val->AddRef();
 	}
 
 	//decrements value's ref-count
 	void
 	DecRefCount()
 	{
-		m_val->Release();
 	}
 
 	// sets the gclock counter for an entry; useful for updating counter upon access

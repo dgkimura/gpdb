@@ -51,7 +51,7 @@ class CPartConstraint : public CRefCount<CPartConstraint>,
 {
 private:
 	// constraints for different levels
-	UlongToConstraintMap *m_phmulcnstr;
+	gpos::Ref<UlongToConstraintMap> m_phmulcnstr;
 
 	// levels at which the default partitions are included
 	gpos::Ref<CBitSet> m_pbsDefaultParts;
@@ -66,7 +66,7 @@ private:
 	BOOL m_fUninterpreted;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcr;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcr;
 
 	// combined constraint
 	gpos::Ref<CConstraint> m_pcnstrCombined;
@@ -96,8 +96,8 @@ private:
 		gpos::Ref<CConstraint> pcnstrSnd);
 
 	// check if two constaint maps have the same constraints
-	static BOOL FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst,
-								 UlongToConstraintMap *phmulcnstrSnd,
+	static BOOL FEqualConstrMaps(gpos::Ref<UlongToConstraintMap> phmulcnstrFst,
+								 gpos::Ref<UlongToConstraintMap> phmulcnstrSnd,
 								 ULONG ulLevels);
 
 	// check if it is possible to produce a disjunction of the two given part
@@ -110,9 +110,9 @@ public:
 	CPartConstraint(const CPartConstraint &) = delete;
 
 	// ctors
-	CPartConstraint(CMemoryPool *mp, UlongToConstraintMap *phmulcnstr,
+	CPartConstraint(CMemoryPool *mp, gpos::Ref<UlongToConstraintMap> phmulcnstr,
 					gpos::Ref<CBitSet> pbsDefaultParts, BOOL is_unbounded,
-					CColRef2dArray *pdrgpdrgpcr);
+					gpos::Ref<CColRef2dArray> pdrgpdrgpcr);
 	CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,
 					BOOL fDefaultPartition, BOOL is_unbounded);
 
@@ -139,7 +139,7 @@ public:
 	}
 
 	// partition keys
-	CColRef2dArray *
+	gpos::Ref<CColRef2dArray>
 	Pdrgpdrgpcr() const
 	{
 		return m_pdrgpdrgpcr;
@@ -173,7 +173,8 @@ public:
 
 	// return a copy of the part constraint with remapped columns
 	gpos::Ref<CPartConstraint> PpartcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

@@ -42,7 +42,7 @@ class CLogicalGbAggDeduplicate : public CLogicalGbAgg
 {
 private:
 	// array of keys from the join's child
-	CColRefArray *m_pdrgpcrKeys;
+	gpos::Ref<CColRefArray> m_pdrgpcrKeys;
 
 public:
 	CLogicalGbAggDeduplicate(const CLogicalGbAggDeduplicate &) = delete;
@@ -51,15 +51,17 @@ public:
 	explicit CLogicalGbAggDeduplicate(CMemoryPool *mp);
 
 	// ctor
-	CLogicalGbAggDeduplicate(CMemoryPool *mp, CColRefArray *colref_array,
+	CLogicalGbAggDeduplicate(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype,
-							 CColRefArray *pdrgpcrKeys = nullptr);
+							 gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr);
 
 	// ctor
-	CLogicalGbAggDeduplicate(CMemoryPool *mp, CColRefArray *colref_array,
-							 CColRefArray *pdrgpcrMinimal,
+	CLogicalGbAggDeduplicate(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
+							 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 							 COperator::EGbAggType egbaggtype,
-							 CColRefArray *pdrgpcrKeys = nullptr);
+							 gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr);
 
 	// dtor
 	~CLogicalGbAggDeduplicate() override;
@@ -79,7 +81,7 @@ public:
 	}
 
 	// array of keys from the join's child that needs to be deduped
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys;
@@ -93,7 +95,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -119,12 +121,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -137,7 +139,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalGbAggDeduplicate> >(pop);
+		return gpos::dyn_cast<CLogicalGbAggDeduplicate>(pop);
 	}
 
 

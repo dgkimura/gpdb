@@ -121,10 +121,10 @@ private:
 	HMUlCTEListEntry *m_query_level_to_cte_map;
 
 	// query output columns
-	CDXLNodeArray *m_dxl_query_output_cols;
+	gpos::Ref<CDXLNodeArray> m_dxl_query_output_cols;
 
 	// list of CTE producers
-	CDXLNodeArray *m_dxl_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_dxl_cte_producers;
 
 	// CTE producer IDs defined at the current query level
 	UlongBoolHashMap *m_cteid_at_current_query_level_map;
@@ -160,43 +160,45 @@ private:
 	// translate set operations
 	gpos::Ref<CDXLNode> TranslateSetOpToDXL(
 		Node *setop_node, List *target_list,
-		IntToUlongMap *output_attno_to_colid_mapping);
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping);
 
 	// create the set operation given its children, input and output columns
 	gpos::Ref<CDXLNode> CreateDXLSetOpFromColumns(
 		EdxlSetOpType setop_type, List *output_target_list,
-		ULongPtrArray *output_colids, ULongPtr2dArray *input_colids,
-		CDXLNodeArray *children_dxlnodes, BOOL is_cast_across_input,
+		gpos::Ref<ULongPtrArray> output_colids,
+		gpos::Ref<ULongPtr2dArray> input_colids,
+		gpos::Ref<CDXLNodeArray> children_dxlnodes, BOOL is_cast_across_input,
 		BOOL keep_res_junked) const;
 
 	// check if the set operation need to cast any of its input columns
-	static BOOL SetOpNeedsCast(List *target_list, IMdIdArray *input_col_mdids);
+	static BOOL SetOpNeedsCast(List *target_list,
+							   gpos::Ref<IMdIdArray> input_col_mdids);
 	// translate a window operator
 	gpos::Ref<CDXLNode> TranslateWindowToDXL(
 		gpos::Ref<CDXLNode> child_dxlnode, List *target_list,
 		List *window_clause, List *sort_clause,
-		IntToUlongMap *sort_col_attno_to_colid_mapping,
-		IntToUlongMap *output_attno_to_colid_mapping);
+		gpos::Ref<IntToUlongMap> sort_col_attno_to_colid_mapping,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping);
 
 	// translate window spec
-	CDXLWindowSpecArray *TranslateWindowSpecToDXL(
-		List *window_clause, IntToUlongMap *sort_col_attno_to_colid_mapping,
+	gpos::Ref<CDXLWindowSpecArray> TranslateWindowSpecToDXL(
+		List *window_clause,
+		gpos::Ref<IntToUlongMap> sort_col_attno_to_colid_mapping,
 		gpos::Ref<CDXLNode> project_list_dxlnode_node);
 
 	// update window spec positions of LEAD/LAG functions
 	void UpdateLeadLagWinSpecPos(
 		gpos::Ref<CDXLNode> project_list_dxlnode,
-		CDXLWindowSpecArray *window_specs_dxlnode) const;
+		gpos::Ref<CDXLWindowSpecArray> window_specs_dxlnode) const;
 
 	// manufacture window frame for lead/lag functions
 	gpos::Ref<CDXLWindowFrame> CreateWindowFramForLeadLag(
 		BOOL is_lead_func, gpos::Ref<CDXLNode> dxl_offset) const;
 
 	// translate the child of a set operation
-	gpos::Ref<CDXLNode> TranslateSetOpChild(Node *child_node,
-											ULongPtrArray *pdrgpul,
-											IMdIdArray *input_col_mdids,
-											List *target_list);
+	gpos::Ref<CDXLNode> TranslateSetOpChild(
+		Node *child_node, gpos::Ref<ULongPtrArray> pdrgpul,
+		gpos::Ref<IMdIdArray> input_col_mdids, List *target_list);
 
 	// return a dummy const table get
 	gpos::Ref<CDXLNode> DXLDummyConstTableGet() const;
@@ -213,10 +215,11 @@ private:
 		BOOL has_aggs,
 		BOOL has_grouping_sets,	 // is this GB part of a GS query
 		gpos::Ref<CDXLNode> child_dxlnode,
-		IntToUlongMap *phmiulSortGrpColsColId,	// mapping sortgroupref -> ColId
+		gpos::Ref<IntToUlongMap>
+			phmiulSortGrpColsColId,	 // mapping sortgroupref -> ColId
 		IntToUlongMap
 			*child_attno_colid_mapping,	 // mapping attno->colid in child node
-		IntToUlongMap *
+		gpos::Ref<IntToUlongMap>
 			output_attno_to_colid_mapping  // mapping attno -> ColId for output columns
 	);
 
@@ -231,52 +234,56 @@ private:
 	gpos::Ref<CDXLNode> TranslateGroupingSets(
 		FromExpr *from_expr, List *target_list, List *group_clause,
 		List *grouping_set, BOOL has_aggs,
-		IntToUlongMap *phmiulSortGrpColsColId,
-		IntToUlongMap *output_attno_to_colid_mapping);
+		gpos::Ref<IntToUlongMap> phmiulSortGrpColsColId,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping);
 
 	// expand the grouping sets into a union all operator
 	gpos::Ref<CDXLNode> CreateDXLUnionAllForGroupingSets(
 		FromExpr *from_expr, List *target_list, List *group_clause,
-		BOOL has_aggs, CBitSetArray *pdrgpbsGroupingSets,
-		IntToUlongMap *phmiulSortGrpColsColId,
-		IntToUlongMap *output_attno_to_colid_mapping,
-		UlongToUlongMap *
+		BOOL has_aggs, gpos::Ref<CBitSetArray> pdrgpbsGroupingSets,
+		gpos::Ref<IntToUlongMap> phmiulSortGrpColsColId,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		gpos::Ref<UlongToUlongMap>
 			grpcol_index_to_colid_mapping  // mapping pos->unique grouping columns for grouping func arguments
 	);
 
 	// construct a project node with NULL values for columns not included in the grouping set
 	gpos::Ref<CDXLNode> CreateDXLProjectNullsForGroupingSets(
 		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
-		gpos::Ref<CBitSet> bitset, IntToUlongMap *sort_grouping_col_mapping,
-		IntToUlongMap *output_attno_to_colid_mapping,
-		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
+		gpos::Ref<CBitSet> bitset,
+		gpos::Ref<IntToUlongMap> sort_grouping_col_mapping,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		gpos::Ref<UlongToUlongMap> grpcol_index_to_colid_mapping) const;
 
 	// construct a project node with appropriate values for the grouping funcs in the given target list
 	gpos::Ref<CDXLNode> CreateDXLProjectGroupingFuncs(
 		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
-		gpos::Ref<CBitSet> bitset, IntToUlongMap *output_attno_to_colid_mapping,
-		UlongToUlongMap *grpcol_index_to_colid_mapping,
-		IntToUlongMap *sort_grpref_to_colid_mapping) const;
+		gpos::Ref<CBitSet> bitset,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		gpos::Ref<UlongToUlongMap> grpcol_index_to_colid_mapping,
+		gpos::Ref<IntToUlongMap> sort_grpref_to_colid_mapping) const;
 
 	// add sorting and grouping column into the hash map
-	void AddSortingGroupingColumn(TargetEntry *target_entry,
-								  IntToUlongMap *phmiulSortGrpColsColId,
-								  ULONG colid) const;
+	void AddSortingGroupingColumn(
+		TargetEntry *target_entry,
+		gpos::Ref<IntToUlongMap> phmiulSortGrpColsColId, ULONG colid) const;
 
 	// translate the list of sorting columns
-	CDXLNodeArray *TranslateSortColumsToDXL(
-		List *sort_clause, IntToUlongMap *col_attno_colid_mapping) const;
+	gpos::Ref<CDXLNodeArray> TranslateSortColumsToDXL(
+		List *sort_clause,
+		gpos::Ref<IntToUlongMap> col_attno_colid_mapping) const;
 
 	// translate the list of partition-by column identifiers
-	ULongPtrArray *TranslatePartColumns(
-		List *sort_clause, IntToUlongMap *col_attno_colid_mapping) const;
+	gpos::Ref<ULongPtrArray> TranslatePartColumns(
+		List *sort_clause,
+		gpos::Ref<IntToUlongMap> col_attno_colid_mapping) const;
 
 	gpos::Ref<CDXLNode> TranslateLimitToDXLGroupBy(
 		List *plsortcl,			  // list of sort clauses
 		Node *limit_count,		  // query node representing the limit count
 		Node *limit_offset_node,  // query node representing the limit offset
 		gpos::Ref<CDXLNode> dxlnode,  // the dxl node representing the subtree
-		IntToUlongMap *
+		gpos::Ref<IntToUlongMap>
 			grpcols_to_colid_mapping  // the mapping between the position in the TargetList to the ColId
 	);
 
@@ -289,9 +296,9 @@ private:
 	// translate the target list entries of the query into a logical project
 	gpos::Ref<CDXLNode> TranslateTargetListToDXLProject(
 		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
-		IntToUlongMap *group_col_to_colid_mapping,
-		IntToUlongMap *output_attno_to_colid_mapping, List *group_clause,
-		BOOL is_aggref_expanded = false);
+		gpos::Ref<IntToUlongMap> group_col_to_colid_mapping,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		List *group_clause, BOOL is_aggref_expanded = false);
 
 	// translate a target list entry or a join alias entry into a project element
 	gpos::Ref<CDXLNode> TranslateExprToDXLProject(
@@ -312,9 +319,9 @@ private:
 	// generate a DXL node from column values, where each column value is
 	// either a datum or scalar expression represented as a project element.
 	gpos::Ref<CDXLNode> TranslateColumnValuesToDXL(
-		CDXLDatumArray *dxl_datum_array,
-		CDXLColDescrArray *dxl_column_descriptors,
-		CDXLNodeArray *dxl_project_elements) const;
+		gpos::Ref<CDXLDatumArray> dxl_datum_array,
+		gpos::Ref<CDXLColDescrArray> dxl_column_descriptors,
+		gpos::Ref<CDXLNodeArray> dxl_project_elements) const;
 
 	// translate a value scan range table entry
 	gpos::Ref<CDXLNode> TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
@@ -336,12 +343,13 @@ private:
 	gpos::Ref<CDXLNode> CreateDXLConstValueTrue();
 
 	// store mapping attno->colid
-	void StoreAttnoColIdMapping(IntToUlongMap *attno_to_colid_mapping,
+	void StoreAttnoColIdMapping(gpos::Ref<IntToUlongMap> attno_to_colid_mapping,
 								INT attno, ULONG colid) const;
 
 	// construct an array of output columns
-	CDXLNodeArray *CreateDXLOutputCols(
-		List *target_list, IntToUlongMap *attno_to_colid_mapping) const;
+	gpos::Ref<CDXLNodeArray> CreateDXLOutputCols(
+		List *target_list,
+		gpos::Ref<IntToUlongMap> attno_to_colid_mapping) const;
 
 	// check for support command types, throws an exception when command type not yet supported
 	static void CheckSupportedCmdType(Query *query);
@@ -352,15 +360,17 @@ private:
 	// translate a select-project-join expression into DXL
 	gpos::Ref<CDXLNode> TranslateSelectProjectJoinToDXL(
 		List *target_list, FromExpr *from_expr,
-		IntToUlongMap *sort_group_attno_to_colid_mapping,
-		IntToUlongMap *output_attno_to_colid_mapping, List *group_clause);
+		gpos::Ref<IntToUlongMap> sort_group_attno_to_colid_mapping,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		List *group_clause);
 
 	// translate a select-project-join expression into DXL and keep variables appearing
 	// in aggregates and grouping columns in the output column map
 	gpos::Ref<CDXLNode> TranslateSelectProjectJoinForGrpSetsToDXL(
 		List *target_list, FromExpr *from_expr,
-		IntToUlongMap *sort_group_attno_to_colid_mapping,
-		IntToUlongMap *output_attno_to_colid_mapping, List *group_clause);
+		gpos::Ref<IntToUlongMap> sort_group_attno_to_colid_mapping,
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping,
+		List *group_clause);
 
 	// helper to check if OID is included in given array of OIDs
 	static BOOL OIDFound(OID oid, const OID oids[], ULONG size);
@@ -390,7 +400,7 @@ private:
 	CWStringDynamic *ExtractStorageOptionStr(DefElem *def_elem);
 
 	// return resno -> colId mapping of columns to be updated
-	IntToUlongMap *UpdatedColumnMapping();
+	gpos::Ref<IntToUlongMap> UpdatedColumnMapping();
 
 	// obtain the ids of the ctid and segmentid columns for the target
 	// table of a DML query
@@ -399,29 +409,29 @@ private:
 	// translate a grouping func expression
 	gpos::Ref<CDXLNode> TranslateGroupingFuncToDXL(
 		const Expr *expr, gpos::Ref<CBitSet> bitset,
-		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
+		gpos::Ref<UlongToUlongMap> grpcol_index_to_colid_mapping) const;
 
 	// construct a list of CTE producers from the query's CTE list
 	void ConstructCTEProducerList(List *cte_list, ULONG query_level);
 
 	// construct a stack of CTE anchors for each CTE producer in the given array
-	void ConstructCTEAnchors(CDXLNodeArray *dxlnodes,
+	void ConstructCTEAnchors(gpos::Ref<CDXLNodeArray> dxlnodes,
 							 gpos::Ref<CDXLNode> *dxl_cte_anchor_top,
 							 gpos::Ref<CDXLNode> *dxl_cte_anchor_bottom);
 
 	// generate an array of new column ids of the given size
-	ULongPtrArray *GenerateColIds(CMemoryPool *mp, ULONG size) const;
+	gpos::Ref<ULongPtrArray> GenerateColIds(CMemoryPool *mp, ULONG size) const;
 
 	// extract an array of colids from the given column mapping
-	ULongPtrArray *ExtractColIds(CMemoryPool *mp,
-								 IntToUlongMap *attno_to_colid_mapping) const;
+	gpos::Ref<ULongPtrArray> ExtractColIds(
+		CMemoryPool *mp, gpos::Ref<IntToUlongMap> attno_to_colid_mapping) const;
 
 	// construct a new mapping based on the given one by replacing the colid in the "From" list
 	// with the colid at the same position in the "To" list
-	static IntToUlongMap *RemapColIds(CMemoryPool *mp,
-									  IntToUlongMap *attno_to_colid_mapping,
-									  ULongPtrArray *from_list_colids,
-									  ULongPtrArray *to_list_colids);
+	static gpos::Ref<IntToUlongMap> RemapColIds(
+		CMemoryPool *mp, gpos::Ref<IntToUlongMap> attno_to_colid_mapping,
+		gpos::Ref<ULongPtrArray> from_list_colids,
+		gpos::Ref<ULongPtrArray> to_list_colids);
 
 	// true iff this query or one of its ancestors is a DML query
 	BOOL IsDMLQuery();
@@ -460,10 +470,10 @@ public:
 	gpos::Ref<CDXLNode> TranslateQueryToDXL();
 
 	// return the list of output columns
-	CDXLNodeArray *GetQueryOutputCols() const;
+	gpos::Ref<CDXLNodeArray> GetQueryOutputCols() const;
 
 	// return the list of CTEs
-	CDXLNodeArray *GetCTEs() const;
+	gpos::Ref<CDXLNodeArray> GetCTEs() const;
 
 	// factory function
 	static CTranslatorQueryToDXL *QueryToDXLInstance(CMemoryPool *mp,

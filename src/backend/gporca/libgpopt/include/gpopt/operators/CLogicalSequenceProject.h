@@ -35,10 +35,10 @@ private:
 	gpos::Ref<CDistributionSpec> m_pds;
 
 	// order specs of child window functions
-	COrderSpecArray *m_pdrgpos;
+	gpos::Ref<COrderSpecArray> m_pdrgpos;
 
 	// frames of child window functions
-	CWindowFrameArray *m_pdrgpwf;
+	gpos::Ref<CWindowFrameArray> m_pdrgpwf;
 
 	// flag indicating if current operator has any non-empty order specs
 	BOOL m_fHasOrderSpecs;
@@ -57,8 +57,8 @@ public:
 
 	// ctor
 	CLogicalSequenceProject(CMemoryPool *mp, gpos::Ref<CDistributionSpec> pds,
-							COrderSpecArray *pdrgpos,
-							CWindowFrameArray *pdrgpwf);
+							gpos::Ref<COrderSpecArray> pdrgpos,
+							gpos::Ref<CWindowFrameArray> pdrgpwf);
 
 	// ctor for pattern
 	explicit CLogicalSequenceProject(CMemoryPool *mp);
@@ -88,14 +88,14 @@ public:
 	}
 
 	// order by keys
-	COrderSpecArray *
+	gpos::Ref<COrderSpecArray>
 	Pdrgpos() const
 	{
 		return m_pdrgpos;
 	}
 
 	// frame specifications
-	CWindowFrameArray *
+	gpos::Ref<CWindowFrameArray>
 	Pdrgpwf() const
 	{
 		return m_pdrgpwf;
@@ -117,7 +117,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// return true if we can pull projections up past this operator from its given child
@@ -160,7 +160,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// match function
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
@@ -194,7 +194,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequenceProject == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalSequenceProject> >(pop);
+		return gpos::dyn_cast<CLogicalSequenceProject>(pop);
 	}
 
 };	// class CLogicalSequenceProject

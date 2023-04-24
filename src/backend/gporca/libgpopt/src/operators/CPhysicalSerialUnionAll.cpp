@@ -41,8 +41,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalSerialUnionAll::CPhysicalSerialUnionAll(
-	CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrInput)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CPhysicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 	// UnionAll creates two distribution requests to enforce distribution of its children:
@@ -71,7 +71,7 @@ CPhysicalSerialUnionAll::PdsRequired(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CDistributionSpec> pdsRequired,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != PdrgpdrgpcrInput());

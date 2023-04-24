@@ -76,13 +76,6 @@ CExpressionHandle::CExpressionHandle(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CExpressionHandle::~CExpressionHandle()
 {
-	SafeRelease(m_pexpr);
-	SafeRelease(m_pgexpr);
-	SafeRelease(m_pstats);
-	SafeRelease(m_prp);
-	SafeRelease(m_pdpplan);
-	SafeRelease(m_pdrgpstat);
-	SafeRelease(m_pdrgprp);
 }
 
 
@@ -176,7 +169,7 @@ CExpressionHandle::CopyStats()
 	GPOS_ASSERT(nullptr != stats);
 
 	// attach stats
-	stats->AddRef();
+
 	GPOS_ASSERT(nullptr == m_pstats);
 	m_pstats = stats;
 
@@ -199,7 +192,6 @@ CExpressionHandle::CopyStats()
 
 		if (nullptr != child_stats)
 		{
-			child_stats->AddRef();
 		}
 		else
 		{
@@ -230,7 +222,7 @@ CExpressionHandle::Attach(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// increment ref count on base expression
-	pexpr->AddRef();
+
 	m_pexpr = pexpr;
 }
 
@@ -251,7 +243,7 @@ CExpressionHandle::Attach(gpos::Ref<CGroupExpression> pgexpr)
 	GPOS_ASSERT(nullptr != pgexpr);
 
 	// increment ref count on group expression
-	pgexpr->AddRef();
+
 	m_pgexpr = pgexpr;
 }
 
@@ -314,9 +306,9 @@ CExpressionHandle::DeriveProps(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 //		child
 //
 //---------------------------------------------------------------------------
-IStatisticsArray *
-CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
-									  ULONG child_index)
+gpos::Ref<IStatisticsArray>
+CExpressionHandle::PdrgpstatOuterRefs(
+	gpos::Ref<IStatisticsArray> statistics_array, ULONG child_index)
 {
 	GPOS_ASSERT(nullptr != statistics_array);
 	GPOS_ASSERT(child_index < Arity());
@@ -327,7 +319,8 @@ CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 		return GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	}
 
-	IStatisticsArray *pdrgpstatResult = GPOS_NEW(m_mp) IStatisticsArray(m_mp);
+	gpos::Ref<IStatisticsArray> pdrgpstatResult =
+		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	gpos::Ref<CColRefSet> outer_refs = DeriveOuterReferences(child_index);
 	GPOS_ASSERT(0 < outer_refs->Size());
 
@@ -338,7 +331,7 @@ CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 		gpos::Ref<IStatistics> stats = (*statistics_array)[ul];
 		gpos::Ref<CColRefSet> pcrsStats = stats->GetColRefSet(m_mp);
 		BOOL fStatsColsUsed = !outer_refs->IsDisjoint(pcrsStats);
-		pcrsStats->Release();
+
 		if (fStatsColsUsed)
 		{
 			ulStartIndex = ul;
@@ -379,7 +372,7 @@ CExpressionHandle::FAttachedToLeafPattern() const
 //
 //---------------------------------------------------------------------------
 void
-CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
+CExpressionHandle::DeriveRootStats(gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	GPOS_ASSERT(nullptr == m_pstats);
 
@@ -394,7 +387,6 @@ CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
 		pstatsRoot = m_pexpr->Pgexpr()->Pgroup()->PstatsRecursiveDerive(
 			m_mp, m_mp, CReqdPropRelational::GetReqdRelationalProps(m_prp),
 			stats_ctxt);
-		pstatsRoot->AddRef();
 	}
 	else
 	{
@@ -416,7 +408,7 @@ CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
 //
 //---------------------------------------------------------------------------
 void
-CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
+CExpressionHandle::DeriveStats(gpos::Ref<IStatisticsArray> stats_ctxt,
 							   BOOL fComputeRootStats)
 {
 	GPOS_ASSERT(nullptr != stats_ctxt);
@@ -425,7 +417,7 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 	GPOS_ASSERT(nullptr != m_pdrgprp);
 
 	// copy input context
-	IStatisticsArray *pdrgpstatCurrentCtxt =
+	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	CUtils::AddRefAppend(pdrgpstatCurrentCtxt, stats_ctxt);
 
@@ -436,7 +428,7 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		// create a new context for outer references used by current child
-		IStatisticsArray *pdrgpstatChildCtxt =
+		gpos::Ref<IStatisticsArray> pdrgpstatChildCtxt =
 			PdrgpstatOuterRefs(pdrgpstatCurrentCtxt, ul);
 
 		gpos::Ref<IStatistics> stats = nullptr;
@@ -455,12 +447,12 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 		GPOS_ASSERT(nullptr != stats);
 
 		// add child stat to current context
-		stats->AddRef();
+
 		pdrgpstatCurrentCtxt->Append(stats);
-		pdrgpstatChildCtxt->Release();
+
 
 		// add child stat to children stat array
-		stats->AddRef();
+
 		m_pdrgpstat->Append(stats);
 		if (stats->StatsEstimationRisk() > ulMaxChildRisk)
 		{
@@ -486,7 +478,6 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 	}
 
 	// clean up current stat context
-	pdrgpstatCurrentCtxt->Release();
 }
 
 
@@ -533,7 +524,7 @@ CExpressionHandle::DeriveCostContextStats()
 		if (nullptr == m_pstats || m_pstats->Rows() > pstatsDS->Rows())
 		{
 			// Replace the group stats with our newly derived DPE stats
-			SafeRelease(m_pstats);
+
 			m_pstats = pstatsDS;
 		}
 		else
@@ -541,18 +532,17 @@ CExpressionHandle::DeriveCostContextStats()
 			// Eliminating partitions can't possibly increase the row count. If the row
 			// count is higher, that's likely due to some heuristics in the estimation.
 			// If the row count is the same, there is no need to use DPE stats.
-			pstatsDS->Release();
 		}
 
 		return;
 	}
 
 	// release current stats since we will derive new stats
-	SafeRelease(m_pstats);
+
 	m_pstats = nullptr;
 
 	// load stats from child cost context(s) -- these may be different from child groups stats
-	SafeRelease(m_pdrgpstat);
+
 	m_pdrgpstat = nullptr;
 
 	m_pdrgpstat = GPOS_NEW(m_mp) IStatisticsArray(m_mp);
@@ -564,7 +554,7 @@ CExpressionHandle::DeriveCostContextStats()
 		GPOS_ASSERT(nullptr != pccChild);
 		GPOS_ASSERT(nullptr != pccChild->Pstats());
 
-		pccChild->Pstats()->AddRef();
+
 		m_pdrgpstat->Append(pccChild->Pstats());
 	}
 
@@ -573,7 +563,7 @@ CExpressionHandle::DeriveCostContextStats()
 		GPOS_ASSERT(1 == m_pdrgpstat->Size());
 
 		// copy stats from first child
-		(*m_pdrgpstat)[0]->AddRef();
+
 		m_pstats = (*m_pdrgpstat)[0];
 
 		return;
@@ -586,7 +576,7 @@ CExpressionHandle::DeriveCostContextStats()
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(pgexprForStats);
 	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
-	m_pdrgpstat->AddRef();
+
 	exprhdl.m_pdrgpstat = m_pdrgpstat;
 	exprhdl.ComputeReqdProps(m_pcc->Poc()->GetReqdRelationalProps(),
 							 0 /*ulOptReq*/);
@@ -599,7 +589,7 @@ CExpressionHandle::DeriveCostContextStats()
 	GPOS_ASSERT(nullptr == m_pstats);
 	GPOS_ASSERT(nullptr != stats);
 
-	stats->AddRef();
+
 	m_pstats = stats;
 
 	GPOS_ASSERT(m_pstats != nullptr);
@@ -617,7 +607,7 @@ CExpressionHandle::DeriveCostContextStats()
 void
 CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							   gpos::Ref<CReqdPropRelational> prprel,
-							   IStatisticsArray *stats_ctxt) const
+							   gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	gpos::Ref<CReqdPropRelational> prprelNew = prprel;
 	if (nullptr == prprelNew)
@@ -628,10 +618,9 @@ CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 	}
 	else
 	{
-		prprelNew->AddRef();
 	}
 
-	IStatisticsArray *pdrgpstatCtxtNew = stats_ctxt;
+	gpos::Ref<IStatisticsArray> pdrgpstatCtxtNew = stats_ctxt;
 	if (nullptr == stats_ctxt)
 	{
 		// create empty context
@@ -639,7 +628,6 @@ CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 	}
 	else
 	{
-		pdrgpstatCtxtNew->AddRef();
 	}
 
 	if (nullptr != Pgexpr())
@@ -653,9 +641,6 @@ CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 
 		(void) Pexpr()->PstatsDerive(prprelNew, pdrgpstatCtxtNew);
 	}
-
-	prprelNew->Release();
-	pdrgpstatCtxtNew->Release();
 }
 
 
@@ -693,7 +678,6 @@ CExpressionHandle::DerivePlanPropsForCostContext()
 	// create/derive local properties
 	m_pdpplan = Pop()->PdpCreate(m_mp);
 	m_pdpplan->Derive(m_mp, *this, pdpctxtplan);
-	pdpctxtplan->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -714,7 +698,7 @@ CExpressionHandle::InitReqdProps(gpos::Ref<CReqdProp> prpInput)
 
 	// set required properties of attached expr/gexpr
 	m_prp = prpInput;
-	m_prp->AddRef();
+
 
 	// compute required properties of children
 	m_pdrgprp = GPOS_NEW(m_mp) CReqdPropArray(m_mp);
@@ -725,7 +709,6 @@ CExpressionHandle::InitReqdProps(gpos::Ref<CReqdProp> prpInput)
 	const ULONG arity = Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		m_prp->AddRef();
 		m_pdrgprp->Append(m_prp);
 	}
 }
@@ -742,7 +725,7 @@ CExpressionHandle::InitReqdProps(gpos::Ref<CReqdProp> prpInput)
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::ComputeChildReqdProps(ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
+										 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 										 ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != m_prp);
@@ -756,7 +739,6 @@ CExpressionHandle::ComputeChildReqdProps(ULONG child_index,
 	if (FScalarChild(child_index))
 	{
 		// use local reqd properties to fill scalar child entry in children array
-		prp->AddRef();
 	}
 	else
 	{
@@ -804,7 +786,7 @@ CExpressionHandle::CopyChildReqdProps(ULONG child_index,
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::ComputeChildReqdCols(ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt)
+										gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr != m_prp);
 	GPOS_ASSERT(nullptr != m_pdrgprp);
@@ -816,7 +798,6 @@ CExpressionHandle::ComputeChildReqdCols(ULONG child_index,
 	if (FScalarChild(child_index))
 	{
 		// use local reqd properties to fill scalar child entry in children array
-		prp->AddRef();
 	}
 	else
 	{
@@ -1950,7 +1931,7 @@ CExpressionHandle::DeriveFunctionProperties() const
 	return GetRelationalProperties()->GetFunctionProperties();
 }
 
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CExpressionHandle::Pdrgpfd(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1961,7 +1942,7 @@ CExpressionHandle::Pdrgpfd(ULONG child_index) const
 	return GetRelationalProperties(child_index)->GetFunctionalDependencies();
 }
 
-CFunctionalDependencyArray *
+gpos::Ref<CFunctionalDependencyArray>
 CExpressionHandle::Pdrgpfd() const
 {
 	if (nullptr != Pexpr())

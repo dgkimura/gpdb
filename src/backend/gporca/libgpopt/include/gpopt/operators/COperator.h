@@ -28,7 +28,7 @@ using namespace gpos;
 class CExpressionHandle;
 
 // dynamic array for operators
-using COperatorArray = CDynamicPtrArray<COperator, CleanupRelease>;
+using COperatorArray = gpos::Vector<gpos::Ref<COperator>>;
 
 // hash map mapping CColRef -> CColRef
 using ColRefToColRefMap =
@@ -344,7 +344,8 @@ public:
 
 	// return a copy of the operator with remapped columns
 	virtual gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist) = 0;
 
 	// print
 	virtual IOstream &OsPrint(IOstream &os) const;

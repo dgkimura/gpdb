@@ -56,19 +56,19 @@ protected:
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
 	// distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::Ref<ULongPtrArray> m_distr_col_array;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// partition keys
-	ULongPtrArray *m_partition_cols_array;
+	gpos::Ref<ULongPtrArray> m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::Ref<CharPtrArray> m_str_part_types_array;
 
 	// key sets
-	ULongPtr2dArray *m_key_sets_arrays;
+	gpos::Ref<ULongPtr2dArray> m_key_sets_arrays;
 
 	// part constraint
 	gpos::Ref<CDXLNode> m_part_constraint;

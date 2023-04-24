@@ -104,7 +104,7 @@ CHashMapIterTest::EresUnittest_Basic()
 		GPOS_ASSERT(pdrgpulValues->Equals(pdrgpulIterValues.Value()));
 	}
 
-	pm->Release();
+
 
 	return GPOS_OK;
 }

@@ -74,12 +74,6 @@ CReqdPropPlan::CReqdPropPlan(gpos::Ref<CColRefSet> pcrs,
 //---------------------------------------------------------------------------
 CReqdPropPlan::~CReqdPropPlan()
 {
-	SafeRelease(m_pcrs);
-	SafeRelease(m_peo);
-	SafeRelease(m_ped);
-	SafeRelease(m_per);
-	SafeRelease(m_pepp);
-	SafeRelease(m_pcter);
 }
 
 
@@ -94,7 +88,7 @@ CReqdPropPlan::~CReqdPropPlan()
 void
 CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcrs);
 
@@ -116,7 +110,7 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcter);
 
@@ -138,7 +132,7 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+					   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
 
@@ -248,7 +242,6 @@ CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 		gpos::Ref<CColRefSet> pcrsUsed = pps->PcrsUsed(mp);
 		fProvidesReqdCols = pcrsOutput->ContainsAll(pcrsUsed);
-		pcrsUsed->Release();
 	}
 
 	return fProvidesReqdCols;
@@ -535,7 +528,7 @@ gpos::Ref<CReqdPropPlan>
 CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
 							   gpos::Ref<CReqdPropPlan> prppInput,
 							   gpos::Ref<CDrvdPropPlan> pdpplanInput,
-							   UlongToColRefMap *colref_mapping)
+							   gpos::Ref<UlongToColRefMap> colref_mapping)
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
 	GPOS_ASSERT(nullptr != prppInput);
@@ -566,26 +559,24 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
 			pdsNoEquiv->PdsCopyWithRemappedColumns(mp, colref_mapping,
 												   false /*must_exist*/);
 		ped = GPOS_NEW(mp) CEnfdDistribution(pds, prppInput->Ped()->Edm());
-		pdsNoEquiv->Release();
 	}
 	else
 	{
-		prppInput->Ped()->AddRef();
 		ped = prppInput->Ped();
 	}
 
 	// other properties are copied from input
 
-	prppInput->PcrsRequired()->AddRef();
+
 	gpos::Ref<CColRefSet> pcrsRequired = prppInput->PcrsRequired();
 
-	prppInput->Per()->AddRef();
+
 	gpos::Ref<CEnfdRewindability> per = prppInput->Per();
 
-	prppInput->Pepp()->AddRef();
+
 	gpos::Ref<CEnfdPartitionPropagation> pepp = prppInput->Pepp();
 
-	prppInput->Pcter()->AddRef();
+
 	gpos::Ref<CCTEReq> pcter = prppInput->Pcter();
 
 	return GPOS_NEW(mp) CReqdPropPlan(pcrsRequired, peo, ped, per, pepp, pcter);

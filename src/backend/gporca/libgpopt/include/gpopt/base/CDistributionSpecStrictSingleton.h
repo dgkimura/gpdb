@@ -60,11 +60,11 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void
-	AppendEnforcers(CMemoryPool *,			   // mp
-					CExpressionHandle &,	   // exprhdl
-					gpos::Ref<CReqdPropPlan>,  // prpp
-					CExpressionArray *,		   // pdrgpexpr
-					gpos::Ref<CExpression>	   // pexpr
+	AppendEnforcers(CMemoryPool *,				  // mp
+					CExpressionHandle &,		  // exprhdl
+					gpos::Ref<CReqdPropPlan>,	  // prpp
+					gpos::Ref<CExpressionArray>,  // pdrgpexpr
+					gpos::Ref<CExpression>		  // pexpr
 					) override
 	{
 		GPOS_ASSERT(!"attempt to enforce strict SINGLETON distribution");
@@ -80,7 +80,7 @@ public:
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtStrictSingleton == pds->Edt());
 
-		return dynamic_cast<gpos::Ref<CDistributionSpecStrictSingleton> >(pds);
+		return gpos::dyn_cast<CDistributionSpecStrictSingleton>(pds);
 	}
 
 };	// class CDistributionSpecStrictSingleton

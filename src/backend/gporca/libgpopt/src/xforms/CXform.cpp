@@ -45,7 +45,6 @@ CXform::CXform(gpos::Ref<CExpression> pexpr) : m_pexpr(pexpr)
 //---------------------------------------------------------------------------
 CXform::~CXform()
 {
-	m_pexpr->Release();
 }
 
 

@@ -149,7 +149,7 @@ CScalarArrayCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarArrayCmp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarArrayCmp::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{
@@ -215,21 +215,21 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
 	{
 		// if right child is not an actual array (e.g., Const of type array), return input
 		// expression without expansion
-		pexprArrayCmp->AddRef();
+
 		return pexprArrayCmp;
 	}
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulArrayElems; ul++)
 	{
 		gpos::Ref<CExpression> pexprArrayElem =
 			CUtils::PScalarArrayExprChildAt(mp, pexprArray, ul);
-		pexprIdent->AddRef();
+
 		const CWStringConst *str_opname = popArrayCmp->Pstr();
 		gpos::Ref<IMDId> mdid_op = popArrayCmp->MdIdOp();
 		GPOS_ASSERT(IMDId::IsValid(mdid_op));
 
-		mdid_op->AddRef();
+
 
 		gpos::Ref<CExpression> pexprCmp = CUtils::PexprScalarCmp(
 			mp, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
@@ -238,8 +238,9 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
 	// deduplicate resulting array
-	CExpressionArray *pdrgpexprDeduped = CUtils::PdrgpexprDedup(mp, pdrgpexpr);
-	pdrgpexpr->Release();
+	gpos::Ref<CExpressionArray> pdrgpexprDeduped =
+		CUtils::PdrgpexprDedup(mp, pdrgpexpr);
+
 
 	EArrCmpType earrcmpt = popArrayCmp->Earrcmpt();
 	if (EarrcmpAny == earrcmpt)

@@ -29,10 +29,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalForeignScan::CPhysicalForeignScan(CMemoryPool *mp,
-										   const CName *pnameAlias,
-										   gpos::Ref<CTableDescriptor> ptabdesc,
-										   CColRefArray *pdrgpcrOutput)
+CPhysicalForeignScan::CPhysicalForeignScan(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::Ref<CTableDescriptor> ptabdesc, gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalTableScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 	// if this table is coordinator only, then keep the original distribution spec.
@@ -44,7 +43,6 @@ CPhysicalForeignScan::CPhysicalForeignScan(CMemoryPool *mp,
 	// otherwise, override the distribution spec for foreign table
 	if (m_pds)
 	{
-		m_pds->Release();
 	}
 
 	m_pds = GPOS_NEW(mp) CDistributionSpecRandom();

@@ -67,7 +67,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -87,7 +87,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 
 		gpos::Ref<CGroup> pgroup = eng.PgroupRoot();
-		pqc->Prpp()->AddRef();
+
 		gpos::Ref<COptimizationContext> poc = GPOS_NEW(mp) COptimizationContext(
 			mp, pgroup, pqc->Prpp(),
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
@@ -250,7 +250,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 		{
 			CAutoTrace at(mp);
-			CXformSet *xform_set =
+			gpos::Ref<CXformSet> xform_set =
 				CLogical::PopConvert(pgexprLogical->Pop())->PxfsCandidates(mp);
 
 			CXformSetIter xsi(*(xform_set));
@@ -277,13 +277,11 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 				GPOS_DELETE_ARRAY(pestate);
 			}
-
-			xform_set->Release();
 		}
 #endif	// GPOS_DEBUG
 
-		pexpr->Release();
-		poc->Release();
+
+
 		GPOS_DELETE(pqc);
 	}
 

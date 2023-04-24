@@ -43,7 +43,6 @@ CConstExprEvaluatorDefault::~CConstExprEvaluatorDefault() = default;
 gpos::Ref<CExpression>
 CConstExprEvaluatorDefault::PexprEval(gpos::Ref<CExpression> pexpr)
 {
-	pexpr->AddRef();
 	return pexpr;
 }
 

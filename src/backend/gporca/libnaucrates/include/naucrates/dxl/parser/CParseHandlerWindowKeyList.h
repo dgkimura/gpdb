@@ -35,7 +35,7 @@ class CParseHandlerWindowKeyList : public CParseHandlerBase
 {
 private:
 	// list of window keys
-	CDXLWindowKeyArray *m_dxl_window_key_array;
+	gpos::Ref<CDXLWindowKeyArray> m_dxl_window_key_array;
 
 	// process the start of an element
 	void StartElement(
@@ -61,7 +61,7 @@ public:
 							   CParseHandlerBase *parse_handler_root);
 
 	// list of window keys
-	CDXLWindowKeyArray *
+	gpos::Ref<CDXLWindowKeyArray>
 	GetDxlWindowKeyArray() const
 	{
 		return m_dxl_window_key_array;

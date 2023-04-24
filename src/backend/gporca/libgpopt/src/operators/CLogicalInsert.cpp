@@ -44,7 +44,7 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalInsert::CLogicalInsert(CMemoryPool *mp,
 							   gpos::Ref<CTableDescriptor> ptabdesc,
-							   CColRefArray *pdrgpcrSource)
+							   gpos::Ref<CColRefArray> pdrgpcrSource)
 	: CLogical(mp), m_ptabdesc(ptabdesc), m_pdrgpcrSource(pdrgpcrSource)
 
 {
@@ -64,8 +64,6 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalInsert::~CLogicalInsert()
 {
-	SafeRelease(m_ptabdesc);
-	SafeRelease(m_pdrgpcrSource);
 }
 
 //---------------------------------------------------------------------------
@@ -118,13 +116,13 @@ CLogicalInsert::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalInsert::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrSource, colref_mapping, must_exist);
-	m_ptabdesc->AddRef();
+
 
 	return GPOS_NEW(mp) CLogicalInsert(mp, m_ptabdesc, colref_array);
 }
@@ -186,10 +184,10 @@ CLogicalInsert::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalInsert::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfInsert2DML);
 	return xform_set;
 }
@@ -205,7 +203,7 @@ CLogicalInsert::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalInsert::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

@@ -295,7 +295,7 @@ CDXLUtils::GetPlanDXLNode(CMemoryPool *mp, const CHAR *dxl_string,
 											  true /* validate_children */);
 #endif
 
-	root_dxl_node->AddRef();
+
 
 	return root_dxl_node;
 }
@@ -332,18 +332,19 @@ CDXLUtils::ParseQueryToQueryDXLTree(CMemoryPool *mp, const CHAR *dxl_string,
 											  true /* validate_children */);
 #endif
 
-	root_dxl_node->AddRef();
+
 
 	// collect the list of query output columns from the dxl parse handler
 	GPOS_ASSERT(nullptr != parse_handler_dxl->GetOutputColumnsDXLArray());
-	CDXLNodeArray *query_output_cols_dxlnode_array =
+	gpos::Ref<CDXLNodeArray> query_output_cols_dxlnode_array =
 		parse_handler_dxl->GetOutputColumnsDXLArray();
-	query_output_cols_dxlnode_array->AddRef();
+
 
 	// collect the list of CTEs
-	CDXLNodeArray *cte_producers = parse_handler_dxl->GetCTEProducerDXLArray();
+	gpos::Ref<CDXLNodeArray> cte_producers =
+		parse_handler_dxl->GetCTEProducerDXLArray();
 	GPOS_ASSERT(nullptr != cte_producers);
-	cte_producers->AddRef();
+
 
 	CQueryToDXLResult *ptrOutput = GPOS_NEW(mp) CQueryToDXLResult(
 		root_dxl_node, query_output_cols_dxlnode_array, cte_producers);
@@ -372,7 +373,7 @@ CDXLUtils::ParseDXLToScalarExprDXLNode(CMemoryPool *mp, const CHAR *dxl_string,
 	gpos::Ref<CDXLNode> root_dxl_node =
 		parse_handler_dxl_wrapper->GetScalarExprDXLRoot();
 	GPOS_ASSERT(nullptr != root_dxl_node);
-	root_dxl_node->AddRef();
+
 
 	return root_dxl_node;
 }
@@ -388,7 +389,7 @@ CDXLUtils::ParseDXLToScalarExprDXLNode(CMemoryPool *mp, const CHAR *dxl_string,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-IMDCacheObjectArray *
+gpos::Ref<IMDCacheObjectArray>
 CDXLUtils::ParseDXLToIMDObjectArray(CMemoryPool *mp, const CHAR *dxl_string,
 									const CHAR *xsd_file_path)
 {
@@ -400,9 +401,9 @@ CDXLUtils::ParseDXLToIMDObjectArray(CMemoryPool *mp, const CHAR *dxl_string,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect metadata objects from dxl parse handler
-	IMDCacheObjectArray *imd_obj_array =
+	gpos::Ref<IMDCacheObjectArray> imd_obj_array =
 		parse_handler_dxl->GetMdIdCachedObjArray();
-	imd_obj_array->AddRef();
+
 
 	return imd_obj_array;
 }
@@ -427,12 +428,12 @@ CDXLUtils::ParseDXLToMDId(CMemoryPool *mp, const CWStringBase *dxl_string,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect metadata objects from dxl parse handler
-	IMdIdArray *mdid_array = parse_handler_dxl->GetMdIdArray();
+	gpos::Ref<IMdIdArray> mdid_array = parse_handler_dxl->GetMdIdArray();
 
 	GPOS_ASSERT(1 == mdid_array->Size());
 
 	gpos::Ref<IMDId> mdid = (*mdid_array)[0];
-	mdid->AddRef();
+
 
 	return mdid;
 }
@@ -461,7 +462,7 @@ CDXLUtils::ParseDXLToMDRequest(CMemoryPool *mp, const CHAR *dxl_string,
 	// collect metadata ids from dxl parse handler
 	gpos::Ref<CMDRequest> md_request = parse_handler_dxl->GetMiniDumper();
 	GPOS_ASSERT(nullptr != md_request);
-	md_request->AddRef();
+
 
 	return md_request;
 }
@@ -511,7 +512,7 @@ CDXLUtils::ParseDXLToOptimizerConfig(CMemoryPool *mp, const CHAR *dxl_string,
 	gpos::Ref<COptimizerConfig> optimizer_config =
 		parse_handler_dxl->GetOptimizerConfig();
 	GPOS_ASSERT(nullptr != optimizer_config);
-	optimizer_config->AddRef();
+
 
 	return optimizer_config;
 }
@@ -527,7 +528,7 @@ CDXLUtils::ParseDXLToOptimizerConfig(CMemoryPool *mp, const CHAR *dxl_string,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 										  const CWStringBase *dxl_string,
 										  const CHAR *xsd_file_path)
@@ -540,9 +541,9 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect statistics objects from dxl parse handler
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		parse_handler_dxl->GetStatsDerivedRelDXLArray();
-	dxl_derived_rel_stats_array->AddRef();
+
 
 	return dxl_derived_rel_stats_array;
 }
@@ -557,7 +558,7 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::Ref<CDXLStatsDerivedRelationArray>
 CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 										  const CHAR *dxl_string,
 										  const CHAR *xsd_file_path)
@@ -570,9 +571,9 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect statistics objects from dxl parse handler
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		parse_handler_dxl->GetStatsDerivedRelDXLArray();
-	dxl_derived_rel_stats_array->AddRef();
+
 
 	return dxl_derived_rel_stats_array;
 }
@@ -585,29 +586,31 @@ CDXLUtils::ParseDXLToStatsDerivedRelArray(CMemoryPool *mp,
 //		Translate the array of dxl statistics objects to an array of
 //		optimizer statistics object.
 //---------------------------------------------------------------------------
-CStatisticsArray *
+gpos::Ref<CStatisticsArray>
 CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array)
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array)
 {
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 
-	CStatisticsArray *statistics_array = GPOS_NEW(mp) CStatisticsArray(mp);
+	gpos::Ref<CStatisticsArray> statistics_array =
+		GPOS_NEW(mp) CStatisticsArray(mp);
 	const ULONG ulRelStat = dxl_derived_rel_stats_array->Size();
 	for (ULONG ulIdxRelStat = 0; ulIdxRelStat < ulRelStat; ulIdxRelStat++)
 	{
 		// create hash map from colid -> histogram
-		UlongToHistogramMap *column_id_histogram_map =
+		gpos::Ref<UlongToHistogramMap> column_id_histogram_map =
 			GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 		// width hash map
-		UlongToDoubleMap *column_id_width_map =
+		gpos::Ref<UlongToDoubleMap> column_id_width_map =
 			GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 		gpos::Ref<CDXLStatsDerivedRelation> stats_derived_relation_dxl =
 			(*dxl_derived_rel_stats_array)[ulIdxRelStat];
-		const CDXLStatsDerivedColumnArray *derived_column_stats_array =
-			stats_derived_relation_dxl->GetDXLStatsDerivedColArray();
+		const gpos::Ref<CDXLStatsDerivedColumnArray>
+			derived_column_stats_array =
+				stats_derived_relation_dxl->GetDXLStatsDerivedColArray();
 
 		const ULONG num_of_columns = derived_column_stats_array->Size();
 		for (ULONG column_id_idx = 0; column_id_idx < num_of_columns;
@@ -623,7 +626,7 @@ CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				dxl_derived_col_stats->GetDistinctRemain();
 			CDouble freq_remaining = dxl_derived_col_stats->GetFreqRemain();
 
-			CBucketArray *stats_buckets_array =
+			gpos::Ref<CBucketArray> stats_buckets_array =
 				CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
 												  dxl_derived_col_stats);
 			CHistogram *histogram = GPOS_NEW(mp)
@@ -657,14 +660,14 @@ CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 //		Extract the array of optimizer buckets from the dxl representation of
 //		dxl buckets in the dxl derived column statistics object.
 //---------------------------------------------------------------------------
-CBucketArray *
+gpos::Ref<CBucketArray>
 CDXLUtils::ParseDXLToBucketsArray(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CDXLStatsDerivedColumn> dxl_derived_col_stats)
 {
-	CBucketArray *stats_buckets_array = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> stats_buckets_array = GPOS_NEW(mp) CBucketArray(mp);
 
-	const CDXLBucketArray *dxl_bucket_array =
+	const gpos::Ref<CDXLBucketArray> dxl_bucket_array =
 		dxl_derived_col_stats->TransformHistogramToDXLBucketArray();
 	const ULONG num_of_buckets = dxl_bucket_array->Size();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
@@ -719,7 +722,7 @@ CDXLUtils::GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 //		that schema, and an exception is thrown if the DXL does not conform.
 //
 //---------------------------------------------------------------------------
-IMDCacheObjectArray *
+gpos::Ref<IMDCacheObjectArray>
 CDXLUtils::ParseDXLToIMDObjectArray(CMemoryPool *mp,
 									const CWStringBase *dxl_string,
 									const CHAR *xsd_file_path)
@@ -732,9 +735,9 @@ CDXLUtils::ParseDXLToIMDObjectArray(CMemoryPool *mp,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect metadata objects from dxl parse handler
-	IMDCacheObjectArray *imd_obj_array =
+	gpos::Ref<IMDCacheObjectArray> imd_obj_array =
 		parse_handler_dxl->GetMdIdCachedObjArray();
-	imd_obj_array->AddRef();
+
 
 	return imd_obj_array;
 }
@@ -763,7 +766,7 @@ CDXLUtils::ParseDXLToIMDIdCacheObj(CMemoryPool *mp,
 		GetParseHandlerForDXLString(mp, dxl_string, xsd_file_path));
 
 	// collect metadata objects from dxl parse handler
-	IMDCacheObjectArray *imd_obj_array =
+	gpos::Ref<IMDCacheObjectArray> imd_obj_array =
 		parse_handler_dxl_array->GetMdIdCachedObjArray();
 
 	if (0 == imd_obj_array->Size())
@@ -773,7 +776,7 @@ CDXLUtils::ParseDXLToIMDIdCacheObj(CMemoryPool *mp,
 	}
 
 	gpos::Ref<IMDCacheObject> imd_cached_obj = (*imd_obj_array)[0];
-	imd_cached_obj->AddRef();
+
 
 	return imd_cached_obj;
 }
@@ -788,11 +791,11 @@ CDXLUtils::ParseDXLToIMDIdCacheObj(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-CDXLUtils::SerializeQuery(CMemoryPool *mp, IOstream &os,
-						  const gpos::Ref<CDXLNode> dxl_query_node,
-						  const CDXLNodeArray *query_output_dxlnode_array,
-						  const CDXLNodeArray *cte_producers,
-						  BOOL serialize_header_footer, BOOL indentation)
+CDXLUtils::SerializeQuery(
+	CMemoryPool *mp, IOstream &os, const gpos::Ref<CDXLNode> dxl_query_node,
+	const gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+	const gpos::Ref<CDXLNodeArray> cte_producers, BOOL serialize_header_footer,
+	BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != dxl_query_node &&
@@ -937,7 +940,7 @@ CDXLUtils::SerializePlan(CMemoryPool *mp, IOstream &os,
 //---------------------------------------------------------------------------
 void
 CDXLUtils::SerializeMetadata(CMemoryPool *mp,
-							 const IMDCacheObjectArray *imd_obj_array,
+							 const gpos::Ref<IMDCacheObjectArray> imd_obj_array,
 							 IOstream &os, BOOL serialize_header_footer,
 							 BOOL indentation)
 {
@@ -1177,9 +1180,10 @@ CDXLUtils::SerializeMDRequest(CMemoryPool *mp, gpos::Ref<CMDRequest> md_request,
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const CStatisticsArray *statistics_array,
-							   BOOL serialize_header_footer, BOOL indentation)
+CDXLUtils::SerializeStatistics(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CStatisticsArray> statistics_array,
+	BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -1204,10 +1208,10 @@ CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 void
-CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const CStatisticsArray *statistics_array,
-							   IOstream &os, BOOL serialize_header_footer,
-							   BOOL indentation)
+CDXLUtils::SerializeStatistics(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CStatisticsArray> statistics_array, IOstream &os,
+	BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -1231,7 +1235,6 @@ CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CDXLStatsDerivedRelation> stats_derived_relation_dxl =
 			stats->GetDxlStatsDrvdRelation(mp, md_accessor);
 		stats_derived_relation_dxl->Serialize(&xml_serializer);
-		stats_derived_relation_dxl->Release();
 	}
 
 	xml_serializer.CloseElement(
@@ -1256,7 +1259,7 @@ CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 CWStringDynamic *
 CDXLUtils::SerializeMetadata(CMemoryPool *mp,
-							 const IMDCacheObjectArray *imd_obj_array,
+							 const gpos::Ref<IMDCacheObjectArray> imd_obj_array,
 							 BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -1664,13 +1667,13 @@ CDXLUtils::DecodeByteArrayFromString(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CDXLUtils::Serialize(CMemoryPool *mp, const ULongPtr2dArray *array_2D)
+CDXLUtils::Serialize(CMemoryPool *mp, const gpos::Ref<ULongPtr2dArray> array_2D)
 {
 	const ULONG len = array_2D->Size();
 	CWStringDynamic *keys_buffer = GPOS_NEW(mp) CWStringDynamic(mp);
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		ULongPtrArray *pdrgpul = (*array_2D)[ul];
+		gpos::Ref<ULongPtrArray> pdrgpul = (*array_2D)[ul];
 		CWStringDynamic *key_set_string = CDXLUtils::Serialize(mp, pdrgpul);
 
 		keys_buffer->Append(key_set_string);
@@ -1688,8 +1691,8 @@ CDXLUtils::Serialize(CMemoryPool *mp, const ULongPtr2dArray *array_2D)
 
 // Serialize a list of chars into a comma-separated string
 CWStringDynamic *
-CDXLUtils::SerializeToCommaSeparatedString(CMemoryPool *mp,
-										   const CharPtrArray *char_ptr_array)
+CDXLUtils::SerializeToCommaSeparatedString(
+	CMemoryPool *mp, const gpos::Ref<CharPtrArray> char_ptr_array)
 {
 	CWStringDynamic *dxl_string = GPOS_NEW(mp) CWStringDynamic(mp);
 
@@ -1783,7 +1786,7 @@ CDXLUtils::Read(CMemoryPool *mp, const CHAR *filename)
 //
 //---------------------------------------------------------------------------
 void
-CDXLUtils::DebugPrintMDIdArray(IOstream &os, IMdIdArray *mdid_array)
+CDXLUtils::DebugPrintMDIdArray(IOstream &os, gpos::Ref<IMdIdArray> mdid_array)
 {
 	ULONG len = mdid_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)

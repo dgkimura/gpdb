@@ -33,11 +33,13 @@ public:
 
 	// ctor
 	CPhysicalScalarAgg(
-		CMemoryPool *mp, CColRefArray *colref_array,
-		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		gpos::Ref<CColRefArray>
+			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-		CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
+		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+		BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalScalarAgg() override;
@@ -66,7 +68,7 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -97,7 +99,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalScalarAgg == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalScalarAgg> >(pop);
+		return gpos::dyn_cast<CPhysicalScalarAgg>(pop);
 	}
 
 };	// class CPhysicalScalarAgg

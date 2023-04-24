@@ -35,7 +35,7 @@ private:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// source columns
-	CColRefArray *m_pdrgpcrSource;
+	gpos::Ref<CColRefArray> m_pdrgpcrSource;
 
 public:
 	CLogicalInsert(const CLogicalInsert &) = delete;
@@ -45,7 +45,7 @@ public:
 
 	// ctor
 	CLogicalInsert(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
-				   CColRefArray *colref_array);
+				   gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CLogicalInsert() override;
@@ -65,7 +65,7 @@ public:
 	}
 
 	// source columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSource() const
 	{
 		return m_pdrgpcrSource;
@@ -93,7 +93,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(
@@ -150,7 +150,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -170,7 +170,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInsert == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalInsert> >(pop);
+		return gpos::dyn_cast<CLogicalInsert>(pop);
 	}
 
 	// debug print

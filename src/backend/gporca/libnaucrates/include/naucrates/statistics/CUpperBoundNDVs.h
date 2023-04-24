@@ -59,7 +59,6 @@ public:
 	// dtor
 	~CUpperBoundNDVs()
 	{
-		m_column_refset->Release();
 	}
 
 	// return the upper bound of ndvs
@@ -84,7 +83,7 @@ public:
 	// copy upper bound ndvs with remapped column id; function will
 	// return null if there is no mapping found for any of the columns
 	CUpperBoundNDVs *CopyUpperBoundNDVWithRemap(
-		CMemoryPool *mp, UlongToColRefMap *colid_to_colref_map) const;
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colid_to_colref_map) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

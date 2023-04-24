@@ -31,7 +31,7 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalInsert::CDXLLogicalInsert(CMemoryPool *mp,
 									 gpos::Ref<CDXLTableDescr> table_descr,
-									 ULongPtrArray *src_colids_array)
+									 gpos::Ref<ULongPtrArray> src_colids_array)
 	: CDXLLogical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_src_colids_array(src_colids_array)
@@ -50,8 +50,6 @@ CDXLLogicalInsert::CDXLLogicalInsert(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalInsert::~CDXLLogicalInsert()
 {
-	m_dxl_table_descr->Release();
-	m_src_colids_array->Release();
 }
 
 //---------------------------------------------------------------------------

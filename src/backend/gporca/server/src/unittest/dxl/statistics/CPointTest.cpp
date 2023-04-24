@@ -42,7 +42,7 @@ CPointTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -77,8 +77,7 @@ CPointTest::EresUnittest_CPointInt4()
 	GPOS_RTL_ASSERT_MSG(0.99 < dDistance && dDistance < 1.01,
 						"incorrect distance calculation");
 
-	point1->Release();
-	point2->Release();
+
 
 	return GPOS_OK;
 }
@@ -102,8 +101,7 @@ CPointTest::EresUnittest_CPointBool()
 	GPOS_RTL_ASSERT_MSG(point1->IsNotEqual(point2),
 						"true must not be equal to false");
 
-	point1->Release();
-	point2->Release();
+
 
 	return GPOS_OK;
 }

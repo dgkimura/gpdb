@@ -64,8 +64,9 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(CMemoryPool *mp)
 CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -98,7 +99,7 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
-	IMdIdArray *partition_mdids)
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -131,13 +132,6 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 //---------------------------------------------------------------------------
 CLogicalDynamicGetBase::~CLogicalDynamicGetBase()
 {
-	SafeRelease(m_ptabdesc);
-	SafeRelease(m_pdrgpcrOutput);
-	SafeRelease(m_pdrgpdrgpcrPart);
-	SafeRelease(m_partition_mdids);
-	SafeRelease(m_root_col_mapping_per_part);
-	SafeRelease(m_pcrsDist);
-
 	GPOS_DELETE(m_pnameAlias);
 }
 
@@ -174,7 +168,7 @@ CLogicalDynamicGetBase::DeriveKeyCollection(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 ) const
 {
-	const CBitSetArray *pdrgpbs = m_ptabdesc->PdrgpbsKeys();
+	const gpos::Ref<CBitSetArray> pdrgpbs = m_ptabdesc->PdrgpbsKeys();
 
 	return CLogical::PkcKeysBaseTable(mp, pdrgpbs, m_pdrgpcrOutput);
 }
@@ -210,8 +204,8 @@ CLogicalDynamicGetBase::DerivePartitionInfo(CMemoryPool *mp,
 ) const
 {
 	gpos::Ref<IMDId> mdid = m_ptabdesc->MDId();
-	mdid->AddRef();
-	m_pdrgpdrgpcrPart->AddRef();
+
+
 
 	gpos::Ref<CPartInfo> ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 	ppartinfo->AddPartConsumer(mp, m_scan_id, mdid, m_pdrgpdrgpcrPart);
@@ -221,13 +215,15 @@ CLogicalDynamicGetBase::DerivePartitionInfo(CMemoryPool *mp,
 
 // Construct a mapping from each column in root table to an index in each child
 // partition's table descr by matching column names
-ColRefToUlongMapArray *
+gpos::Ref<ColRefToUlongMapArray>
 CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
-	CMemoryPool *mp, CColRefArray *root_cols, IMdIdArray *partition_mdids)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> root_cols,
+	gpos::Ref<IMdIdArray> partition_mdids)
 {
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	ColRefToUlongMapArray *part_maps = GPOS_NEW(mp) ColRefToUlongMapArray(mp);
+	gpos::Ref<ColRefToUlongMapArray> part_maps =
+		GPOS_NEW(mp) ColRefToUlongMapArray(mp);
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 	{
 		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
@@ -235,7 +231,7 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 
 		GPOS_ASSERT(nullptr != partrel);
 
-		ColRefToUlongMap *mapping = GPOS_NEW(mp) ColRefToUlongMap(mp);
+		gpos::Ref<ColRefToUlongMap> mapping = GPOS_NEW(mp) ColRefToUlongMap(mp);
 
 		for (ULONG i = 0; i < root_cols->Size(); ++i)
 		{

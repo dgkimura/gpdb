@@ -18,7 +18,7 @@
 namespace gpopt
 {
 // dynamic array of datum arrays -- array owns elements
-using IDatum2dArray = CDynamicPtrArray<IDatumArray, CleanupRelease>;
+using IDatum2dArray = gpos::Vector<gpos::Ref<IDatumArray>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -32,17 +32,17 @@ class CLogicalConstTableGet : public CLogical
 {
 private:
 	// array of column descriptors: the schema of the const table
-	CColumnDescriptorArray *m_pdrgpcoldesc;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldesc;
 
 	// array of datum arrays
-	IDatum2dArray *m_pdrgpdrgpdatum;
+	gpos::Ref<IDatum2dArray> m_pdrgpdrgpdatum;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// construct column descriptors from column references
-	static CColumnDescriptorArray *PdrgpcoldescMapping(
-		CMemoryPool *mp, CColRefArray *colref_array);
+	static gpos::Ref<CColumnDescriptorArray> PdrgpcoldescMapping(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 public:
 	CLogicalConstTableGet(const CLogicalConstTableGet &) = delete;
@@ -50,11 +50,13 @@ public:
 	// ctors
 	explicit CLogicalConstTableGet(CMemoryPool *mp);
 
-	CLogicalConstTableGet(CMemoryPool *mp, CColumnDescriptorArray *pdrgpcoldesc,
-						  IDatum2dArray *pdrgpdrgpdatum);
+	CLogicalConstTableGet(CMemoryPool *mp,
+						  gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc,
+						  gpos::Ref<IDatum2dArray> pdrgpdrgpdatum);
 
-	CLogicalConstTableGet(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-						  IDatum2dArray *pdrgpdrgpdatum);
+	CLogicalConstTableGet(CMemoryPool *mp,
+						  gpos::Ref<CColRefArray> pdrgpcrOutput,
+						  gpos::Ref<IDatum2dArray> pdrgpdrgpdatum);
 
 	// dtor
 	~CLogicalConstTableGet() override;
@@ -74,21 +76,21 @@ public:
 	}
 
 	// col descr accessor
-	CColumnDescriptorArray *
+	gpos::Ref<CColumnDescriptorArray>
 	Pdrgpcoldesc() const
 	{
 		return m_pdrgpcoldesc;
 	}
 
 	// const table values accessor
-	IDatum2dArray *
+	gpos::Ref<IDatum2dArray>
 	Pdrgpdrgpdatum() const
 	{
 		return m_pdrgpdrgpdatum;
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -105,7 +107,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -160,14 +162,14 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -187,7 +189,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalConstTableGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalConstTableGet> >(pop);
+		return gpos::dyn_cast<CLogicalConstTableGet>(pop);
 	}
 
 

@@ -35,10 +35,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalSetOp::CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-								   CDXLColDescrArray *col_descr_array,
-								   ULongPtr2dArray *input_colids_arrays,
-								   BOOL fCastAcrossInputs)
+CDXLLogicalSetOp::CDXLLogicalSetOp(
+	CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
+	gpos::Ref<CDXLColDescrArray> col_descr_array,
+	gpos::Ref<ULongPtr2dArray> input_colids_arrays, BOOL fCastAcrossInputs)
 	: CDXLLogical(mp),
 	  m_set_operation_dxl_type(edxlsetoptype),
 	  m_col_descr_array(col_descr_array),
@@ -54,7 +54,8 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
 	const ULONG length = m_input_colids_arrays->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		ULongPtrArray *input_colids_array = (*m_input_colids_arrays)[idx];
+		gpos::Ref<ULongPtrArray> input_colids_array =
+			(*m_input_colids_arrays)[idx];
 		GPOS_ASSERT(num_of_cols == input_colids_array->Size());
 	}
 
@@ -71,8 +72,6 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
 //---------------------------------------------------------------------------
 CDXLLogicalSetOp::~CDXLLogicalSetOp()
 {
-	m_col_descr_array->Release();
-	m_input_colids_arrays->Release();
 }
 
 //---------------------------------------------------------------------------

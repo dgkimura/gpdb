@@ -39,8 +39,9 @@ private:
 
 public:
 	// ctor
-	CJoinOrderGreedy(CMemoryPool *pmp, CExpressionArray *pdrgpexprComponents,
-					 CExpressionArray *pdrgpexprConjuncts);
+	CJoinOrderGreedy(CMemoryPool *pmp,
+					 gpos::Ref<CExpressionArray> pdrgpexprComponents,
+					 gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderGreedy() override;

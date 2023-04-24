@@ -61,9 +61,9 @@ private:
 	static BOOL FPushThruOuterChild(gpos::Ref<CExpression> pexprLogical);
 
 	// return a Select expression, if needed, with a scalar condition made of given array of conjuncts
-	static gpos::Ref<CExpression> PexprSelect(CMemoryPool *mp,
-											  gpos::Ref<CExpression> pexpr,
-											  CExpressionArray *pdrgpexpr);
+	static gpos::Ref<CExpression> PexprSelect(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// push scalar expression through an expression with unary operator with scalar child
 	static void PushThruUnaryWithScalarChild(
@@ -94,17 +94,18 @@ private:
 							   gpos::Ref<CExpression> *ppexprResult);
 
 	// split the given conjunct into pushable and unpushable predicates
-	static void SplitConjunct(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-							  gpos::Ref<CExpression> pexprConj,
-							  CExpressionArray **ppdrgpexprPushable,
-							  CExpressionArray **ppdrgpexprUnpushable);
+	static void SplitConjunct(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpression> pexprConj,
+		gpos::Ref<CExpressionArray> *ppdrgpexprPushable,
+		gpos::Ref<CExpressionArray> *ppdrgpexprUnpushable);
 
 	// split the given conjunct into pushable and unpushable predicates for a sequence project expression
-	static void SplitConjunctForSeqPrj(CMemoryPool *mp,
-									   gpos::Ref<CExpression> pexprSeqPrj,
-									   gpos::Ref<CExpression> pexprConj,
-									   CExpressionArray **ppdrgpexprPushable,
-									   CExpressionArray **ppdrgpexprUnpushable);
+	static void SplitConjunctForSeqPrj(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj,
+		gpos::Ref<CExpression> pexprConj,
+		gpos::Ref<CExpressionArray> *ppdrgpexprPushable,
+		gpos::Ref<CExpressionArray> *ppdrgpexprUnpushable);
 
 	// push scalar expression through left outer join children
 	static void PushThruOuterChild(CMemoryPool *mp,
@@ -124,9 +125,9 @@ private:
 
 	// push an array of conjuncts through logical expression, and compute an array of remaining conjuncts
 	static void PushThru(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
-						 CExpressionArray *pdrgpexprConjuncts,
+						 gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 						 gpos::Ref<CExpression> *ppexprResult,
-						 CExpressionArray **ppdrgpexprRemaining);
+						 gpos::Ref<CExpressionArray> *ppdrgpexprRemaining);
 
 	// private copy ctor
 	CNormalizer(const CNormalizer &);
@@ -141,7 +142,7 @@ private:
 	static gpos::Ref<CExpression> PexprPullUpProjectElements(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
-		CExpressionArray *pdrgpexprPrElPullUp);
+		gpos::Ref<CExpressionArray> pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns

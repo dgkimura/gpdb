@@ -160,10 +160,10 @@ CLogicalCTEAnchor::HashValue() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalCTEAnchor::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2Sequence);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2TrivialSelect);
 	return xform_set;

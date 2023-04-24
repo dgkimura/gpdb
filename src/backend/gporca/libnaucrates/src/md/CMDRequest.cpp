@@ -28,7 +28,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRequest::CMDRequest(CMemoryPool *mp, IMdIdArray *mdid_array,
+CMDRequest::CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
 					   SMDTypeRequestArray *mdtype_request_array)
 	: m_mp(mp),
 	  m_mdid_array(mdid_array),
@@ -69,8 +69,6 @@ CMDRequest::CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request)
 //---------------------------------------------------------------------------
 CMDRequest::~CMDRequest()
 {
-	m_mdid_array->Release();
-	m_mdtype_request_array->Release();
 }
 
 //---------------------------------------------------------------------------

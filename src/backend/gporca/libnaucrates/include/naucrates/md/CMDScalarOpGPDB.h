@@ -71,7 +71,7 @@ private:
 	BOOL m_returns_null_on_null_input;
 
 	// operator classes this operator belongs to
-	IMdIdArray *m_mdid_opfamilies_array;
+	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
 
 	// compatible hash op family
 	gpos::Ref<IMDId> m_mdid_hash_opfamily;
@@ -93,7 +93,7 @@ public:
 		gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> mdid_func,
 		gpos::Ref<IMDId> mdid_commute_opr, gpos::Ref<IMDId> m_mdid_inverse_opr,
 		IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-		IMdIdArray *mdid_opfamilies_array,
+		gpos::Ref<IMdIdArray> mdid_opfamilies_array,
 		gpos::Ref<IMDId> m_mdid_hash_opfamily,
 		gpos::Ref<IMDId> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving);
 

@@ -14,11 +14,11 @@
 #define GPDXL_CDXLLogicalConstTable_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -33,18 +33,18 @@ class CDXLLogicalConstTable : public CDXLLogical
 {
 private:
 	// list of column descriptors
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// array of datum arrays (const tuples)
-	CDXLDatum2dArray *m_const_tuples_datum_array;
+	gpos::Ref<CDXLDatum2dArray> m_const_tuples_datum_array;
 
 public:
 	CDXLLogicalConstTable(CDXLLogicalConstTable &) = delete;
 
 	// ctor
 	CDXLLogicalConstTable(CMemoryPool *mp,
-						  CDXLColDescrArray *dxl_col_descr_array,
-						  CDXLDatum2dArray *pdrgpdrgpdxldatum);
+						  gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
+						  gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum);
 
 	//dtor
 	~CDXLLogicalConstTable() override;
@@ -58,7 +58,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// column descriptors
-	const CDXLColDescrArray *
+	const gpos::Ref<CDXLColDescrArray>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -78,7 +78,7 @@ public:
 	}
 
 	// return the const tuple (datum array) at a given position
-	const CDXLDatumArray *
+	const gpos::Ref<CDXLDatumArray>
 	GetConstTupleDatumArrayAt(ULONG ulTuplePos) const
 	{
 		return (*m_const_tuples_datum_array)[ulTuplePos];
@@ -98,7 +98,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalConstTable == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalConstTable> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalConstTable>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

@@ -72,13 +72,14 @@ CTranslatorDXLToExprUtils::GetDatum(
 // 		Construct a datum array from a DXL datum array
 //
 //---------------------------------------------------------------------------
-IDatumArray *
-CTranslatorDXLToExprUtils::Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-									  const CDXLDatumArray *pdrgpdxldatum)
+gpos::Ref<IDatumArray>
+CTranslatorDXLToExprUtils::Pdrgpdatum(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CDXLDatumArray> pdrgpdxldatum)
 {
 	GPOS_ASSERT(nullptr != pdrgpdxldatum);
 
-	IDatumArray *pdrgdatum = GPOS_NEW(mp) IDatumArray(mp);
+	gpos::Ref<IDatumArray> pdrgdatum = GPOS_NEW(mp) IDatumArray(mp);
 	const ULONG length = pdrgpdxldatum->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -124,10 +125,10 @@ CTranslatorDXLToExprUtils::PexprConstInt8(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
-									  gpos::Ref<CTableDescriptor> ptabdesc,
-									  const gpos::Ref<IMDRelation> pmdrel,
-									  UlongToUlongMap *phmululColMapping)
+CTranslatorDXLToExprUtils::AddKeySets(
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
+	const gpos::Ref<IMDRelation> pmdrel,
+	gpos::Ref<UlongToUlongMap> phmululColMapping)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);
 	GPOS_ASSERT(nullptr != pmdrel);
@@ -137,7 +138,7 @@ CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
 	{
 		gpos::Ref<CBitSet> pbs =
 			GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
-		const ULongPtrArray *pdrgpulKeys = pmdrel->KeySetAt(ul);
+		const gpos::Ref<ULongPtrArray> pdrgpulKeys = pmdrel->KeySetAt(ul);
 		const ULONG ulKeys = pdrgpulKeys->Size();
 
 		for (ULONG ulKey = 0; ulKey < ulKeys; ulKey++)
@@ -152,7 +153,6 @@ CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
 
 		if (!ptabdesc->FAddKeySet(pbs))
 		{
-			pbs->Release();
 		}
 	}
 }
@@ -225,14 +225,14 @@ CTranslatorDXLToExprUtils::EBoolOperator(EdxlBoolExprType edxlbooltype)
 //		given col ids
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::Ref<CColRefArray>
 CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
-								   UlongToColRefMap *colref_mapping,
-								   const ULongPtrArray *colids)
+								   gpos::Ref<UlongToColRefMap> colref_mapping,
+								   const gpos::Ref<ULongPtrArray> colids)
 {
 	GPOS_ASSERT(nullptr != colids);
 
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	for (ULONG ul = 0; ul < colids->Size(); ul++)
 	{

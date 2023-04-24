@@ -15,10 +15,10 @@
 #define GPDXL_CDXLPhysicalNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/operators/CDXLPhysicalJoin.h"
-
 namespace gpdxl
 {
 // indices of nested loop join elements in the children array
@@ -49,7 +49,7 @@ private:
 
 	// array holding nest params col references used for creating nestparam
 	// node during translation
-	CDXLColRefArray *m_nest_params_col_refs;
+	gpos::Ref<CDXLColRefArray> m_nest_params_col_refs;
 
 	// if nest params are required to be parsed
 	BOOL m_nest_params_exists;
@@ -83,9 +83,10 @@ public:
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
 						const gpos::Ref<CDXLNode> dxlnode) const override;
 
-	void SetNestLoopParamsColRefs(CDXLColRefArray *nest_params_col_refs);
+	void SetNestLoopParamsColRefs(
+		gpos::Ref<CDXLColRefArray> nest_params_col_refs);
 
-	CDXLColRefArray *GetNestLoopParamsColRefs() const;
+	gpos::Ref<CDXLColRefArray> GetNestLoopParamsColRefs() const;
 
 	// conversion function
 	static gpos::Ref<CDXLPhysicalNLJoin>
@@ -94,7 +95,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalNLJoin> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalNLJoin>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

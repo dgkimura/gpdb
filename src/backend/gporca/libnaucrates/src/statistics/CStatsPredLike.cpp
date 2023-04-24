@@ -49,8 +49,6 @@ CStatsPredLike::CStatsPredLike(ULONG colid, gpos::Ref<CExpression> expr_left,
 //---------------------------------------------------------------------------
 CStatsPredLike::~CStatsPredLike()
 {
-	m_expr_left->Release();
-	m_expr_right->Release();
 }
 
 //---------------------------------------------------------------------------

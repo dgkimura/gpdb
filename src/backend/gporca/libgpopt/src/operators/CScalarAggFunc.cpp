@@ -37,7 +37,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
-							   ULongPtrArray *argtypes, BOOL fRepSafe)
+							   gpos::Ref<ULongPtrArray> argtypes, BOOL fRepSafe)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),
@@ -59,7 +59,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 	// store id of type obtained by looking up MD cache
 	gpos::Ref<IMDId> mdid = PmdidLookupReturnType(
 		m_pmdidAggFunc, (EaggfuncstageGlobal == m_eaggfuncstage));
-	mdid->AddRef();
+
 	m_return_type_mdid = mdid;
 }
 

@@ -44,7 +44,7 @@ public:
 
 	CLogicalForeignGet(CMemoryPool *mp, const CName *pnameAlias,
 					   gpos::Ref<CTableDescriptor> ptabdesc,
-					   CColRefArray *pdrgpcrOutput);
+					   gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// ident accessors
 	EOperatorId
@@ -65,7 +65,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalForeignGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalForeignGet> >(pop);
+		return gpos::dyn_cast<CLogicalForeignGet>(pop);
 	}
 
 };	// class CLogicalForeignGet

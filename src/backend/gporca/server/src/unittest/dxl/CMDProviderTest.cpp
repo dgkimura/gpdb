@@ -74,27 +74,27 @@ CMDProviderTest::EresUnittest_Basic()
 	// test lookup with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdpFile =
 		GPOS_NEW(mp) CMDProviderMemory(mp, file_name);
-	pmdpFile->AddRef();
+
 
 	TestMDLookup(mp, pmdpFile);
 
-	pmdpFile->Release();
+
 
 	// test lookup with a memory-based provider
 	CHAR *dxl_string = CDXLUtils::Read(mp, file_name);
 
-	IMDCacheObjectArray *mdcache_obj_array =
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array =
 		CDXLUtils::ParseDXLToIMDObjectArray(mp, dxl_string,
 											nullptr /*xsd_file_path*/);
 
 	gpos::Ref<CMDProviderMemory> pmdpMemory =
 		GPOS_NEW(mp) CMDProviderMemory(mp, mdcache_obj_array);
-	pmdpMemory->AddRef();
+
 	TestMDLookup(mp, pmdpMemory);
 
 	GPOS_DELETE_ARRAY(dxl_string);
-	mdcache_obj_array->Release();
-	pmdpMemory->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -136,12 +136,10 @@ CMDProviderTest::TestMDLookup(CMemoryPool *mp, gpos::Ref<IMDProvider> pmdp)
 	GPOS_ASSERT(nullptr != pimdobj2 && pmdid2->Equals(pimdobj2->MDId()));
 
 	// cleanup
-	pmdid1->Release();
-	pmdid2->Release();
+
+
 	GPOS_DELETE(pstrMDObject1);
 	GPOS_DELETE(pstrMDObject2);
-	pimdobj1->Release();
-	pimdobj2->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -163,7 +161,6 @@ CMDProviderTest::EresUnittest_Stats()
 		GPOS_NEW(mp) CMDProviderMemory(mp, file_name);
 
 	{
-		pmdpFile->AddRef();
 		CAutoMDAccessor amda(mp, pmdpFile, CTestUtils::m_sysidDefault,
 							 CMDCache::Pcache());
 
@@ -192,15 +189,13 @@ CMDProviderTest::EresUnittest_Stats()
 		GPOS_ASSERT(nullptr != pmdobjColStats);
 
 		// cleanup
-		rel_stats_mdid->Release();
-		mdid_col_stats->Release();
+
+
 		GPOS_DELETE(pstrRelStats);
 		GPOS_DELETE(pstrColStats);
-		pmdobjRelStats->Release();
-		pmdobjColStats->Release();
 	}
 
-	pmdpFile->Release();
+
 
 	return GPOS_OK;
 }
@@ -221,7 +216,7 @@ CMDProviderTest::EresUnittest_Negative()
 
 	gpos::Ref<CMDProviderMemory> pmdpFile =
 		GPOS_NEW(mp) CMDProviderMemory(mp, file_name);
-	pmdpFile->AddRef();
+
 
 	// we need to use an auto pointer for the cache here to ensure
 	// deleting memory of cached objects when we throw

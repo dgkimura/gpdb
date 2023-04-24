@@ -59,14 +59,15 @@ public:
 		CMDAccessor *md_accessor, const gpos::Ref<CDXLScalarConstValue> dxl_op);
 
 	// create a datum array from a dxl datum array
-	static IDatumArray *Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   const CDXLDatumArray *pdrgpdatum);
+	static gpos::Ref<IDatumArray> Pdrgpdatum(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CDXLDatumArray> pdrgpdatum);
 
 	// update table descriptor's key sets info from the MD cache object
 	static void AddKeySets(CMemoryPool *mp,
 						   gpos::Ref<CTableDescriptor> ptabdesc,
 						   const gpos::Ref<IMDRelation> pmdrel,
-						   UlongToUlongMap *phmululColMapping);
+						   gpos::Ref<UlongToUlongMap> phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type
 	static BOOL FScalarBool(const gpos::Ref<CDXLNode> dxlnode,
@@ -78,9 +79,9 @@ public:
 		EdxlBoolExprType edxlbooltype);
 
 	// construct a dynamic array of col refs corresponding to the given col ids
-	static CColRefArray *Pdrgpcr(CMemoryPool *mp,
-								 UlongToColRefMap *colref_mapping,
-								 const ULongPtrArray *colids);
+	static gpos::Ref<CColRefArray> Pdrgpcr(
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		const gpos::Ref<ULongPtrArray> colids);
 
 	// is the given expression is a scalar function that casts
 	static BOOL FCastFunc(CMDAccessor *md_accessor,

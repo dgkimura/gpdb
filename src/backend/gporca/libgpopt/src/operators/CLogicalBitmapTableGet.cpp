@@ -36,7 +36,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CLogicalBitmapTableGet::CLogicalBitmapTableGet(
 	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameTableAlias, CColRefArray *pdrgpcrOutput)
+	const CName *pnameTableAlias, gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CLogical(mp),
 	  m_ptabdesc(ptabdesc),
 	  m_ulOriginOpId(ulOriginOpId),
@@ -75,9 +75,6 @@ CLogicalBitmapTableGet::CLogicalBitmapTableGet(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalBitmapTableGet::~CLogicalBitmapTableGet()
 {
-	SafeRelease(m_ptabdesc);
-	SafeRelease(m_pdrgpcrOutput);
-
 	GPOS_DELETE(m_pnameTableAlias);
 }
 
@@ -177,9 +174,9 @@ CLogicalBitmapTableGet::DerivePropertyConstraint(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalBitmapTableGet::PstatsDerive(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 IStatisticsArray *stats_ctxt) const
+CLogicalBitmapTableGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl,
 														  stats_ctxt);
@@ -217,9 +214,10 @@ CLogicalBitmapTableGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -232,7 +230,7 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 	}
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameTableAlias);
 
-	m_ptabdesc->AddRef();
+
 
 	return GPOS_NEW(mp) CLogicalBitmapTableGet(mp, m_ptabdesc, m_ulOriginOpId,
 											   pnameAlias, pdrgpcrOutput);
@@ -246,10 +244,10 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalBitmapTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementBitmapTableGet);
 
 	return xform_set;

@@ -213,7 +213,7 @@ CCacheTest::EresUnittest_Basic()
 			ca.Insert(&(pso->m_ulKey), pso);
 
 		//release the ownership from pso, but ccacheentry still has the ownership
-		pso->Release();
+
 
 		GPOS_ASSERT(psoReturned == pso && "Incorrect cache entry was inserted");
 		GPOS_ASSERT(1 == pcache->Size());
@@ -245,7 +245,6 @@ CCacheTest::EresUnittest_Basic()
 			if (nullptr != pso)
 			{
 				// release object since there is no customer to release it after lookup and before CCache's cleanup
-				pso->Release();
 			}
 
 			GPOS_ASSERT_IMP(!pcache->AllowsDuplicateKeys(),
@@ -265,7 +264,7 @@ CCacheTest::EresUnittest_Basic()
 			if (nullptr != pso)
 			{
 				// release object since there is no customer to release it after lookup and before CCache's cleanup
-				pso->Release();
+
 
 				ca.MarkForDeletion();
 			}
@@ -348,7 +347,7 @@ CCacheTest::EresUnittest_Refcount()
 			4 == pso->RefCount() &&
 			"Expected pso, CCacheEntry CCacheAccessor, and customer to have ownership");
 		// Ideally it shouldn't delete itself because CCache is still holding this object
-		pso->Release();
+
 		GPOS_ASSERT(
 			3 == pso->RefCount() &&
 			"Expected CCacheEntry, CCacheAccessor and customer to have ownership");
@@ -358,7 +357,7 @@ CCacheTest::EresUnittest_Refcount()
 		"Expected refcount to be 1. CCacheEntry and customer have the ownership");
 
 	// release object since there is no customer to release it after lookup and before CCache's cleanup
-	pso->Release();
+
 
 	return GPOS_OK;
 }
@@ -387,7 +386,7 @@ CCacheTest::InsertOneElement(CCache<gpos::Ref<SSimpleObject>, ULONG *> *pCache,
 			3 == pso->RefCount() &&
 			"Expected pso, cacheentry and cacheaccessor to have ownership");
 		//Remove the ownership of pso. Still CCacheEntry has the ownership
-		pso->Release();
+
 		GPOS_ASSERT(2 == pso->RefCount() &&
 					"Expected pso and cacheentry to have ownership");
 		ulTotalAllocatedSize = mp->TotalAllocatedSize();
@@ -481,7 +480,7 @@ CCacheTest::CheckGenerationSanityAfterEviction(
 		if (nullptr != pso)
 		{
 			// release object since there is no customer to release it after lookup and before CCache's cleanup
-			pso->Release();
+
 
 			if (ulKey <= ulOldGenEndKey)
 			{
@@ -552,7 +551,6 @@ CCacheTest::TestEvictionForOneCacheSize(ULLONG ullCacheQuota)
 	if (nullptr != psoBeforeEviction)
 	{
 		// release object since there is no customer to release it after lookup and before CCache's cleanup
-		psoBeforeEviction->Release();
 	}
 
 	// Now verify everything from the first generation insertion is evicted
@@ -566,7 +564,6 @@ CCacheTest::TestEvictionForOneCacheSize(ULLONG ullCacheQuota)
 		if (nullptr != pso)
 		{
 			// release object since there is no customer to release it after lookup and before CCache's cleanup
-			pso->Release();
 		}
 
 		GPOS_ASSERT(nullptr == pso);
@@ -611,7 +608,6 @@ CCacheTest::TestEvictionForOneCacheSize(ULLONG ullCacheQuota)
 		if (nullptr != pso)
 		{
 			// release object since there is no customer to release it after lookup and before CCache's cleanup
-			pso->Release();
 		}
 
 		// everything is evicted from third and fourth gen, except the pinned entry
@@ -668,8 +664,6 @@ CCacheTest::EresInsertDuplicates(
 				ca.Insert(&(pso->m_ulKey), pso);
 
 			GPOS_ASSERT(nullptr != psoReturned);
-
-			pso->Release();
 		}
 		GPOS_CHECK_ABORT;
 	}
@@ -716,7 +710,6 @@ CCacheTest::EresRemoveDuplicates(
 		if (nullptr != pso)
 		{
 			// release object since there is no customer to release it after lookup and before CCache's cleanup
-			pso->Release();
 		}
 
 		while (nullptr != pso)
@@ -780,7 +773,7 @@ CCacheTest::EresUnittest_DeepObject()
 
 		gpos::Ref<CDeepObject> pdoReturned GPOS_ASSERTS_ONLY =
 			ca.Insert(pdo->Key(), pdo);
-		pdo->Release();
+
 
 		GPOS_ASSERT(nullptr != pdoReturned &&
 					"Incorrect cache entry was inserted");
@@ -813,7 +806,6 @@ CCacheTest::EresUnittest_DeepObject()
 			if (nullptr != pdo)
 			{
 				// release object since there is no customer to release it after lookup and before CCache's cleanup
-				pdo->Release();
 			}
 
 			GPOS_ASSERT_IMP(pcache->AllowsDuplicateKeys(), nullptr == pdo);
@@ -834,7 +826,7 @@ CCacheTest::EresUnittest_DeepObject()
 			if (nullptr != pdo)
 			{
 				// release object since there is no customer to release it after lookup and before CCache's cleanup
-				pdo->Release();
+
 
 				ca.MarkForDeletion();
 			}
@@ -898,7 +890,7 @@ CCacheTest::EresUnittest_Iteration()
 		GPOS_ASSERT(nullptr != pso);
 
 		// release object since there is no customer to release it after lookup and before CCache's cleanup
-		pso->Release();
+
 
 		while (nullptr != pso)
 		{
@@ -970,7 +962,6 @@ CCacheTest::EresUnittest_IterativeDeletion()
 		if (nullptr != pso)
 		{
 			// release object since there is no customer to release it after lookup and before CCache's cleanup
-			pso->Release();
 		}
 
 		while (nullptr != pso)

@@ -171,7 +171,6 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 				dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 			sort_col_list_dxlnode =
 				sort_col_list_parse_handler->CreateDXLNode();
-			sort_col_list_dxlnode->AddRef();
 		}
 	}
 	else if (2 == this->Length())
@@ -179,7 +178,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerSortColList *sort_col_list_parse_handler =
 			dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 		sort_col_list_dxlnode = sort_col_list_parse_handler->CreateDXLNode();
-		sort_col_list_dxlnode->AddRef();
+
 
 		CParseHandlerWindowFrame *window_frame_parse_handler =
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);

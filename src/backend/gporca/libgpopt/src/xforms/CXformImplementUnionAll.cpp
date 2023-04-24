@@ -53,7 +53,7 @@ CXformImplementUnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -63,13 +63,13 @@ CXformImplementUnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 		CLogicalUnionAll::PopConvert(pexpr->Pop());
 	CPhysicalUnionAllFactory factory(popUnionAll);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = pexpr->Arity();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+
 		pdrgpexpr->Append(pexprChild);
 	}
 
@@ -91,7 +91,7 @@ CXformImplementUnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 		gpos::Ref<CPhysicalUnionAll> popPhysicalParallelUnionAll =
 			factory.PopPhysicalUnionAll(mp, true);
 
-		pdrgpexpr->AddRef();
+
 
 		// assemble physical parallel operator
 		gpos::Ref<CExpression> pexprParallelUnionAll = GPOS_NEW(mp)

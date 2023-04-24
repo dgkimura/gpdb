@@ -47,7 +47,6 @@ CParseHandlerMetadataIdList::CParseHandlerMetadataIdList(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataIdList::~CParseHandlerMetadataIdList()
 {
-	SafeRelease(m_mdid_array);
 }
 
 
@@ -264,7 +263,7 @@ CParseHandlerMetadataIdList::FSupportedListType(const XMLCh *const xml_str)
 //		Return the constructed list of metadata ids
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerMetadataIdList::GetMdIdArray()
 {
 	return m_mdid_array;

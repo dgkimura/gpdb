@@ -40,15 +40,16 @@ private:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcrPart;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for coordinator only tables)
 	gpos::Ref<CColRefSet> m_pcrsDist;
 
-	void CreatePartCols(CMemoryPool *mp, const ULongPtrArray *pdrgpulPart);
+	void CreatePartCols(CMemoryPool *mp,
+						const gpos::Ref<ULongPtrArray> pdrgpulPart);
 
 	// private copy ctor
 	CLogicalGet(const CLogicalGet &);
@@ -62,7 +63,7 @@ public:
 
 	CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 				gpos::Ref<CTableDescriptor> ptabdesc,
-				CColRefArray *pdrgpcrOutput);
+				gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalGet() override;
@@ -89,7 +90,7 @@ public:
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -110,7 +111,7 @@ public:
 	}
 
 	// partition columns
-	CColRef2dArray *
+	gpos::Ref<CColRef2dArray>
 	PdrgpdrgpcrPartColumns() const
 	{
 		return m_pdrgpdrgpcrPart;
@@ -127,7 +128,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -199,7 +200,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(
@@ -208,7 +209,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -229,7 +230,7 @@ public:
 		GPOS_ASSERT(EopLogicalGet == pop->Eopid() ||
 					EopLogicalForeignGet == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalGet> >(pop);
+		return gpos::dyn_cast<CLogicalGet>(pop);
 	}
 
 	// debug print

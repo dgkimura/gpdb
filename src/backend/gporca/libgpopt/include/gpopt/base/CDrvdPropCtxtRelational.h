@@ -78,7 +78,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<gpos::Ref<CDrvdPropCtxtRelational> >(pdpctxt);
+		return gpos::dyn_cast<CDrvdPropCtxtRelational>(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtRelational

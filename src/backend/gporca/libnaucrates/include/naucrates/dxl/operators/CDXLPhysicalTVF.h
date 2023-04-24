@@ -13,11 +13,11 @@
 #define GPDXL_CDXLPhysicalTVF_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalTVF == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalTVF> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalTVF>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

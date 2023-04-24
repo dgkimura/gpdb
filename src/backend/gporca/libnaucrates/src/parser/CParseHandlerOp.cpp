@@ -44,7 +44,6 @@ CParseHandlerOp::CParseHandlerOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerOp::~CParseHandlerOp()
 {
-	SafeRelease(m_dxl_node);
 }
 
 //---------------------------------------------------------------------------
@@ -83,7 +82,7 @@ CParseHandlerOp::AddChildFromParseHandler(
 	gpos::Ref<CDXLNode> child_dxlnode = parse_handler_op->CreateDXLNode();
 	GPOS_ASSERT(nullptr != child_dxlnode);
 
-	child_dxlnode->AddRef();
+
 	m_dxl_node->AddChild(child_dxlnode);
 }
 

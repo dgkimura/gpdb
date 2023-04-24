@@ -55,7 +55,6 @@ CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(
 //---------------------------------------------------------------------------
 CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 {
-	m_dxl_bucket->Release();
 }
 
 //---------------------------------------------------------------------------

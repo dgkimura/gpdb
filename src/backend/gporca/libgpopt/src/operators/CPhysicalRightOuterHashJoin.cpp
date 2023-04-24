@@ -30,9 +30,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalRightOuterHashJoin::CPhysicalRightOuterHashJoin(
-	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-	BOOL is_null_aware, CXform::EXformId origin_xform)
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+	gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+	gpos::Ref<IMdIdArray> hash_opfamilies, BOOL is_null_aware,
+	CXform::EXformId origin_xform)
 	: CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
 						hash_opfamilies, is_null_aware, origin_xform)
 {
@@ -63,7 +64,8 @@ CPhysicalRightOuterHashJoin::~CPhysicalRightOuterHashJoin() = default;
 gpos::Ref<CEnfdDistribution>
 CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 gpos::Ref<CReqdPropPlan> prppInput,
-								 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+								 ULONG child_index,
+								 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 								 ULONG ulOptReq)
 {
 	// create the following requests:
@@ -127,7 +129,7 @@ gpos::Ref<CPartitionPropagationSpec>
 CPhysicalRightOuterHashJoin::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CPartitionPropagationSpec> pppsRequired, ULONG child_index,
-	CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	return PppsRequiredForJoins(mp, exprhdl, pppsRequired, child_index,
 								pdrgpdpCtxt, ulOptReq);

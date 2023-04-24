@@ -36,7 +36,7 @@ class CParseHandlerMDRequest : public CParseHandlerBase
 {
 private:
 	// array of metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// array of type requests
 	CMDRequest::SMDTypeRequestArray *m_mdtype_request_array;
@@ -71,7 +71,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// parsed mdids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::Ref<IMdIdArray> GetMdIdArray() const;
 
 	// parsed type requests
 	CMDRequest::SMDTypeRequestArray *GetMDTypeRequestArray() const;

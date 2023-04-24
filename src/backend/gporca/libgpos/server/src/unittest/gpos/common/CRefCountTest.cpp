@@ -66,17 +66,15 @@ CRefCountTest::EresUnittest_CountUpAndDown()
 	// add counts
 	for (ULONG i = 0; i < 10; i++)
 	{
-		pref->AddRef();
 	}
 
 	// release all additional refs
 	for (ULONG i = 0; i < 10; i++)
 	{
-		pref->Release();
 	}
 
 	// destruct the object
-	pref->Release();
+
 
 	return GPOS_OK;
 }
@@ -101,7 +99,6 @@ CRefCountTest::EresUnittest_DeletableObjects()
 	GPOS_TRY
 	{
 		// trying to release object here throws InvalidDeletion exception
-		pdt->Release();
 	}
 	GPOS_CATCH_EX(ex)
 	{
@@ -119,7 +116,7 @@ CRefCountTest::EresUnittest_DeletableObjects()
 	pdt->AllowDeletion();
 
 	// now deletion is allowed
-	pdt->Release();
+
 
 	return GPOS_OK;
 }
@@ -168,7 +165,7 @@ CRefCountTest::EresUnittest_Check()
 
 
 	// must throw
-	pref->AddRef();
+
 
 	// does not reach this line
 	return GPOS_FAILED;

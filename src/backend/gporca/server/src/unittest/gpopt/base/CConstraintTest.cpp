@@ -124,7 +124,7 @@ CConstraintTest::EresUnittest_CInterval()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -185,7 +185,7 @@ CConstraintTest::EresUnittest_CInterval()
 	// equality
 	gpos::Ref<CConstraintInterval> pciThird =
 		PciFirstInterval(mp, mdid, colref);
-	pciThird->AddRef();
+
 	gpos::Ref<CConstraintInterval> pciFourth = pciThird;
 	GPOS_ASSERT(!pciFirst->Equals(pciSecond));
 	GPOS_ASSERT(!pciFirst->Equals(pciDiff1));
@@ -193,17 +193,7 @@ CConstraintTest::EresUnittest_CInterval()
 	GPOS_ASSERT(pciFirst->Equals(pciThird));
 	GPOS_ASSERT(pciFourth->Equals(pciThird));
 
-	pciFirst->Release();
-	pciSecond->Release();
-	pciThird->Release();
-	pciFourth->Release();
-	pciIntersect->Release();
-	pciUnion->Release();
-	pciDiff1->Release();
-	pciDiff2->Release();
-	pciComp->Release();
 
-	pexprGet->Release();
 
 	return GPOS_OK;
 }
@@ -225,7 +215,7 @@ CConstraintTest::EresUnittest_CConjunction()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -255,9 +245,9 @@ CConstraintTest::EresUnittest_CConjunction()
 	gpos::Ref<CConstraintConjunction> pcconj2 = Pcstconjunction(mp, mdid, pcr2);
 	PrintConstraint(mp, pcconj2);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
-	pcconj1->AddRef();
-	pcconj2->AddRef();
+	gpos::Ref<CConstraintArray> pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+
+
 	pdrgpcst->Append(pcconj1);
 	pdrgpcst->Append(pcconj2);
 
@@ -277,12 +267,7 @@ CConstraintTest::EresUnittest_CConjunction()
 	GPOS_ASSERT(!pcconj1->Equals(pcconjTop));
 	GPOS_ASSERT(!pcconjTop->Equals(pcconj2));
 
-	pcconjTop->Release();
-	pcconj1->Release();
-	pcconj2->Release();
 
-	pexprGet1->Release();
-	pexprGet2->Release();
 
 	return GPOS_OK;
 }
@@ -308,7 +293,7 @@ CConstraintTest::Pcstconjunction(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	gpos::Ref<CConstraintInterval> pciSecond =
 		PciSecondInterval(mp, mdid, colref);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -335,7 +320,7 @@ CConstraintTest::Pcstdisjunction(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	gpos::Ref<CConstraintInterval> pciSecond =
 		PciSecondInterval(mp, mdid, colref);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -359,7 +344,7 @@ CConstraintTest::EresUnittest_CDisjunction()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -389,9 +374,9 @@ CConstraintTest::EresUnittest_CDisjunction()
 	gpos::Ref<CConstraintDisjunction> pcdisj2 = Pcstdisjunction(mp, mdid, pcr2);
 	PrintConstraint(mp, pcdisj2);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
-	pcdisj1->AddRef();
-	pcdisj2->AddRef();
+	gpos::Ref<CConstraintArray> pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+
+
 	pdrgpcst->Append(pcdisj1);
 	pdrgpcst->Append(pcdisj2);
 
@@ -411,12 +396,7 @@ CConstraintTest::EresUnittest_CDisjunction()
 	GPOS_ASSERT(!pcdisj1->Equals(pcdisjTop));
 	GPOS_ASSERT(!pcdisjTop->Equals(pcdisj2));
 
-	pcdisjTop->Release();
-	pcdisj1->Release();
-	pcdisj2->Release();
 
-	pexprGet1->Release();
-	pexprGet2->Release();
 
 	return GPOS_OK;
 }
@@ -438,7 +418,7 @@ CConstraintTest::EresUnittest_CNegation()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -460,12 +440,12 @@ CConstraintTest::EresUnittest_CNegation()
 	gpos::Ref<CConstraintInterval> pci = PciFirstInterval(mp, mdid, colref);
 	PrintConstraint(mp, pci);
 
-	pci->AddRef();
+
 	gpos::Ref<CConstraintNegation> pcn1 =
 		GPOS_NEW(mp) CConstraintNegation(mp, pci);
 	PrintConstraint(mp, pcn1);
 
-	pcn1->AddRef();
+
 	gpos::Ref<CConstraintNegation> pcn2 =
 		GPOS_NEW(mp) CConstraintNegation(mp, pcn1);
 	PrintConstraint(mp, pcn2);
@@ -483,11 +463,7 @@ CConstraintTest::EresUnittest_CNegation()
 	GPOS_ASSERT(!pcn1->Equals(pcn2));
 	GPOS_ASSERT(pci->Equals(pcn2));
 
-	pcn2->Release();
-	pcn1->Release();
-	pci->Release();
 
-	pexprGet->Release();
 
 	return GPOS_OK;
 }
@@ -509,7 +485,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarExpr()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -530,7 +506,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarExpr()
 	GPOS_RESULT eres2 =
 		EresUnittest_CIntervalFromScalarBoolOp(mp, &mda, colref);
 
-	pexprGet->Release();
+
 	if (GPOS_OK == eres1 && GPOS_OK == eres2)
 	{
 		return GPOS_OK;
@@ -556,7 +532,7 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -574,7 +550,7 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	gpos::Ref<CColRefSet> pcrs2 = pexprGet2->DeriveOutputColumns();
 	gpos::Ref<CColRef> pcr2 = pcrs2->PcrAny();
 
-	CColRefSetArray *pdrgpcrs = nullptr;
+	gpos::Ref<CColRefSetArray> pdrgpcrs = nullptr;
 
 	// expression with 1 column
 	gpos::Ref<CExpression> pexpr =
@@ -583,13 +559,13 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 		CConstraint::PcnstrFromScalarExpr(mp, pexpr, &pdrgpcrs);
 	PrintConstraint(mp, pcnstr);
 	PrintEquivClasses(mp, pdrgpcrs);
-	pdrgpcrs->Release();
+
 	pdrgpcrs = nullptr;
-	pcnstr->Release();
-	pexpr->Release();
+
+
 
 	// expression with 2 columns
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(PexprScalarCmp(mp, &mda, pcr1, IMDType::EcmptG, 15));
 	pdrgpexpr->Append(PexprScalarCmp(mp, &mda, pcr2, IMDType::EcmptL, 20));
 
@@ -601,11 +577,10 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 		CConstraint::PcnstrFromScalarExpr(mp, pexprAnd, &pdrgpcrs);
 	PrintConstraint(mp, pcnstrAnd);
 	PrintEquivClasses(mp, pdrgpcrs);
-	pdrgpcrs->Release();
+
 	pdrgpcrs = nullptr;
 
-	pcnstrAnd->Release();
-	pexprAnd->Release();
+
 
 	// equality predicate with 2 columns
 	gpos::Ref<CExpression> pexprEq = CUtils::PexprScalarEqCmp(mp, pcr1, pcr2);
@@ -615,13 +590,7 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	PrintConstraint(mp, pcnstrEq);
 	PrintEquivClasses(mp, pdrgpcrs);
 
-	pcnstrEq->Release();
-	pexprEq->Release();
 
-	pdrgpcrs->Release();
-
-	pexprGet1->Release();
-	pexprGet2->Release();
 
 	return GPOS_OK;
 }
@@ -644,7 +613,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -672,7 +641,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 
 	// create constraint
-	CRangeArray *pdrgprng =
+	gpos::Ref<CRangeArray> pdrgprng =
 		Pdrgprng(mp, mdid, rgRangeInfoIn, GPOS_ARRAY_SIZE(rgRangeInfoIn));
 	gpos::Ref<CConstraintInterval> pcnstin =
 		GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, true);
@@ -689,9 +658,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	GPOS_ASSERT(pcnstNotIn->FConvertsToNotIn());
 	GPOS_ASSERT(!pcnstNotIn->FConvertsToIn());
 
-	pcnstin->Release();
-	pcnstNotIn->Release();
-	pexprGet->Release();
+
 
 	return GPOS_OK;
 }
@@ -714,7 +681,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -743,7 +710,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	gpos::Ref<CColRef> colref = pcrs->PcrAny();
 
-	CRangeArray *pdrgprng = nullptr;
+	gpos::Ref<CRangeArray> pdrgprng = nullptr;
 	gpos::Ref<CConstraintInterval> pcnstin = nullptr;
 	gpos::Ref<CExpression> pexpr = nullptr;
 	gpos::Ref<CConstraintInterval> pcnstNotIn = nullptr;
@@ -764,7 +731,6 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	GPOS_RTL_ASSERT(3 ==
 					CUtils::UlCountOperator(pexpr, COperator::EopScalarConst));
 
-	pcnstin->Release();
 
 
 	// IN CONSTRAINT FOR SIMPLE INTERVAL WITH NULL
@@ -785,7 +751,6 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 		3 == CUtils::UlCountOperator((*pexpr)[0], COperator::EopScalarConst));
 	GPOS_RTL_ASSERT(CUtils::FScalarNullTest((*pexpr)[1]));
 
-	pcnstin->Release();
 
 
 	// NOT IN CONSTRAINT FOR SIMPLE INTERVAL WITHOUT NULL
@@ -796,7 +761,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	pcnstin = GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, true);
 
 	pcnstNotIn = pcnstin->PciComplement(mp);
-	pcnstin->Release();
+
 
 	pexpr = pcnstNotIn->PexprScalar(mp);  // pexpr is owned by the constraint
 	PrintConstraint(mp, pcnstNotIn);
@@ -807,7 +772,6 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	GPOS_RTL_ASSERT(3 ==
 					CUtils::UlCountOperator(pexpr, COperator::EopScalarConst));
 
-	pcnstNotIn->Release();
 
 
 	// NOT IN CONSTRAINT FOR SIMPLE INTERVAL WITH NULL
@@ -818,7 +782,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	pcnstin = GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, false);
 
 	pcnstNotIn = pcnstin->PciComplement(mp);
-	pcnstin->Release();
+
 
 	pexpr = pcnstNotIn->PexprScalar(mp);  // pexpr is owned by the constraint
 	PrintConstraint(mp, pcnstNotIn);
@@ -831,10 +795,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 					CUtils::UlCountOperator(pexpr, COperator::EopScalarConst));
 	GPOS_RTL_ASSERT(CUtils::FScalarNullTest((*pexpr)[1]));
 
-	pcnstNotIn->Release();
 
-
-	pexprGet->Release();
 
 	return GPOS_OK;
 }
@@ -856,7 +817,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -885,8 +846,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 		pcnstIn->Pdrgprng()->Size() ==
 		CUtils::UlCountOperator(pexprArrayComp, COperator::EopScalarConst));
 
-	pcnstIn->Release();
-	pexpr->Release();
+
 
 	// test a NOT IN expression
 
@@ -903,11 +863,10 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 				1 + CUtils::UlCountOperator(pexprArrayNotInComp,
 											COperator::EopScalarConst));
 
-	pexprNotIn->Release();
-	pcnstNotIn->Release();
+
 
 	// create an IN expression with repeated values
-	IntPtrArray *pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::Ref<IntPtrArray> pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
 	INT aiValsRepeat[] = {5, 1, 2, 5, 3, 4, 5};
 	ULONG aiValsLength = sizeof(aiValsRepeat) / sizeof(INT);
 	for (ULONG ul = 0; ul < aiValsLength; ul++)
@@ -926,8 +885,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayCmpRepeats,
 													   pcrInRepeats);
 	GPOS_ASSERT(5 == pcnstInRepeats->Pdrgprng()->Size());
-	pexprInRepeatsSelect->Release();
-	pcnstInRepeats->Release();
+
+
 
 	// create a NOT IN expression with repeated values
 	gpos::Ref<CExpression> pexprNotInRepeatsSelect =
@@ -942,9 +901,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 			mp, pexprNotInArrayCmpRepeats, pcrNotInRepeats);
 	// a total of 5 unique ScalarConsts in the expression will result in 6 ranges
 	GPOS_ASSERT(6 == pcnstNotInRepeats->Pdrgprng()->Size());
-	pexprNotInRepeatsSelect->Release();
-	pcnstNotInRepeats->Release();
-	pdrgpi->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -968,7 +926,7 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -982,7 +940,7 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 
 	// test for includes NULL
 	// create an IN expression with repeated values
-	IntPtrArray *pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::Ref<IntPtrArray> pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
 	INT rngiValues[] = {1, 2};
 	ULONG ulValsLength = GPOS_ARRAY_SIZE(rngiValues);
 	for (ULONG ul = 0; ul < ulValsLength; ul++)
@@ -1008,9 +966,8 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 													   colref);
 	GPOS_RTL_ASSERT(!pci->FIncludesNull());
 	GPOS_RTL_ASSERT(2 == pci->Pdrgprng()->Size());
-	pexprIn->Release();
-	pci->Release();
-	pdrgpi->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -1041,9 +998,6 @@ CConstraintTest::EresUnittest_CIntervalFromScalarCmp(CMemoryPool *mp,
 			CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprScCmp,
 														   colref);
 		PrintConstraint(mp, pci);
-
-		pci->Release();
-		pexprScCmp->Release();
 	}
 
 	return GPOS_OK;
@@ -1062,7 +1016,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CColRef> colref)
 {
 	// AND
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(
 		PexprScalarCmp(mp, md_accessor, colref, IMDType::EcmptL, 5));
 	pdrgpexpr->Append(
@@ -1076,8 +1030,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciAnd);
 
-	pciAnd->Release();
-	(void) pexpr->Release();
+
 
 	// OR
 	pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -1093,8 +1046,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciOr);
 
-	pciOr->Release();
-	pexpr->Release();
+
 
 	// NOT
 	pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -1108,8 +1060,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciNot);
 
-	pciNot->Release();
-	pexpr->Release();
+
 
 	return GPOS_OK;
 }
@@ -1132,7 +1083,7 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
 		md_accessor->PtMDType<IMDTypeInt8>();
 	gpos::Ref<IMDId> mdid_op = pmdtypeint8->GetMdidForCmpType(cmp_type);
-	mdid_op->AddRef();
+
 
 	const CMDName mdname = md_accessor->RetrieveScOp(mdid_op)->Mdname();
 
@@ -1164,7 +1115,7 @@ CConstraintTest::PciFirstInterval(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 		{CRange::EriExcluded, 20, CRange::EriExcluded, 1000},
 	};
 
-	CRangeArray *pdrgprng =
+	gpos::Ref<CRangeArray> pdrgprng =
 		Pdrgprng(mp, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
 
 	return GPOS_NEW(mp)
@@ -1189,7 +1140,7 @@ CConstraintTest::PciSecondInterval(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 		{CRange::EriExcluded, 10, CRange::EriExcluded, 25},
 	};
 
-	CRangeArray *pdrgprng =
+	gpos::Ref<CRangeArray> pdrgprng =
 		Pdrgprng(mp, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
 
 	return GPOS_NEW(mp)
@@ -1204,16 +1155,16 @@ CConstraintTest::PciSecondInterval(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //		Construct an array of ranges to be used to create an interval
 //
 //---------------------------------------------------------------------------
-CRangeArray *
+gpos::Ref<CRangeArray>
 CConstraintTest::Pdrgprng(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						  const SRangeInfo rgRangeInfo[], ULONG ulRanges)
 {
-	CRangeArray *pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
+	gpos::Ref<CRangeArray> pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
 		SRangeInfo rnginfo = rgRangeInfo[ul];
-		mdid->AddRef();
+
 		gpos::Ref<CRange> prange = GPOS_NEW(mp)
 			CRange(mdid, COptCtxt::PoctxtFromTLS()->Pcomp(),
 				   GPOS_NEW(mp) CDatumInt8GPDB(CTestUtils::m_sysidDefault,
@@ -1260,7 +1211,8 @@ CConstraintTest::PrintConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr)
 //
 //---------------------------------------------------------------------------
 void
-CConstraintTest::PrintEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+CConstraintTest::PrintEquivClasses(CMemoryPool *mp,
+								   gpos::Ref<CColRefSetArray> pdrgpcrs,
 								   BOOL fExpected)
 {
 	// debug print
@@ -1309,7 +1261,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 
 	// we need to use an auto pointer for the cache here to ensure
 	// deleting memory of cached objects when we throw
@@ -1352,7 +1304,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 		lLower1, CRange::EriIncluded, pstrUpper1.Value(), lUpper1,
 		CRange::EriExcluded);
 	PrintConstraint(mp, pciFirst);
-	pciFirst->Release();
+
 
 	return GPOS_OK;
 }
@@ -1377,7 +1329,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
@@ -1481,17 +1433,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	GPOS_ASSERT(!pciSecond->Equals(pciDiff2));
 	GPOS_ASSERT(pciFirst->Equals(pciThird));
 
-	pciThird->Release();
-	pciDiff2Expected->Release();
-	pciDiff1Expected->Release();
-	pciUnionExpected->Release();
-	pciIntersectExpected->Release();
-	pciDiff2->Release();
-	pciDiff1->Release();
-	pciUnion->Release();
-	pciIntersect->Release();
-	pciSecond->Release();
-	pciFirst->Release();
+
 
 	return GPOS_OK;
 }

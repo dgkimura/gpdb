@@ -30,7 +30,7 @@ using namespace gpos;
 class CConstraint;
 
 // constraint array
-using CConstraintArray = CDynamicPtrArray<CConstraint, CleanupRelease>;
+using CConstraintArray = gpos::Vector<gpos::Ref<CConstraint>>;
 
 // hash map mapping CColRef -> CConstraintArray
 using ColRefToConstraintArrayMap =
@@ -96,23 +96,22 @@ private:
 	// existing equivalence classes
 	static void AddColumnToEquivClasses(CMemoryPool *mp,
 										const gpos::Ref<CColRef> colref,
-										CColRefSetArray *pdrgpcrs);
+										gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// create constraint from scalar comparison
 	static gpos::Ref<CConstraint> PcnstrFromScalarCmp(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false);
+		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create constraint from scalar boolean expression
 	static gpos::Ref<CConstraint> PcnstrFromScalarBoolOp(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false,
+		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false,
 		IMDIndex::EmdindexType access_method = IMDIndex::EmdindSentinel);
 
 	// create conjunction/disjunction from array of constraints
-	static gpos::Ref<CConstraint> PcnstrConjDisj(CMemoryPool *mp,
-												 CConstraintArray *pdrgpcnstr,
-												 BOOL fConj);
+	static gpos::Ref<CConstraint> PcnstrConjDisj(
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr, BOOL fConj);
 
 protected:
 	// memory pool -- used for local computations
@@ -125,33 +124,33 @@ protected:
 	gpos::Ref<CExpression> m_pexprScalar;
 
 	// print
-	IOstream &PrintConjunctionDisjunction(IOstream &os,
-										  CConstraintArray *pdrgpcnstr) const;
+	IOstream &PrintConjunctionDisjunction(
+		IOstream &os, gpos::Ref<CConstraintArray> pdrgpcnstr) const;
 
 	// construct a conjunction or disjunction scalar expression from an
 	// array of constraints
 	static gpos::Ref<CExpression> PexprScalarConjDisj(
-		CMemoryPool *mp, CConstraintArray *pdrgpcnstr, BOOL fConj);
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr, BOOL fConj);
 
 	// flatten an array of constraints to be used as constraint children
-	static CConstraintArray *PdrgpcnstrFlatten(CMemoryPool *mp,
-											   CConstraintArray *pdrgpcnstr,
-											   EConstraintType ect);
+	static gpos::Ref<CConstraintArray> PdrgpcnstrFlatten(
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr,
+		EConstraintType ect);
 
 	// combine any two or more constraints that reference only one particular column
-	static CConstraintArray *PdrgpcnstrDeduplicate(CMemoryPool *mp,
-												   CConstraintArray *pdrgpcnstr,
-												   EConstraintType ect);
+	static gpos::Ref<CConstraintArray> PdrgpcnstrDeduplicate(
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr,
+		EConstraintType ect);
 
 	// mapping between columns and arrays of constraints
-	static ColRefToConstraintArrayMap *Phmcolconstr(
+	static gpos::Ref<ColRefToConstraintArrayMap> Phmcolconstr(
 		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-		CConstraintArray *pdrgpcnstr);
+		gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 	// return a copy of the conjunction/disjunction constraint for a different column
 	static gpos::Ref<CConstraint> PcnstrConjDisjRemapForColumn(
 		CMemoryPool *mp, gpos::Ref<CColRef> colref,
-		CConstraintArray *pdrgpcnstr, BOOL fConj);
+		gpos::Ref<CConstraintArray> pdrgpcnstr, BOOL fConj);
 
 	// create constraint from scalar array comparison expression originally generated for
 	// "scalar op ANY/ALL (array)" construct
@@ -160,7 +159,7 @@ protected:
 		gpos::Ref<CColRef> colref, BOOL infer_nulls_as = false);
 
 	static gpos::Ref<CColRefSet> PcrsFromConstraints(
-		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 public:
 	CConstraint(const CConstraint &) = delete;
@@ -217,7 +216,8 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	virtual gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist) = 0;
 
 	// return constraint on a given column
 	virtual gpos::Ref<CConstraint>
@@ -245,32 +245,32 @@ public:
 	// equivalence classes
 	static gpos::Ref<CConstraint> PcnstrFromScalarExpr(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray **ppdrgpcrs, BOOL infer_nulls_as = false,
+		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false,
 		IMDIndex::EmdindexType access_method = IMDIndex::EmdindSentinel);
 
 	// create constraint from EXISTS/ANY scalar subquery
 	static gpos::Ref<CConstraint> PcnstrFromExistsAnySubquery(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray **ppdrgpcrs);
+		gpos::Ref<CColRefSetArray> *ppdrgpcrs);
 
 	// create conjunction from array of constraints
 	static gpos::Ref<CConstraint> PcnstrConjunction(
-		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 	// create disjunction from array of constraints
 	static gpos::Ref<CConstraint> PcnstrDisjunction(
-		CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr);
 
 	// merge equivalence classes coming from children of a bool op
-	static CColRefSetArray *PdrgpcrsMergeFromBoolOp(
+	static gpos::Ref<CColRefSetArray> PdrgpcrsMergeFromBoolOp(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray *pdrgpcrsFst, CColRefSetArray *pdrgpcrsSnd);
+		gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+		gpos::Ref<CColRefSetArray> pdrgpcrsSnd);
 
 	// subset of the given constraints, which reference the given column
-	static CConstraintArray *PdrgpcnstrOnColumn(CMemoryPool *mp,
-												CConstraintArray *pdrgpcnstr,
-												gpos::Ref<CColRef> colref,
-												BOOL fExclusive);
+	static gpos::Ref<CConstraintArray> PdrgpcnstrOnColumn(
+		CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr,
+		gpos::Ref<CColRef> colref, BOOL fExclusive);
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 
 };	// class CConstraint

@@ -53,7 +53,6 @@ CParseHandlerBase::CParseHandlerBase(CMemoryPool *mp,
 
 CParseHandlerBase::~CParseHandlerBase()
 {
-	m_parse_handler_base_array->Release();
 }
 
 //---------------------------------------------------------------------------

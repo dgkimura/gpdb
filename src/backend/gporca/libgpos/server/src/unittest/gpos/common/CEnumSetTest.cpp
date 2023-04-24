@@ -71,7 +71,7 @@ CEnumSetTest::EresUnittest_Basics()
 		GPOS_ASSERT(enum_set->Get(type_info.TBit()));
 	}
 
-	enum_set->Release();
+
 
 	return GPOS_OK;
 }

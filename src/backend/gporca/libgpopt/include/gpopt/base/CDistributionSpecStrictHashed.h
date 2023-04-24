@@ -14,7 +14,7 @@ namespace gpopt
 class CDistributionSpecStrictHashed : public CDistributionSpecHashed
 {
 public:
-	CDistributionSpecStrictHashed(CExpressionArray *pdrgpexpr,
+	CDistributionSpecStrictHashed(gpos::Ref<CExpressionArray> pdrgpexpr,
 								  BOOL fNullsColocated);
 
 	EDistributionType Edt() const override;

@@ -13,9 +13,9 @@
 #define GPDXL_CDXLPhysicalDynamicBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -35,9 +35,9 @@ class CXMLSerializer;
 class CDXLPhysicalDynamicBitmapTableScan : public CDXLPhysicalAbstractBitmapScan
 {
 private:
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicBitmapTableScan(
@@ -46,8 +46,8 @@ public:
 	// ctor
 	CDXLPhysicalDynamicBitmapTableScan(CMemoryPool *mp,
 									   gpos::Ref<CDXLTableDescr> table_descr,
-									   IMdIdArray *part_mdids,
-									   ULongPtrArray *selector_ids)
+									   gpos::Ref<IMdIdArray> part_mdids,
+									   gpos::Ref<ULongPtrArray> selector_ids)
 		: CDXLPhysicalAbstractBitmapScan(mp, table_descr),
 		  m_part_mdids(part_mdids),
 		  m_selector_ids(selector_ids)
@@ -68,9 +68,9 @@ public:
 	// operator name
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -88,8 +88,7 @@ public:
 		GPOS_ASSERT(EdxlopPhysicalDynamicBitmapTableScan ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalDynamicBitmapTableScan> >(
-			dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(dxl_op);
 	}
 
 };	// class CDXLPhysicalDynamicBitmapTableScan

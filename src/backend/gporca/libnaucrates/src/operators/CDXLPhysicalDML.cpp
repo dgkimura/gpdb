@@ -30,8 +30,9 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::CDXLPhysicalDML(
 	CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-	gpos::Ref<CDXLTableDescr> table_descr, ULongPtrArray *src_colids_array,
-	ULONG action_colid, ULONG ctid_colid, ULONG segid_colid,
+	gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<ULongPtrArray> src_colids_array, ULONG action_colid,
+	ULONG ctid_colid, ULONG segid_colid,
 	gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info, BOOL fSplit)
 	: CDXLPhysical(mp),
 	  m_dxl_dml_type(dxl_dml_type),
@@ -58,9 +59,6 @@ CDXLPhysicalDML::CDXLPhysicalDML(
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::~CDXLPhysicalDML()
 {
-	m_dxl_table_descr->Release();
-	m_src_colids_array->Release();
-	SafeRelease(m_direct_dispatch_info);
 }
 
 //---------------------------------------------------------------------------

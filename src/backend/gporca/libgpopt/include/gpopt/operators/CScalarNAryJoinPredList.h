@@ -62,9 +62,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -74,7 +74,7 @@ public:
 	static gpos::Ref<CScalarNAryJoinPredList>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
-		return dynamic_cast<gpos::Ref<CScalarNAryJoinPredList> >(pop);
+		return gpos::dyn_cast<CScalarNAryJoinPredList>(pop);
 	}
 
 	gpos::Ref<IMDId>

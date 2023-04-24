@@ -19,9 +19,9 @@
 #define GPDXL_CDXLDatumInt4_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -73,7 +73,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumInt4 == dxl_datum->GetDatumType());
 
-		return dynamic_cast<gpos::Ref<CDXLDatumInt4> >(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumInt4>(dxl_datum);
 	}
 };
 }  // namespace gpdxl

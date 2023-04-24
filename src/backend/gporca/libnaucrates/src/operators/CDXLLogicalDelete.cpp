@@ -29,10 +29,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalDelete::CDXLLogicalDelete(CMemoryPool *mp,
-									 gpos::Ref<CDXLTableDescr> table_descr,
-									 ULONG ctid_colid, ULONG segid_colid,
-									 ULongPtrArray *delete_colid_array)
+CDXLLogicalDelete::CDXLLogicalDelete(
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr, ULONG ctid_colid,
+	ULONG segid_colid, gpos::Ref<ULongPtrArray> delete_colid_array)
 	: CDXLLogical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_ctid_colid(ctid_colid),
@@ -53,8 +52,6 @@ CDXLLogicalDelete::CDXLLogicalDelete(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalDelete::~CDXLLogicalDelete()
 {
-	m_dxl_table_descr->Release();
-	m_deletion_colid_array->Release();
 }
 
 //---------------------------------------------------------------------------

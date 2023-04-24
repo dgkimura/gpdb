@@ -15,10 +15,10 @@
 #define GPDXL_CDXLScalarProjElem_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/CMDName.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -79,7 +79,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarProjectElem == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarProjElem> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarProjElem>(dxl_op);
 	}
 
 	// does the operator return a boolean result

@@ -50,7 +50,7 @@ CHistogramTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -152,12 +152,9 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 					CStatistics::Epsilon);
 
 	// clean up
-	ppoint0->Release();
-	point1->Release();
-	point2->Release();
-	point3->Release();
-	ppoint4->Release();
-	ppoint5->Release();
+
+
+
 	GPOS_DELETE(histogram);
 	GPOS_DELETE(phist0);
 	GPOS_DELETE(histogram1);
@@ -183,7 +180,7 @@ CHistogramTest::EresUnittest_CHistogramBool()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate histogram of the form [false, false), [true,true)
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	CBucket *pbucketFalse =
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, false, 0.1);
 	CBucket *pbucketTrue =
@@ -201,7 +198,7 @@ CHistogramTest::EresUnittest_CHistogramBool()
 	GPOS_RTL_ASSERT(histogram1->GetNumBuckets() == 1);
 
 	// clean up
-	point1->Release();
+
 	GPOS_DELETE(histogram);
 	GPOS_DELETE(histogram1);
 
@@ -217,7 +214,7 @@ CHistogramTest::EresUnittest_CHistogramValid()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 
 	// generate histogram of the form [0, 10), [9, 20)
 	CBucket *bucket1 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
@@ -254,7 +251,7 @@ CHistogram *
 CHistogramTest::PhistExampleInt4Remain(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 0], [10, 10], [20, 20] ...
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < 5; idx++)
 	{
 		INT iLower = INT(idx * 10);
@@ -296,13 +293,13 @@ CHistogramTest::EresUnittest_Skew()
 	CBucket *pbucket8 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
 		mp, 701, 800, CDouble(0.2), CDouble(100.0));
 
-	CBucketArray *pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
 	pdrgppbucket1->Append(pbucket3);
 	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
 
-	CBucketArray *pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(pbucket4);
 	pdrgppbucket2->Append(pbucket5);
 	pdrgppbucket2->Append(pbucket6);
@@ -343,12 +340,12 @@ CHistogramTest::EresUnittest_MergeUnion()
 	CBucket *pbucket4 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
 		mp, 200, 400, CDouble(0.7), CDouble(100.0));
 
-	CBucketArray *pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
 	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
 
-	CBucketArray *pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(pbucket3);
 	pdrgppbucket2->Append(pbucket4);
 	CHistogram *histogram2 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket2);
@@ -406,11 +403,11 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 		CBucket(ppLower2, ppUpper2, false /* is_lower_closed */,
 				false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
-	CBucketArray *pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
 	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
 
-	CBucketArray *pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(bucket2);
 	CHistogram *histogram2 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket2);
 

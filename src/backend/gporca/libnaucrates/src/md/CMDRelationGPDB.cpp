@@ -32,12 +32,15 @@ using namespace gpmd;
 CMDRelationGPDB::CMDRelationGPDB(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname, BOOL fTemporary,
 	Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
-	CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
-	IMdIdArray *distr_opfamilies, ULongPtrArray *partition_cols_array,
-	CharPtrArray *str_part_types_array, IMdIdArray *partition_oids,
-	BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-	CMDIndexInfoArray *md_index_info_array,
-	IMdIdArray *mdid_check_constraint_array,
+	gpos::Ref<CMDColumnArray> mdcol_array,
+	gpos::Ref<ULongPtrArray> distr_col_array,
+	gpos::Ref<IMdIdArray> distr_opfamilies,
+	gpos::Ref<ULongPtrArray> partition_cols_array,
+	gpos::Ref<CharPtrArray> str_part_types_array,
+	gpos::Ref<IMdIdArray> partition_oids, BOOL convert_hash_to_random,
+	gpos::Ref<ULongPtr2dArray> keyset_array,
+	gpos::Ref<CMDIndexInfoArray> md_index_info_array,
+	gpos::Ref<IMdIdArray> mdid_check_constraint_array,
 	gpos::Ref<CDXLNode> mdpart_constraint, gpos::Ref<IMDId> foreign_server)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -127,22 +130,6 @@ CMDRelationGPDB::~CMDRelationGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	m_md_col_array->Release();
-	SafeRelease(m_distr_col_array);
-	SafeRelease(m_distr_opfamilies);
-	SafeRelease(m_partition_oids);
-	SafeRelease(m_partition_cols_array);
-	SafeRelease(m_str_part_types_array);
-	SafeRelease(m_keyset_array);
-	m_mdindex_info_array->Release();
-	m_mdid_check_constraint_array->Release();
-	m_col_width_array->Release();
-	SafeRelease(m_foreign_server);
-	SafeRelease(m_mdpart_constraint);
-	SafeRelease(m_colpos_nondrop_colpos_map);
-	SafeRelease(m_attrno_nondrop_col_pos_map);
-	SafeRelease(m_nondrop_col_pos_array);
 }
 
 //---------------------------------------------------------------------------
@@ -316,7 +303,7 @@ CMDRelationGPDB::GetPosFromAttno(INT attno) const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CMDRelationGPDB::NonDroppedColsArray() const
 {
 	return m_nondrop_col_pos_array;
@@ -358,7 +345,7 @@ CMDRelationGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CMDRelationGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);
@@ -410,7 +397,7 @@ CMDRelationGPDB::PartColumnCount() const
 }
 
 // Retrieve list of partition types
-CharPtrArray *
+gpos::Ref<CharPtrArray>
 CMDRelationGPDB::GetPartitionTypes() const
 {
 	return m_str_part_types_array;
@@ -751,7 +738,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	GPOS_CHECK_ABORT;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CMDRelationGPDB::ChildPartitionMdids() const
 {
 	return m_partition_oids;

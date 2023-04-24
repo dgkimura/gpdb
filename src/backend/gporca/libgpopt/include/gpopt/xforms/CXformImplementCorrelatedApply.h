@@ -71,7 +71,7 @@ public:
 			  gpos::Ref<CExpression> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
-		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
@@ -81,14 +81,13 @@ public:
 		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 		gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 		TLogicalApply *popApply = TLogicalApply::PopConvert(pexpr->Pop());
-		CColRefArray *colref_array = popApply->PdrgPcrInner();
+		gpos::Ref<CColRefArray> colref_array = popApply->PdrgPcrInner();
 
-		colref_array->AddRef();
+
 
 		// addref all children
-		pexprLeft->AddRef();
-		pexprRight->AddRef();
-		pexprScalar->AddRef();
+
+
 
 		// assemble physical operator
 		gpos::Ref<CExpression> pexprPhysicalApply = GPOS_NEW(mp) CExpression(

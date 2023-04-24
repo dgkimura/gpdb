@@ -36,7 +36,6 @@ CParseHandlerExtStatsDependency::CParseHandlerExtStatsDependency(
 
 CParseHandlerExtStatsDependency::~CParseHandlerExtStatsDependency()
 {
-	m_dependency->Release();
 }
 
 //---------------------------------------------------------------------------

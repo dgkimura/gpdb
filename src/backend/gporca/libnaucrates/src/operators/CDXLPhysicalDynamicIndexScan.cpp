@@ -31,8 +31,8 @@ using namespace gpdxl;
 CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
 	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
 	gpos::Ref<CDXLIndexDescr> dxl_index_descr,
-	EdxlIndexScanDirection idx_scan_direction, IMdIdArray *part_mdids,
-	ULongPtrArray *selector_ids)
+	EdxlIndexScanDirection idx_scan_direction, gpos::Ref<IMdIdArray> part_mdids,
+	gpos::Ref<ULongPtrArray> selector_ids)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_dxl_index_descr(dxl_index_descr),
@@ -54,10 +54,6 @@ CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicIndexScan::~CDXLPhysicalDynamicIndexScan()
 {
-	m_dxl_index_descr->Release();
-	m_dxl_table_descr->Release();
-	m_part_mdids->Release();
-	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +126,7 @@ CDXLPhysicalDynamicIndexScan::GetDXLTableDescr() const
 	return m_dxl_table_descr;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CDXLPhysicalDynamicIndexScan::GetParts() const
 {
 	return m_part_mdids;

@@ -13,12 +13,12 @@
 #define GPDXL_CDXLPhysicalIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 // indices of index scan elements in the children array
@@ -88,7 +88,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalIndexScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalIndexScan> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalIndexScan>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

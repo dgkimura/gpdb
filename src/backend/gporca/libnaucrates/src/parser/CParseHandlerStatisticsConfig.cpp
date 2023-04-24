@@ -49,7 +49,6 @@ CParseHandlerStatisticsConfig::CParseHandlerStatisticsConfig(
 //---------------------------------------------------------------------------
 CParseHandlerStatisticsConfig::~CParseHandlerStatisticsConfig()
 {
-	SafeRelease(m_stats_conf);
 }
 
 //---------------------------------------------------------------------------

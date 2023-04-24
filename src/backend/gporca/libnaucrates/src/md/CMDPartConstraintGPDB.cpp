@@ -28,7 +28,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::CMDPartConstraintGPDB(
-	CMemoryPool *mp, ULongPtrArray *level_with_default_part_array,
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> level_with_default_part_array,
 	BOOL is_unbounded, gpos::Ref<CDXLNode> dxlnode)
 	: m_mp(mp),
 	  m_level_with_default_part_array(level_with_default_part_array),
@@ -48,8 +48,6 @@ CMDPartConstraintGPDB::CMDPartConstraintGPDB(
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 {
-	SafeRelease(m_dxl_node);
-	m_level_with_default_part_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -61,9 +59,9 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
-											 CMDAccessor *md_accessor,
-											 CColRefArray *colref_array) const
+CMDPartConstraintGPDB::GetPartConstraintExpr(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CColRefArray> colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -80,7 +78,7 @@ CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
 //		Included default partitions
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CMDPartConstraintGPDB::GetDefaultPartsArray() const
 {
 	return m_level_with_default_part_array;

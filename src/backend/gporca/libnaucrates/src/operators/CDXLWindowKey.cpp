@@ -40,8 +40,6 @@ CDXLWindowKey::CDXLWindowKey()
 //---------------------------------------------------------------------------
 CDXLWindowKey::~CDXLWindowKey()
 {
-	SafeRelease(m_window_frame_dxl);
-	SafeRelease(m_sort_col_list_dxlnode);
 }
 
 //---------------------------------------------------------------------------

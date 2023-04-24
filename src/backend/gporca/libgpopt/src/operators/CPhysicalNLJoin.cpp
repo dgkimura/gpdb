@@ -68,8 +68,8 @@ CPhysicalNLJoin::~CPhysicalNLJoin() = default;
 gpos::Ref<COrderSpec>
 CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<COrderSpec> posInput, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -96,7 +96,8 @@ CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CRewindabilitySpec>
 CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CRewindabilitySpec> prsRequired,
-							 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+							 ULONG child_index,
+							 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							 ULONG	// ulOptReq
 ) const
 {
@@ -146,8 +147,8 @@ gpos::Ref<CColRefSet>
 CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  gpos::Ref<CColRefSet> pcrsRequired,
 							  ULONG child_index,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							  ULONG						  // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -174,7 +175,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, 2 /*ulScalarIndex*/);
-	pcrs->Release();
+
 
 	return pcrsReqd;
 }

@@ -32,7 +32,7 @@ class CLogicalApply : public CLogical
 private:
 protected:
 	// columns used from Apply's inner child
-	CColRefArray *m_pdrgpcrInner;
+	gpos::Ref<CColRefArray> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -41,7 +41,7 @@ protected:
 	explicit CLogicalApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalApply(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInner,
 				  EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -61,7 +61,7 @@ public:
 	}
 
 	// inner column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrInner() const
 	{
 		return m_pdrgpcrInner;
@@ -69,9 +69,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -108,7 +108,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 // stats_ctxt
+				 gpos::Ref<IStatisticsArray>  // stats_ctxt
 	) const override
 	{
 		// we should use stats from the corresponding Join tree if decorrelation succeeds
@@ -178,7 +178,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FApply(pop));
 
-		return dynamic_cast<gpos::Ref<CLogicalApply> >(pop);
+		return gpos::dyn_cast<CLogicalApply>(pop);
 	}
 
 };	// class CLogicalApply

@@ -13,11 +13,11 @@
 #define GPDXL_CDXLScalarHashExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -63,7 +63,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarHashExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarHashExpr> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarHashExpr>(dxl_op);
 	}
 
 	// does the operator return a boolean result

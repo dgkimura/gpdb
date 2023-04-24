@@ -83,7 +83,7 @@ CEngineTest::EresUnittest_Basic()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -110,8 +110,8 @@ CEngineTest::EresUnittest_Basic()
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	// clean up
-	pexpr->Release();
-	pexprPlan->Release();
+
+
 	GPOS_DELETE(pqc);
 
 	return GPOS_OK;
@@ -149,7 +149,7 @@ CEngineTest::EresOptimize(
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 	// scope for optimization context
@@ -158,12 +158,12 @@ CEngineTest::EresOptimize(
 						 CTestUtils::GetCostModel(mp));
 
 		// generate cross product expressions
-		CExpressionJoinsArray *pdrgpexprCrossProducts =
+		gpos::Ref<CExpressionJoinsArray> pdrgpexprCrossProducts =
 			CTestUtils::PdrgpexprJoins(mp, str, pul, ulRels,
 									   true /*fCrossProduct*/);
 
 		// generate join expressions
-		CExpressionJoinsArray *pdrgpexpr = CTestUtils::PdrgpexprJoins(
+		gpos::Ref<CExpressionJoinsArray> pdrgpexpr = CTestUtils::PdrgpexprJoins(
 			mp, str, pul, ulRels, false /*fCrossProduct*/);
 
 		// build memo for each expression
@@ -184,12 +184,6 @@ CEngineTest::EresOptimize(
 
 		// reset counter
 		m_ulTestCounter = 0;
-
-		(*pdrgpexprCrossProducts)[ulRels - 1]->Release();
-		SafeRelease(pdrgpexprCrossProducts);
-
-		(*pdrgpexpr)[ulRels - 1]->Release();
-		SafeRelease(pdrgpexpr);
 	}
 
 	return GPOS_OK;
@@ -232,7 +226,7 @@ CEngineTest::EresUnittest_BuildMemo()
 
 	GPOS_RESULT eres =
 		EresOptimize(BuildMemoRecursive, rgscRel, rgulRel, ulRels, pbs);
-	pbs->Release();
+
 
 	return eres;
 }
@@ -256,7 +250,7 @@ CEngineTest::EresUnittest_AppendStats()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -323,8 +317,8 @@ CEngineTest::EresUnittest_AppendStats()
 	}
 	eng.Trace();
 
-	pexpr->Release();
-	prprel->Release();
+
+
 	GPOS_DELETE(pqc);
 
 	return GPOS_OK;
@@ -364,7 +358,7 @@ CEngineTest::EresUnittest_BuildMemoLargeJoins()
 
 	GPOS_RESULT eres =
 		EresOptimize(BuildMemoRecursive, rgscRel, rgulRel, ulRels, pbs);
-	pbs->Release();
+
 
 	return eres;
 }
@@ -381,7 +375,7 @@ CEngineTest::EresUnittest_BuildMemoLargeJoins()
 void
 CEngineTest::BuildMemoRecursive(CMemoryPool *mp,
 								gpos::Ref<CExpression> pexprInput,
-								CSearchStageArray *search_stage_array)
+								gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
 
@@ -412,7 +406,7 @@ CEngineTest::BuildMemoRecursive(CMemoryPool *mp,
 	os << std::endl << std::endl;
 
 	eng.PrintOptCtxts();
-	pexprPlan->Release();
+
 	GPOS_DELETE(pqc);
 
 	GPOS_CHECK_ABORT;
@@ -435,7 +429,7 @@ CEngineTest::EresTestEngine(Pfpexpr rgpf[], ULONG size)
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -447,7 +441,7 @@ CEngineTest::EresTestEngine(Pfpexpr rgpf[], ULONG size)
 
 		gpos::Ref<CExpression> pexpr = rgpf[ul](mp);
 		BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
-		pexpr->Release();
+
 
 		m_ulTestCounter++;
 	}
@@ -518,7 +512,7 @@ CEngineTest::EresUnittest_BuildMemoWithSubqueries()
 
 		// setup a file-based provider
 		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-		pmdp->AddRef();
+
 		CMDAccessor mda(mp, CMDCache::Pcache());
 		mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -530,7 +524,6 @@ CEngineTest::EresUnittest_BuildMemoWithSubqueries()
 			ULONG ulIndex = ul / 2;
 			gpos::Ref<CExpression> pexpr = rgpf[ulIndex](mp, fCorrelated);
 			BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
-			pexpr->Release();
 		}
 
 		fCorrelated = !fCorrelated;
@@ -641,7 +634,7 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -666,7 +659,7 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 								 pexprCTE, pexprGet, pexprScalar);
 
 	BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
-	pexpr->Release();
+
 
 	return GPOS_OK;
 }

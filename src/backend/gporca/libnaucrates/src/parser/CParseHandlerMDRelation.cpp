@@ -203,7 +203,7 @@ CParseHandlerMDRelation::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerScalarOp *pphPartCnstr =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[Length() - 1]);
 		m_part_constraint = pphPartCnstr->CreateDXLNode();
-		m_part_constraint->AddRef();
+
 		return;
 	}
 
@@ -228,33 +228,30 @@ CParseHandlerMDRelation::EndElement(const XMLCh *const,	 // element_uri,
 	GPOS_ASSERT(nullptr != pphMdidlCheckConstraints->GetMdIdArray());
 
 	// refcount child objects
-	CMDColumnArray *md_col_array = md_cols_parse_handler->GetMdColArray();
-	CMDIndexInfoArray *md_index_info_array =
+	gpos::Ref<CMDColumnArray> md_col_array =
+		md_cols_parse_handler->GetMdColArray();
+	gpos::Ref<CMDIndexInfoArray> md_index_info_array =
 		pphMdlIndexInfo->GetMdIndexInfoArray();
-	IMdIdArray *mdid_check_constraint_array =
+	gpos::Ref<IMdIdArray> mdid_check_constraint_array =
 		pphMdidlCheckConstraints->GetMdIdArray();
 
-	md_col_array->AddRef();
-	md_index_info_array->AddRef();
-	mdid_check_constraint_array->AddRef();
 
-	IMdIdArray *distr_opfamilies = nullptr;
+
+	gpos::Ref<IMdIdArray> distr_opfamilies = nullptr;
 	if (m_rel_distr_policy == IMDRelation::EreldistrHash &&
 		m_opfamilies_parse_handler != nullptr)
 	{
 		distr_opfamilies = dynamic_cast<CParseHandlerMetadataIdList *>(
 							   m_opfamilies_parse_handler)
 							   ->GetMdIdArray();
-		distr_opfamilies->AddRef();
 	}
 
-	IMdIdArray *child_partitions = nullptr;
+	gpos::Ref<IMdIdArray> child_partitions = nullptr;
 	if (nullptr != m_child_partitions_parse_handler)
 	{
 		child_partitions = dynamic_cast<CParseHandlerMetadataIdList *>(
 							   m_child_partitions_parse_handler)
 							   ->GetMdIdArray();
-		child_partitions->AddRef();
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationGPDB(

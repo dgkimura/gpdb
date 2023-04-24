@@ -52,7 +52,7 @@ CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
 )
 {
 	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();
-	pmdtypeint4->MDId()->AddRef();
+
 
 	gpos::Ref<CDXLDatumInt4> dxl_datum = GPOS_NEW(m_mp) CDXLDatumInt4(
 		m_mp, pmdtypeint4->MDId(), false /*is_const_null*/, m_val);
@@ -114,9 +114,8 @@ CConstExprEvaluatorDXLTest::EresUnittest_NonScalar()
 
 	// this call should raise an exception
 	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprGet);
-	SafeRelease(pexprResult);
-	pexprGet->Release();
-	pceeval->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -147,9 +146,8 @@ CConstExprEvaluatorDXLTest::EresUnittest_NestedSubquery()
 
 	// this call should raise an exception
 	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprPredicate);
-	SafeRelease(pexprResult);
-	pexprSelect->Release();
-	pceeval->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -186,9 +184,8 @@ CConstExprEvaluatorDXLTest::EresUnittest_ScalarContainingVariables()
 
 	// this call should raise an exception
 	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprFunCall);
-	SafeRelease(pexprResult);
-	pexprFunCall->Release();
-	pceeval->Release();
+
+
 
 	return GPOS_OK;
 }

@@ -49,7 +49,7 @@ private:
 	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
-	IMdIdArray *m_mdid_types_array;
+	gpos::Ref<IMdIdArray> m_mdid_types_array;
 
 	// whether function returns a set of values
 	BOOL m_returns_set;
@@ -93,10 +93,11 @@ public:
 
 	// ctor/dtor
 	CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
-					gpos::Ref<IMDId> result_type_mdid, IMdIdArray *mdid_array,
-					BOOL ReturnsSet, EFuncStbl func_stability,
-					EFuncDataAcc func_data_access, BOOL is_strict,
-					BOOL is_ndv_preserving, BOOL is_allowed_for_PS);
+					gpos::Ref<IMDId> result_type_mdid,
+					gpos::Ref<IMdIdArray> mdid_array, BOOL ReturnsSet,
+					EFuncStbl func_stability, EFuncDataAcc func_data_access,
+					BOOL is_strict, BOOL is_ndv_preserving,
+					BOOL is_allowed_for_PS);
 
 	~CMDFunctionGPDB() override;
 
@@ -117,7 +118,7 @@ public:
 	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// output argument types
-	IMdIdArray *OutputArgTypesMdidArray() const override;
+	gpos::Ref<IMdIdArray> OutputArgTypesMdidArray() const override;
 
 	// does function return NULL on NULL input
 	BOOL

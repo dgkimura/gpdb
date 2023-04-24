@@ -122,7 +122,7 @@ public:
 	PcrConvert(gpos::Ref<CColRef> cr)
 	{
 		GPOS_ASSERT(cr->Ecrt() == CColRef::EcrtTable);
-		return dynamic_cast<gpos::Ref<CColRefTable> >(cr);
+		return gpos::dyn_cast<CColRefTable>(cr);
 	}
 
 

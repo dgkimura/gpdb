@@ -30,10 +30,10 @@ class CPhysicalSplit : public CPhysical
 {
 private:
 	// deletion columns
-	CColRefArray *m_pdrgpcrDelete;
+	gpos::Ref<CColRefArray> m_pdrgpcrDelete;
 
 	// insertion columns
-	CColRefArray *m_pdrgpcrInsert;
+	gpos::Ref<CColRefArray> m_pdrgpcrInsert;
 
 	// ctid column
 	gpos::Ref<CColRef> m_pcrCtid;
@@ -51,9 +51,9 @@ public:
 	CPhysicalSplit(const CPhysicalSplit &) = delete;
 
 	// ctor
-	CPhysicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
-				   CColRefArray *pdrgpcrInsert, gpos::Ref<CColRef> pcrCtid,
-				   gpos::Ref<CColRef> pcrSegmentId,
+	CPhysicalSplit(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrDelete,
+				   gpos::Ref<CColRefArray> pdrgpcrInsert,
+				   gpos::Ref<CColRef> pcrCtid, gpos::Ref<CColRef> pcrSegmentId,
 				   gpos::Ref<CColRef> pcrAction);
 
 	// dtor
@@ -95,14 +95,14 @@ public:
 	}
 
 	// deletion columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrDelete() const
 	{
 		return m_pdrgpcrDelete;
 	}
 
 	// insertion columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrInsert() const
 	{
 		return m_pdrgpcrInsert;
@@ -130,7 +130,7 @@ public:
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<COrderSpec> posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -155,26 +155,26 @@ public:
 									   CExpressionHandle &exprhdl,
 									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
-									   CDrvdPropArray *pdrgpdpCtxt,
+									   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CCTEReq> pcter, ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
@@ -223,7 +223,7 @@ public:
 	{
 		GPOS_ASSERT(COperator::EopPhysicalSplit == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CPhysicalSplit> >(pop);
+		return gpos::dyn_cast<CPhysicalSplit>(pop);
 	}
 
 	// debug print

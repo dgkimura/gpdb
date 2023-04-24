@@ -79,7 +79,7 @@ CPartConstraintTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
@@ -107,7 +107,7 @@ CPartConstraintTest::EresUnittest_Basic()
 
 	// setup an MD accessor
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
@@ -131,17 +131,17 @@ CPartConstraintTest::EresUnittest_Basic()
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pcnstr13->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr13NoDefault =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, false /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pcnstr13->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr13DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
-	pcnstr15->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr15DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
@@ -172,11 +172,8 @@ CPartConstraintTest::EresUnittest_Basic()
 	GPOS_ASSERT(ppartcnstr13NoDefault->FOverlap(mp, ppartcnstr13Default));
 
 	// cleanup
-	ppartcnstr13Default->Release();
-	ppartcnstr15Default->Release();
-	ppartcnstr13DefaultUnbounded->Release();
-	ppartcnstr15DefaultUnbounded->Release();
-	ppartcnstr13NoDefault->Release();
+
+
 
 	return GPOS_OK;
 }
@@ -199,7 +196,7 @@ CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, gpos::Ref<CColRef> colref,
 		CUtils::PexprScalarConstInt4(mp, ulRight);
 
 	// AND
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(
 		CUtils::PexprScalarCmp(mp, colref, pexprConstLeft, IMDType::EcmptGEq));
 	pdrgpexpr->Append(
@@ -210,7 +207,7 @@ CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, gpos::Ref<CColRef> colref,
 	gpos::Ref<CConstraint> pcnstr =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 
-	pexpr->Release();
+
 
 	return pcnstr;
 }
@@ -235,7 +232,7 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 
 	// setup an MD accessor
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	const gpos::Ref<IMDType> pmdtype =
@@ -270,17 +267,17 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pciFirst->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr1NoDefault =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, false /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pciFirst->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr1DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
-	pciSecond->AddRef();
+
 	gpos::Ref<CPartConstraint> ppartcnstr2DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
@@ -311,11 +308,8 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	GPOS_ASSERT(ppartcnstr1NoDefault->FOverlap(mp, ppartcnstr1Default));
 
 	// cleanup
-	ppartcnstr1Default->Release();
-	ppartcnstr2Default->Release();
-	ppartcnstr1DefaultUnbounded->Release();
-	ppartcnstr2DefaultUnbounded->Release();
-	ppartcnstr1NoDefault->Release();
+
+
 
 	return GPOS_OK;
 }

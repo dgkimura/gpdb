@@ -69,7 +69,7 @@ CScalarCoerceToDomain::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCoerceToDomain::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarCoerceToDomain::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

@@ -63,10 +63,6 @@ CMDCastGPDB::CMDCastGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //---------------------------------------------------------------------------
 CMDCastGPDB::~CMDCastGPDB()
 {
-	m_mdid->Release();
-	m_mdid_src->Release();
-	m_mdid_dest->Release();
-	SafeRelease(m_mdid_cast_func);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }

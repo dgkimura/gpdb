@@ -72,54 +72,48 @@ CMinidumperUtils::PdxlmdLoad(CMemoryPool *mp, const CHAR *file_name)
 	gpos::Ref<COptimizerConfig> optimizer_config =
 		parse_handler_dxl->GetOptimizerConfig();
 	gpos::Ref<CDXLNode> query = parse_handler_dxl->GetQueryDXLRoot();
-	CDXLNodeArray *query_output_dxlnode_array =
+	gpos::Ref<CDXLNodeArray> query_output_dxlnode_array =
 		parse_handler_dxl->GetOutputColumnsDXLArray();
-	CDXLNodeArray *cte_producers = parse_handler_dxl->GetCTEProducerDXLArray();
-	IMDCacheObjectArray *mdcache_obj_array =
+	gpos::Ref<CDXLNodeArray> cte_producers =
+		parse_handler_dxl->GetCTEProducerDXLArray();
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array =
 		parse_handler_dxl->GetMdIdCachedObjArray();
-	CSystemIdArray *pdrgpsysid = parse_handler_dxl->GetSysidPtrArray();
+	gpos::Ref<CSystemIdArray> pdrgpsysid =
+		parse_handler_dxl->GetSysidPtrArray();
 	gpos::Ref<CDXLNode> pdxlnPlan = parse_handler_dxl->PdxlnPlan();
 	ULLONG plan_id = parse_handler_dxl->GetPlanId();
 	ULLONG plan_space_size = parse_handler_dxl->GetPlanSpaceSize();
 
 	if (nullptr != pbs)
 	{
-		pbs->AddRef();
 	}
 
 	if (nullptr != optimizer_config)
 	{
-		optimizer_config->AddRef();
 	}
 
 	if (nullptr != query)
 	{
-		query->AddRef();
 	}
 
 	if (nullptr != query_output_dxlnode_array)
 	{
-		query_output_dxlnode_array->AddRef();
 	}
 
 	if (nullptr != cte_producers)
 	{
-		cte_producers->AddRef();
 	}
 
 	if (nullptr != mdcache_obj_array)
 	{
-		mdcache_obj_array->AddRef();
 	}
 
 	if (nullptr != pdrgpsysid)
 	{
-		pdrgpsysid->AddRef();
 	}
 
 	if (nullptr != pdxlnPlan)
 	{
-		pdxlnPlan->AddRef();
 	}
 
 	// cleanup
@@ -334,8 +328,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 		// reset trace flags
 		ResetTraceflags(pbsEnabled, pbsDisabled);
 
-		SafeRelease(pbsEnabled);
-		SafeRelease(pbsDisabled);
+
 
 		GPOS_RETHROW(ex);
 	}
@@ -345,8 +338,8 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	ResetTraceflags(pbsEnabled, pbsDisabled);
 
 	// clean up
-	SafeRelease(pbsEnabled);
-	SafeRelease(pbsDisabled);
+
+
 
 	GPOS_CHECK_ABORT;
 

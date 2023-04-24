@@ -19,10 +19,10 @@
 #define GPDXL_CDXLScalarArrayCoerceExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalarCoerceBase.h"
 #include "naucrates/md/IMDId.h"
-
 namespace gpdxl
 {
 using namespace gpos;
@@ -55,7 +55,6 @@ public:
 
 	~CDXLScalarArrayCoerceExpr() override
 	{
-		m_coerce_func_mdid->Release();
 	}
 
 	// ident accessor
@@ -92,7 +91,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayCoerceExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarArrayCoerceExpr> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarArrayCoerceExpr>(dxl_op);
 	}
 };
 }  // namespace gpdxl

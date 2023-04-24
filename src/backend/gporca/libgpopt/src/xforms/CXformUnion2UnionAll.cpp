@@ -52,35 +52,34 @@ CXformUnion2UnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	gpos::Ref<CLogicalUnion> popUnion = CLogicalUnion::PopConvert(pexpr->Pop());
-	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
-	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popUnion->PdrgpcrOutput();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = pexpr->Arity();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	pdrgpcrOutput->AddRef();
-	pdrgpdrgpcrInput->AddRef();
+
 
 	// assemble new logical operator
 	gpos::Ref<CExpression> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
 		pdrgpexpr);
 
-	pdrgpcrOutput->AddRef();
+
 
 	gpos::Ref<CExpression> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),

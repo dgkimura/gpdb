@@ -57,7 +57,6 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 	// are either constant or equal to a column from the outer relation
 	if (!CheckJoinPruningCondOnJoinCond(mp, pexprNew, result))
 	{
-		result->Release();
 		return pexprNew;
 	}
 
@@ -65,7 +64,6 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 	// is not possible, so return the current expression
 	if (result->Size() == 0)
 	{
-		result->Release();
 		return pexprNew;
 	}
 
@@ -77,14 +75,13 @@ CLeftJoinPruningPreprocessor::PexprCheckLeftOuterJoinPruningConditions(
 	if (CheckForFullUniqueKeySetInInnerRel(mp, pexprNew, result))
 	{
 		gpos::Ref<CExpression> outer_child = (*pexprNew)[0];
-		outer_child->AddRef();
-		pexprNew->Release();
-		result->Release();
+
+
+
 		return outer_child;
 	}
 	else
 	{
-		result->Release();
 		return pexprNew;
 	}
 }
@@ -144,7 +141,6 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 	{
 		gpos::Ref<CColRefSet> pdrgpcrKey = inner_rel_key_sets->PcrsKey(mp, ul);
 		inner_unique_keys->Include(pdrgpcrKey);
-		pdrgpcrKey->Release();
 	}
 
 	// Join Pruning is done only when the join condition is a 'ScalarCmp
@@ -154,7 +150,6 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 		 !CPredicateUtils::FAnd(join_cond)) ||
 		join_cond->DeriveHasSubquery())
 	{
-		inner_unique_keys->Release();
 		return false;
 	}
 
@@ -165,7 +160,6 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 		// and const then join pruning will not be done
 		if (!CPredicateUtils::FPlainEqualityIdentConstWithoutCast(join_cond))
 		{
-			inner_unique_keys->Release();
 			return false;
 		}
 
@@ -174,7 +168,6 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 		if (CPredicateUtils::FPlainEquality(join_cond) &&
 			1 == join_cond->DeriveUsedColumns()->Size())
 		{
-			inner_unique_keys->Release();
 			return false;
 		}
 
@@ -187,7 +180,6 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 
 		CheckUniqueKeyInJoinCond(inner_columns, usedColumns, result,
 								 inner_unique_keys, outer_rel_columns);
-		inner_columns->Release();
 	}
 
 	// Condition 2: If AND operator is present in join condition
@@ -195,11 +187,10 @@ CLeftJoinPruningPreprocessor::CheckJoinPruningCondOnJoinCond(
 		!CheckAndCondInJoinCond(mp, join_cond, inner_unique_keys, result,
 								outer_rel_columns))
 	{
-		inner_unique_keys->Release();
 		return false;
 	}
 
-	inner_unique_keys->Release();
+
 	return true;
 }
 
@@ -252,8 +243,6 @@ CLeftJoinPruningPreprocessor::CheckAndCondInJoinCond(
 
 		CheckUniqueKeyInJoinCond(inner_columns, usedColumns, result,
 								 inner_unique_keys, outer_rel_columns);
-
-		inner_columns->Release();
 	}
 	return true;
 }
@@ -285,7 +274,7 @@ CLeftJoinPruningPreprocessor::CheckForFullUniqueKeySetInInnerRel(
 				break;
 			}
 		}
-		pdrgpcrKey->Release();
+
 		if (are_all_unique_keys_present)
 		{
 			break;
@@ -363,11 +352,10 @@ CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
 
 	if (CUtils::FExistentialSubquery(pexprScalar->Pop()))
 	{
-		pexprScalar->AddRef();
 		return pexprScalar;
 	}
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CColRefSet> subquery_colrefset = GPOS_NEW(mp) CColRefSet(mp);
 	const gpos::Ref<CColRef> subquery_colref = nullptr;
 	if (COperator::EopScalarSubquery == pexprScalar->Pop()->Eopid())
@@ -391,7 +379,7 @@ CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
 
 	pexprScalar = JoinPruningTreeTraversal(mp, pexprScalar, pdrgpexpr,
 										   subquery_colrefset);
-	subquery_colrefset->Release();
+
 	return pexprScalar;
 }
 
@@ -443,7 +431,7 @@ CLeftJoinPruningPreprocessor::ComputeOutputColumns(
 gpos::Ref<CExpression>
 CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
 	CMemoryPool *mp, const gpos::Ref<CExpression> pexpr,
-	CExpressionArray *pdrgpexpr,
+	gpos::Ref<CExpressionArray> pdrgpexpr,
 	const gpos::Ref<CColRefSet> childs_output_columns)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -467,13 +455,12 @@ CLeftJoinPruningPreprocessor::JoinPruningTreeTraversal(
 		}
 		else
 		{
-			pexpr_child->AddRef();
 			pdrgpexpr->Append(pexpr_child);
 		}
 	}
 
 	gpos::Ref<COperator> pop = pexpr->Pop();
-	pop->AddRef();
+
 	gpos::Ref<CExpression> pexprNew =
 		GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 	return pexprNew;
@@ -543,7 +530,6 @@ CLeftJoinPruningPreprocessor::PexprPreprocess(
 
 	if (nullptr == pcrsOutput)
 	{
-		pexpr->AddRef();
 		return pexpr;
 	}
 
@@ -562,12 +548,12 @@ CLeftJoinPruningPreprocessor::PexprPreprocess(
 						 childs_output_columns, pcrsOutput);
 
 	// Array to hold the child expressions
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
 	// Traversing the tree
 	gpos::Ref<CExpression> pexprNew =
 		JoinPruningTreeTraversal(mp, pexpr, pdrgpexpr, childs_output_columns);
-	childs_output_columns->Release();
+
 
 	// Checking if the join is a left join then pruning the join if possible
 	if (CPredicateUtils::FLeftOuterJoin(pexprNew))
@@ -577,7 +563,7 @@ CLeftJoinPruningPreprocessor::PexprPreprocess(
 		pexprNew = PexprCheckLeftOuterJoinPruningConditions(mp, pexprNew,
 															output_columns);
 	}
-	output_columns->Release();
+
 	return pexprNew;
 }
 

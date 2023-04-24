@@ -38,13 +38,13 @@ public:
 		CDouble m_scale_factor;
 
 		// mdid pair for the predicate
-		IMdIdArray *m_oid_pair;
+		gpos::Ref<IMdIdArray> m_oid_pair;
 
 		// true if both sides of the predicate are distribution keys
 		BOOL m_dist_keys;
 
 		//ctor
-		SJoinCondition(CDouble scale_factor, IMdIdArray *mdid_pair,
+		SJoinCondition(CDouble scale_factor, gpos::Ref<IMdIdArray> mdid_pair,
 					   BOOL both_dist_keys)
 			: m_scale_factor(scale_factor),
 			  m_oid_pair(mdid_pair),
@@ -54,21 +54,21 @@ public:
 
 		~SJoinCondition()
 		{
-			SafeRelease(m_oid_pair);
 		}
 
 		// We hash/compare the pointer rather than the contents of the IMdId, as we want to discern between different instances of IMdIds.
 		// For example, when performing a self join, the underlying tables will have different IMdId pointers, but the same contents.
 		// We treat them as different instances and assume independence to calculate the correct join cardinality.
 		static ULONG
-		HashValue(const IMdIdArray *oid_pair)
+		HashValue(const gpos::Ref<IMdIdArray> oid_pair)
 		{
 			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0]),
 								 gpos::HashPtr<IMDId>((*oid_pair)[1]));
 		}
 
 		static BOOL
-		Equals(const IMdIdArray *first, const IMdIdArray *second)
+		Equals(const gpos::Ref<IMdIdArray> first,
+			   const gpos::Ref<IMdIdArray> second)
 		{
 			return ((*first)[0] == (*second)[0]) &&
 				   ((*first)[1] == (*second)[1]);
@@ -88,19 +88,20 @@ public:
 					 CleanupRelease<CDoubleArray>>;
 
 	// generate the hashmap of scale factors grouped by pred tables, also produces array of complex join preds
-	static OIDPairToScaleFactorArrayMap *GenerateScaleFactorMap(
-		CMemoryPool *mp, SJoinConditionArray *join_conds_scale_factors,
-		CDoubleArray *complex_join_preds);
+	static gpos::Ref<OIDPairToScaleFactorArrayMap> GenerateScaleFactorMap(
+		CMemoryPool *mp,
+		gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
+		gpos::Ref<CDoubleArray> complex_join_preds);
 
 	// generate a cumulative scale factor using a modified sqrt algorithm
 	static CDouble CalcCumulativeScaleFactorSqrtAlg(
-		OIDPairToScaleFactorArrayMap *scale_factor_hashmap,
-		CDoubleArray *complex_join_preds);
+		gpos::Ref<OIDPairToScaleFactorArrayMap> scale_factor_hashmap,
+		gpos::Ref<CDoubleArray> complex_join_preds);
 
 	// calculate the cumulative join scaling factor
 	static CDouble CumulativeJoinScaleFactor(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		SJoinConditionArray *join_conds_scale_factors,
+		gpos::Ref<SJoinConditionArray> join_conds_scale_factors,
 		CDouble limit_for_result_scale_factor);
 
 	// return scaling factor of the join predicate after apply damping
@@ -116,18 +117,18 @@ public:
 		const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns);
 
 	// sort the array of scaling factor
-	static void SortScalingFactor(CDoubleArray *scale_factors,
+	static void SortScalingFactor(gpos::Ref<CDoubleArray> scale_factors,
 								  BOOL is_descending);
 
 	// calculate the cumulative scaling factor for conjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeConj(
 		const gpos::Ref<CStatisticsConfig> stats_config,
-		CDoubleArray *scale_factors);
+		gpos::Ref<CDoubleArray> scale_factors);
 
 	// calculate the cumulative scaling factor for disjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeDisj(
 		const gpos::Ref<CStatisticsConfig> stats_config,
-		CDoubleArray *scale_factors, CDouble tota_rows);
+		gpos::Ref<CDoubleArray> scale_factors, CDouble tota_rows);
 
 	// comparison function in descending order
 	static INT DescendingOrderCmpFunc(const void *val1, const void *val2);

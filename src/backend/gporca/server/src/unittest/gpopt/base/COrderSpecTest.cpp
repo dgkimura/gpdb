@@ -55,7 +55,7 @@ COrderSpecTest::EresUnittest_Basics()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -83,8 +83,8 @@ COrderSpecTest::EresUnittest_Basics()
 
 	gpos::Ref<IMDId> pmdidInt4LT =
 		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
+
+
 
 	pos1->Append(pmdidInt4LT, pcr1, COrderSpec::EntFirst);
 	pos1->Append(pmdidInt4LT, pcr2, COrderSpec::EntLast);
@@ -93,9 +93,8 @@ COrderSpecTest::EresUnittest_Basics()
 	GPOS_ASSERT(pos1->FSatisfies(pos1));
 
 	gpos::Ref<COrderSpec> pos2 = GPOS_NEW(mp) COrderSpec(mp);
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
+
+
 
 	pos2->Append(pmdidInt4LT, pcr1, COrderSpec::EntFirst);
 	pos2->Append(pmdidInt4LT, pcr2, COrderSpec::EntLast);
@@ -128,8 +127,7 @@ COrderSpecTest::EresUnittest_Basics()
 		(void) pos1->Ent(ul);
 	}
 
-	pos1->Release();
-	pos2->Release();
+
 
 	return GPOS_OK;
 }

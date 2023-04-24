@@ -47,8 +47,9 @@ CLogicalSplit::CLogicalSplit(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalSplit::CLogicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
-							 CColRefArray *pdrgpcrInsert,
+CLogicalSplit::CLogicalSplit(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> pdrgpcrDelete,
+							 gpos::Ref<CColRefArray> pdrgpcrInsert,
 							 gpos::Ref<CColRef> pcrCtid,
 							 gpos::Ref<CColRef> pcrSegmentId,
 							 gpos::Ref<CColRef> pcrAction)
@@ -84,8 +85,6 @@ CLogicalSplit::CLogicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
 //---------------------------------------------------------------------------
 CLogicalSplit::~CLogicalSplit()
 {
-	SafeRelease(m_pdrgpcrDelete);
-	SafeRelease(m_pdrgpcrInsert);
 }
 
 //---------------------------------------------------------------------------
@@ -143,13 +142,13 @@ CLogicalSplit::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalSplit::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalSplit::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrDelete =
+	gpos::Ref<CColRefArray> pdrgpcrDelete =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
-	CColRefArray *pdrgpcrInsert =
+	gpos::Ref<CColRefArray> pdrgpcrInsert =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
 	gpos::Ref<CColRef> pcrCtid =
 		CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
@@ -223,10 +222,10 @@ CLogicalSplit::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalSplit::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSplit);
 	return xform_set;
 }
@@ -241,7 +240,7 @@ CLogicalSplit::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalSplit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	// split returns double the number of tuples coming from its child

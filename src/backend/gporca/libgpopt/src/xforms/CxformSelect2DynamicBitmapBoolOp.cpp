@@ -73,7 +73,7 @@ CXformSelect2DynamicBitmapBoolOp::Transform(gpos::Ref<CXformContext> pxfctxt,
 											gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalDynamicGet> popGet =
@@ -92,7 +92,7 @@ CXformSelect2DynamicBitmapBoolOp::Transform(gpos::Ref<CXformContext> pxfctxt,
 		// create a redundant SELECT on top of DynamicIndexGet to be able to use predicate in partition elimination
 		gpos::Ref<CExpression> pexprRedundantSelect =
 			CXformUtils::PexprRedundantSelectForDynamicIndex(mp, pexprResult);
-		pexprResult->Release();
+
 
 		pxfres->Add(pexprRedundantSelect);
 	}

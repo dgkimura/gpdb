@@ -15,10 +15,10 @@
 #define GPDXL_CDXLPhysicalAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
-
 namespace gpdxl
 {
 // indices of group by elements in the children array
@@ -53,7 +53,7 @@ private:
 	CDXLPhysicalAgg(const CDXLPhysicalAgg &);
 
 	// grouping column ids
-	ULongPtrArray *m_grouping_colids_array;
+	gpos::Ref<ULongPtrArray> m_grouping_colids_array;
 
 	EdxlAggStrategy m_dxl_agg_strategy;
 
@@ -78,10 +78,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 	const CWStringConst *GetAggStrategyNameStr() const;
 	const CWStringConst *PstrAggLevel() const;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	const gpos::Ref<ULongPtrArray> GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingCols(ULongPtrArray *);
+	void SetGroupingCols(gpos::Ref<ULongPtrArray>);
 
 	// is aggregate a hash aggregate that it safe to stream
 	BOOL
@@ -101,7 +101,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalAgg == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLPhysicalAgg> >(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalAgg>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

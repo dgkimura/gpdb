@@ -46,7 +46,7 @@ static gpos::Ref<CExpression>
 InsertGroupIntoMemo(CMemo *pmemo, CMemoryPool *mp)
 {
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	pexprGet->Pop()->AddRef();
+
 	gpos::Ref<CGroupExpression> pgexpr = GPOS_NEW(mp)
 		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArray(mp),
 						 CXform::ExfInvalid /*exfidOrigin*/,
@@ -66,7 +66,7 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -107,14 +107,14 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 		pmemo->Pgroup(1)->Pstats() != nullptr)
 	{
 		GPOS_DELETE(pmemo);
-		pexprGet1->Release();
-		pexprGet2->Release();
+
+
 		return GPOS_FAILED;
 	}
 
 	GPOS_DELETE(pmemo);
-	pexprGet1->Release();
-	pexprGet2->Release();
+
+
 	return GPOS_OK;
 }
 

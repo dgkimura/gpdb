@@ -35,7 +35,7 @@ class CDrvdPropPlan;
 class CCostContext;
 
 // array of cost contexts
-using CCostContextArray = CDynamicPtrArray<CCostContext, CleanupRelease>;
+using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 
 // cost context pointer definition
 using COSTCTXT_PTR = gpos::Ref<CCostContext>;
@@ -83,7 +83,7 @@ private:
 	gpos::Ref<CGroupExpression> m_pgexprForStats;
 
 	// array of optimization contexts of child groups
-	COptimizationContextArray *m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> m_pdrgpoc;
 
 	// derived properties of the carried plan
 	gpos::Ref<CDrvdPropPlan> m_pdpplan;
@@ -159,7 +159,7 @@ public:
 	}
 
 	// accessor of child optimization contexts array
-	COptimizationContextArray *
+	gpos::Ref<COptimizationContextArray>
 	Pdrgpoc() const
 	{
 		return m_pdrgpoc;
@@ -235,7 +235,7 @@ public:
 
 	// set child contexts
 	void
-	SetChildContexts(COptimizationContextArray *pdrgpoc)
+	SetChildContexts(gpos::Ref<COptimizationContextArray> pdrgpoc)
 	{
 		GPOS_ASSERT(nullptr == m_pdrgpoc);
 		GPOS_ASSERT(nullptr != pdrgpoc);
@@ -251,7 +251,7 @@ public:
 	BOOL operator==(const CCostContext &cc) const;
 
 	// compute cost
-	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
+	CCost CostCompute(CMemoryPool *mp, gpos::Ref<CCostArray> pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
 	BOOL FBetterThan(const gpos::Ref<CCostContext> pcc) const;

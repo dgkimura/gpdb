@@ -38,8 +38,9 @@ using namespace gpos;
 CLogicalDynamicBitmapTableGet::CLogicalDynamicBitmapTableGet(
 	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameTableAlias, ULONG ulPartIndex,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameTableAlias, ptabdesc, ulPartIndex,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_ulOriginOpId(ulOriginOpId)
@@ -146,9 +147,9 @@ CLogicalDynamicBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalDynamicBitmapTableGet::PstatsDerive(CMemoryPool *mp,
-											CExpressionHandle &exprhdl,
-											IStatisticsArray *stats_ctxt) const
+CLogicalDynamicBitmapTableGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl,
 														  stats_ctxt);
@@ -186,9 +187,10 @@ CLogicalDynamicBitmapTableGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -201,10 +203,9 @@ CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns(
 	}
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 
-	m_ptabdesc->AddRef();
-	m_partition_mdids->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(
+
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrPart, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalDynamicBitmapTableGet(
@@ -220,10 +221,10 @@ CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDynamicBitmapTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementDynamicBitmapTableGet);
 
 	return xform_set;

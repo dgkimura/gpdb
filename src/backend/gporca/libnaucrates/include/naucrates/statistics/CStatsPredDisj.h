@@ -37,16 +37,15 @@ private:
 	CStatsPredDisj &operator=(CStatsPredDisj &);
 
 	// array of filters
-	CStatsPredPtrArry *m_disj_pred_stats_array;
+	gpos::Ref<CStatsPredPtrArry> m_disj_pred_stats_array;
 
 public:
 	// ctor
-	explicit CStatsPredDisj(CStatsPredPtrArry *disj_pred_stats_array);
+	explicit CStatsPredDisj(gpos::Ref<CStatsPredPtrArry> disj_pred_stats_array);
 
 	// dtor
 	~CStatsPredDisj() override
 	{
-		m_disj_pred_stats_array->Release();
 	}
 
 	// the column identifier on which the predicates are on
@@ -60,7 +59,7 @@ public:
 	}
 
 	// return the array of predicate filters
-	CStatsPredPtrArry *
+	gpos::Ref<CStatsPredPtrArry>
 	GetDisjPredStatsArray() const
 	{
 		return m_disj_pred_stats_array;
@@ -80,7 +79,7 @@ public:
 	}
 
 	// return the column id of the filter based on the column ids of its child filters
-	static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
+	static ULONG GetColId(const gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// conversion function
 	static gpos::Ref<CStatsPredDisj>
@@ -89,7 +88,7 @@ public:
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptDisj == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<gpos::Ref<CStatsPredDisj> >(pred_stats);
+		return gpos::dyn_cast<CStatsPredDisj>(pred_stats);
 	}
 
 };	// class CStatsPredDisj

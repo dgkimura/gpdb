@@ -110,7 +110,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// print
@@ -166,7 +166,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *) const override;
 
 	// stat promise
 	EStatPromise
@@ -178,7 +178,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLimit == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalLimit> >(pop);
+		return gpos::dyn_cast<CLogicalLimit>(pop);
 	}
 
 };	// class CLogicalLimit

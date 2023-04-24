@@ -30,12 +30,15 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLMinidump::CDXLMinidump(
-	gpos::Ref<CBitSet> pbs, gpos::Ref<COptimizerConfig> optimizer_config,
-	gpos::Ref<CDXLNode> query, CDXLNodeArray *query_output_dxlnode_array,
-	CDXLNodeArray *cte_producers, gpos::Ref<CDXLNode> pdxlnPlan,
-	IMDCacheObjectArray *mdcache_obj_array, CSystemIdArray *pdrgpsysid,
-	ULLONG plan_id, ULLONG plan_space_size)
+CDXLMinidump::CDXLMinidump(gpos::Ref<CBitSet> pbs,
+						   gpos::Ref<COptimizerConfig> optimizer_config,
+						   gpos::Ref<CDXLNode> query,
+						   gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+						   gpos::Ref<CDXLNodeArray> cte_producers,
+						   gpos::Ref<CDXLNode> pdxlnPlan,
+						   gpos::Ref<IMDCacheObjectArray> mdcache_obj_array,
+						   gpos::Ref<CSystemIdArray> pdrgpsysid, ULLONG plan_id,
+						   ULLONG plan_space_size)
 	: m_pbs(pbs),
 	  m_optimizer_config(optimizer_config),
 	  m_query_dxl_root(query),
@@ -61,14 +64,6 @@ CDXLMinidump::CDXLMinidump(
 CDXLMinidump::~CDXLMinidump()
 {
 	// some of the structures may be NULL as they are not included in the minidump
-	SafeRelease(m_pbs);
-	SafeRelease(m_optimizer_config);
-	SafeRelease(m_query_dxl_root);
-	SafeRelease(m_query_output);
-	SafeRelease(m_cte_producers);
-	SafeRelease(m_plan_dxl_root);
-	SafeRelease(m_mdid_cached_obj_array);
-	SafeRelease(m_system_id_array);
 }
 
 //---------------------------------------------------------------------------
@@ -107,7 +102,7 @@ CDXLMinidump::GetQueryDXLRoot() const
 //		Query output columns
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+const gpos::Ref<CDXLNodeArray>
 CDXLMinidump::PdrgpdxlnQueryOutput() const
 {
 	return m_query_output;
@@ -121,7 +116,7 @@ CDXLMinidump::PdrgpdxlnQueryOutput() const
 //		CTE list
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+const gpos::Ref<CDXLNodeArray>
 CDXLMinidump::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;
@@ -149,7 +144,7 @@ CDXLMinidump::PdxlnPlan() const
 //		Metadata objects
 //
 //---------------------------------------------------------------------------
-const IMDCacheObjectArray *
+const gpos::Ref<IMDCacheObjectArray>
 CDXLMinidump::GetMdIdCachedObjArray() const
 {
 	return m_mdid_cached_obj_array;
@@ -163,7 +158,7 @@ CDXLMinidump::GetMdIdCachedObjArray() const
 //		Metadata source system ids
 //
 //---------------------------------------------------------------------------
-const CSystemIdArray *
+const gpos::Ref<CSystemIdArray>
 CDXLMinidump::GetSysidPtrArray() const
 {
 	return m_system_id_array;

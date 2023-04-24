@@ -55,8 +55,10 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(CMemoryPool *mp)
 CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
 	CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, ULONG part_idx_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids)
+	const CName *pnameAlias, ULONG part_idx_id,
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, part_idx_id,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_pindexdesc(nullptr),
@@ -81,8 +83,6 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
 //---------------------------------------------------------------------------
 CLogicalDynamicIndexGet::~CLogicalDynamicIndexGet()
 {
-	SafeRelease(m_pindexdesc);
-	SafeRelease(m_pos);
 }
 
 //---------------------------------------------------------------------------
@@ -142,14 +142,15 @@ CLogicalDynamicIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalDynamicIndexGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const gpos::Ref<IMDIndex> pmdindex =
 		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -161,11 +162,10 @@ CLogicalDynamicIndexGet::PopCopyWithRemappedColumns(
 											 colref_mapping, must_exist);
 	}
 
-	CColRef2dArray *pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrPart, colref_mapping, must_exist);
 
-	m_ptabdesc->AddRef();
-	m_partition_mdids->AddRef();
+
 
 	return GPOS_NEW(mp) CLogicalDynamicIndexGet(
 		mp, pmdindex, m_ptabdesc, m_ulOriginOpId, pnameAlias, m_scan_id,
@@ -194,10 +194,10 @@ CLogicalDynamicIndexGet::FInputOrderSensitive() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalDynamicIndexGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDynamicIndexGet2DynamicIndexScan);
 	return xform_set;
 }
@@ -212,9 +212,9 @@ CLogicalDynamicIndexGet::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 
 gpos::Ref<IStatistics>
-CLogicalDynamicIndexGet::PstatsDerive(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl,
-									  IStatisticsArray *stats_ctxt) const
+CLogicalDynamicIndexGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForIndexGet(mp, exprhdl, stats_ctxt);
 }

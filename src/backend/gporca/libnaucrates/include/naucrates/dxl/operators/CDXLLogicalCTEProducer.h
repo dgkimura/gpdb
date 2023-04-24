@@ -12,9 +12,9 @@
 #define GPDXL_CDXLLogicalCTEProducer_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -32,14 +32,14 @@ private:
 	ULONG m_id;
 
 	// output column ids
-	ULongPtrArray *m_output_colids_array;
+	gpos::Ref<ULongPtrArray> m_output_colids_array;
 
 public:
 	CDXLLogicalCTEProducer(CDXLLogicalCTEProducer &) = delete;
 
 	// ctor
 	CDXLLogicalCTEProducer(CMemoryPool *mp, ULONG id,
-						   ULongPtrArray *output_colids_array);
+						   gpos::Ref<ULongPtrArray> output_colids_array);
 
 	// dtor
 	~CDXLLogicalCTEProducer() override;
@@ -57,7 +57,7 @@ public:
 		return m_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetOutputColIdsArray() const
 	{
 		return m_output_colids_array;
@@ -80,7 +80,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTEProducer == dxl_op->GetDXLOperator());
-		return dynamic_cast<gpos::Ref<CDXLLogicalCTEProducer> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTEProducer>(dxl_op);
 	}
 };
 }  // namespace gpdxl

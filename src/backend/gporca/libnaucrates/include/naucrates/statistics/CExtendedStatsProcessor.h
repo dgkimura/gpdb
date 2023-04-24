@@ -20,16 +20,16 @@ class CExtendedStatsProcessor
 {
 public:
 	static void ApplyCorrelatedStatsToScaleFactorFilterCalculation(
-		CDoubleArray *scale_factors,
+		gpos::Ref<CDoubleArray> scale_factors,
 		gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
 		const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
-		UlongToIntMap *colid_to_attno_mapping, CMemoryPool *mp,
-		UlongToHistogramMap *result_histograms);
+		gpos::Ref<UlongToIntMap> colid_to_attno_mapping, CMemoryPool *mp,
+		gpos::Ref<UlongToHistogramMap> result_histograms);
 
 	static bool ApplyCorrelatedStatsToNDistinctCalculation(
 		CMemoryPool *mp, const gpos::Ref<IMDExtStatsInfo> md_statsinfo,
-		const UlongToIntMap *colid_to_attno_mapping,
-		ULongPtrArray *&src_grouping_cols, DOUBLE *ndistinct);
+		const gpos::Ref<UlongToIntMap> colid_to_attno_mapping,
+		gpos::Ref<ULongPtrArray> &src_grouping_cols, DOUBLE *ndistinct);
 };
 }  // namespace gpnaucrates
 

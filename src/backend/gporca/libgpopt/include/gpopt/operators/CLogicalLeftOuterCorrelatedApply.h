@@ -38,7 +38,7 @@ public:
 
 	// ctor
 	CLogicalLeftOuterCorrelatedApply(CMemoryPool *mp,
-									 CColRefArray *pdrgpcrInner,
+									 gpos::Ref<CColRefArray> pdrgpcrInner,
 									 EOperatorId eopidOriginSubq);
 
 	// ctor for patterns
@@ -66,11 +66,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// return true if operator is a correlated apply
 	BOOL
@@ -92,7 +92,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftOuterCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalLeftOuterCorrelatedApply> >(pop);
+		return gpos::dyn_cast<CLogicalLeftOuterCorrelatedApply>(pop);
 	}
 
 };	// class CLogicalLeftOuterCorrelatedApply

@@ -69,7 +69,6 @@ CTaskContext::CTaskContext(CMemoryPool *mp, const CTaskContext &task_ctxt)
 //---------------------------------------------------------------------------
 CTaskContext::~CTaskContext()
 {
-	SafeRelease(m_bitset);
 }
 
 

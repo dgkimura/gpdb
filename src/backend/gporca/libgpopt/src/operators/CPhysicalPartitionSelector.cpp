@@ -52,8 +52,6 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector(
 //---------------------------------------------------------------------------
 CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 {
-	m_mdid->Release();
-	SafeRelease(m_filter_expr);
 }
 
 //---------------------------------------------------------------------------
@@ -106,12 +104,11 @@ CPhysicalPartitionSelector::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 gpos::Ref<CColRefSet> pcrsInput,
-										 ULONG child_index,
-										 CDrvdPropArray *,	// pdrgpdpCtxt
-										 ULONG				// ulOptReq
+CPhysicalPartitionSelector::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -134,12 +131,11 @@ CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<COrderSpec> posRequired,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+CPhysicalPartitionSelector::PosRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<COrderSpec> posRequired, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -156,12 +152,11 @@ CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CDistributionSpec> pdsInput,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+CPhysicalPartitionSelector::PdsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -192,8 +187,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalPartitionSelector::PrsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CRewindabilitySpec> prsRequired, ULONG child_index,
-	CDrvdPropArray *,  // pdrgpdpCtxt
-	ULONG			   // ulOptReq
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -210,16 +205,17 @@ CPhysicalPartitionSelector::PrsRequired(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalPartitionSelector::PcteRequired(CMemoryPool *,		   //mp,
-										 CExpressionHandle &,  //exprhdl,
-										 gpos::Ref<CCTEReq> pcter,
-										 ULONG
+CPhysicalPartitionSelector::PcteRequired(
+	CMemoryPool *,		  //mp,
+	CExpressionHandle &,  //exprhdl,
+	gpos::Ref<CCTEReq> pcter,
+	ULONG
 #ifdef GPOS_DEBUG
-											 child_index
+		child_index
 #endif
-										 ,
-										 CDrvdPropArray *,	//pdrgpdpCtxt,
-										 ULONG				//ulOptReq
+	,
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+	ULONG						//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -230,7 +226,7 @@ gpos::Ref<CPartitionPropagationSpec>
 CPhysicalPartitionSelector::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &,
 	gpos::Ref<CPartitionPropagationSpec> pppsRequired,
-	ULONG child_index GPOS_ASSERTS_ONLY, CDrvdPropArray *, ULONG) const
+	ULONG child_index GPOS_ASSERTS_ONLY, gpos::Ref<CDrvdPropArray>, ULONG) const
 {
 	GPOS_ASSERT(child_index == 0);
 
@@ -317,7 +313,7 @@ CPhysicalPartitionSelector::PppsDerive(CMemoryPool *mp,
 	pps_result->InsertAll(pps_child);
 	pps_result->Insert(m_scan_id, CPartitionPropagationSpec::EpptPropagator,
 					   m_mdid, selector_ids, nullptr);
-	selector_ids->Release();
+
 
 	return pps_result;
 }

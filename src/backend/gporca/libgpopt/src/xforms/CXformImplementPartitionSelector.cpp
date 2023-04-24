@@ -53,7 +53,7 @@ CXformImplementPartitionSelector::Transform(gpos::Ref<CXformContext> pxfctxt,
 											gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -66,8 +66,8 @@ CXformImplementPartitionSelector::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<IMDId> mdid = popSelector->MDId();
 
 	// addref all components
-	pexprRelational->AddRef();
-	mdid->AddRef();
+
+
 
 	UlongToExprMap *phmulexprFilter = GPOS_NEW(mp) UlongToExprMap(mp);
 
@@ -76,7 +76,7 @@ CXformImplementPartitionSelector::Transform(gpos::Ref<CXformContext> pxfctxt,
 	{
 		gpos::Ref<CExpression> pexprFilter = popSelector->PexprPartFilter(ul);
 		GPOS_ASSERT(nullptr != pexprFilter);
-		pexprFilter->AddRef();
+
 		BOOL fInserted GPOS_ASSERTS_ONLY =
 			phmulexprFilter->Insert(GPOS_NEW(mp) ULONG(ul), pexprFilter);
 		GPOS_ASSERT(fInserted);

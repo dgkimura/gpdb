@@ -29,7 +29,7 @@ class CStack
 {
 private:
 	// backing dynamic array store
-	CDynamicPtrArray<T, CleanupNULL> *m_dynamic_ptr_array;
+	gpos::Ref<CDynamicPtrArray<T, CleanupNULL>> m_dynamic_ptr_array;
 
 	// top of stack index
 	ULONG m_size;
@@ -47,7 +47,6 @@ public:
 	// destructor
 	virtual ~CStack()
 	{
-		m_dynamic_ptr_array->Release();
 	}
 
 	// push element onto stack

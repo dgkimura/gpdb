@@ -45,11 +45,6 @@ CDrvdPropPlan::CDrvdPropPlan() = default;
 //---------------------------------------------------------------------------
 CDrvdPropPlan::~CDrvdPropPlan()
 {
-	SafeRelease(m_pos);
-	SafeRelease(m_pds);
-	SafeRelease(m_prs);
-	SafeRelease(m_ppps);
-	SafeRelease(m_pcm);
 }
 
 
@@ -68,7 +63,7 @@ CDrvdPropPlan::Pdpplan(gpos::Ref<CDrvdProp> pdp)
 	GPOS_ASSERT(EptPlan == pdp->Ept() &&
 				"This is not a plan properties container");
 
-	return dynamic_cast<gpos::Ref<CDrvdPropPlan> >(pdp);
+	return gpos::dyn_cast<CDrvdPropPlan>(pdp);
 }
 
 
@@ -124,7 +119,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 	gpos::Ref<CPhysicalCTEConsumer> popCTEConsumer =
 		CPhysicalCTEConsumer::PopConvert(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
-	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
+	gpos::Ref<UlongToColRefMap> colref_mapping = popCTEConsumer->Phmulcr();
 	gpos::Ref<CDrvdPropPlan> pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{
@@ -135,7 +130,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 														   true /*must_exist*/);
 		// rewindability and partition filter map do not need column remapping,
 		// we add-ref producer's properties directly
-		pdpplan->Prs()->AddRef();
+
 		m_prs = pdpplan->Prs();
 
 		// no need to copy the part index map. return an empty one. This is to

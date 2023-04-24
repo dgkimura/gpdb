@@ -81,7 +81,7 @@ CHashSetTest::EresUnittest_Basic()
 		GPOS_ASSERT(phs->Contains(&rgul[ul]));
 	}
 
-	phs->Release();
+
 
 	return GPOS_OK;
 }
@@ -122,7 +122,7 @@ CHashSetTest::EresUnittest_Ownership()
 		GPOS_ASSERT(!phs->Insert(pulp));
 	}
 
-	phs->Release();
+
 
 	return GPOS_OK;
 }

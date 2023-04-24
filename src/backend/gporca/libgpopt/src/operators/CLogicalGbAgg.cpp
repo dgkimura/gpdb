@@ -54,7 +54,8 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp)
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype)
 	: CLogicalUnary(mp),
 	  m_fGeneratesDuplicates(false),
@@ -77,7 +78,8 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 	m_pcrsLocalUsed->Include(m_pdrgpcr);
 }
 
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype,
 							 EAggStage aggStage)
 	: CLogicalUnary(mp),
@@ -110,10 +112,11 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype,
 							 BOOL fGeneratesDuplicates,
-							 CColRefArray *pdrgpcrArgDQA)
+							 gpos::Ref<CColRefArray> pdrgpcrArgDQA)
 	: CLogicalUnary(mp),
 	  m_fGeneratesDuplicates(fGeneratesDuplicates),
 	  m_pdrgpcrArgDQA(pdrgpcrArgDQA),
@@ -132,10 +135,12 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 	m_pcrsLocalUsed->Include(m_pdrgpcr);
 }
 
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype,
 							 BOOL fGeneratesDuplicates,
-							 CColRefArray *pdrgpcrArgDQA, EAggStage aggStage)
+							 gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+							 EAggStage aggStage)
 	: CLogicalUnary(mp),
 	  m_fGeneratesDuplicates(fGeneratesDuplicates),
 	  m_pdrgpcrArgDQA(pdrgpcrArgDQA),
@@ -162,8 +167,9 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
-							 CColRefArray *pdrgpcrMinimal,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
+							 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 							 COperator::EGbAggType egbaggtype)
 	: CLogicalUnary(mp),
 	  m_fGeneratesDuplicates(true),
@@ -182,7 +188,6 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 
 	if (nullptr == pdrgpcrMinimal)
 	{
-		m_pdrgpcr->AddRef();
 		m_pdrgpcrMinimal = m_pdrgpcr;
 	}
 
@@ -198,11 +203,12 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 //		ctor
 //
 //---------------------------------------------------------------------------
-CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
-							 CColRefArray *pdrgpcrMinimal,
+CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp,
+							 gpos::Ref<CColRefArray> colref_array,
+							 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 							 COperator::EGbAggType egbaggtype,
 							 BOOL fGeneratesDuplicates,
-							 CColRefArray *pdrgpcrArgDQA)
+							 gpos::Ref<CColRefArray> pdrgpcrArgDQA)
 	: CLogicalUnary(mp),
 	  m_fGeneratesDuplicates(fGeneratesDuplicates),
 	  m_pdrgpcrArgDQA(pdrgpcrArgDQA),
@@ -223,7 +229,6 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 
 	if (nullptr == pdrgpcrMinimal)
 	{
-		m_pdrgpcr->AddRef();
 		m_pdrgpcrMinimal = m_pdrgpcr;
 	}
 
@@ -242,9 +247,6 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 CLogicalGbAgg::~CLogicalGbAgg()
 {
 	// safe release -- to allow for instances used in patterns
-	SafeRelease(m_pdrgpcr);
-	SafeRelease(m_pdrgpcrMinimal);
-	SafeRelease(m_pdrgpcrArgDQA);
 }
 
 //---------------------------------------------------------------------------
@@ -256,20 +258,20 @@ CLogicalGbAgg::~CLogicalGbAgg()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalGbAgg::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalGbAgg::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
-	CColRefArray *pdrgpcrMinimal = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = nullptr;
 	if (nullptr != m_pdrgpcrMinimal)
 	{
 		pdrgpcrMinimal = CUtils::PdrgpcrRemap(mp, m_pdrgpcrMinimal,
 											  colref_mapping, must_exist);
 	}
 
-	CColRefArray *pdrgpcrArgDQA = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA = nullptr;
 	if (nullptr != m_pdrgpcrArgDQA)
 	{
 		pdrgpcrArgDQA = CUtils::PdrgpcrRemap(mp, m_pdrgpcrArgDQA,
@@ -323,7 +325,7 @@ CLogicalGbAgg::DeriveOuterReferences(CMemoryPool *mp,
 
 	gpos::Ref<CColRefSet> outer_refs =
 		CLogical::DeriveOuterReferences(mp, exprhdl, pcrsGrp);
-	pcrsGrp->Release();
+
 
 	return outer_refs;
 }
@@ -346,7 +348,7 @@ CLogicalGbAgg::DerivePropertyConstraint(CMemoryPool *mp,
 	// get the constraints on the grouping columns only
 	gpos::Ref<CPropConstraint> ppc =
 		PpcDeriveConstraintRestrict(mp, exprhdl, pcrsGrouping);
-	pcrsGrouping->Release();
+
 
 	return ppc;
 }
@@ -380,7 +382,7 @@ CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
-							 CColRefArray *pdrgpcrGrp) const
+							 gpos::Ref<CColRefArray> pdrgpcrGrp) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
@@ -408,7 +410,7 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::Ref<CColRefSet> pcrsRequired =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrs, child_index);
-	pcrs->Release();
+
 
 	return pcrsRequired;
 }
@@ -496,7 +498,7 @@ CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 		if (0 < m_pdrgpcr->Size())
 		{
 			// grouping columns always constitute a key
-			m_pdrgpcr->AddRef();
+
 			pkc = GPOS_NEW(mp) CKeyCollection(mp, m_pdrgpcr);
 		}
 		else
@@ -510,7 +512,7 @@ CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 				return nullptr;
 			}
 
-			pcrs->AddRef();
+
 			pkc = GPOS_NEW(mp) CKeyCollection(mp, pcrs);
 		}
 	}
@@ -563,8 +565,7 @@ CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	gpos::Ref<CLogicalGbAgg> popAgg =
-		dynamic_cast<gpos::Ref<CLogicalGbAgg> >(pop);
+	gpos::Ref<CLogicalGbAgg> popAgg = gpos::dyn_cast<CLogicalGbAgg>(pop);
 
 	return FGeneratesDuplicates() == popAgg->FGeneratesDuplicates() &&
 		   popAgg->Egbaggtype() == m_egbaggtype &&
@@ -581,10 +582,10 @@ CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::Ref<CXformSet>
 CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSimplifyGbAgg);
 	(void) xform_set->ExchangeSet(CXform::ExfGbAggWithMDQA2Join);
@@ -616,14 +617,15 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
-							CColRefArray *pdrgpcrGroupingCols,
-							ULongPtrArray *pdrgpulComputedCols,
+							gpos::Ref<CColRefArray> pdrgpcrGroupingCols,
+							gpos::Ref<ULongPtrArray> pdrgpulComputedCols,
 							gpos::Ref<CBitSet> keys)
 {
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();
 
 	// extract grouping column ids
-	ULongPtrArray *pdrgpulGroupingCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulGroupingCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ul = 0; ul < ulGroupingCols; ul++)
 	{
 		gpos::Ref<CColRef> colref = (*pdrgpcrGroupingCols)[ul];
@@ -631,11 +633,11 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 	}
 
 	gpos::Ref<IStatistics> stats = CGroupByStatsProcessor::CalcGroupByStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
-		pdrgpulGroupingCols, pdrgpulComputedCols, keys);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), pdrgpulGroupingCols,
+		pdrgpulComputedCols, keys);
 
 	// clean up
-	pdrgpulGroupingCols->Release();
+
 
 	return stats;
 }
@@ -651,20 +653,21 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
 	gpos::Ref<IStatistics> stats = PstatsDerive(
 		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, nullptr /*keys*/);
 
-	pdrgpulComputedCols->Release();
+
 
 	return stats;
 }

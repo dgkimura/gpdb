@@ -68,7 +68,6 @@ public:
 	// dtor
 	~CScalarArrayCmp() override
 	{
-		m_mdid_op->Release();
 		GPOS_DELETE(m_pscOp);
 	}
 
@@ -110,9 +109,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -125,7 +124,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayCmp == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarArrayCmp> >(pop);
+		return gpos::dyn_cast<CScalarArrayCmp>(pop);
 	}
 
 	// name of the comparison operator
@@ -138,7 +137,8 @@ public:
 	gpos::Ref<IMDId> MdidType() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

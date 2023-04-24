@@ -66,10 +66,10 @@ CXformJoinAssociativity::CXformJoinAssociativity(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
-										  gpos::Ref<CExpression> pexpr,
-										  CExpressionArray *pdrgpexprLower,
-										  CExpressionArray *pdrgpexprUpper)
+CXformJoinAssociativity::CreatePredicates(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CExpressionArray> pdrgpexprLower,
+	gpos::Ref<CExpressionArray> pdrgpexprUpper)
 {
 	GPOS_CHECK_ABORT;
 
@@ -78,12 +78,13 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprLeftLeft = (*pexprLeft)[0];
 	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
-	CExpressionArray *pdrgpexprJoins = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprJoins =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
-	pexprLeft->AddRef();
+
 	pdrgpexprJoins->Append(pexprLeft);
 
-	pexpr->AddRef();
+
 	pdrgpexprJoins->Append(pexpr);
 
 	// columns for new lower join
@@ -92,21 +93,22 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
 	pcrsLower->Union(pexprRight->DeriveOutputColumns());
 
 	// convert current predicates into arrays of conjuncts
-	CExpressionArray *pdrgpexprOrig = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprOrig =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	for (ULONG ul = 0; ul < 2; ul++)
 	{
-		CExpressionArray *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(
-			mp, (*(*pdrgpexprJoins)[ul])[2]);
+		gpos::Ref<CExpressionArray> pdrgpexprPreds =
+			CPredicateUtils::PdrgpexprConjuncts(mp,
+												(*(*pdrgpexprJoins)[ul])[2]);
 		ULONG length = pdrgpexprPreds->Size();
 		for (ULONG ulConj = 0; ulConj < length; ulConj++)
 		{
 			gpos::Ref<CExpression> pexprConj = (*pdrgpexprPreds)[ulConj];
-			pexprConj->AddRef();
+
 
 			pdrgpexprOrig->Append(pexprConj);
 		}
-		pdrgpexprPreds->Release();
 	}
 
 	// divvy up conjuncts for upper and lower join
@@ -116,7 +118,7 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexprOrig)[ul];
 		gpos::Ref<CColRefSet> pcrs = pexprPred->DeriveUsedColumns();
 
-		pexprPred->AddRef();
+
 		if (pcrsLower->ContainsAll(pcrs))
 		{
 			pdrgpexprLower->Append(pexprPred);
@@ -145,10 +147,6 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
 	}
 
 	// clean up
-	pcrsLower->Release();
-	pdrgpexprOrig->Release();
-
-	pdrgpexprJoins->Release();
 }
 
 
@@ -214,14 +212,16 @@ CXformJoinAssociativity::Transform(gpos::Ref<CXformContext> pxfctxt,
 								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create new predicates
-	CExpressionArray *pdrgpexprLower = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprUpper = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprLower =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexprUpper =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	CreatePredicates(mp, pexpr, pdrgpexprLower, pdrgpexprUpper);
 
 	GPOS_ASSERT(pdrgpexprLower->Size() > 0);
@@ -274,9 +274,8 @@ CXformJoinAssociativity::Transform(gpos::Ref<CXformContext> pxfctxt,
 		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 		// add-ref all components for re-use
-		pexprLeftLeft->AddRef();
-		pexprRight->AddRef();
-		pexprLeftRight->AddRef();
+
+
 
 		// build new joins
 		gpos::Ref<CExpression> pexprBottomJoin =
@@ -294,8 +293,6 @@ CXformJoinAssociativity::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 	else
 	{
-		pdrgpexprLower->Release();
-		pdrgpexprUpper->Release();
 	}
 }
 

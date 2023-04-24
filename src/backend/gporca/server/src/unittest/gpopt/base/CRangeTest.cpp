@@ -88,7 +88,7 @@ CRangeTest::EresUnittest()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -115,7 +115,7 @@ CRangeTest::EresUnittest_CRangeInt2()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<IMDTypeInt2> pmdtypeint2 =
@@ -143,7 +143,7 @@ CRangeTest::EresUnittest_CRangeInt4()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<IMDTypeInt4> pmdtypeint4 =
@@ -171,7 +171,7 @@ CRangeTest::EresUnittest_CRangeInt8()
 
 	// setup a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
@@ -214,17 +214,13 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 	CDefaultComparator comp(pceeval);
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgecmpt); ul++)
 	{
-		pdatumint4->AddRef();
 		gpos::Ref<CRange> prange =
 			GPOS_NEW(mp) CRange(&comp, rgecmpt[ul], pdatumint4);
 
 		PrintRange(mp, colref, prange);
-		prange->Release();
 	}
 
-	pceeval->Release();
-	pdatumint4->Release();
-	pexprGet->Release();
+
 
 	return GPOS_OK;
 }
@@ -246,39 +242,34 @@ CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	CDefaultComparator comp(pceeval);
 
 	// generate ranges
-	mdid->AddRef();
+
 	gpos::Ref<CRange> prange1 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, 10), CRange::EriIncluded, nullptr,
 			   CRange::EriExcluded);  // [10, inf)
 
-	mdid->AddRef();
+
 	gpos::Ref<CRange> prange2 = GPOS_NEW(mp)
 		CRange(mdid, &comp, nullptr, CRange::EriExcluded, (*pf)(mp, 20),
 			   CRange::EriIncluded);  // (-inf, 20]
 
-	mdid->AddRef();
+
 	gpos::Ref<CRange> prange3 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, -20), CRange::EriExcluded, (*pf)(mp, 0),
 			   CRange::EriIncluded);  // (-20, 0]
 
-	mdid->AddRef();
+
 	gpos::Ref<CRange> prange4 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, -10), CRange::EriIncluded, (*pf)(mp, 10),
 			   CRange::EriExcluded);  // [-10, 10)
 
-	mdid->AddRef();
+
 	gpos::Ref<CRange> prange5 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, 0), CRange::EriIncluded, (*pf)(mp, 0),
 			   CRange::EriIncluded);  // [0, 0]
 
 	TestRangeRelationship(mp, prange1, prange2, prange3, prange4, prange5);
 
-	prange1->Release();
-	prange2->Release();
-	prange3->Release();
-	prange4->Release();
-	prange5->Release();
-	pceeval->Release();
+
 
 	return GPOS_OK;
 }
@@ -332,8 +323,6 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, gpos::Ref<CRange> prange1,
 	PrintRange(mp, colref, prange3);
 	PrintRange(mp, colref, prange4);
 	PrintRange(mp, colref, prange5);
-
-	pexprGet->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -356,7 +345,6 @@ CRangeTest::PrintRange(CMemoryPool *mp, gpos::Ref<CColRef> colref,
 	at.Os() << "RANGE: " << *prange << std::endl
 			<< "EXPR:" << std::endl
 			<< *pexpr << std::endl;
-	pexpr->Release();
 }
 
 // EOF

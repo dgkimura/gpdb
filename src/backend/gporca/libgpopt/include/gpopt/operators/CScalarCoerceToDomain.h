@@ -75,7 +75,8 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// conversion function
 	static gpos::Ref<CScalarCoerceToDomain>
@@ -84,7 +85,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCoerceToDomain == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarCoerceToDomain> >(pop);
+		return gpos::dyn_cast<CScalarCoerceToDomain>(pop);
 	}
 
 };	// class CScalarCoerceToDomain

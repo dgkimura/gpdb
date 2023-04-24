@@ -215,8 +215,8 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 
 			GPOS_CHECK_ABORT;
-			pdxlnPlan->Release();
-			pcm->Release();
+
+
 
 			// test should have thrown
 			eres = GPOS_FAILED;
@@ -314,9 +314,8 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 					optimizer_config, nullptr /*pceeval*/
 				);
 			GPOS_CHECK_ABORT;
-			optimizer_config->Release();
-			pdxlnPlan->Release();
-			pcm->Release();
+
+
 
 			// test should have thrown
 			eres = GPOS_FAILED;
@@ -450,7 +449,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		1,	// ulSessionId
 		1,	// ulCmdId
 		FHasIndexJoin, pdrgpcpUnlimited);
-	pdrgpcpUnlimited->Release();
+
 
 	if (GPOS_OK != eres)
 	{
@@ -475,7 +474,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		1,	// ulSessionId
 		1,	// ulCmdId
 		FHasNoIndexJoin, pdrgpcpNoIndexJoin);
-	pdrgpcpNoIndexJoin->Release();
+
 
 	return eres;
 }

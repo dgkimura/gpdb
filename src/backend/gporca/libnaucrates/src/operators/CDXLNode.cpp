@@ -134,7 +134,8 @@ CDXLNode::CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(gpos::Ref<CDXLOperator> dxl_op, CDXLNodeArray *dxl_array)
+CDXLNode::CDXLNode(gpos::Ref<CDXLOperator> dxl_op,
+				   gpos::Ref<CDXLNodeArray> dxl_array)
 	: m_dxl_op(dxl_op),
 	  m_dxl_properties(nullptr),
 	  m_dxl_array(dxl_array),
@@ -154,10 +155,6 @@ CDXLNode::CDXLNode(gpos::Ref<CDXLOperator> dxl_op, CDXLNodeArray *dxl_array)
 //---------------------------------------------------------------------------
 CDXLNode::~CDXLNode()
 {
-	m_dxl_array->Release();
-	SafeRelease(m_dxl_op);
-	SafeRelease(m_dxl_properties);
-	SafeRelease(m_direct_dispatch_info);
 }
 
 //---------------------------------------------------------------------------

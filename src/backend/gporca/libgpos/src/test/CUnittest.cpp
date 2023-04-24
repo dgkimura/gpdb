@@ -329,7 +329,7 @@ CUnittest::UllParsePlanId(const CHAR *szPlanId)
 //
 //---------------------------------------------------------------------------
 ULONG
-CUnittest::Driver(CBitVector *pbv)
+CUnittest::Driver(gpos::Ref<CBitVector> pbv)
 {
 	CAutoConfig ac(m_pfConfig, m_pfCleanup, m_ulNested);
 	ULONG ulOk = 0;

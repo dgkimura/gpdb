@@ -60,19 +60,19 @@ public:
 	BOOL ExchangeClear(ULONG ulBit);
 
 	// union vectors
-	void Or(const CBitVector *);
+	void Or(const gpos::Ref<CBitVector>);
 
 	// intersect vectors
-	void And(const CBitVector *);
+	void And(const gpos::Ref<CBitVector>);
 
 	// is subset
-	BOOL ContainsAll(const CBitVector *) const;
+	BOOL ContainsAll(const gpos::Ref<CBitVector>) const;
 
 	// is dijoint
-	BOOL IsDisjoint(const CBitVector *) const;
+	BOOL IsDisjoint(const gpos::Ref<CBitVector>) const;
 
 	// equality
-	BOOL Equals(const CBitVector *) const;
+	BOOL Equals(const gpos::Ref<CBitVector>) const;
 
 	// is empty?
 	BOOL IsEmpty() const;

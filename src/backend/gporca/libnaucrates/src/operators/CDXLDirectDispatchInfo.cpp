@@ -32,7 +32,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDirectDispatchInfo::CDXLDirectDispatchInfo(
-	CDXLDatum2dArray *dispatch_identifer_datum_array, BOOL contains_raw_values)
+	gpos::Ref<CDXLDatum2dArray> dispatch_identifer_datum_array,
+	BOOL contains_raw_values)
 	: m_dispatch_identifer_datum_array(dispatch_identifer_datum_array),
 	  m_contains_raw_values(contains_raw_values)
 {
@@ -62,7 +63,6 @@ CDXLDirectDispatchInfo::CDXLDirectDispatchInfo(
 //---------------------------------------------------------------------------
 CDXLDirectDispatchInfo::~CDXLDirectDispatchInfo()
 {
-	m_dispatch_identifer_datum_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -99,7 +99,7 @@ CDXLDirectDispatchInfo::Serialize(CXMLSerializer *xml_serializer)
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			CDXLTokens::GetDXLTokenStr(EdxltokenDirectDispatchKeyValue));
 
-		CDXLDatumArray *dispatch_identifier_array =
+		gpos::Ref<CDXLDatumArray> dispatch_identifier_array =
 			(*m_dispatch_identifer_datum_array)[idx1];
 
 		const ULONG num_of_datums = dispatch_identifier_array->Size();

@@ -22,14 +22,16 @@ using namespace gpopt;
 gpos::Ref<CStatistics>
 CGroupByStatsProcessor::CalcGroupByStats(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-	ULongPtrArray *GCs, ULongPtrArray *aggs, gpos::Ref<CBitSet> keys)
+	gpos::Ref<ULongPtrArray> GCs, gpos::Ref<ULongPtrArray> aggs,
+	gpos::Ref<CBitSet> keys)
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// hash map colid -> width
-	UlongToDoubleMap *col_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::Ref<UlongToDoubleMap> col_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -74,15 +76,14 @@ CGroupByStatsProcessor::CalcGroupByStats(
 		const gpos::Ref<CStatisticsConfig> stats_config =
 			input_stats->GetStatsConfig();
 
-		CDoubleArray *NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
+		gpos::Ref<CDoubleArray> NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
 			mp, stats_config, input_stats, groupby_cols_for_stats, keys);
 		CDouble groups =
 			CStatisticsUtils::GetCumulativeNDVs(stats_config, NDVs);
 
 		// clean up
-		groupby_cols_for_stats->Release();
-		computed_groupby_cols->Release();
-		NDVs->Release();
+
+
 
 		agg_rows = std::min(std::max(CStatistics::MinRows.Get(), groups.Get()),
 							input_stats->Rows().Get());

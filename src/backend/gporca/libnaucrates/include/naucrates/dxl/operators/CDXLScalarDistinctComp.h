@@ -13,10 +13,9 @@
 #define GPDXL_CDXLScalarDistinctComp_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalarComp.h"
-
-
 namespace gpdxl
 {
 // indices of scalar distinct comparison elements in the children array
@@ -61,7 +60,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarDistinct == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarDistinctComp> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarDistinctComp>(dxl_op);
 	}
 
 	// does the operator return a boolean result

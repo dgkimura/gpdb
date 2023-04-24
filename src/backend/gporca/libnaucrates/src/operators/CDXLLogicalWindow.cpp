@@ -35,8 +35,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalWindow::CDXLLogicalWindow(CMemoryPool *mp,
-									 CDXLWindowSpecArray *window_spec_array)
+CDXLLogicalWindow::CDXLLogicalWindow(
+	CMemoryPool *mp, gpos::Ref<CDXLWindowSpecArray> window_spec_array)
 	: CDXLLogical(mp), m_window_spec_array(window_spec_array)
 {
 	GPOS_ASSERT(nullptr != m_window_spec_array);
@@ -53,7 +53,6 @@ CDXLLogicalWindow::CDXLLogicalWindow(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalWindow::~CDXLLogicalWindow()
 {
-	m_window_spec_array->Release();
 }
 
 //---------------------------------------------------------------------------

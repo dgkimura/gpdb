@@ -13,9 +13,9 @@
 #define GPDXL_CDXLLogicalSelect_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalSelect == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalSelect> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalSelect>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

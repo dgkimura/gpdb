@@ -13,10 +13,10 @@
 #define GPDXL_CDXLLogicalDelete_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -42,7 +42,7 @@ private:
 	ULONG m_segid_colid;
 
 	// list of deletion column ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 public:
 	CDXLLogicalDelete(const CDXLLogicalDelete &) = delete;
@@ -50,7 +50,7 @@ public:
 	// ctor
 	CDXLLogicalDelete(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
 					  ULONG ctid_colid, ULONG segid_colid,
-					  ULongPtrArray *delete_colid_array);
+					  gpos::Ref<ULongPtrArray> delete_colid_array);
 
 	// dtor
 	~CDXLLogicalDelete() override;
@@ -83,7 +83,7 @@ public:
 	}
 
 	// deletion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDeletionColIdArray() const
 	{
 		return m_deletion_colid_array;
@@ -107,7 +107,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalDelete == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalDelete> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalDelete>(dxl_op);
 	}
 };
 }  // namespace gpdxl

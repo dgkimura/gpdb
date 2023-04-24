@@ -72,18 +72,18 @@ CXformImplementSplit::Transform(gpos::Ref<CXformContext> pxfctxt,
 								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalSplit> popSplit = CLogicalSplit::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
-	CColRefArray *pdrgpcrDelete = popSplit->PdrgpcrDelete();
-	pdrgpcrDelete->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrDelete = popSplit->PdrgpcrDelete();
 
-	CColRefArray *pdrgpcrInsert = popSplit->PdrgpcrInsert();
-	pdrgpcrInsert->AddRef();
+
+	gpos::Ref<CColRefArray> pdrgpcrInsert = popSplit->PdrgpcrInsert();
+
 
 	gpos::Ref<CColRef> pcrAction = popSplit->PcrAction();
 	gpos::Ref<CColRef> pcrCtid = popSplit->PcrCtid();
@@ -92,8 +92,8 @@ CXformImplementSplit::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// child of Split operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprProjList = (*pexpr)[1];
-	pexprChild->AddRef();
-	pexprProjList->AddRef();
+
+
 
 	// create physical Split
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(

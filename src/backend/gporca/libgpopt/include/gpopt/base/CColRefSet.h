@@ -25,7 +25,7 @@ namespace gpopt
 class CColRefSet;
 
 // short hand for colref set array
-using CColRefSetArray = CDynamicPtrArray<CColRefSet, CleanupRelease>;
+using CColRefSetArray = gpos::Vector<gpos::Ref<CColRefSet>>;
 
 // hash map mapping CColRef -> CColRefSet
 using ColRefToColRefSetMap =
@@ -71,7 +71,7 @@ public:
 	explicit CColRefSet(CMemoryPool *mp, const CColRefSet &);
 
 	// ctor, copy from col refs array
-	CColRefSet(CMemoryPool *mp, const CColRefArray *colref_array,
+	CColRefSet(CMemoryPool *mp, const gpos::Ref<CColRefArray> colref_array,
 			   ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
 
 	// dtor
@@ -90,7 +90,7 @@ public:
 	void Include(const gpos::Ref<CColRef> colref);
 
 	// include column array
-	void Include(const CColRefArray *colref_array);
+	void Include(const gpos::Ref<CColRefArray> colref_array);
 
 	// include column set
 	void Include(const gpos::Ref<CColRefSet> pcrs);
@@ -99,7 +99,7 @@ public:
 	void Exclude(const gpos::Ref<CColRef> colref);
 
 	// remove column array
-	void Exclude(const CColRefArray *colref_array);
+	void Exclude(const gpos::Ref<CColRefArray> colref_array);
 
 	// remove column set
 	void Exclude(const gpos::Ref<CColRefSet> pcrs);
@@ -109,20 +109,21 @@ public:
 				 const gpos::Ref<CColRef> pcrIn);
 
 	// replace column array with another column array
-	void Replace(const CColRefArray *pdrgpcrOut, const CColRefArray *pdrgpcrIn);
+	void Replace(const gpos::Ref<CColRefArray> pdrgpcrOut,
+				 const gpos::Ref<CColRefArray> pdrgpcrIn);
 
 	// check if the current colrefset is a subset of any of the colrefsets
 	// in the given array
-	BOOL FContained(const CColRefSetArray *pdrgpcrs);
+	BOOL FContained(const gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// check if current colrefset intersects with the given colrefset
 	BOOL FIntersects(const gpos::Ref<CColRefSet> pcrs);
 
 	// convert to array
-	CColRefArray *Pdrgpcr(CMemoryPool *mp) const;
+	gpos::Ref<CColRefArray> Pdrgpcr(CMemoryPool *mp) const;
 
 	// convert to id colref map
-	IntToColRefMap *Phmicr(CMemoryPool *mp) const;
+	gpos::Ref<IntToColRefMap> Phmicr(CMemoryPool *mp) const;
 
 	// hash function
 	ULONG HashValue();
@@ -132,10 +133,11 @@ public:
 	IOstream &OsPrint(IOstream &os, ULONG ulLenMax) const;
 
 	// extract all column ids
-	void ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const;
+	void ExtractColIds(CMemoryPool *mp, gpos::Ref<ULongPtrArray> colids) const;
 
 	// are the columns in the column reference set covered by the array of column ref sets
-	static BOOL FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs);
+	static BOOL FCovered(gpos::Ref<CColRefSetArray> pdrgpcrs,
+						 gpos::Ref<CColRefSet> pcrs);
 
 };	// class CColRefSet
 

@@ -45,7 +45,6 @@ CParseHandlerMetadataObject::CParseHandlerMetadataObject(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 {
-	SafeRelease(m_imd_obj);
 }
 
 //---------------------------------------------------------------------------

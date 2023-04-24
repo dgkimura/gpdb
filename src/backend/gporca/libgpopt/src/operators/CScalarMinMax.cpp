@@ -55,7 +55,6 @@ CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 //---------------------------------------------------------------------------
 CScalarMinMax::~CScalarMinMax()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

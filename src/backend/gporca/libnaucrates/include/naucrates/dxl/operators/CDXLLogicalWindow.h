@@ -13,11 +13,11 @@
 #define GPDXL_CDXLLogicalWindow_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLWindowSpec.h"
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -32,14 +32,15 @@ class CDXLLogicalWindow : public CDXLLogical
 {
 private:
 	// array of window specifications
-	CDXLWindowSpecArray *m_window_spec_array;
+	gpos::Ref<CDXLWindowSpecArray> m_window_spec_array;
 
 	// private copy ctor
 	CDXLLogicalWindow(CDXLLogicalWindow &);
 
 public:
 	//ctor
-	CDXLLogicalWindow(CMemoryPool *mp, CDXLWindowSpecArray *pdrgpdxlwinspec);
+	CDXLLogicalWindow(CMemoryPool *mp,
+					  gpos::Ref<CDXLWindowSpecArray> pdrgpdxlwinspec);
 
 	//dtor
 	~CDXLLogicalWindow() override;
@@ -65,7 +66,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalWindow == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalWindow> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalWindow>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

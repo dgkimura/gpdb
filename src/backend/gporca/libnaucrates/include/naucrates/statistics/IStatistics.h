@@ -121,7 +121,7 @@ public:
 	virtual CDouble Width() const = 0;
 
 	// what is the width in bytes of set of column id's
-	virtual CDouble Width(ULongPtrArray *colids) const = 0;
+	virtual CDouble Width(gpos::Ref<ULongPtrArray> colids) const = 0;
 
 	// what is the width in bytes of set of column references
 	virtual CDouble Width(CMemoryPool *mp,
@@ -141,22 +141,22 @@ public:
 	// inner join with another stats structure
 	virtual gpos::Ref<IStatistics> CalcInnerJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats) const = 0;
 
 	// LOJ with another stats structure
 	virtual gpos::Ref<IStatistics> CalcLOJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats) const = 0;
 
 	// semi join stats computation
 	virtual gpos::Ref<IStatistics> CalcLSJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats) const = 0;
 
 	// anti semi join
 	virtual gpos::Ref<IStatistics> CalcLASJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats,
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats,
 		BOOL DoIgnoreLASJHistComputation) const = 0;
 
 	// return required props associated with stats object
@@ -178,7 +178,7 @@ public:
 
 	// copy stats with remapped column ids
 	virtual gpos::Ref<IStatistics> CopyStatsWithRemap(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist = true) const = 0;
 
 	// return a set of column references we have stats for
@@ -208,7 +208,7 @@ operator<<(IOstream &os, IStatistics &stats)
 }
 
 // dynamic array for derived stats
-using IStatisticsArray = CDynamicPtrArray<IStatistics, CleanupRelease>;
+using IStatisticsArray = gpos::Vector<gpos::Ref<IStatistics>>;
 }  // namespace gpnaucrates
 
 #endif	// !GPNAUCRATES_IStatistics_H

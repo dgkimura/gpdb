@@ -33,9 +33,9 @@ class CDistributionSpecHashed : public CDistributionSpecRandom
 {
 private:
 	// array of distribution expressions
-	CExpressionArray *m_pdrgpexpr;
+	gpos::Ref<CExpressionArray> m_pdrgpexpr;
 
-	IMdIdArray *m_opfamilies;
+	gpos::Ref<IMdIdArray> m_opfamilies;
 
 	// are NULLS consistently distributed
 	BOOL m_fNullsColocated;
@@ -46,7 +46,7 @@ private:
 	// array of expression arrays, an array at position n
 	// is the list of expression which are equivalent to the distribution expr
 	// at position n in m_pdrgpexpr array.
-	CExpressionArrays *m_equiv_hash_exprs;
+	gpos::Ref<CExpressionArrays> m_equiv_hash_exprs;
 
 	// check if specs are compatible wrt to co-location of nulls;
 	// HD1 satisfies HD2 if:
@@ -76,18 +76,20 @@ public:
 	CDistributionSpecHashed(const CDistributionSpecHashed &) = delete;
 
 	// ctor
-	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-							IMdIdArray *opfamilies = nullptr);
+	CDistributionSpecHashed(gpos::Ref<CExpressionArray> pdrgpexpr,
+							BOOL fNullsColocated,
+							gpos::Ref<IMdIdArray> opfamilies = nullptr);
 
 	// ctor
-	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
+	CDistributionSpecHashed(gpos::Ref<CExpressionArray> pdrgpexpr,
+							BOOL fNullsColocated,
 							gpos::Ref<CDistributionSpecHashed> pdshashedEquiv,
-							IMdIdArray *opfamilies = nullptr);
+							gpos::Ref<IMdIdArray> opfamilies = nullptr);
 
 	static gpos::Ref<CDistributionSpecHashed> MakeHashedDistrSpec(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv,
-		IMdIdArray *opfamilies);
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
+		BOOL fNullsColocated, gpos::Ref<CDistributionSpecHashed> pdshashedEquiv,
+		gpos::Ref<IMdIdArray> opfamilies);
 
 	// dtor
 	~CDistributionSpecHashed() override;
@@ -108,7 +110,7 @@ public:
 	}
 
 	// expression array accessor
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr;
@@ -128,7 +130,7 @@ public:
 		return m_pdshashedEquiv;
 	}
 
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	Opfamilies() const
 	{
 		return m_opfamilies;
@@ -160,7 +162,7 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::Ref<CDistributionSpec> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// strip off any equivalent columns embedded in the distribution spec
@@ -169,7 +171,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdPropPlan> prpp,
-						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function for hashed distribution spec
@@ -188,7 +190,8 @@ public:
 
 	// return a hashed distribution on the maximal hashable subset of given columns
 	static gpos::Ref<CDistributionSpecHashed> PdshashedMaximal(
-		CMemoryPool *mp, CColRefArray *colref_array, BOOL fNullsColocated);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		BOOL fNullsColocated);
 
 	// conversion function
 	static gpos::Ref<CDistributionSpecHashed>
@@ -196,13 +199,13 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pds);
 		gpos::Ref<CDistributionSpecHashed> pdsHashed =
-			dynamic_cast<gpos::Ref<CDistributionSpecHashed> >(pds);
+			gpos::dyn_cast<CDistributionSpecHashed>(pds);
 		GPOS_ASSERT(nullptr != pdsHashed);
 
 		return pdsHashed;
 	}
 
-	CExpressionArrays *
+	gpos::Ref<CExpressionArrays>
 	HashSpecEquivExprs() const
 	{
 		return m_equiv_hash_exprs;
@@ -212,7 +215,8 @@ public:
 							   CExpressionHandle &expression_handle);
 
 	// does the current spec or equivalent spec cover the input expression array
-	BOOL IsCoveredBy(const CExpressionArray *dist_cols_expr_array) const;
+	BOOL IsCoveredBy(
+		const gpos::Ref<CExpressionArray> dist_cols_expr_array) const;
 
 	// create a copy of the distribution spec
 	gpos::Ref<CDistributionSpecHashed> Copy(CMemoryPool *mp);
@@ -222,7 +226,7 @@ public:
 											BOOL fNullsColocated);
 
 	// get distribution expr array from the current and its equivalent spec
-	CExpressionArrays *GetAllDistributionExprs(CMemoryPool *mp);
+	gpos::Ref<CExpressionArrays> GetAllDistributionExprs(CMemoryPool *mp);
 
 	// return a new spec created by merging the current with the input spec
 	gpos::Ref<CDistributionSpecHashed> Combine(

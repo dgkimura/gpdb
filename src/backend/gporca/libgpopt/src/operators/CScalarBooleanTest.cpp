@@ -120,7 +120,7 @@ CScalarBooleanTest::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBooleanTest::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarBooleanTest::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 == pdrgpulChildren->Size());

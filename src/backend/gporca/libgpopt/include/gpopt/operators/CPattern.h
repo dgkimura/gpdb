@@ -66,7 +66,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
@@ -76,7 +76,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FPattern());
 
-		return dynamic_cast<gpos::Ref<CPattern> >(pop);
+		return gpos::dyn_cast<CPattern>(pop);
 	}
 
 	// helper to check multi-node pattern

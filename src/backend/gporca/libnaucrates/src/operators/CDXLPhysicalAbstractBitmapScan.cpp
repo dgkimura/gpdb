@@ -30,7 +30,6 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 {
-	m_dxl_table_descr->Release();
 }
 
 #ifdef GPOS_DEBUG

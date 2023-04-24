@@ -77,7 +77,7 @@ CXformCTEAnchor2Sequence::Transform(gpos::Ref<CXformContext> pxfctxt,
 									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// ExfExpandFullOuterJoin converts a LogicalFullJoin to a CTE with a UnionAll
@@ -104,11 +104,11 @@ CXformCTEAnchor2Sequence::Transform(gpos::Ref<CXformContext> pxfctxt,
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 
-	pexprProducer->AddRef();
+
 
 	// child of CTE anchor
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 
 	// create logical sequence
 	gpos::Ref<CExpression> pexprSequence = GPOS_NEW(mp) CExpression(

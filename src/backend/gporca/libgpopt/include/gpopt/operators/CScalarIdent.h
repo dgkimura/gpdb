@@ -92,7 +92,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 
@@ -116,7 +116,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarIdent == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CScalarIdent> >(pop);
+		return gpos::dyn_cast<CScalarIdent>(pop);
 	}
 
 	// the type of the scalar expression

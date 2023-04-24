@@ -13,10 +13,9 @@
 #define GPDXL_CDXLScalarJoinFilter_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLScalarFilter.h"
-
-
 namespace gpdxl
 {
 //---------------------------------------------------------------------------
@@ -51,7 +50,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarJoinFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLScalarJoinFilter> >(dxl_op);
+		return gpos::dyn_cast<CDXLScalarJoinFilter>(dxl_op);
 	}
 
 	// does the operator return a boolean result

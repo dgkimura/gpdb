@@ -42,7 +42,7 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -80,25 +80,21 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 	pcrsThree->Include(pcrThree);
 	GPOS_ASSERT(pcrsThree->Size() == 1);
 
-	CColRefSetArray *pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
-	pcrs->AddRef();
-	pcrsTwo->AddRef();
+	gpos::Ref<CColRefSetArray> pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
+
+
 	pdrgpcrs->Append(pcrs);
 	pdrgpcrs->Append(pcrsTwo);
 	GPOS_ASSERT(!CUtils::FEquivalanceClassesDisjoint(mp, pdrgpcrs));
 
-	CColRefSetArray *pdrgpcrsTwo = GPOS_NEW(mp) CColRefSetArray(mp);
-	pcrs->AddRef();
-	pcrsThree->AddRef();
+	gpos::Ref<CColRefSetArray> pdrgpcrsTwo = GPOS_NEW(mp) CColRefSetArray(mp);
+
+
 	pdrgpcrsTwo->Append(pcrs);
 	pdrgpcrsTwo->Append(pcrsThree);
 	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(mp, pdrgpcrsTwo));
 
-	pcrsThree->Release();
-	pcrsTwo->Release();
-	pcrs->Release();
-	pdrgpcrs->Release();
-	pdrgpcrsTwo->Release();
+
 
 	return GPOS_OK;
 }
@@ -114,7 +110,7 @@ CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 
 	// Setup an MD cache with a file-based provider
 	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -144,28 +140,24 @@ CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 
 	// Generate equivalence classes
 	INT setBoundaryFirst[] = {2, 5, 7};
-	CColRefSetArray *pdrgpFirst =
+	gpos::Ref<CColRefSetArray> pdrgpFirst =
 		CTestUtils::createEquivalenceClasses(mp, pcrs, setBoundaryFirst);
 
 	INT setBoundarySecond[] = {1, 4, 5, 6};
-	CColRefSetArray *pdrgpSecond =
+	gpos::Ref<CColRefSetArray> pdrgpSecond =
 		CTestUtils::createEquivalenceClasses(mp, pcrs, setBoundarySecond);
 
 	INT setBoundaryExpected[] = {1, 2, 4, 5, 6, 7};
-	CColRefSetArray *pdrgpIntersectExpectedOp =
+	gpos::Ref<CColRefSetArray> pdrgpIntersectExpectedOp =
 		CTestUtils::createEquivalenceClasses(mp, pcrs, setBoundaryExpected);
 
-	CColRefSetArray *pdrgpResult =
+	gpos::Ref<CColRefSetArray> pdrgpResult =
 		CUtils::PdrgpcrsIntersectEquivClasses(mp, pdrgpFirst, pdrgpSecond);
 	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(mp, pdrgpResult));
 	GPOS_ASSERT(CUtils::FEquivalanceClassesEqual(mp, pdrgpResult,
 												 pdrgpIntersectExpectedOp));
 
-	pcrs->Release();
-	pdrgpFirst->Release();
-	pdrgpResult->Release();
-	pdrgpSecond->Release();
-	pdrgpIntersectExpectedOp->Release();
+
 
 	return GPOS_OK;
 }

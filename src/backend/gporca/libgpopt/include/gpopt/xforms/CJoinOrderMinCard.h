@@ -38,8 +38,9 @@ private:
 
 public:
 	// ctor
-	CJoinOrderMinCard(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-					  CExpressionArray *pdrgpexprConjuncts);
+	CJoinOrderMinCard(CMemoryPool *mp,
+					  gpos::Ref<CExpressionArray> pdrgpexprComponents,
+					  gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderMinCard() override;

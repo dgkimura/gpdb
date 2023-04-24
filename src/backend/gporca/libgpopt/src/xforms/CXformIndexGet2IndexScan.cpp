@@ -81,7 +81,7 @@ CXformIndexGet2IndexScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalIndexGet> pop =
@@ -97,19 +97,18 @@ CXformIndexGet2IndexScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 		return;
 	}
 
-	pindexdesc->AddRef();
-	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
+
+	gpos::Ref<CColRefArray> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
+
 
 	gpos::Ref<COrderSpec> pos = pop->Pos();
 	GPOS_ASSERT(nullptr != pos);
-	pos->AddRef();
+
 
 	// addref all children
-	pexprIndexCond->AddRef();
+
 
 	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,

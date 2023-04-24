@@ -67,7 +67,7 @@ CXformDelete2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CLogicalDelete> popDelete =
@@ -77,10 +77,10 @@ CXformDelete2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popDelete->Ptabdesc();
-	ptabdesc->AddRef();
 
-	CColRefArray *colref_array = popDelete->Pdrgpcr();
-	colref_array->AddRef();
+
+	gpos::Ref<CColRefArray> colref_array = popDelete->Pdrgpcr();
+
 
 	gpos::Ref<CColRef> pcrCtid = popDelete->PcrCtid();
 
@@ -88,7 +88,7 @@ CXformDelete2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// child of delete operator
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+
 
 	// create logical DML
 	gpos::Ref<CExpression> pexprAlt = CXformUtils::PexprLogicalDMLOverProject(

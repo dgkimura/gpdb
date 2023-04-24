@@ -13,10 +13,10 @@
 #define GPDXL_CDXLLogicalUpdate_H
 
 #include "gpos/base.h"
+#include "gpos/common/Casting.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
-
 namespace gpdxl
 {
 using namespace gpmd;
@@ -42,10 +42,10 @@ private:
 	ULONG m_segid_colid;
 
 	// list of deletion column ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 	// list of insertion column ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::Ref<ULongPtrArray> m_insert_colid_array;
 
 public:
 	CDXLLogicalUpdate(const CDXLLogicalUpdate &) = delete;
@@ -53,8 +53,8 @@ public:
 	// ctor
 	CDXLLogicalUpdate(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
 					  ULONG ctid_colid, ULONG segid_colid,
-					  ULongPtrArray *delete_colid_array,
-					  ULongPtrArray *insert_colid_array);
+					  gpos::Ref<ULongPtrArray> delete_colid_array,
+					  gpos::Ref<ULongPtrArray> insert_colid_array);
 
 	// dtor
 	~CDXLLogicalUpdate() override;
@@ -87,14 +87,14 @@ public:
 	}
 
 	// deletion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDeletionColIdArray() const
 	{
 		return m_deletion_colid_array;
 	}
 
 	// insertion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetInsertionColIdArray() const
 	{
 		return m_insert_colid_array;
@@ -118,7 +118,7 @@ public:
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalUpdate == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<gpos::Ref<CDXLLogicalUpdate> >(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalUpdate>(dxl_op);
 	}
 };
 }  // namespace gpdxl

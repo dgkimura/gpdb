@@ -35,7 +35,7 @@ private:
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// columns to delete
-	CColRefArray *m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// ctid column
 	gpos::Ref<CColRef> m_pcrCtid;
@@ -51,8 +51,8 @@ public:
 
 	// ctor
 	CLogicalDelete(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
-				   CColRefArray *colref_array, gpos::Ref<CColRef> pcrCtid,
-				   gpos::Ref<CColRef> pcrSegmentId);
+				   gpos::Ref<CColRefArray> colref_array,
+				   gpos::Ref<CColRef> pcrCtid, gpos::Ref<CColRef> pcrSegmentId);
 
 	// dtor
 	~CLogicalDelete() override;
@@ -72,7 +72,7 @@ public:
 	}
 
 	// columns to delete
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
@@ -114,7 +114,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(
@@ -171,7 +171,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -191,7 +191,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDelete == pop->Eopid());
 
-		return dynamic_cast<gpos::Ref<CLogicalDelete> >(pop);
+		return gpos::dyn_cast<CLogicalDelete>(pop);
 	}
 
 	// debug print

@@ -35,8 +35,9 @@ private:
 	// and output columns
 	static gpos::Ref<CExpression> PexprLogicalJoinOverCTEs(
 		CMemoryPool *mp, EdxlJoinType edxljointype, ULONG ulLeftCTEId,
-		CColRefArray *pdrgpcrLeft, ULONG ulRightCTEId,
-		CColRefArray *pdrgpcrRight, gpos::Ref<CExpression> pexprScalar);
+		gpos::Ref<CColRefArray> pdrgpcrLeft, ULONG ulRightCTEId,
+		gpos::Ref<CColRefArray> pdrgpcrRight,
+		gpos::Ref<CExpression> pexprScalar);
 
 public:
 	CXformExpandFullOuterJoin(const CXformExpandFullOuterJoin &) = delete;

@@ -34,9 +34,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CJoinOrderMinCard::CJoinOrderMinCard(CMemoryPool *mp,
-									 CExpressionArray *pdrgpexprComponents,
-									 CExpressionArray *pdrgpexprConjuncts)
+CJoinOrderMinCard::CJoinOrderMinCard(
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+	gpos::Ref<CExpressionArray> pdrgpexprConjuncts)
 	: CJoinOrder(mp, pdrgpexprComponents, pdrgpexprConjuncts,
 				 true /* m_include_loj_childs */),
 	  m_pcompResult(nullptr)
@@ -61,7 +61,6 @@ CJoinOrderMinCard::CJoinOrderMinCard(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CJoinOrderMinCard::~CJoinOrderMinCard()
 {
-	SafeRelease(m_pcompResult);
 }
 
 //---------------------------------------------------------------------------
@@ -111,11 +110,10 @@ CJoinOrderMinCard::PexprExpand()
 			{
 				pcompBest = pcompCurrent;
 				dMinRows = rows;
-				pcompTemp->AddRef();
-				SafeRelease(pcompBestResult);
+
+
 				pcompBestResult = pcompTemp;
 			}
-			pcompTemp->Release();
 		}
 
 #ifndef GPOS_DEBUG
@@ -135,7 +133,7 @@ CJoinOrderMinCard::PexprExpand()
 		// join alternative, thus there will be atleast one component
 		// marked as pcompBest
 		pcompBest->m_fUsed = true;
-		m_pcompResult->Release();
+
 		m_pcompResult = pcompBestResult;
 
 		// mark used edges to avoid including them multiple times
@@ -145,7 +143,7 @@ CJoinOrderMinCard::PexprExpand()
 	GPOS_ASSERT(nullptr != m_pcompResult->m_pexpr);
 
 	gpos::Ref<CExpression> pexprResult = m_pcompResult->m_pexpr;
-	pexprResult->AddRef();
+
 
 	return pexprResult;
 }

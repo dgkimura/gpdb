@@ -61,7 +61,6 @@ CScalarBitmapBoolOp::CScalarBitmapBoolOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CScalarBitmapBoolOp::~CScalarBitmapBoolOp()
 {
-	m_pmdidBitmapType->Release();
 }
 
 //---------------------------------------------------------------------------

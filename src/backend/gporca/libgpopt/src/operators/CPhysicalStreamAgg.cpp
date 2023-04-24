@@ -33,10 +33,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalStreamAgg::CPhysicalStreamAgg(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-	CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	BOOL fGeneratesDuplicates, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
 				   fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution),
@@ -56,11 +57,12 @@ CPhysicalStreamAgg::CPhysicalStreamAgg(
 //
 //---------------------------------------------------------------------------
 void
-CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
+CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp,
+								  gpos::Ref<CColRefArray> pdrgpcrOrder)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOrder);
 
-	SafeRelease(m_pos);
+
 	m_pos = GPOS_NEW(mp) COrderSpec(mp);
 	const ULONG size = pdrgpcrOrder->Size();
 	for (ULONG ul = 0; ul < size; ul++)
@@ -71,7 +73,7 @@ CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
 		// a pointer to a cached object
 		gpos::Ref<gpmd::IMDId> mdid =
 			colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
-		mdid->AddRef();
+
 
 		m_pos->Append(mdid, colref, COrderSpec::EntLast);
 	}
@@ -88,8 +90,6 @@ CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
 //---------------------------------------------------------------------------
 CPhysicalStreamAgg::~CPhysicalStreamAgg()
 {
-	m_pcrsMinimalGrpCols->Release();
-	m_pos->Release();
 }
 
 
@@ -106,7 +106,7 @@ CPhysicalStreamAgg::~CPhysicalStreamAgg()
 gpos::Ref<COrderSpec>
 CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
 								gpos::Ref<COrderSpec> posRequired,
-								CColRefArray *pdrgpcrGrp)
+								gpos::Ref<CColRefArray> pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != posRequired);
 
@@ -136,7 +136,7 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
 				const_cast<gpos::Ref<CColRef> >(posRequired->Pcr(ul));
 			gpos::Ref<IMDId> mdid = posRequired->GetMdIdSortOp(ul);
 			COrderSpec::ENullTreatment ent = posRequired->Ent(ul);
-			mdid->AddRef();
+
 			pos->Append(mdid, colref, ent);
 		}
 
@@ -149,13 +149,13 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
 			{
 				gpos::Ref<IMDId> mdid =
 					colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
-				mdid->AddRef();
+
 				pos->Append(mdid, colref, COrderSpec::EntLast);
 			}
 		}
 	}
-	pcrsGrpCols->Release();
-	pcrsReqd->Release();
+
+
 
 	return pos;
 }
@@ -169,15 +169,15 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 gpos::Ref<COrderSpec> posRequired,
-										 ULONG
+CPhysicalStreamAgg::PosRequiredStreamAgg(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<COrderSpec> posRequired,
+	ULONG
 #ifdef GPOS_DEBUG
-											 child_index
+		child_index
 #endif	// GPOS_DEBUG
-										 ,
-										 CColRefArray *pdrgpcrGrp) const
+	,
+	gpos::Ref<CColRefArray> pdrgpcrGrp) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -185,7 +185,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	if (nullptr == pos)
 	{
 		// failed to find a covering order spec, use local order spec
-		m_pos->AddRef();
+
 		pos = m_pos;
 	}
 
@@ -199,18 +199,18 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	{
 		gpos::Ref<CColRefSet> pcrsReqd = posRequired->PcrsUsed(m_mp);
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrsReqd, exprhdl);
-		pcrsReqd->Release();
+
 
 		if (!fUsesDefinedCols)
 		{
 			// we are grouping on child's key,
 			// stream agg does not need to sort child and we can pass through input spec
-			pos->Release();
-			posRequired->AddRef();
+
+
 			pos = posRequired;
 		}
 	}
-	pcrs->Release();
+
 
 	return pos;
 }

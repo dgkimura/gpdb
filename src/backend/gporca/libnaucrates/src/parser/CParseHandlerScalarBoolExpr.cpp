@@ -158,10 +158,10 @@ CParseHandlerScalarBoolExpr::EndElement(const XMLCh *const,	 // element_uri,
 
 	const ULONG size = this->Length();
 	// If the operation is NOT then it only has one child.
-	if (((((gpos::Ref<CDXLScalarBoolExpr>) m_dxl_node->GetOperator())
+	if (((gpos::dyn_cast<CDXLScalarBoolExpr>(m_dxl_node->GetOperator())
 			  ->GetDxlBoolTypeStr() == Edxlnot) &&
 		 (1 != size)) ||
-		((((gpos::Ref<CDXLScalarBoolExpr>) m_dxl_node->GetOperator())
+		((gpos::dyn_cast<CDXLScalarBoolExpr>(m_dxl_node->GetOperator())
 			  ->GetDxlBoolTypeStr() != Edxlnot) &&
 		 (2 > size)))
 	{

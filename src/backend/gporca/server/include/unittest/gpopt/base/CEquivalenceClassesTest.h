@@ -22,9 +22,8 @@ public:
 	static GPOS_RESULT EresUnittest();
 	static GPOS_RESULT EresUnittest_NotDisjointEquivalanceClasses();
 	static GPOS_RESULT EresUnittest_IntersectEquivalanceClasses();
-	static CColRefSetArray *createEquivalenceClasses(CMemoryPool *mp,
-													 gpos::Ref<CColRefSet> pcrs,
-													 int breakpoints[]);
+	static gpos::Ref<CColRefSetArray> createEquivalenceClasses(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs, int breakpoints[]);
 
 };	// class CEquivalenceClassesTest
 }  // namespace gpopt

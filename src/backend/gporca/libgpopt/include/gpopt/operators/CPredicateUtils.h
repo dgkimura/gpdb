@@ -40,11 +40,11 @@ class CPredicateUtils
 private:
 	// collect conjuncts recursively
 	static void CollectConjuncts(gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexpr);
+								 gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// collect disjuncts recursively
 	static void CollectDisjuncts(gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexpr);
+								 gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// check if a conjunct/disjunct can be skipped
 	static BOOL FSkippable(gpos::Ref<CExpression> pexpr, BOOL fConjunction);
@@ -67,20 +67,21 @@ private:
 	static BOOL FCheckPredicateImplication(gpos::Ref<CExpression> pexprPred);
 
 	// check if predicate is implied by given equivalence classes
-	static BOOL FImpliedPredicate(gpos::Ref<CExpression> pexprPred,
-								  CColRefSetArray *pdrgpcrsEquivClasses);
+	static BOOL FImpliedPredicate(
+		gpos::Ref<CExpression> pexprPred,
+		gpos::Ref<CColRefSetArray> pdrgpcrsEquivClasses);
 
 	// helper to create index lookup comparison predicate with index key on left side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnLeft(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// helper to create index lookup comparison predicate with index key on right side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnRight(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// for all columns that appear in the given expression and are members
 	// of the given set, replace these columns with NULL constants
@@ -121,7 +122,8 @@ public:
 							IMDType::ECmpType cmp_type);
 
 	// is the given array of expressions contain a volatile function like random()
-	static BOOL FContainsVolatileFunction(CExpressionArray *pdrgpexpr);
+	static BOOL FContainsVolatileFunction(
+		gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// is the given expressions contain a volatile function like random()
 	static BOOL FContainsVolatileFunction(gpos::Ref<CExpression> pexpr);
@@ -157,8 +159,8 @@ public:
 
 	// generate a conjunction of INDF expressions between corresponding columns in the given arrays
 	static gpos::Ref<CExpression> PexprINDFConjunction(
-		CMemoryPool *mp, CColRefArray *pdrgpcrFirst,
-		CColRefArray *pdrgpcrSecond);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrFirst,
+		gpos::Ref<CColRefArray> pdrgpcrSecond);
 
 	// is the given expression of the form (col CMP/IS DISTINCT/IS NOT DISTINCT FROM constant)
 	// either the constant or the column can be casted
@@ -268,24 +270,25 @@ public:
 	// then collect the later's children and set the input columns of the new n-ary union/unionall operator
 	static void CollectGrandChildrenUnionUnionAll(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, ULONG child_index,
-		CExpressionArray *pdrgpexprResult, CColRef2dArray *pdrgdrgpcrResult);
+		gpos::Ref<CExpressionArray> pdrgpexprResult,
+		gpos::Ref<CColRef2dArray> pdrgdrgpcrResult);
 
 	// extract conjuncts from a scalar tree
-	static CExpressionArray *PdrgpexprConjuncts(CMemoryPool *mp,
-												gpos::Ref<CExpression> pexpr);
+	static gpos::Ref<CExpressionArray> PdrgpexprConjuncts(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// extract disjuncts from a scalar tree
-	static CExpressionArray *PdrgpexprDisjuncts(CMemoryPool *mp,
-												gpos::Ref<CExpression> pexpr);
+	static gpos::Ref<CExpressionArray> PdrgpexprDisjuncts(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// extract equality predicates on scalar identifier from a list of scalar expressions
-	static CExpressionArray *PdrgpexprPlainEqualities(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr);
+	static gpos::Ref<CExpressionArray> PdrgpexprPlainEqualities(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// create conjunction/disjunction
-	static gpos::Ref<CExpression> PexprConjDisj(CMemoryPool *mp,
-												CExpressionArray *Pdrgpexpr,
-												BOOL fConjunction);
+	static gpos::Ref<CExpression> PexprConjDisj(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> Pdrgpexpr,
+		BOOL fConjunction);
 
 	// create conjunction/disjunction of two expressions
 	static gpos::Ref<CExpression> PexprConjDisj(CMemoryPool *mp,
@@ -294,8 +297,8 @@ public:
 												BOOL fConjunction);
 
 	// create conjunction
-	static gpos::Ref<CExpression> PexprConjunction(CMemoryPool *mp,
-												   CExpressionArray *pdrgpexpr);
+	static gpos::Ref<CExpression> PexprConjunction(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// create conjunction of two expressions
 	static gpos::Ref<CExpression> PexprConjunction(
@@ -308,12 +311,12 @@ public:
 		gpos::Ref<CExpression> pexprTwo);
 
 	// expand disjuncts in the given array by converting ArrayComparison to AND/OR tree and deduplicating resulting disjuncts
-	static CExpressionArray *PdrgpexprExpandDisjuncts(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprDisjuncts);
+	static gpos::Ref<CExpressionArray> PdrgpexprExpandDisjuncts(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprDisjuncts);
 
 	// expand conjuncts in the given array by converting ArrayComparison to AND/OR tree and deduplicating resulting conjuncts
-	static CExpressionArray *PdrgpexprExpandConjuncts(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprConjuncts);
+	static gpos::Ref<CExpressionArray> PdrgpexprExpandConjuncts(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// check if the given expression is a boolean expression on the
 	// given column, e.g. if its of the form "ScalarIdent(colref)" or
@@ -336,8 +339,8 @@ public:
 									  gpos::Ref<CColRef> colref);
 
 	// create disjunction
-	static gpos::Ref<CExpression> PexprDisjunction(CMemoryPool *mp,
-												   CExpressionArray *Pdrgpexpr);
+	static gpos::Ref<CExpression> PexprDisjunction(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> Pdrgpexpr);
 
 	static gpos::Ref<CExpression> ValidatePartPruningExpr(
 		CMemoryPool *mp, gpos::Ref<CExpression> expr,
@@ -346,20 +349,20 @@ public:
 
 	// find a predicate that can be used for partition pruning with the given part key
 	static gpos::Ref<CExpression> PexprPartPruningPredicate(
-		CMemoryPool *mp, const CExpressionArray *pdrgpexpr,
+		CMemoryPool *mp, const gpos::Ref<CExpressionArray> pdrgpexpr,
 		gpos::Ref<CColRef> pcrPartKey, gpos::Ref<CExpression> pexprCol,
 		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allowNotEqualPreds);
 
 	// append the conjuncts from the given expression to the given array, removing
 	// any duplicates, and return the resulting array
-	static CExpressionArray *PdrgpexprAppendConjunctsDedup(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr,
+	static gpos::Ref<CExpressionArray> PdrgpexprAppendConjunctsDedup(
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
 		gpos::Ref<CExpression> pexpr);
 
 	// extract interesting conditions involving the partitioning keys
 	static gpos::Ref<CExpression> PexprExtractPredicatesOnPartKeys(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-		CColRef2dArray *pdrgpdrgpcrPartKeys,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrPartKeys,
 		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL fUseConstraints,
 		const gpos::Ref<IMDRelation> pmdrel = nullptr);
 
@@ -411,9 +414,11 @@ public:
 	// split predicates into those that refer to an index key, and those that don't
 	static void ExtractIndexPredicates(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CExpressionArray *pdrgpexprPredicate,
-		const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
-		CExpressionArray *pdrgpexprIndex, CExpressionArray *pdrgpexprResidual,
+		gpos::Ref<CExpressionArray> pdrgpexprPredicate,
+		const gpos::Ref<IMDIndex> pmdindex,
+		gpos::Ref<CColRefArray> pdrgpcrIndex,
+		gpos::Ref<CExpressionArray> pdrgpexprIndex,
+		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		gpos::Ref<CColRefSet> pcrsAcceptedOuterRefs =
 			nullptr,  // outer refs that are acceptable in an index predicate
 		BOOL allowArrayCmpForBTreeIndexes = false);
@@ -435,7 +440,7 @@ public:
 	static BOOL FValidSemiJoinCorrelations(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
 		gpos::Ref<CExpression> pexprInner,
-		CExpressionArray *pdrgpexprCorrelations);
+		gpos::Ref<CExpressionArray> pdrgpexprCorrelations);
 
 	// check if given expression is composed of simple column equalities that use columns from given column set
 	static BOOL FSimpleEqualityUsingCols(CMemoryPool *mp,
@@ -447,7 +452,7 @@ public:
 	static gpos::Ref<CExpression> PexprIndexLookup(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpPred, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
 		BOOL allowArrayCmpForBTreeIndexes);
 
 	// split given scalar expression into two conjunctions; without and with outer references
@@ -476,13 +481,13 @@ public:
 	// returns true iff the given predicate pexprPred is compatible with the given index pmdindex
 	static BOOL FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 										  const gpos::Ref<IMDIndex> pmdindex,
-										  CColRefArray *pdrgpcrIndex,
+										  gpos::Ref<CColRefArray> pdrgpcrIndex,
 										  CMDAccessor *md_accessor);
 
 	// returns true iff all predicates in the given array are compatible with the given index
-	static BOOL FCompatiblePredicates(CExpressionArray *pdrgpexprPred,
+	static BOOL FCompatiblePredicates(gpos::Ref<CExpressionArray> pdrgpexprPred,
 									  const gpos::Ref<IMDIndex> pmdindex,
-									  CColRefArray *pdrgpcrIndex,
+									  gpos::Ref<CColRefArray> pdrgpcrIndex,
 									  CMDAccessor *md_accessor);
 
 	// check if the expensive CNF conversion is beneficial in finding predicate for hash join
@@ -508,7 +513,8 @@ public:
 
 	// Check if the given exprs only contains conjuncts of strict comparison operators
 	// NB: This does NOT recurse into Boolean AND/OR operations
-	static BOOL ExprsContainsOnlyStrictComparisons(CExpressionArray *conjuncts);
+	static BOOL ExprsContainsOnlyStrictComparisons(
+		gpos::Ref<CExpressionArray> conjuncts);
 
 };	// class CPredicateUtils
 }  // namespace gpopt

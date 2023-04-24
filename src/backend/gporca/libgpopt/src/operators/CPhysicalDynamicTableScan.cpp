@@ -36,9 +36,10 @@ using namespace gpopt;
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrParts,
-	IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
 						   pdrgpcrOutput, pdrgpdrgpcrParts, partition_mdids,
 						   root_col_mapping_per_part)
@@ -68,10 +69,10 @@ CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CReqdPropPlan> prpplan,
-										IStatisticsArray *	// stats_ctxt
+CPhysicalDynamicTableScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray>	 // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(nullptr != prpplan);

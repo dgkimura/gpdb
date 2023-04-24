@@ -96,11 +96,11 @@ private:
 	gpos::Ref<COperator> m_pop{nullptr};
 
 	// array of child groups
-	CGroupArray *m_pdrgpgroup{nullptr};
+	gpos::Ref<CGroupArray> m_pdrgpgroup{nullptr};
 
 	// sorted array of children groups for faster comparison
 	// of order-insensitive operators
-	CGroupArray *m_pdrgpgroupSorted{nullptr};
+	gpos::Ref<CGroupArray> m_pdrgpgroupSorted{nullptr};
 
 	// back pointer to group
 	gpos::Ref<CGroup> m_pgroup{nullptr};
@@ -122,7 +122,7 @@ private:
 	EOptimizationLevel m_eol{EolLow};
 
 	// map of partial plans to their cost lower bound
-	PartialPlanToCostMap *m_ppartialplancostmap{nullptr};
+	gpos::Ref<PartialPlanToCostMap> m_ppartialplancostmap{nullptr};
 
 	// circular dependency state
 	ECircularDependency m_ecirculardependency;
@@ -157,7 +157,7 @@ private:
 
 	// check validity of group expression
 	BOOL FValidContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-					   COptimizationContextArray *pdrgpocChild);
+					   gpos::Ref<COptimizationContextArray> pdrgpocChild);
 
 	// remove cost context in hash table
 	gpos::Ref<CCostContext> PccRemove(gpos::Ref<COptimizationContext> poc,
@@ -178,7 +178,7 @@ public:
 
 	// ctor
 	CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
-					 CGroupArray *pdrgpgroup, CXform::EXformId exfid,
+					 gpos::Ref<CGroupArray> pdrgpgroup, CXform::EXformId exfid,
 					 gpos::Ref<CGroupExpression> pgexprOrigin,
 					 BOOL fIntermediate);
 
@@ -206,14 +206,13 @@ public:
 
 	// check if cost context already exists in group expression hash table
 	BOOL FCostContextExists(gpos::Ref<COptimizationContext> poc,
-							COptimizationContextArray *pdrgpoc);
+							gpos::Ref<COptimizationContextArray> pdrgpoc);
 
 	// compute and store expression's cost under a given context
-	gpos::Ref<CCostContext> PccComputeCost(CMemoryPool *mp,
-										   gpos::Ref<COptimizationContext> poc,
-										   ULONG ulOptReq,
-										   COptimizationContextArray *pdrgpoc,
-										   BOOL fPruned, CCost costLowerBound);
+	gpos::Ref<CCostContext> PccComputeCost(
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
+		gpos::Ref<COptimizationContextArray> pdrgpoc, BOOL fPruned,
+		CCost costLowerBound);
 
 	// compute a cost lower bound for plans, rooted by current group expression, and satisfying the given required properties
 	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
@@ -309,7 +308,7 @@ public:
 	BOOL
 	operator==(const CGroupExpression &gexpr) const
 	{
-		return gexpr.Matches(this);
+		return gexpr.Matches(SharedFromThis());
 	}
 
 	// equality function for hash table
@@ -335,7 +334,8 @@ public:
 	}
 
 	// static hash function for operator and group references
-	static ULONG HashValue(gpos::Ref<COperator> pop, CGroupArray *drgpgroup);
+	static ULONG HashValue(gpos::Ref<COperator> pop,
+						   gpos::Ref<CGroupArray> drgpgroup);
 
 	// static hash function for group expression
 	static ULONG HashValue(const CGroupExpression &);
@@ -368,7 +368,7 @@ public:
 	// check if transition to the given state is completed
 	BOOL FTransitioned(EState estate) const;
 
-	CGroupArray *
+	gpos::Ref<CGroupArray>
 	Pdrgpgroup() const
 	{
 		return m_pdrgpgroup;
@@ -379,8 +379,8 @@ public:
 									  ULONG ulOptReq);
 
 	// lookup all cost contexts matching given optimization context
-	CCostContextArray *PdrgpccLookupAll(CMemoryPool *mp,
-										gpos::Ref<COptimizationContext> poc);
+	gpos::Ref<CCostContextArray> PdrgpccLookupAll(
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc);
 
 	// insert a cost context in hash table
 	gpos::Ref<CCostContext> PccInsert(gpos::Ref<CCostContext> pcc);
@@ -388,8 +388,8 @@ public:
 	// derive statistics recursively on a given group expression
 	gpos::Ref<IStatistics> PstatsRecursiveDerive(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt,
-		BOOL fComputeRootStats = true);
+		gpos::Ref<CReqdPropRelational> prprel,
+		gpos::Ref<IStatisticsArray> stats_ctxt, BOOL fComputeRootStats = true);
 
 	// print driver
 	IOstream &OsPrint(IOstream &os) const;
