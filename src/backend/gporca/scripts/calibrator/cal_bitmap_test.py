@@ -28,10 +28,8 @@ import math
 import os
 import sys
 
-try:
-    from gppylib.db import dbconn
-except ImportError as e:
-    sys.exit('ERROR: Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
+import settings
+from utils import log_output, run_query, connect, select_version, execute_sql, select_first_int, timed_execute_n_times, execute_sql_arr
 
 # constants
 # -----------------------------------------------------------------------------
@@ -84,13 +82,10 @@ OPTIMIZER_DEFAULT_PLAN = "optimizer"
 # constants
 # only consider optimizer errors beyond x * sigma (standard deviation) as significant
 glob_sigma_diff = 3
-glob_log_file = None
 glob_exe_timeout = 40000
-glob_gpdb_major_version = 7
 glob_dim_table_rows = 10000
 
 # global variables that may be modified
-glob_verbose = False
 glob_rowcount = -1
 glob_appendonly = False
 
@@ -204,127 +199,8 @@ def parseargs():
     return args, parser
 
 
-def log_output(str):
-    if glob_verbose:
-        print(str)
-    if glob_log_file != None:
-        glob_log_file.write(str + "\n")
-
-
-# SQL related methods
-# -----------------------------------------------------------------------------
-
-def connect(host, port_num, db_name):
-    try:
-        dburl = dbconn.DbURL(hostname=host, port=port_num, dbname=db_name)
-        conn = dbconn.connect(dburl, encoding="UTF8", unsetSearchPath=False)
-
-    except Exception as e:
-        print(("Exception during connect: %s" % e))
-        quit()
-
-    return conn
-
-
-def select_version(conn):
-    global glob_gpdb_major_version
-    sqlStr = "SELECT version()"
-    curs = dbconn.query(conn, sqlStr)
-
-    rows = curs.fetchall()
-    for row in rows:
-        log_output(row[0])
-        glob_gpdb_major_version = int(re.sub(".*Greenplum Database ([0-9]*)\..*", "\\1", row[0]))
-        log_output("GPDB major version is %d" % glob_gpdb_major_version)
-
-    log_output("Backend pid:")
-    sqlStr = "SELECT pg_backend_pid()"
-    curs = dbconn.query(conn, sqlStr)
-
-    rows = curs.fetchall()
-    for row in rows:
-        log_output(str(row[0]))
-
-
-def execute_sql(conn, sqlStr):
-    try:
-        log_output("")
-        log_output("Executing query: %s" % sqlStr)
-        dbconn.execSQL(conn, sqlStr)
-    except Exception as e:
-        print("")
-        print(("Error executing query: %s; Reason: %s" % (sqlStr, e)))
-        dbconn.execSQL(conn, "abort")
-
-
-def select_first_int(conn, sqlStr):
-    try:
-        log_output("")
-        log_output("Executing query: %s" % sqlStr)
-        curs = dbconn.query(conn, sqlStr)
-        rows = curs.fetchall()
-        for row in rows:
-            return int(row[0])
-
-    except Exception as e:
-        print("")
-        print(("Error executing query: %s; Reason: %s" % (sqlStr, e)))
-        dbconn.execSQL(conn, "abort")
-
-
-def execute_sql_arr(conn, sqlStrArr):
-    for sqlStr in sqlStrArr:
-        execute_sql(conn, sqlStr)
-
-
-def execute_and_commit_sql(conn, sqlStr):
-    execute_sql(conn, sqlStr)
-    commit_db(conn)
-
-
 def commit_db(conn):
     execute_sql(conn, "commit")
-
-
-# run an SQL statement and return the elapsed wallclock time, in seconds
-def timed_execute_sql(conn, sqlStr):
-    start = time.time()
-    num_rows = select_first_int(conn, sqlStr)
-    end = time.time()
-    elapsed_time_in_msec = round((end - start) * 1000)
-    log_output("Elapsed time (msec): %d, rows: %d" % (elapsed_time_in_msec, num_rows))
-    return elapsed_time_in_msec, num_rows
-
-
-# run an SQL statement n times, unless it takes longer than a timeout
-
-def timed_execute_n_times(conn, sqlStr, exec_n_times):
-    sum_exec_times = 0.0
-    sum_square_exec_times = 0.0
-    e = 0
-    act_num_exes = exec_n_times
-    num_rows = -1
-    while e < act_num_exes:
-        exec_time, local_num_rows = timed_execute_sql(conn, sqlStr)
-        e = e + 1
-        sum_exec_times += exec_time
-        sum_square_exec_times += exec_time * exec_time
-        if num_rows >= 0 and local_num_rows != num_rows:
-            log_output("Inconsistent number of rows returned: %d and %d" % (num_rows, local_num_rows))
-        num_rows = local_num_rows
-        if exec_time > glob_exe_timeout:
-            # we exceeded the timeout, don't keep executing this long query
-            act_num_exes = e
-            log_output("Query %s exceeded the timeout of %d seconds" % (sqlStr, glob_exe_timeout))
-
-    # compute mean and standard deviation of the execution times
-    mean = sum_exec_times / act_num_exes
-    if exec_n_times == 1:
-        # be safe, avoid any rounding errors
-        variance = 0.0
-    else:
-        variance = sum_square_exec_times / act_num_exes - mean * mean
-    return (round(mean, 3), round(math.sqrt(variance), 3), act_num_exes, num_rows)
 
 
 # Explain a query and find a table scan or index scan in an explain output
@@ -337,14 +213,13 @@ def explain_index_scan(conn, sqlStr):
     try:
         log_output("")
         log_output("Executing query: %s" % ("explain " + sqlStr))
-        exp_curs = dbconn.query(conn, "explain " + sqlStr)
-        rows = exp_curs.fetchall()
+        rows = run_query(conn, "explain " + sqlStr)
         table_scan_pattern = TABLE_SCAN_PATTERN
         index_scan_pattern = INDEX_SCAN_PATTERN
         index_only_scan_pattern = INDEX_ONLY_SCAN_PATTERN
         bitmap_scan_pattern = BITMAP_SCAN_PATTERN
         fallback_pattern = FALLBACK_PATTERN
-        if (glob_gpdb_major_version) <= 5:
+        if (settings.glob_gpdb_major_version) <= 5:
             table_scan_pattern = TABLE_SCAN_PATTERN_V5
             index_scan_pattern = INDEX_SCAN_PATTERN_V5
             index_only_scan_pattern = INDEX_ONLY_SCAN_PATTERN_V5
@@ -387,8 +262,7 @@ def explain_join_scan(conn, sqlStr):
     try:
         log_output("")
         log_output("Executing query: %s" % ("explain " + sqlStr))
-        exp_curs = dbconn.query(conn, "explain " + sqlStr)
-        rows = exp_curs.fetchall()
+        rows = run_query(conn, "explain " + sqlStr)
         hash_join_pattern = HASH_JOIN_PATTERN
         nl_join_pattern = NL_JOIN_PATTERN
         table_scan_pattern = TABLE_SCAN_PATTERN
@@ -396,7 +270,7 @@ def explain_join_scan(conn, sqlStr):
         index_only_scan_pattern = INDEX_ONLY_SCAN_PATTERN
         bitmap_scan_pattern = BITMAP_SCAN_PATTERN
         fallback_pattern = FALLBACK_PATTERN
-        if (glob_gpdb_major_version) <= 5:
+        if (settings.glob_gpdb_major_version) <= 5:
             hash_join_pattern = HASH_JOIN_PATTERN_V5
             nl_join_pattern = NL_JOIN_PATTERN_V5
             table_scan_pattern = TABLE_SCAN_PATTERN_V5
@@ -1490,7 +1364,7 @@ def smoothStatisticsForOneCol(conn, table_name, attnum, row_count, ndv, corr):
 # ensure that we have perfect histogram statistics on the relevant columns
 def smoothStatistics(conn, num_fact_table_rows):
     prev_table_name = ""
-    if glob_gpdb_major_version > 5:
+    if settings.glob_gpdb_major_version > 5:
         execute_sql(conn, _allow_system_mods)
     else:
         execute_sql(conn, _allow_system_mods_v5)
@@ -1510,20 +1384,18 @@ def inspectExistingTables(conn):
     global glob_appendonly
 
     sqlStr = "SELECT count(*) from cal_txtest"
-    curs = dbconn.query(conn, sqlStr)
 
-    rows = curs.fetchall()
+    rows = run_query(conn, sqlStr)
     for row in rows:
         glob_rowcount = row[0]
         log_output("Row count of existing fact table is %d" % glob_rowcount)
 
-    if glob_gpdb_major_version < 7:
+    if settings.glob_gpdb_major_version < 7:
         sqlStr = "SELECT lower(unnest(reloptions)) from pg_class where relname = 'cal_txtest'"
     else:
         sqlStr = "SELECT case when relam=3434 then 'appendonly' else 'appendonly,column' end from pg_class where relname = 'cal_txtest' and relam in (3434,3435)"
-    curs = dbconn.query(conn, sqlStr)
 
-    rows = curs.fetchall()
+    rows = run_query(conn, sqlStr)
     for row in rows:
         if re.search("appendonly", row[0]):
             glob_appendonly = True
@@ -1535,15 +1407,15 @@ def inspectExistingTables(conn):
 
 
 def main():
-    global glob_verbose
-    global glob_log_file
     global glob_rowcount
+
+    settings.initialize()
 
     args, parser = parseargs()
     if args.logFile != "":
-        glob_log_file = open(args.logFile, "wt", 1)
+        settings.glob_log_file = open(args.logFile, "wt", 1)
     if args.verbose:
-        glob_verbose = True
+        settings.glob_verbose = True
     log_output("Connecting to host %s on port %d, database %s" % (args.host, args.port, args.dbName))
     conn = connect(args.host, args.port, args.dbName)
     select_version(conn)
@@ -1583,8 +1455,8 @@ def main():
         dropDB(conn)
 
     conn.close()
-    if glob_log_file != None:
-        glob_log_file.close()
+    if settings.glob_log_file != None:
+        settings.glob_log_file.close()
 
 
 if __name__ == "__main__":
