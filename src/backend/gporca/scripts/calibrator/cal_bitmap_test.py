@@ -101,177 +101,6 @@ _drop_tables = """
 DROP TABLE IF EXISTS cal_txtest, cal_temp_ids, cal_dim, cal_bfvtest, cal_bfv_dim, cal_ndvtest, cal_widetest;
 """
 
-# create the table. Parameters:
-# - WITH clause (optional), for append-only tables
-_create_cal_table = """
-CREATE TABLE cal_txtest(id int,
-                        btreeunique int,
-                        btree10 int,
-                        btree100 int,
-                        btree1000 int,
-                        btree10000 int,
-                        bitmap10 int,
-                        bitmap100 int,
-                        bitmap1000 int,
-                        bitmap10000 int,
-                        txt text)
-%s
-DISTRIBUTED BY (id);
-"""
-
-_create_bfv_table = """
-CREATE TABLE cal_bfvtest (col1 integer,
-                          wk_id int,
-                          id integer)
-%s
-DISTRIBUTED BY (col1);
-"""
-
-_create_ndv_table = """
-CREATE TABLE cal_ndvtest (id int, val int)
-%s
-DISTRIBUTED BY (id);
-"""
-
-_create_brin_table = """
-CREATE TABLE cal_brintest(id int,
-                          clust_10 int,
-                          clust_100 int,
-                          clust_1000 int,
-                          clust_10000 int,
-                          clust_uniq int,
-                          rand_10 int,
-                          rand_100 int,
-                          rand_1000 int,
-                          rand_10000 int,
-                          rand_uniq int,
-                          txt text)
-%s
-DISTRIBUTED BY (id);
-"""
-
-_with_appendonly = """
-WITH (appendonly=true)
-"""
-
-_create_other_tables = ["""
-CREATE TABLE cal_temp_ids(f_id int, f_rand double precision) DISTRIBUTED BY (f_id);
-""",
-                        """
-CREATE TABLE cal_dim(dim_id int,
-                     dim_id2 int,
-                     txt text)
-DISTRIBUTED BY (dim_id);
-""",
-                        """
-CREATE TABLE cal_bfv_dim (id integer, col2 integer) DISTRIBUTED BY (id);
-"""]
-
-# insert into temp table. Parameters:
-# - integer stop value (suggested value is 10,000,000)
-_insert_into_temp = """
-INSERT INTO cal_temp_ids SELECT x, random() FROM (SELECT * FROM generate_series(1,%d)) T(x);
-"""
-
-_insert_into_table = """
-INSERT INTO cal_txtest
-SELECT f_id,
-       f_id,
-       f_id%10 + 1,
-       f_id%100 + 1,
-       f_id%1000 + 1,
-       f_id%10000 + 1,
-       f_id%10 + 1,
-       f_id%100 + 1,
-       f_id%1000 + 1,
-       f_id%10000 + 1,
-       repeat('a', 960)
-FROM cal_temp_ids
-order by f_rand;
-"""
-
-# use a row_number() function to create column values that are strongly correlated
-# to the physical order of the rows on disk
-_insert_into_brin_table = """
-INSERT INTO cal_brintest
-SELECT ordered_id,
-       ceil(ordered_id*(10.0/{rows})),
-       ceil(ordered_id*(100.0/{rows})),
-       ceil(ordered_id*(1000.0/{rows})),
-       ceil(ordered_id*(10000.0/{rows})),
-       ordered_id,
-       f_id%10 + 1,
-       f_id%100 + 1,
-       f_id%1000 + 1,
-       f_id%10000 + 1,
-       f_id,
-       repeat('a', 956)
-FROM (select row_number() over(order by f_rand) as ordered_id, f_id, f_rand from cal_temp_ids) src
-order by f_rand;
-"""
-
-_insert_into_other_tables = """
-INSERT INTO cal_dim SELECT x, x, repeat('d', 100) FROM (SELECT * FROM generate_series(%d,%d)) T(x);
-"""
-
-_create_index_arr = ["""
-CREATE INDEX cal_txtest_i_bitmap_10    ON cal_txtest USING bitmap(bitmap10);
-""",
-                     """
-CREATE INDEX cal_txtest_i_bitmap_100   ON cal_txtest USING bitmap(bitmap100);
-""",
-                     """
-CREATE INDEX cal_txtest_i_bitmap_1000  ON cal_txtest USING bitmap(bitmap1000);
-""",
-                     """
-CREATE INDEX cal_txtest_i_bitmap_10000 ON cal_txtest USING bitmap(bitmap10000);
-""",
-                     ]
-
-_create_bfv_index_arr = ["""
-CREATE INDEX idx_cal_bfvtest_bitmap ON cal_bfvtest USING bitmap(id);
-""",
-                         ]
-
-_create_ndv_index_arr = ["""
-CREATE INDEX cal_ndvtest_bitmap ON cal_ndvtest USING bitmap(val);
-""",
-                         ]
-
-_create_btree_indexes_arr = ["""
-CREATE INDEX cal_txtest_i_btree_unique ON cal_txtest USING btree(btreeunique);
-""",
-                             """
-CREATE INDEX cal_txtest_i_btree_10     ON cal_txtest USING btree(btree10);
-""",
-                             """
-CREATE INDEX cal_txtest_i_btree_100    ON cal_txtest USING btree(btree100);
-""",
-                             """
-CREATE INDEX cal_txtest_i_btree_1000   ON cal_txtest USING btree(btree1000);
-""",
-                             """
-CREATE INDEX cal_txtest_i_btree_10000  ON cal_txtest USING btree(btree10000);
-""",
-                             """
-CREATE INDEX idx_cal_bfvtest_btree ON cal_bfvtest USING btree(id);
-""",
-                             """
-CREATE INDEX cal_ndvtest_btree ON cal_ndvtest USING btree(val);
-""",
-                             ]
-
-_create_brin_index_arr = ["""
-CREATE INDEX cal_brintest_brin ON cal_brintest USING brin(
-id, clust_10, clust_100, clust_1000, clust_10000, clust_uniq, rand_10, rand_100, rand_1000, rand_10000, rand_uniq, txt)
-WITH(pages_per_range=4);
-""",
-                         ]
-
-_analyze_table = """
-ANALYZE cal_txtest;
-ANALYZE cal_brintest;
-"""
 
 _allow_system_mods = """
 SET allow_system_table_mods to on;
@@ -1588,6 +1417,12 @@ def run_brin_tests(conn, execute_n_times):
                            parameterize_brin_index_10000r_multi_wide,
                            execute_n_times)
 
+def fetch_sql_content(filename):
+    sql_content = ""
+    with open(filename, 'r') as f:
+        sql_content += f.read()
+    return sql_content
+
 
 # common parts of all test suites, create tables, run tests, drop objects
 # -----------------------------------------------------------------------------
@@ -1596,38 +1431,19 @@ def run_brin_tests(conn, execute_n_times):
 def createDB(conn, use_ao, num_rows):
     global glob_appendonly
 
-    create_options = ""
+    create_tables = ""
     if use_ao:
-        create_options = _with_appendonly
+        create_tables = "set default_table_access_method='ao_row"
         glob_appendonly = True
-    create_cal_table_stmt = _create_cal_table % create_options
-    create_bfv_table = _create_bfv_table % create_options
-    create_ndv_table = _create_ndv_table % create_options
-    create_brin_table = _create_brin_table % create_options
-    insert_into_temp_stmt = _insert_into_temp % num_rows
-    insert_into_other_stmt = _insert_into_other_tables % (1, glob_dim_table_rows)
-    insert_into_brin_table = _insert_into_brin_table.format(rows=num_rows)
 
-    execute_sql(conn, _drop_tables)
-    execute_sql(conn, create_cal_table_stmt)
-    execute_sql(conn, create_bfv_table)
-    execute_sql(conn, create_ndv_table)
-    execute_sql(conn, create_brin_table)
-    execute_sql_arr(conn, _create_other_tables)
+    execute_sql(conn, fetch_sql_content('sql/drop_tables.sql'))
+    execute_sql(conn, create_tables + fetch_sql_content('sql/create_tables.sql'))
     commit_db(conn)
-    execute_and_commit_sql(conn, insert_into_temp_stmt)
-    execute_and_commit_sql(conn, _insert_into_table)
+    execute_sql(conn, fetch_sql_content('sql/insert_tables.sql'))
     commit_db(conn)
-    execute_and_commit_sql(conn, insert_into_brin_table)
-    execute_and_commit_sql(conn, insert_into_other_stmt)
+    execute_sql(conn, fetch_sql_content('sql/create_indexes.sql'))
     commit_db(conn)
-    execute_sql_arr(conn, _create_index_arr)
-    execute_sql_arr(conn, _create_bfv_index_arr)
-    execute_sql_arr(conn, _create_ndv_index_arr)
-    commit_db(conn)
-    execute_sql_arr(conn, _create_btree_indexes_arr)
-    execute_sql_arr(conn, _create_brin_index_arr)
-    execute_sql(conn, _analyze_table)
+    execute_sql(conn, fetch_sql_content('sql/analyze_tables.sql'))
     commit_db(conn)
 
 
