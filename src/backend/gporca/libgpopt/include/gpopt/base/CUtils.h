@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/COrderSpec.h"
+#include "gpopt/base/CShapeSpec.h"
 #include "gpopt/base/CWindowFrame.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CExpression.h"

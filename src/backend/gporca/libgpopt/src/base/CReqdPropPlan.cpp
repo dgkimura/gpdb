@@ -24,6 +24,7 @@
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/CEnfdPartitionPropagation.h"
 #include "gpopt/base/CEnfdRewindability.h"
+#include "gpopt/base/CEnfdShape.h"
 #include "gpopt/base/CPartInfo.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -44,12 +45,14 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CReqdPropPlan::CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo,
 							 CEnfdDistribution *ped, CEnfdRewindability *per,
-							 CEnfdPartitionPropagation *pepp, CCTEReq *pcter)
+							 CEnfdPartitionPropagation *pepp, CEnfdShape *pes,
+							 CCTEReq *pcter)
 	: m_pcrs(pcrs),
 	  m_peo(peo),
 	  m_ped(ped),
 	  m_per(per),
 	  m_pepp(pepp),
+	  m_pes(pes),
 	  m_pcter(pcter)
 {
 	GPOS_ASSERT(nullptr != pcrs);
@@ -57,6 +60,7 @@ CReqdPropPlan::CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo,
 	GPOS_ASSERT(nullptr != ped);
 	GPOS_ASSERT(nullptr != per);
 	GPOS_ASSERT(nullptr != pepp);
+	GPOS_ASSERT(nullptr != pes);
 	GPOS_ASSERT(nullptr != pcter);
 }
 
@@ -201,6 +205,9 @@ CReqdPropPlan::Pps(ULONG ul) const
 
 		case CPropSpec::EpstPartPropagation:
 			return m_pepp->PppsRequired();
+
+		case CPropSpec::EpstShape:
+			return m_pes->PssRequired();
 
 		default:
 			GPOS_ASSERT(!"Invalid property spec index");
@@ -406,9 +413,11 @@ CReqdPropPlan::PrppEmpty(CMemoryPool *mp)
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 
-	return GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+	return GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pes, pcter);
 }
 
 //---------------------------------------------------------------------------
@@ -460,6 +469,12 @@ CReqdPropPlan::OsPrint(IOstream &os) const
 	if (nullptr != m_pepp)
 	{
 		os << GetPrintablePtr(m_pepp);
+	}
+
+	os << "], req shape: [";
+	if (nullptr != m_pepp)
+	{
+		os << GetPrintablePtr(m_pes);
 	}
 	os << "]";
 
@@ -575,10 +590,14 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
 	prppInput->Pepp()->AddRef();
 	CEnfdPartitionPropagation *pepp = prppInput->Pepp();
 
+	prppInput->Pes()->AddRef();
+	CEnfdShape *pes = prppInput->Pes();
+
 	prppInput->Pcter()->AddRef();
 	CCTEReq *pcter = prppInput->Pcter();
 
-	return GPOS_NEW(mp) CReqdPropPlan(pcrsRequired, peo, ped, per, pepp, pcter);
+	return GPOS_NEW(mp)
+		CReqdPropPlan(pcrsRequired, peo, ped, per, pepp, pes, pcter);
 }
 
 

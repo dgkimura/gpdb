@@ -25,6 +25,7 @@ using namespace gpos;
 class CDistributionSpec;
 class CExpressionHandle;
 class COrderSpec;
+class CShapeSpec;
 class CRewindabilitySpec;
 class CPartitionPropagationSpec;
 class CReqdPropPlan;
@@ -56,6 +57,9 @@ private:
 
 	// derived partition propagation spec
 	CPartitionPropagationSpec *m_ppps{nullptr};
+
+	// derived plan shape
+	CShapeSpec *m_pss{nullptr};
 
 	// derived cte map
 	CCTEMap *m_pcm{nullptr};
@@ -119,6 +123,12 @@ public:
 	GetCostModel() const
 	{
 		return m_pcm;
+	}
+
+	CShapeSpec *
+	Pss() const
+	{
+		return m_pss;
 	}
 
 	// hash function

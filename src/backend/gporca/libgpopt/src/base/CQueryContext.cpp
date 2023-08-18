@@ -242,6 +242,8 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context
 	CCTEReq *pcter = poptctxt->Pcteinfo()->PcterProducers(mp);
@@ -251,7 +253,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// CReqdPropPlan::InitReqdPartitionPropagation().
 
 	CReqdPropPlan *prpp =
-		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pes, pcter);
 
 	// Finally, create the CQueryContext
 	pdrgpmdname->AddRef();

@@ -25,6 +25,7 @@ class CColRefSet;
 class CDrvdPropRelational;
 class CDrvdPropPlan;
 class CEnfdOrder;
+class CEnfdShape;
 class CEnfdDistribution;
 class CEnfdRewindability;
 class CEnfdPartitionPropagation;
@@ -60,6 +61,9 @@ private:
 	// required partition propagation
 	CEnfdPartitionPropagation *m_pepp{nullptr};
 
+	// required shape
+	CEnfdShape *m_pes{nullptr};
+
 	// required ctes
 	CCTEReq *m_pcter{nullptr};
 
@@ -72,7 +76,7 @@ public:
 	// ctor
 	CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo, CEnfdDistribution *ped,
 				  CEnfdRewindability *per, CEnfdPartitionPropagation *pepp,
-				  CCTEReq *pcter);
+				  CEnfdShape *pes, CCTEReq *pcter);
 
 	// dtor
 	~CReqdPropPlan() override;
@@ -133,6 +137,13 @@ public:
 	Pepp() const
 	{
 		return m_pepp;
+	}
+
+	// required shape accessor
+	CEnfdShape *
+	Pes() const
+	{
+		return m_pes;
 	}
 
 	// required cte accessor

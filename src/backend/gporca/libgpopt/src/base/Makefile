@@ -53,6 +53,7 @@ OBJS        = CAutoOptCtxt.o \
               CEnfdPartitionPropagation.o \
               CEnfdProp.o \
               CEnfdRewindability.o \
+              CEnfdShape.o \
               CFunctionProp.o \
               CFunctionalDependency.o \
               CIOUtils.o \
@@ -71,6 +72,7 @@ OBJS        = CAutoOptCtxt.o \
               CReqdPropPlan.o \
               CReqdPropRelational.o \
               CRewindabilitySpec.o \
+              CShapeSpec.o \
               CUtils.o \
               CWindowFrame.o \
               CWindowOids.o \

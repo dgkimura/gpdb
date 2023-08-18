@@ -20,6 +20,7 @@
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/CEnfdPartitionPropagation.h"
 #include "gpopt/base/CEnfdRewindability.h"
+#include "gpopt/base/CEnfdShape.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CPartitionPropagationSpec.h"
 #include "gpopt/base/CRewindabilitySpec.h"
@@ -408,6 +409,14 @@ public:
 	// return partition propagation property enforcing type for this operator
 	virtual CEnfdProp::EPropEnforcingType EpetPartitionPropagation(
 		CExpressionHandle &exprhdl, const CEnfdPartitionPropagation *per) const;
+
+	// return shape property enforcing type for this operator
+	virtual CEnfdProp::EPropEnforcingType
+	EpetShape(CExpressionHandle &exprhdl GPOS_UNUSED,
+			  const CEnfdShape *peo GPOS_UNUSED) const
+	{
+		return CEnfdProp::EpetOptional;
+	}
 
 	// order matching type
 	virtual CEnfdOrder::EOrderMatching Eom(CReqdPropPlan *prppInput,

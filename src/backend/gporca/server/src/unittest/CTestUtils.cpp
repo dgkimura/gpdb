@@ -2495,10 +2495,13 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
 
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
+
 	CCTEReq *pcter = COptCtxt::PoctxtFromTLS()->Pcteinfo()->PcterProducers(mp);
 
 	CReqdPropPlan *prpp =
-		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pes, pcter);
 
 	colref_array->AddRef();
 	CMDNameArray *pdrgpmdname = GPOS_NEW(mp) CMDNameArray(mp);
@@ -2576,9 +2579,11 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr)
 	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	CReqdPropPlan *prpp =
-		GPOS_NEW(mp) CReqdPropPlan(pcrsOutput, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrsOutput, peo, ped, per, pepp, pes, pcter);
 
 	CMDNameArray *pdrgpmdname = GPOS_NEW(mp) CMDNameArray(mp);
 	const ULONG length = colref_array->Size();

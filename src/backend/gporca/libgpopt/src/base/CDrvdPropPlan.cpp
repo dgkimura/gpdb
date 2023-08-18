@@ -141,6 +141,9 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
 		// distinguish between a CTE consumer and the inlined expression
 		m_ppps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
+		pdpplan->Pss()->AddRef();
+		m_pss = pdpplan->Pss();
+
 		GPOS_ASSERT(CDistributionSpec::EdtAny != m_pds->Edt() &&
 					"CDistributionAny is a require-only, cannot be derived");
 	}

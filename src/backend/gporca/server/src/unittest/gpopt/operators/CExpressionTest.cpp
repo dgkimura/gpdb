@@ -65,8 +65,10 @@ CExpressionTest::PrppCreateRequiredProperties(CMemoryPool *mp, CColRefSet *pcrs)
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
-	return GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+	return GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pes, pcter);
 }
 
 //---------------------------------------------------------------------------
@@ -791,10 +793,12 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
-	CReqdPropPlan *prppIncompatibleOrder =
-		GPOS_NEW(mp) CReqdPropPlan(pcrsGetCopy, peo, ped, per, pepp, pcter);
+	CReqdPropPlan *prppIncompatibleOrder = GPOS_NEW(mp)
+		CReqdPropPlan(pcrsGetCopy, peo, ped, per, pepp, pes, pcter);
 
 	// Test that the plan is not valid.
 	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleOrder, pdpctxtplan));
@@ -851,10 +855,12 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 	CColRefSet *pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 	CReqdPropPlan *prppIncompatibleDistribution =
-		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pes, pcter);
 
 	// Test that the plan is not valid.
 	GPOS_ASSERT(
@@ -912,11 +918,13 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 	CColRefSet *pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 
 	CReqdPropPlan *prppIncompatibleRewindability =
-		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pes, pcter);
 	// Test that the plan is not valid.
 	GPOS_ASSERT(
 		!pexprPlan->FValidPlan(prppIncompatibleRewindability, pdpctxtplan));
@@ -973,6 +981,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 	ULONG ulCTEId = 0;
 
@@ -984,7 +994,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 				  pdpplan);
 	CColRefSet *pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 	CReqdPropPlan *prppIncompatibleCTE =
-		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pcter);
+		GPOS_NEW(mp) CReqdPropPlan(pcrsCopy, peo, ped, per, pepp, pes, pcter);
 
 	// Test that the plan is not valid.
 	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleCTE, pdpctxtplan));
