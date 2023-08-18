@@ -281,7 +281,9 @@ CCostContext::IsValid(CMemoryPool *mp)
 	BOOL fValid = Poc()->Prpp()->FSatisfied(pdprel, m_pdpplan);
 
 #ifdef GPOS_DEBUG
-	if (COptCtxt::FAllEnforcersEnabled() && !fValid)
+	if (COptCtxt::FAllEnforcersEnabled() &&
+		// Shape spec can leave invalid plan paths..
+		!fValid && m_pdpplan->Pss()->UlSortColumns() == 0)
 	{
 		CAutoTrace at(mp);
 		IOstream &os = at.Os();

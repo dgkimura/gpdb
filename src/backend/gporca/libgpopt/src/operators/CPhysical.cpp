@@ -362,6 +362,18 @@ CPhysical::PosPassThru(CMemoryPool *,		 // mp
 	return posRequired;
 }
 
+CShapeSpec *
+CPhysical::PssPassThru(CMemoryPool *,		 // mp
+					   CExpressionHandle &,	 // exprhdl
+					   CShapeSpec *pssRequired,
+					   ULONG  // child_index
+)
+{
+	pssRequired->AddRef();
+
+	return pssRequired;
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -968,6 +980,13 @@ CPhysical::Erm(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
 	return CEnfdRewindability::ErmSatisfy;
 }
 
+CEnfdShape::EShapeMatching
+CPhysical::Esm(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
+{
+	// request satisfaction by default
+	return CEnfdShape::EomSatisfy;
+}
+
 CEnfdDistribution *
 CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			   CReqdPropPlan *prppInput, ULONG child_index,
@@ -1038,6 +1057,24 @@ CPhysical::PppsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	}
 
 	return pps_result;
+}
+
+CShapeSpec *
+CPhysical::PssDerive(CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl)
+{
+	//FIXME:XXX:TODO: append all properties from children...
+
+	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	for (ULONG ul = 0; ul < exprhdl.Arity(); ul++)
+	{
+		// scalar operators do not have shapes properties...
+		if (nullptr != exprhdl.Pgexpr() && !(*exprhdl.Pgexpr())[ul]->FScalar())
+		{
+			CShapeSpec *pssChild = exprhdl.Pdpplan(ul /*child_index*/)->Pss();
+			pss->Append(pssChild);
+		}
+	}
+	return pss;
 }
 
 // EOF

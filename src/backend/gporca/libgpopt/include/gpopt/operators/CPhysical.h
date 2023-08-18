@@ -212,6 +212,9 @@ protected:
 	static COrderSpec *PosPassThru(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   COrderSpec *posInput, ULONG child_index);
 
+	static CShapeSpec *PssPassThru(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CShapeSpec *pssInput, ULONG child_index);
+
 	// helper for a simple case of computing child's required distribution
 	static CDistributionSpec *PdsPassThru(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl,
@@ -355,6 +358,20 @@ public:
 		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
 
+	// compute required shape of the n-th child
+	virtual CShapeSpec *
+	PssRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+				CShapeSpec *pssRequired, ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+				ULONG ulOptReq GPOS_UNUSED) const
+	{
+		// TODO:XXX:FIXME: implement in child classes...
+
+		// If this operator satisfies part of the required shape spec then
+		// remove it from what is required of the children...
+		return PssPassThru(mp, exprhdl, pssRequired, child_index);
+	}
+
 
 	// required properties: check if required columns are included in output columns
 	virtual BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
@@ -384,6 +401,9 @@ public:
 	// derived properties: derive partition propagation spec
 	virtual CPartitionPropagationSpec *PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
+
+	// derive shape
+	virtual CShapeSpec *PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// derive cte map
 	virtual CCTEMap *PcmDerive(CMemoryPool *mp,
@@ -428,6 +448,12 @@ public:
 	virtual CEnfdRewindability::ERewindabilityMatching Erm(
 		CReqdPropPlan *prppInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+
+	// shape matching type
+	virtual CEnfdShape::EShapeMatching Esm(CReqdPropPlan *prppInput,
+										   ULONG child_index,
+										   CDrvdPropArray *pdrgpdpCtxt,
+										   ULONG ulOptReq);
 
 	// check if optimization contexts is valid
 	virtual BOOL

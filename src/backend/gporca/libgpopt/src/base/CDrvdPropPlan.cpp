@@ -50,6 +50,7 @@ CDrvdPropPlan::~CDrvdPropPlan()
 	CRefCount::SafeRelease(m_prs);
 	CRefCount::SafeRelease(m_ppps);
 	CRefCount::SafeRelease(m_pcm);
+	CRefCount::SafeRelease(m_pss);
 }
 
 
@@ -97,6 +98,7 @@ CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		m_pds = popPhysical->PdsDerive(mp, exprhdl);
 		m_prs = popPhysical->PrsDerive(mp, exprhdl);
 		m_ppps = popPhysical->PppsDerive(mp, exprhdl);
+		m_pss = popPhysical->PssDerive(mp, exprhdl);
 
 		GPOS_ASSERT(CDistributionSpec::EdtAny != m_pds->Edt() &&
 					"CDistributionAny is a require-only, cannot be derived");
@@ -171,6 +173,7 @@ CDrvdPropPlan::FSatisfies(const CReqdPropPlan *prpp) const
 		   m_pds->FSatisfies(prpp->Ped()->PdsRequired()) &&
 		   m_prs->FSatisfies(prpp->Per()->PrsRequired()) &&
 		   m_ppps->FSatisfies(prpp->Pepp()->PppsRequired()) &&
+		   m_pss->FSatisfies(prpp->Pes()->PssRequired()) &&
 		   m_pcm->FSatisfies(prpp->Pcter());
 }
 
@@ -189,6 +192,7 @@ CDrvdPropPlan::HashValue() const
 	ULONG ulHash = gpos::CombineHashes(m_pos->HashValue(), m_pds->HashValue());
 	ulHash = gpos::CombineHashes(ulHash, m_prs->HashValue());
 	ulHash = gpos::CombineHashes(ulHash, m_pcm->HashValue());
+	ulHash = gpos::CombineHashes(ulHash, m_pss->HashValue());
 
 	return ulHash;
 }
@@ -223,7 +227,8 @@ CDrvdPropPlan::OsPrint(IOstream &os) const
 	os << "Drvd Plan Props ("
 	   << "ORD: " << (*m_pos) << ", DIST: " << (*m_pds)
 	   << ", REWIND: " << (*m_prs) << ", PART PROP:" << (*m_ppps) << ")"
-	   << ", CTE Map: [" << *m_pcm << "]";
+	   << ", CTE Map: [" << *m_pcm << "]"
+	   << ", SHAPE: [" << *m_pss << "]";
 
 	return os;
 }

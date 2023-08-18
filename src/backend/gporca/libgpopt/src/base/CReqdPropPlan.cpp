@@ -80,6 +80,7 @@ CReqdPropPlan::~CReqdPropPlan()
 	CRefCount::SafeRelease(m_ped);
 	CRefCount::SafeRelease(m_per);
 	CRefCount::SafeRelease(m_pepp);
+	CRefCount::SafeRelease(m_pes);
 	CRefCount::SafeRelease(m_pcter);
 }
 
@@ -177,6 +178,11 @@ CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								  prppInput->Pepp()->PppsRequired(),
 								  child_index, pdrgpdpCtxt, ulPartPropagateReq),
 		CEnfdPartitionPropagation::EppmSatisfy);
+
+	m_pes = GPOS_NEW(mp) CEnfdShape(
+		popPhysical->PssRequired(mp, exprhdl, prppInput->Pes()->PssRequired(),
+								 child_index, pdrgpdpCtxt, ulOrderReq),
+		popPhysical->Esm(prppInput, child_index, pdrgpdpCtxt, ulOrderReq));
 }
 
 //---------------------------------------------------------------------------
