@@ -243,6 +243,8 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
 	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+	//pss->Append(1);
+	//pss->Append(2);
 	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context

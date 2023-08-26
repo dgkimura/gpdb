@@ -67,6 +67,29 @@ CPhysicalHashJoin::CPhysicalHashJoin(CMemoryPool *mp,
 	}
 
 	CreateOptRequests(mp);
+	//FIXME:XXX:TODO: add optimization requests for shape based on number of hints...
+	//    if there are 2 hints (h1 and h2) then need to try 4 combinations:
+	//        LS             RS
+	//        --             --
+	//        h1+h2
+	//                       h1+h2
+	//        h1             h2
+	//        h2             h1
+	//    if there are 3 hints (h1, h2, and h3) then need to try 8 combinations:
+	//        LS             RS
+	//        --             --
+	//        h1             h2+h3
+	//        h1+h2          h3
+	//        h1+h3          h2
+	//        h2             h1+h3
+	//        h2+h3          h1
+	//        h3             h1+h2
+	//                       h1+h2+3
+	//        h1+h2+h3
+	//FIXME:XXX:TODO: Better is to know which side of the join each relation is
+	//    on and send the optimization corresponding optimization requestion.
+	//    (e.g. if A is on left side, then always send SeqScan(A) or
+	//    IndexScan(A) to //    the left side
 }
 
 //---------------------------------------------------------------------------

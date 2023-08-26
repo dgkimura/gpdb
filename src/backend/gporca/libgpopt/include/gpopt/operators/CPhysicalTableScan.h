@@ -101,6 +101,14 @@ public:
 							   CRewindabilitySpec::EmhtNoMotion);
 	}
 
+	virtual CShapeSpec *
+	PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl GPOS_UNUSED) override
+	{
+		CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+		pss->Append(1);
+		return pss;
+	}
+
 
 };	// class CPhysicalTableScan
 

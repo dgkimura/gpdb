@@ -172,6 +172,14 @@ public:
 		return nullptr;
 	}
 
+	virtual CShapeSpec *
+	PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl GPOS_UNUSED) override
+	{
+		CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
+		pss->Append(2);
+		return pss;
+	}
+
 	// debug print
 	IOstream &OsPrint(IOstream &) const override;
 
