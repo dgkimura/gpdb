@@ -126,8 +126,19 @@ CTranslatorUtils::GetTableDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const IMDRelation *rel = md_accessor->RetrieveRel(mdid);
 
 	// look up table name
-	const CWStringConst *tablename = rel->Mdname().GetMDName();
-	CMDName *table_mdname = GPOS_NEW(mp) CMDName(mp, tablename);
+	CMDName *table_mdname = nullptr;
+	if (rte->alias)
+	{
+		CWStringDynamic *alias_str =
+			CDXLUtils::CreateDynamicStringFromCharArray(mp,
+														rte->alias->aliasname);
+		table_mdname = GPOS_NEW(mp) CMDName(mp, alias_str);
+	}
+	else
+	{
+		const CWStringConst *tablename = rel->Mdname().GetMDName();
+		table_mdname = GPOS_NEW(mp) CMDName(mp, tablename);
+	}
 
 	ULONG required_perms = static_cast<ULONG>(rte->requiredPerms);
 	CDXLTableDescr *table_descr = GPOS_NEW(mp) CDXLTableDescr(
