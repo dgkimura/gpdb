@@ -105,7 +105,7 @@ public:
 	PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl GPOS_UNUSED) override
 	{
 		CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
-		pss->Append(1);
+		pss->Append(Eopid(), const_cast<CWStringConst *>(m_pnameAlias->Pstr()));
 		return pss;
 	}
 

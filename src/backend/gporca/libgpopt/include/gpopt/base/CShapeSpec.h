@@ -52,22 +52,29 @@ private:
 	class CShapeExpression : public gpos::DbgPrintMixin<CShapeExpression>
 	{
 	private:
-		ULONG m_shape;
+		COperator::EOperatorId m_id;
+		CWStringConst *m_alias;
 
 	public:
 		CShapeExpression(const CShapeExpression &) = delete;
 
 		// ctor
-		CShapeExpression(ULONG shape);
+		CShapeExpression(COperator::EOperatorId id, CWStringConst *alias);
 
 		// dtor
 		virtual ~CShapeExpression();
 
 		// accessor of shape
-		ULONG
-		GetShape() const
+		COperator::EOperatorId
+		GetOperator() const
 		{
-			return m_shape;
+			return m_id;
+		}
+
+		CWStringConst *
+		GetAlias() const
+		{
+			return m_alias;
 		}
 
 		// check if order specs match
@@ -114,7 +121,7 @@ public:
 	}
 
 	// append new component
-	void Append(ULONG shape);
+	void Append(COperator::EOperatorId id, CWStringConst *alias);
 
 	// append shape spec
 	void Append(CShapeSpec *pss);

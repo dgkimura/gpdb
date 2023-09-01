@@ -31,7 +31,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CShapeSpec::CShapeExpression::CShapeExpression(ULONG shape) : m_shape(shape)
+CShapeSpec::CShapeExpression::CShapeExpression(COperator::EOperatorId id,
+											   CWStringConst *alias)
+	: m_id(id), m_alias(alias)
 {
 }
 
@@ -60,7 +62,7 @@ CShapeSpec::CShapeExpression::Matches(const CShapeExpression *pse) const
 {
 	GPOS_ASSERT(nullptr != pse);
 
-	return pse->m_shape == m_shape;
+	return pse->m_id == m_id && pse->m_alias->Equals(m_alias);
 }
 
 
@@ -78,7 +80,7 @@ IOstream &
 CShapeSpec::CShapeExpression::OsPrint(IOstream &os) const
 {
 	os << "( ";
-	os << m_shape;
+	os << "id:" << m_id << " alias:" << m_alias->GetBuffer();
 	os << " )";
 
 	return os;
@@ -122,10 +124,10 @@ CShapeSpec::~CShapeSpec()
 //
 //---------------------------------------------------------------------------
 void
-CShapeSpec::Append(ULONG shape)
+CShapeSpec::Append(COperator::EOperatorId id, CWStringConst *alias)
 {
-	CShapeExpression *poe = GPOS_NEW(m_mp) CShapeExpression(shape);
-	m_pdrgpoe->Append(poe);
+	CShapeExpression *pse_new = GPOS_NEW(m_mp) CShapeExpression(id, alias);
+	m_pdrgpoe->Append(pse_new);
 }
 void
 CShapeSpec::Append(CShapeSpec *pss)
@@ -133,7 +135,7 @@ CShapeSpec::Append(CShapeSpec *pss)
 	for (ULONG ul = 0; ul < pss->m_pdrgpoe->Size(); ul++)
 	{
 		CShapeExpression *pse = (*pss->m_pdrgpoe)[ul];
-		Append(pse->GetShape());
+		Append(pse->GetOperator(), pse->GetAlias());
 	}
 }
 
@@ -234,7 +236,9 @@ CShapeSpec::HashValue() const
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CShapeExpression *pse = (*m_pdrgpoe)[ul];
-		ulHash = gpos::CombineHashes(ulHash, pse->GetShape());
+		ulHash = gpos::CombineHashes(ulHash, pse->GetOperator());
+		ulHash = gpos::CombineHashes(ulHash,
+									 CWStringConst::HashValue(pse->GetAlias()));
 	}
 
 	return ulHash;
