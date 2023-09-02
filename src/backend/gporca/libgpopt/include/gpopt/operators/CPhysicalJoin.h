@@ -144,9 +144,30 @@ public:
 												 CDrvdPropArray *pdrgpdpCtxt,
 												 ULONG ulOptReq) override;
 
+	// compute required shape of the n-th child
+	virtual CShapeSpec *
+	PssRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+				CShapeSpec *pssRequired, ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+				ULONG ulOptReq GPOS_UNUSED) const
+	{
+		// TODO:XXX:FIXME: check which side of this operator the tables used in
+		//     pssRequired exit.
+		//     1) at least one left and at least right, then make sure this
+		//        operator matches and adjust left/right requirement.
+		//     2) all left then forward requirement to only left
+		//     3) all right then forward requirement to only right
+		//     4) none on left or right then return "impossible" spec.
+
+		// (gdb) exprhdl.DeriveTableDescriptor(ul);
+		return PssPassThru(mp, exprhdl, pssRequired, child_index);
+	}
+
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
+
+	virtual CShapeSpec *PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// derive sort order from outer child
 	COrderSpec *

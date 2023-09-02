@@ -1072,6 +1072,9 @@ CPhysical::PssDerive(CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl)
 		{
 			CShapeSpec *pssChild = exprhdl.Pdpplan(ul /*child_index*/)->Pss();
 			pss->Append(pssChild);
+
+			// TODO:XXX:FIXME: join needs child tables...
+			// (gdb) exprhdl.DeriveTableDescriptor(ul);
 		}
 	}
 	return pss;

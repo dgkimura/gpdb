@@ -369,6 +369,9 @@ public:
 
 		// If this operator satisfies part of the required shape spec then
 		// remove it from what is required of the children...
+
+		// TODO:XXX:FIXME: join needs child tables...
+		// (gdb) exprhdl.DeriveTableDescriptor(ul);
 		return PssPassThru(mp, exprhdl, pssRequired, child_index);
 	}
 

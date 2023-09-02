@@ -997,5 +997,14 @@ CPhysicalJoin::Edm(CReqdPropPlan *,	 // prppInput
 	return CEnfdDistribution::EdmExact;
 }
 
+CShapeSpec *
+CPhysicalJoin::PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl)
+{
+	// TODO:XXX:FIXME: construct spec based on operator, left table set, right
+	//    table set.
+	//    In order to handle mixed join types, need to map join types to table sets
+	return CPhysical::PssDerive(mp, exprhdl);
+}
+
 
 // EOF

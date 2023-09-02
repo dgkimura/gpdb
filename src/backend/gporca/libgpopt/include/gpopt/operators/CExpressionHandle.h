@@ -323,6 +323,9 @@ public:
 	CPartInfo *DerivePartitionInfo() const;
 	CPartInfo *DerivePartitionInfo(ULONG child_index) const;
 
+	// TODO:XXX:FIXME: make these return a set of CTableDescriptor
+	//     In order to support hint on join order, need to know all children on
+	//     each side
 	CTableDescriptor *DeriveTableDescriptor() const;
 	CTableDescriptor *DeriveTableDescriptor(ULONG child_index) const;
 
