@@ -2193,7 +2193,8 @@ CUtils::PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr,
 		pexpr->Pop()->Eopid() == CLogical::EopLogicalGet ||
 		pexpr->Pop()->Eopid() == CLogical::EopLogicalDynamicGet)
 	{
-		ptabdesc = pexpr->DeriveTableDescriptor();
+		CTableDescriptorHashSet *ptabdescset = pexpr->DeriveTableDescriptor();
+		ptabdesc = ptabdescset != nullptr ? ptabdescset->First() : nullptr;
 		// there are some cases where we don't populate LogicalSelect currently
 		GPOS_ASSERT_IMP(pexpr->Pop()->Eopid() != CLogical::EopLogicalSelect,
 						nullptr != ptabdesc);

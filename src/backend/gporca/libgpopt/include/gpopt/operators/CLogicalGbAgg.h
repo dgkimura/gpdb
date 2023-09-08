@@ -261,11 +261,14 @@ public:
 	static IOstream &OsPrintGbAggType(IOstream &os,
 									  COperator::EGbAggType egbaggtype);
 
-	CTableDescriptor *
+	CTableDescriptorHashSet *
 	DeriveTableDescriptor(CMemoryPool *,
 						  CExpressionHandle &exprhdl) const override
 	{
-		return exprhdl.DeriveTableDescriptor(0);
+		CTableDescriptorHashSet *table_descriptor_set =
+			exprhdl.DeriveTableDescriptor(0);
+		table_descriptor_set->AddRef();
+		return table_descriptor_set;
 	}
 
 private:

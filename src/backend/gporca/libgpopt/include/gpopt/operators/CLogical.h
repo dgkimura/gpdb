@@ -258,7 +258,7 @@ public:
 	virtual CFunctionProp *DeriveFunctionProperties(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
-	virtual CTableDescriptor *DeriveTableDescriptor(
+	virtual CTableDescriptorHashSet *DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	//-------------------------------------------------------------------------------------
