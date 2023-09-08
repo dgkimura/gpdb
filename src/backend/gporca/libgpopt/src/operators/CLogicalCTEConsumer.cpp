@@ -238,7 +238,7 @@ CLogicalCTEConsumer::DeriveJoinDepth(CMemoryPool *,		  //mp,
 }
 
 // derive table descriptor
-CTableDescriptor *
+CTableDescriptorHashSet *
 CLogicalCTEConsumer::DeriveTableDescriptor(CMemoryPool *,		//mp
 										   CExpressionHandle &	//exprhdl
 ) const

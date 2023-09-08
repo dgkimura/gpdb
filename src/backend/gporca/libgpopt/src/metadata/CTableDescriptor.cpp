@@ -309,5 +309,23 @@ CTableDescriptor::IndexCount()
 	return ulIndices;
 }
 
+ULONG
+CTableDescriptor::HashValue(const CTableDescriptor *ptabdesc)
+{
+	ULONG ulHash =
+		gpos::CombineHashes(ptabdesc->MDId()->HashValue(),
+							CWStringConst::HashValue(ptabdesc->Name().Pstr()));
+
+	return ulHash;
+}
+
+BOOL
+CTableDescriptor::Equals(const CTableDescriptor *ptabdescLeft,
+						 const CTableDescriptor *ptabdescRight)
+{
+	return ptabdescLeft->MDId()->Equals(ptabdescRight->MDId()) &&
+		   ptabdescLeft->Name().Equals(ptabdescRight->Name());
+}
+
 
 // EOF

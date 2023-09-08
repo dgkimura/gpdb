@@ -169,12 +169,16 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
-	DeriveTableDescriptor(CMemoryPool *,	   // mp
+	CTableDescriptorHashSet *
+	DeriveTableDescriptor(CMemoryPool *mp,
 						  CExpressionHandle &  // exprhdl
 	) const override
 	{
-		return m_ptabdesc;
+		CTableDescriptorHashSet *ptabdeschash =
+			GPOS_NEW(mp) CTableDescriptorHashSet(mp);
+		m_ptabdesc->AddRef();
+		ptabdeschash->Insert(m_ptabdesc);
+		return ptabdeschash;
 	}
 
 	//-------------------------------------------------------------------------------------

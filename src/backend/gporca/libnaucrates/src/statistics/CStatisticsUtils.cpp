@@ -1225,7 +1225,12 @@ CStatisticsUtils::DeriveStatsForBitmapTableGet(CMemoryPool *mp,
 					expr_handle.Pop()->Eopid() ||
 				CLogical::EopLogicalDynamicBitmapTableGet ==
 					expr_handle.Pop()->Eopid());
-	CTableDescriptor *table_descriptor = expr_handle.DeriveTableDescriptor();
+
+	CTableDescriptorHashSet *table_descriptor_set =
+		expr_handle.DeriveTableDescriptor();
+	CTableDescriptor *table_descriptor = table_descriptor_set->First();
+	table_descriptor->AddRef();
+	//table_descriptor_set->Release();
 
 	// the index of the condition
 	ULONG child_cond_index = 0;

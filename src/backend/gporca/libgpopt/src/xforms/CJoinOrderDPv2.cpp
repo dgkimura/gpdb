@@ -1380,7 +1380,11 @@ CJoinOrderDPv2::PexprExpand()
 		// We need the underlying partition and table row information to properly estimate cardinality for
 		// partition selection. If this is a logical expr that is more complex (eg: cte, nary join), we
 		// will use a default estimate
-		CTableDescriptor *table_desc = pexpr_atom->DeriveTableDescriptor();
+		CTableDescriptorHashSet *table_desc_set =
+			pexpr_atom->DeriveTableDescriptor();
+		CTableDescriptor *table_desc = table_desc_set->First();
+		table_desc->AddRef();
+		//table_desc_set->Release();
 
 		if (table_desc != nullptr)
 		{

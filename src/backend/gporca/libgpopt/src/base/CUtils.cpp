@@ -2180,6 +2180,17 @@ CUtils::PexprAgg(CMemoryPool *mp, CMDAccessor *md_accessor,
 						EaggfuncstageGlobal /*fGlobal*/, false /*fSplit*/);
 }
 
+//using MdidHashSetIter = CHashSetIter<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare,
+//									 CleanupRelease<IMDId>>;
+//	MdidHashSetIter hsiter(m_phsmdidcolinfo);
+//	while (hsiter.Advance())
+//	{
+//		CMDIdColStats *mdid_col_stats =
+//			CMDIdColStats::CastMdid(const_cast<IMDId *>(hsiter.Get()));
+//		mdid_col_stats->AddRef();
+//		pdrgmdid->Append(mdid_col_stats);
+//	}
+
 // generate a select expression
 CExpression *
 CUtils::PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr,
@@ -2193,7 +2204,10 @@ CUtils::PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr,
 		pexpr->Pop()->Eopid() == CLogical::EopLogicalGet ||
 		pexpr->Pop()->Eopid() == CLogical::EopLogicalDynamicGet)
 	{
-		ptabdesc = pexpr->DeriveTableDescriptor();
+		CTableDescriptorHashSet *ptabdescset = pexpr->DeriveTableDescriptor();
+		ptabdesc = ptabdescset->First();
+		ptabdesc->AddRef();
+		//ptabdescset->Release();
 		// there are some cases where we don't populate LogicalSelect currently
 		GPOS_ASSERT_IMP(pexpr->Pop()->Eopid() != CLogical::EopLogicalSelect,
 						nullptr != ptabdesc);

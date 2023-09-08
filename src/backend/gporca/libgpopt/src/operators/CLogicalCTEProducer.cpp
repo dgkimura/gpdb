@@ -132,7 +132,7 @@ CLogicalCTEProducer::DeriveMaxCard(CMemoryPool *,  // mp
 	return exprhdl.DeriveMaxCard(0);
 }
 
-CTableDescriptor *
+CTableDescriptorHashSet *
 CLogicalCTEProducer::DeriveTableDescriptor(CMemoryPool *,  // mp
 										   CExpressionHandle &exprhdl) const
 {

@@ -586,14 +586,15 @@ CDrvdPropRelational::DeriveFunctionProperties(CExpressionHandle &exprhdl)
 }
 
 // table descriptor
-CTableDescriptor *
+CTableDescriptorHashSet *
 CDrvdPropRelational::GetTableDescriptor() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
+	m_table_descriptor->AddRef();
 	return m_table_descriptor;
 }
 
-CTableDescriptor *
+CTableDescriptorHashSet *
 CDrvdPropRelational::DeriveTableDescriptor(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptTableDescriptor))

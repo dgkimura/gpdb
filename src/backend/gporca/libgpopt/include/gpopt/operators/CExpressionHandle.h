@@ -326,8 +326,8 @@ public:
 	// TODO:XXX:FIXME: make these return a set of CTableDescriptor
 	//     In order to support hint on join order, need to know all children on
 	//     each side
-	CTableDescriptor *DeriveTableDescriptor() const;
-	CTableDescriptor *DeriveTableDescriptor(ULONG child_index) const;
+	CTableDescriptorHashSet *DeriveTableDescriptor() const;
+	CTableDescriptorHashSet *DeriveTableDescriptor(ULONG child_index) const;
 
 	// Scalar property accessors
 	CColRefSet *DeriveDefinedColumns(ULONG child_index) const;

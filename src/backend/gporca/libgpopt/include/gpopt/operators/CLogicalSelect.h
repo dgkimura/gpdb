@@ -95,7 +95,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	CTableDescriptorHashSet *
 	DeriveTableDescriptor(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const override
 	{

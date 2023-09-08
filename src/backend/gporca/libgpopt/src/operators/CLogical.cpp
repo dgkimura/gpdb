@@ -972,7 +972,7 @@ CLogical::DeriveFunctionProperties(CMemoryPool *mp,
 //		Derive table descriptor for tables used by operator
 //
 //---------------------------------------------------------------------------
-CTableDescriptor *
+CTableDescriptorHashSet *
 CLogical::DeriveTableDescriptor(CMemoryPool *, CExpressionHandle &) const
 {
 	//currently return null unless there is a single table being used. Later we may want
