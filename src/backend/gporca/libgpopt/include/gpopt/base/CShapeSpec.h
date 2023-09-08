@@ -314,8 +314,8 @@ private:
 	CMemoryPool *m_mp;
 
 protected:
-	// components of order spec
-	CPlanHintArray *m_pdrgpoe;
+	CPlanHintArray *m_pdrgpScanHint;
+	CPlanHintArray *m_pdrgpJoinHint;
 
 public:
 	CShapeSpec(const CShapeSpec &) = delete;
@@ -326,18 +326,11 @@ public:
 	// dtor
 	~CShapeSpec() override;
 
-	// number of sort expressions
-	ULONG
-	UlSortColumns() const
-	{
-		return m_pdrgpoe->Size();
-	}
-
-	// check if order spec has no columns
+	// check if shape spec has hints
 	BOOL
 	IsEmpty() const
 	{
-		return UlSortColumns() == 0;
+		return m_pdrgpScanHint->Size() + m_pdrgpJoinHint->Size() == 0;
 	}
 
 	// append new component

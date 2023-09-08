@@ -27,9 +27,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CShapeSpec::CShapeSpec(CMemoryPool *mp) : m_mp(mp), m_pdrgpoe(nullptr)
+CShapeSpec::CShapeSpec(CMemoryPool *mp)
+	: m_mp(mp), m_pdrgpScanHint(nullptr), m_pdrgpJoinHint(nullptr)
 {
-	m_pdrgpoe = GPOS_NEW(mp) CPlanHintArray(mp);
+	m_pdrgpScanHint = GPOS_NEW(mp) CPlanHintArray(mp);
+	m_pdrgpJoinHint = GPOS_NEW(mp) CPlanHintArray(mp);
 }
 
 
@@ -43,7 +45,8 @@ CShapeSpec::CShapeSpec(CMemoryPool *mp) : m_mp(mp), m_pdrgpoe(nullptr)
 //---------------------------------------------------------------------------
 CShapeSpec::~CShapeSpec()
 {
-	m_pdrgpoe->Release();
+	m_pdrgpScanHint->Release();
+	m_pdrgpJoinHint->Release();
 }
 
 
@@ -56,16 +59,32 @@ CShapeSpec::~CShapeSpec()
 //
 //---------------------------------------------------------------------------
 void
-CShapeSpec::Append(CPlanHint *pph)
+CShapeSpec::Append(CPlanHint *_pph)
 {
-	m_pdrgpoe->Append(pph);
+	CScanHint *pph = dynamic_cast<CScanHint *>(_pph);
+	if (nullptr != pph)
+	{
+		_pph->AddRef();
+		m_pdrgpScanHint->Append(_pph);
+	}
+	else
+	{
+		// XXX: FIXME: TODO guard against bad intput types?
+		_pph->AddRef();
+		m_pdrgpJoinHint->Append(_pph);
+	}
 }
 void
 CShapeSpec::Append(CShapeSpec *pss)
 {
-	for (ULONG ul = 0; ul < pss->m_pdrgpoe->Size(); ul++)
+	for (ULONG ul = 0; ul < pss->m_pdrgpScanHint->Size(); ul++)
 	{
-		CPlanHint *pph = (*pss->m_pdrgpoe)[ul];
+		CPlanHint *pph = (*pss->m_pdrgpScanHint)[ul];
+		Append(pph);
+	}
+	for (ULONG ul = 0; ul < pss->m_pdrgpJoinHint->Size(); ul++)
+	{
+		CPlanHint *pph = (*pss->m_pdrgpJoinHint)[ul];
 		Append(pph);
 	}
 }
@@ -82,8 +101,9 @@ CShapeSpec::Append(CShapeSpec *pss)
 BOOL
 CShapeSpec::Matches(const CShapeSpec *pos) const
 {
-	BOOL fMatch =
-		m_pdrgpoe->Size() == pos->m_pdrgpoe->Size() && FSatisfies(pos);
+	BOOL fMatch = m_pdrgpScanHint->Size() == pos->m_pdrgpScanHint->Size() &&
+				  m_pdrgpJoinHint->Size() == pos->m_pdrgpJoinHint->Size() &&
+				  FSatisfies(pos);
 
 	GPOS_ASSERT_IMP(fMatch, pos->FSatisfies(this));
 
@@ -102,12 +122,21 @@ CShapeSpec::Matches(const CShapeSpec *pos) const
 BOOL
 CShapeSpec::FSatisfies(const CShapeSpec *pos) const
 {
-	const ULONG arity = pos->m_pdrgpoe->Size();
-	BOOL fSatisfies = (m_pdrgpoe->Size() >= arity);
+	ULONG arity = pos->m_pdrgpScanHint->Size();
+	BOOL fSatisfies = (m_pdrgpScanHint->Size() >= arity);
 
 	for (ULONG ul = 0; fSatisfies && ul < arity; ul++)
 	{
-		fSatisfies = (*m_pdrgpoe)[ul]->Matches((*(pos->m_pdrgpoe))[ul]);
+		fSatisfies =
+			(*m_pdrgpScanHint)[ul]->Matches((*(pos->m_pdrgpScanHint))[ul]);
+	}
+
+	fSatisfies =
+		fSatisfies && (m_pdrgpJoinHint->Size() >= pos->m_pdrgpJoinHint->Size());
+	for (ULONG ul = 0; fSatisfies && ul < pos->m_pdrgpJoinHint->Size(); ul++)
+	{
+		fSatisfies =
+			(*m_pdrgpJoinHint)[ul]->Matches((*(pos->m_pdrgpJoinHint))[ul]);
 	}
 
 	return fSatisfies;
@@ -162,11 +191,15 @@ ULONG
 CShapeSpec::HashValue() const
 {
 	ULONG ulHash = 0;
-	ULONG arity = m_pdrgpoe->Size();
 
-	for (ULONG ul = 0; ul < arity; ul++)
+	for (ULONG ul = 0; ul < m_pdrgpScanHint->Size(); ul++)
 	{
-		CPlanHint *pse = (*m_pdrgpoe)[ul];
+		CPlanHint *pse = (*m_pdrgpScanHint)[ul];
+		ulHash = gpos::CombineHashes(ulHash, pse->HashValue());
+	}
+	for (ULONG ul = 0; ul < m_pdrgpJoinHint->Size(); ul++)
+	{
+		CPlanHint *pse = (*m_pdrgpScanHint)[ul];
 		ulHash = gpos::CombineHashes(ulHash, pse->HashValue());
 	}
 
@@ -202,16 +235,24 @@ CShapeSpec::PcrsUsed(CMemoryPool *mp) const
 IOstream &
 CShapeSpec::OsPrint(IOstream &os) const
 {
-	const ULONG arity = m_pdrgpoe->Size();
-	if (0 == arity)
+	const ULONG arity1 = m_pdrgpScanHint->Size();
+	const ULONG arity2 = m_pdrgpJoinHint->Size();
+	if (0 == arity1 && 0 == arity2)
 	{
 		os << "<empty>";
 	}
 	else
 	{
-		for (ULONG ul = 0; ul < arity; ul++)
+		os << "\nScanHints: ";
+		for (ULONG ul = 0; ul < arity1; ul++)
 		{
-			(*m_pdrgpoe)[ul]->OsPrint(os) << " ";
+			(*m_pdrgpScanHint)[ul]->OsPrint(os) << " ";
+		}
+
+		os << "\nJoinHints: ";
+		for (ULONG ul = 0; ul < arity2; ul++)
+		{
+			(*m_pdrgpJoinHint)[ul]->OsPrint(os) << " ";
 		}
 	}
 
