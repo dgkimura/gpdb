@@ -15,76 +15,8 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CPhysicalSort.h"
 
-#ifdef GPOS_DEBUG
-#include "gpos/error/CAutoTrace.h"
-#endif	// GPOS_DEBUG
-
 using namespace gpopt;
 using namespace gpmd;
-
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CShapeSpec::CShapeExpression::CShapeExpression
-//
-//	@doc:
-//		Ctor
-//
-//---------------------------------------------------------------------------
-CShapeSpec::CShapeExpression::CShapeExpression(COperator::EOperatorId id,
-											   CWStringConst *alias)
-	: m_id(id), m_alias(alias)
-{
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CShapeSpec::CShapeExpression::~CShapeExpression
-//
-//	@doc:
-//		Dtor
-//
-//---------------------------------------------------------------------------
-CShapeSpec::CShapeExpression::~CShapeExpression()
-{
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CShapeSpec::CShapeExpression::Matches
-//
-//	@doc:
-//		Check if order expression equal to given one;
-//
-//---------------------------------------------------------------------------
-BOOL
-CShapeSpec::CShapeExpression::Matches(const CShapeExpression *pse) const
-{
-	GPOS_ASSERT(nullptr != pse);
-
-	return pse->m_id == m_id && pse->m_alias->Equals(m_alias);
-}
-
-
-FORCE_GENERATE_DBGSTR(gpopt::CShapeSpec::CShapeExpression);
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CShapeSpec::CShapeExpression::OsPrint
-//
-//	@doc:
-//		Print order expression
-//
-//---------------------------------------------------------------------------
-IOstream &
-CShapeSpec::CShapeExpression::OsPrint(IOstream &os) const
-{
-	os << "( ";
-	os << "id:" << m_id << " alias:" << m_alias->GetBuffer();
-	os << " )";
-
-	return os;
-}
 
 
 //---------------------------------------------------------------------------
@@ -97,7 +29,7 @@ CShapeSpec::CShapeExpression::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 CShapeSpec::CShapeSpec(CMemoryPool *mp) : m_mp(mp), m_pdrgpoe(nullptr)
 {
-	m_pdrgpoe = GPOS_NEW(mp) CShapeExpressionArray(mp);
+	m_pdrgpoe = GPOS_NEW(mp) CPlanHintArray(mp);
 }
 
 
@@ -124,18 +56,17 @@ CShapeSpec::~CShapeSpec()
 //
 //---------------------------------------------------------------------------
 void
-CShapeSpec::Append(COperator::EOperatorId id, CWStringConst *alias)
+CShapeSpec::Append(CPlanHint *pph)
 {
-	CShapeExpression *pse_new = GPOS_NEW(m_mp) CShapeExpression(id, alias);
-	m_pdrgpoe->Append(pse_new);
+	m_pdrgpoe->Append(pph);
 }
 void
 CShapeSpec::Append(CShapeSpec *pss)
 {
 	for (ULONG ul = 0; ul < pss->m_pdrgpoe->Size(); ul++)
 	{
-		CShapeExpression *pse = (*pss->m_pdrgpoe)[ul];
-		Append(pse->GetOperator(), pse->GetAlias());
+		CPlanHint *pph = (*pss->m_pdrgpoe)[ul];
+		Append(pph);
 	}
 }
 
@@ -235,10 +166,8 @@ CShapeSpec::HashValue() const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CShapeExpression *pse = (*m_pdrgpoe)[ul];
-		ulHash = gpos::CombineHashes(ulHash, pse->GetOperator());
-		ulHash = gpos::CombineHashes(ulHash,
-									 CWStringConst::HashValue(pse->GetAlias()));
+		CPlanHint *pse = (*m_pdrgpoe)[ul];
+		ulHash = gpos::CombineHashes(ulHash, pse->HashValue());
 	}
 
 	return ulHash;

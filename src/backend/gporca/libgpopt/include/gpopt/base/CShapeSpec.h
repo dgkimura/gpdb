@@ -25,10 +25,279 @@ namespace gpopt
 class CShapeSpec;
 using CShapeSpecArray = CDynamicPtrArray<CShapeSpec, CleanupRelease>;
 
+using CWStringConstArray =
+	CDynamicPtrArray<CWStringConst, CleanupDelete<CWStringConst>>;
+
 using namespace gpos;
 
 // fwd declaration
 class CColRefSet;
+
+class CPlanHint : public CRefCount
+{
+public:
+	// check if order specs match
+	virtual BOOL Matches(CPlanHint *pph) const = 0;
+
+	// print
+	virtual IOstream &OsPrint(IOstream &os) const = 0;
+
+	virtual ULONG HashValue() const = 0;
+};
+
+class CScanHint : public CPlanHint
+{
+private:
+	const CWStringConst *m_name;
+
+	const CWStringConst *m_indexname{nullptr};
+
+	COperator::EOperatorId m_id;
+
+public:
+	CScanHint(const CWStringConst *name, const CWStringConst *indexname,
+			  COperator::EOperatorId id)
+		: m_name(name), m_indexname(indexname), m_id(id)
+	{
+	}
+
+	CScanHint(const CWStringConst *name, COperator::EOperatorId id)
+		: m_name(name), m_id(id)
+	{
+	}
+
+	BOOL
+	Matches(CPlanHint *_pph) const override
+	{
+		CScanHint *pph = dynamic_cast<CScanHint *>(_pph);
+		if (nullptr == pph)
+		{
+			return false;
+		}
+
+		if ((pph->m_indexname == nullptr && m_indexname != nullptr) ||
+			(pph->m_indexname != nullptr && m_indexname == nullptr))
+		{
+			return false;
+		}
+		if (pph->m_indexname != nullptr && m_indexname != nullptr &&
+			!CWStringConst::Equals(m_indexname, pph->m_indexname))
+		{
+			return false;
+		}
+		return CWStringConst::Equals(m_name, pph->m_name) && m_id == pph->m_id;
+	}
+
+	ULONG
+	HashValue() const override
+	{
+		return gpos::CombineHashes(
+			gpos::CombineHashes(
+				CWStringConst::HashValue(m_name),
+				m_indexname ? CWStringConst::HashValue(m_indexname) : 0),
+			m_id);
+	}
+
+	IOstream &
+	OsPrint(IOstream &os) const
+	{
+		os << "( ";
+		os << "id:" << m_id << " name:" << m_name->GetBuffer();
+		if (m_indexname)
+		{
+			os << " indexname:" << m_indexname->GetBuffer();
+		}
+		os << " )";
+
+		return os;
+	}
+};
+
+//FORCE_GENERATE_DBGSTR(gpopt::CScanHint);
+
+class CJoinTypeHint : public CPlanHint
+{
+private:
+	// order is irrelevant
+	CWStringConstArray *m_names;
+
+	COperator::EOperatorId m_id;
+
+public:
+	CJoinTypeHint(CWStringConstArray *names, COperator::EOperatorId id)
+		: m_names(names), m_id(id)
+	{
+	}
+
+	ULONG
+	HashValue() const override
+	{
+		// TODO:FIXME: Array needs to be sorted or hash will be inconsistent...
+
+		ULONG hashValue = m_id;
+		for (ULONG ul = 0; ul < m_names->Size(); ul++)
+		{
+			hashValue = gpos::CombineHashes(
+				hashValue, CWStringConst::HashValue((*m_names)[ul]));
+		}
+
+		return hashValue;
+	}
+
+	BOOL
+	Matches(CPlanHint *_pph) const override
+	{
+		CJoinTypeHint *pph = dynamic_cast<CJoinTypeHint *>(_pph);
+		if (nullptr == pph)
+		{
+			return false;
+		}
+
+		// TODO:FIXME: Array needs to be sorted or hash will be inconsistent...
+
+		if (pph->m_names->Size() != m_names->Size())
+		{
+			return false;
+		}
+		for (ULONG ul = 0; ul < m_names->Size(); ul++)
+		{
+			if (!CWStringConst::Equals((*m_names)[ul], (*pph->m_names)[ul]))
+			{
+				return false;
+			}
+		}
+
+		return m_id == pph->m_id;
+	}
+
+	IOstream &
+	OsPrint(IOstream &os) const
+	{
+		os << "CJoinTypeHint";
+
+		return os;
+	}
+};
+
+class CJoinOrderHint : public CPlanHint
+{
+private:
+	// order is relevant
+	CWStringConstArray *m_names;
+
+public:
+	CJoinOrderHint(CWStringConstArray *names) : m_names(names)
+	{
+	}
+
+	ULONG
+	HashValue() const override
+	{
+		ULONG hashValue = 0;
+		for (ULONG ul = 0; ul < m_names->Size(); ul++)
+		{
+			hashValue = gpos::CombineHashes(
+				hashValue, CWStringConst::HashValue((*m_names)[ul]));
+		}
+
+		return hashValue;
+	}
+
+	BOOL
+	Matches(CPlanHint *_pph) const override
+	{
+		CJoinOrderHint *pph = dynamic_cast<CJoinOrderHint *>(_pph);
+		if (nullptr == pph)
+		{
+			return false;
+		}
+
+		if (pph->m_names->Size() != m_names->Size())
+		{
+			return false;
+		}
+		for (ULONG ul = 0; ul < m_names->Size(); ul++)
+		{
+			if (!CWStringConst::Equals((*m_names)[ul], (*pph->m_names)[ul]))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	IOstream &
+	OsPrint(IOstream &os) const
+	{
+		os << "CJoinOrderHint";
+
+		return os;
+	}
+};
+
+class CJoinMotionHint : public CPlanHint
+{
+public:
+	enum class MotionType
+	{
+		Redistribute,
+		Broadcast,
+		Gather,
+		Any,
+		None
+	};
+
+	CJoinMotionHint(CWStringConst *name_left, CWStringConst *name_right,
+					MotionType motion_left, MotionType motion_right)
+		: m_name_left(name_left),
+		  m_name_right(name_right),
+		  m_motion_left(motion_left),
+		  m_motion_right(motion_right)
+	{
+	}
+
+	ULONG
+	HashValue() const override
+	{
+		return gpos::CombineHashes(
+			gpos::CombineHashes(
+				gpos::CombineHashes(CWStringConst::HashValue(m_name_left),
+									CWStringConst::HashValue(m_name_right)),
+				static_cast<ULONG>(m_motion_left)),
+			static_cast<ULONG>(m_motion_right));
+	}
+
+	BOOL
+	Matches(CPlanHint *_pph) const override
+	{
+		CJoinMotionHint *pph = dynamic_cast<CJoinMotionHint *>(_pph);
+		if (nullptr == pph)
+		{
+			return false;
+		}
+		return CWStringConst::Equals(m_name_left, pph->m_name_left) &&
+			   CWStringConst::Equals(m_name_right, pph->m_name_right) &&
+			   m_motion_left == pph->m_motion_left &&
+			   m_motion_right == pph->m_motion_right;
+	}
+
+	IOstream &
+	OsPrint(IOstream &os) const
+	{
+		os << "CJoinMotionHint";
+
+		return os;
+	}
+
+private:
+	CWStringConst *m_name_left;
+	CWStringConst *m_name_right;
+	MotionType m_motion_left;
+	MotionType m_motion_right;
+};
+
+using CPlanHintArray = CDynamicPtrArray<CPlanHint, CleanupRelease<CPlanHint>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -41,61 +310,12 @@ class CColRefSet;
 class CShapeSpec : public CPropSpec
 {
 private:
-	//---------------------------------------------------------------------------
-	//	@class:
-	//		CShapeExpression
-	//
-	//	@doc:
-	//		Spec of shape component
-	//
-	//---------------------------------------------------------------------------
-	class CShapeExpression : public gpos::DbgPrintMixin<CShapeExpression>
-	{
-	private:
-		COperator::EOperatorId m_id;
-		CWStringConst *m_alias;
-
-	public:
-		CShapeExpression(const CShapeExpression &) = delete;
-
-		// ctor
-		CShapeExpression(COperator::EOperatorId id, CWStringConst *alias);
-
-		// dtor
-		virtual ~CShapeExpression();
-
-		// accessor of shape
-		COperator::EOperatorId
-		GetOperator() const
-		{
-			return m_id;
-		}
-
-		CWStringConst *
-		GetAlias() const
-		{
-			return m_alias;
-		}
-
-		// check if order specs match
-		BOOL Matches(const CShapeExpression *pse) const;
-
-		// print
-		IOstream &OsPrint(IOstream &os) const;
-
-	};	// class CShapeExpression
-
-	// array of order expressions
-	using CShapeExpressionArray =
-		CDynamicPtrArray<CShapeExpression, CleanupDelete>;
-
-
 	// memory pool
 	CMemoryPool *m_mp;
 
 protected:
 	// components of order spec
-	CShapeExpressionArray *m_pdrgpoe;
+	CPlanHintArray *m_pdrgpoe;
 
 public:
 	CShapeSpec(const CShapeSpec &) = delete;
@@ -121,7 +341,7 @@ public:
 	}
 
 	// append new component
-	void Append(COperator::EOperatorId id, CWStringConst *alias);
+	void Append(CPlanHint *pph);
 
 	// append shape spec
 	void Append(CShapeSpec *pss);

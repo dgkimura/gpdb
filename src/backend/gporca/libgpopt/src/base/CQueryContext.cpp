@@ -243,10 +243,13 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
 	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
-	pss->Append(COperator::EopPhysicalTableScan,
-				GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_table")));
-	pss->Append(COperator::EopPhysicalIndexScan,
-				GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_awesome_index")));
+	//pss->Append(GPOS_NEW(mp) CScanHint(
+	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_table")),
+	//	COperator::EopPhysicalTableScan));
+	//pss->Append(GPOS_NEW(mp) CScanHint(
+	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("your_table")),
+	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_awesome_index")),
+	//	COperator::EopPhysicalIndexScan));
 	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context
