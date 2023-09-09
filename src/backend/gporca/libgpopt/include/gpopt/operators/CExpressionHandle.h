@@ -329,6 +329,10 @@ public:
 	CTableDescriptorHashSet *DeriveTableDescriptor() const;
 	CTableDescriptorHashSet *DeriveTableDescriptor(ULONG child_index) const;
 
+	CWStringHashSet *DeriveTableNameSet() const;
+
+	CWStringHashSet *DeriveTableNameSet(ULONG child_index) const;
+
 	// Scalar property accessors
 	CColRefSet *DeriveDefinedColumns(ULONG child_index) const;
 	CColRefSet *DeriveUsedColumns(ULONG child_index) const;

@@ -2004,6 +2004,48 @@ CExpressionHandle::DeriveTableDescriptor(ULONG child_index) const
 
 	return GetRelationalProperties(child_index)->GetTableDescriptor();
 }
+
+CWStringHashSet *
+CExpressionHandle::DeriveTableNameSet() const
+{
+	// FIXME:TODO:XXX cache the work...
+	CWStringHashSet *ptableNameSet = GPOS_NEW(m_mp) CWStringHashSet(m_mp);
+
+	CTableDescriptorHashSet *ptableDescSet = DeriveTableDescriptor();
+	CTableDescriptorHashSetIter hsiter(ptableDescSet);
+
+	while (hsiter.Advance())
+	{
+		const CTableDescriptor *ptabedesc = hsiter.Get();
+		ptableNameSet->Insert(
+			const_cast<CWStringConst *>(ptabedesc->Name().Pstr()));
+	}
+
+	return ptableNameSet;
+}
+
+CWStringHashSet *
+CExpressionHandle::DeriveTableNameSet(ULONG child_index) const
+{
+	// FIXME:TODO:XXX cache the work...
+	CWStringHashSet *ptableNameSet = GPOS_NEW(m_mp) CWStringHashSet(m_mp);
+
+	CTableDescriptorHashSet *ptableDescSet = DeriveTableDescriptor(child_index);
+	if (nullptr == ptableDescSet)
+	{
+		return ptableNameSet;
+	}
+	CTableDescriptorHashSetIter hsiter(ptableDescSet);
+
+	while (hsiter.Advance())
+	{
+		const CTableDescriptor *ptabedesc = hsiter.Get();
+		ptableNameSet->Insert(
+			const_cast<CWStringConst *>(ptabedesc->Name().Pstr()));
+	}
+
+	return ptableNameSet;
+}
 // Scalar property accessors
 
 CColRefSet *

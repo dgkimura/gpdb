@@ -590,7 +590,10 @@ CTableDescriptorHashSet *
 CDrvdPropRelational::GetTableDescriptor() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	m_table_descriptor->AddRef();
+	if (m_table_descriptor)
+	{
+		m_table_descriptor->AddRef();
+	}
 	return m_table_descriptor;
 }
 

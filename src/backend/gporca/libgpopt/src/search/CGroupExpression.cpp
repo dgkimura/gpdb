@@ -458,7 +458,7 @@ CGroupExpression::PccComputeCost(
 		GPOS_ASSERT_IMP(
 			COptCtxt::FAllEnforcersEnabled(),
 			// Shape spec can leave invalid plan paths..
-			(fValid || poc->Prpp()->Pes()->PssRequired()->IsEmpty()) &&
+			(fValid || !poc->Prpp()->Pes()->PssRequired()->IsEmpty()) &&
 				"Cost context carries an invalid plan");
 	}
 	else

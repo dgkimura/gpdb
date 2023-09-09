@@ -997,6 +997,53 @@ CPhysicalJoin::Edm(CReqdPropPlan *,	 // prppInput
 	return CEnfdDistribution::EdmExact;
 }
 
+// compute required shape of the n-th child
+CShapeSpec *
+CPhysicalJoin::PssRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+						   CShapeSpec *pssRequired, ULONG child_index,
+						   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+						   ULONG ulOptReq GPOS_UNUSED) const
+{
+	// TODO:XXX:FIXME: check which side of this operator the tables used in
+	//     pssRequired exit.
+	//     1) at least one left and at least right, then make sure this
+	//        operator matches and adjust left/right requirement.
+	//     2) all left then forward requirement to only left
+	//     3) all right then forward requirement to only right
+	//     4) none on left or right then return "impossible" spec.
+
+	// (gdb) exprhdl.DeriveTableDescriptor(ul);
+	//return PssPassThru(mp, exprhdl, pssRequired, child_index);
+	CShapeSpec *pspec = GPOS_NEW(mp) CShapeSpec(mp);
+	CPlanHintArray *requiredScans = pssRequired->ScanHints();
+
+	CWStringHashSet *leftnames = exprhdl.DeriveTableNameSet(0);
+	CWStringHashSet *rightnames = exprhdl.DeriveTableNameSet(1);
+
+	for (ULONG ul = 0; ul < requiredScans->Size(); ul++)
+	{
+		CScanHint *pph = dynamic_cast<CScanHint *>((*requiredScans)[ul]);
+		GPOS_ASSERT(pph);
+
+		if (child_index == 0 && leftnames->Contains(pph->GetName()))
+		{
+			pspec->Append(pph);
+		}
+		else if (rightnames == nullptr ||
+				 (!leftnames->Contains(pph->GetName()) &&
+				  !rightnames->Contains(pph->GetName())))
+		{
+			// nobody contains it, but should have. make us blow up....
+			pspec->Append(pph);
+		}
+		else if (child_index == 1 && rightnames->Contains(pph->GetName()))
+		{
+			pspec->Append(pph);
+		}
+	}
+	return pspec;
+}
+
 CShapeSpec *
 CPhysicalJoin::PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {

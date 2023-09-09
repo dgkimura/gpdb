@@ -66,6 +66,18 @@ public:
 	{
 	}
 
+	const CWStringConst *
+	GetName()
+	{
+		return m_name;
+	}
+
+	const CWStringConst *
+	GetIndexName()
+	{
+		return m_indexname;
+	}
+
 	BOOL
 	Matches(CPlanHint *_pph) const override
 	{
@@ -338,6 +350,18 @@ public:
 
 	// append shape spec
 	void Append(CShapeSpec *pss);
+
+	CPlanHintArray *
+	ScanHints()
+	{
+		return m_pdrgpScanHint;
+	}
+
+	CPlanHintArray *
+	JoinHints()
+	{
+		return m_pdrgpJoinHint;
+	}
 
 	// extract colref set of order columns
 	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;

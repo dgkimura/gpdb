@@ -273,6 +273,10 @@ using CTableDescriptorHashSet =
 	CHashSet<CTableDescriptor, CTableDescriptor::HashValue,
 			 CTableDescriptor::Equals, CleanupNULL<CTableDescriptor>>;
 
+using CTableDescriptorHashSetIter =
+	CHashSetIter<CTableDescriptor, CTableDescriptor::HashValue,
+				 CTableDescriptor::Equals, CleanupNULL<CTableDescriptor>>;
+
 }  // namespace gpopt
 
 #endif	// !GPOPT_CTableDescriptor_H

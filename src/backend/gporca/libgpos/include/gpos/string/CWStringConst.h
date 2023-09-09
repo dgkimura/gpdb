@@ -11,6 +11,7 @@
 #ifndef GPOS_CWStringConst_H
 #define GPOS_CWStringConst_H
 
+#include "gpos/common/CHashSet.h"
 #include "gpos/string/CWStringBase.h"
 
 namespace gpos
@@ -57,6 +58,10 @@ public:
 	// checks whether the string is byte-wise equal to another string
 	BOOL Equals(const CWStringBase *str) const override;
 };
+
+using CWStringHashSet =
+	CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
+			 CleanupRelease<CWStringConst>>;
 }  // namespace gpos
 
 #endif	// #ifndef GPOS_CWStringConst_H
