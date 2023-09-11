@@ -1004,6 +1004,8 @@ CPhysicalJoin::PssRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 						   ULONG ulOptReq GPOS_UNUSED) const
 {
+	// TODO:XXX:FIXME: check operator id to handle different types of joins
+
 	// TODO:XXX:FIXME: check which side of this operator the tables used in
 	//     pssRequired exit.
 	//     1) at least one left and at least right, then make sure this
@@ -1047,6 +1049,23 @@ CPhysicalJoin::PssRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 CShapeSpec *
 CPhysicalJoin::PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
+	// TODO:XXX:FIXME: derive the join type and permutate over all the children
+	//    for each side. For example:
+	//
+	//      Left-Side            Right-Side
+	//      A, B, C              D, E
+	//
+	//    Procuces:
+	//
+	//      (A, D)
+	//      (A, E)
+	//      (B, D)
+	//      (B, E)
+	//      (C, D)
+	//      (C, E)
+	//
+	//    Thus it should satisfy any of these hints...
+
 	// TODO:XXX:FIXME: construct spec based on operator, left table set, right
 	//    table set.
 	//    In order to handle mixed join types, need to map join types to table sets
