@@ -62,6 +62,9 @@ public:
 using CWStringHashSet =
 	CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
 			 CleanupRelease<CWStringConst>>;
+using CWStringHashSetIter =
+	CHashSetIter<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
+				 CleanupRelease<CWStringConst>>;
 }  // namespace gpos
 
 #endif	// #ifndef GPOS_CWStringConst_H

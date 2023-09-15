@@ -1077,6 +1077,7 @@ CPhysical::PssDerive(CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl)
 			// (gdb) exprhdl.DeriveTableDescriptor(ul);
 		}
 	}
+	pss->SetOperator(this);
 	return pss;
 }
 

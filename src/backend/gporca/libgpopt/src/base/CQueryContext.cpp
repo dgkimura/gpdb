@@ -243,13 +243,22 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
 	CShapeSpec *pss = GPOS_NEW(mp) CShapeSpec(mp);
-	//pss->Append(GPOS_NEW(mp) CScanHint(
-	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_table")),
-	//	COperator::EopPhysicalTableScan));
-	//pss->Append(GPOS_NEW(mp) CScanHint(
-	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("your_table")),
-	//	GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_awesome_index")),
-	//	COperator::EopPhysicalIndexScan));
+	pss->Append(GPOS_NEW(mp) CScanHint(
+		GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("your_table")),
+		COperator::EopPhysicalTableScan));
+	pss->Append(GPOS_NEW(mp) CScanHint(
+		GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_table")),
+		GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_awesome_index")),
+		COperator::EopPhysicalIndexScan));
+
+	CWStringHashSet *leftnames = GPOS_NEW(mp) CWStringHashSet(mp);
+	leftnames->Insert(GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("your_table")));
+	CWStringHashSet *rightnames = GPOS_NEW(mp) CWStringHashSet(mp);
+	rightnames->Insert(GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("my_table")));
+
+	pss->Append(GPOS_NEW(mp) CJoinMotionHint(
+		leftnames, rightnames, CJoinMotionHint::MotionType::Gather,
+		CJoinMotionHint::MotionType::Gather));
 	CEnfdShape *pes = GPOS_NEW(mp) CEnfdShape(pss, CEnfdShape::EomSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context

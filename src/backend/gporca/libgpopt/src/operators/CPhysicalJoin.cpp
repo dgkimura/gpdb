@@ -27,6 +27,8 @@
 
 using namespace gpopt;
 
+FORCE_GENERATE_DBGSTR(CScanHint);
+FORCE_GENERATE_DBGSTR(CJoinMotionHint);
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -1069,7 +1071,57 @@ CPhysicalJoin::PssDerive(CMemoryPool *mp, CExpressionHandle &exprhdl)
 	// TODO:XXX:FIXME: construct spec based on operator, left table set, right
 	//    table set.
 	//    In order to handle mixed join types, need to map join types to table sets
-	return CPhysical::PssDerive(mp, exprhdl);
+	CShapeSpec *childspec = CPhysical::PssDerive(mp, exprhdl);
+
+	CShapeSpec *spec = GPOS_NEW(mp) CShapeSpec(mp);
+	spec->Append(childspec);
+
+	auto getMotion = [](COperator *op) {
+		CJoinMotionHint::MotionType motion = CJoinMotionHint::MotionType::None;
+		if (nullptr == op)
+		{
+			return motion;
+		}
+
+		switch (op->Eopid())
+		{
+			case COperator::EopPhysicalMotionGather:
+			{
+				motion = CJoinMotionHint::MotionType::Gather;
+				break;
+			}
+			case COperator::EopPhysicalMotionBroadcast:
+			{
+				motion = CJoinMotionHint::MotionType::Broadcast;
+				break;
+			}
+			case COperator::EopPhysicalMotionHashDistribute:
+			{
+				motion = CJoinMotionHint::MotionType::Redistribute;
+				break;
+			}
+			default:
+			{
+				// TODO:FIXME:XXX routed?
+			}
+		}
+		return motion;
+	};
+
+	// (gdb) p *exprhdl.Pdpplan(0)->Pss()->m_op
+	// (gdb) p *exprhdl.Pdpplan(1)->Pss()->m_op
+	spec->Append(GPOS_NEW(mp) CJoinMotionHint(
+		exprhdl.DeriveTableNameSet(0), exprhdl.DeriveTableNameSet(1),
+		getMotion(exprhdl.Pdpplan(0)->Pss()->GetOperator()),
+		getMotion(exprhdl.Pdpplan(1)->Pss()->GetOperator())));
+
+	// XXX:TODO:FIXME: does this mirror hint make sense or should the logic be
+	//                 moved insde the CJoinMotionHint::Matches() function?
+	spec->Append(GPOS_NEW(mp) CJoinMotionHint(
+		exprhdl.DeriveTableNameSet(1), exprhdl.DeriveTableNameSet(1),
+		getMotion(exprhdl.Pdpplan(1)->Pss()->GetOperator()),
+		getMotion(exprhdl.Pdpplan(0)->Pss()->GetOperator())));
+	return spec;
 }
 
 

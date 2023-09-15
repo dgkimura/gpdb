@@ -132,6 +132,14 @@ public:
 		return dynamic_cast<CPhysicalMotion *>(pop);
 	}
 
+	//virtual CShapeSpec *
+	//PssDerive(CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl) override
+	//{
+	//	CShapeSpec *pssChild = exprhdl.Pdpplan(0 /*child_index*/)->Pss();
+	//	// FIXME:TODO:XXX If there's a motion hint, replace it with me!
+	//	return pssChild;
+	//}
+
 };	// class CPhysicalMotion
 
 }  // namespace gpopt

@@ -45,7 +45,7 @@ public:
 	virtual ULONG HashValue() const = 0;
 };
 
-class CScanHint : public CPlanHint
+class CScanHint : public CPlanHint, public DbgPrintMixin<CScanHint>
 {
 private:
 	const CWStringConst *m_name;
@@ -124,8 +124,6 @@ public:
 		return os;
 	}
 };
-
-//FORCE_GENERATE_DBGSTR(gpopt::CScanHint);
 
 class CJoinTypeHint : public CPlanHint
 {
@@ -248,7 +246,7 @@ public:
 	}
 };
 
-class CJoinMotionHint : public CPlanHint
+class CJoinMotionHint : public CPlanHint, public DbgPrintMixin<CJoinMotionHint>
 {
 public:
 	enum class MotionType
@@ -260,10 +258,10 @@ public:
 		None
 	};
 
-	CJoinMotionHint(CWStringConst *name_left, CWStringConst *name_right,
+	CJoinMotionHint(CWStringHashSet *leftnames, CWStringHashSet *rightnames,
 					MotionType motion_left, MotionType motion_right)
-		: m_name_left(name_left),
-		  m_name_right(name_right),
+		: m_leftnames(leftnames),
+		  m_rightnames(rightnames),
 		  m_motion_left(motion_left),
 		  m_motion_right(motion_right)
 	{
@@ -272,10 +270,21 @@ public:
 	ULONG
 	HashValue() const override
 	{
+		auto hash = [](CWStringHashSet *names) {
+			ULONG hashValue = 0;
+			CWStringHashSetIter hsiter(names);
+			while (hsiter.Advance())
+			{
+				const CWStringConst *pname = hsiter.Get();
+				hashValue = gpos::CombineHashes(
+					hashValue, CWStringConst::HashValue(pname));
+			}
+			return hashValue;
+		};
+
 		return gpos::CombineHashes(
 			gpos::CombineHashes(
-				gpos::CombineHashes(CWStringConst::HashValue(m_name_left),
-									CWStringConst::HashValue(m_name_right)),
+				gpos::CombineHashes(hash(m_leftnames), hash(m_rightnames)),
 				static_cast<ULONG>(m_motion_left)),
 			static_cast<ULONG>(m_motion_right));
 	}
@@ -288,10 +297,31 @@ public:
 		{
 			return false;
 		}
-		return CWStringConst::Equals(m_name_left, pph->m_name_left) &&
-			   CWStringConst::Equals(m_name_right, pph->m_name_right) &&
-			   m_motion_left == pph->m_motion_left &&
-			   m_motion_right == pph->m_motion_right;
+		auto matches = [](CWStringHashSet *left, CWStringHashSet *right) {
+			if (left->Size() != right->Size())
+			{
+				return false;
+			}
+
+			CWStringHashSetIter hsiter(left);
+			while (hsiter.Advance())
+			{
+				const CWStringConst *name = hsiter.Get();
+				if (!right->Contains(name))
+				{
+					return false;
+				}
+			}
+			return true;
+		};
+		return matches(m_leftnames, pph->m_leftnames) &&
+			   matches(m_rightnames, pph->m_rightnames) &&
+			   (m_motion_left == pph->m_motion_left ||
+				m_motion_left == CJoinMotionHint::MotionType::Any ||
+				pph->m_motion_left == CJoinMotionHint::MotionType::Any) &&
+			   (m_motion_right == pph->m_motion_right ||
+				m_motion_right == CJoinMotionHint::MotionType::Any ||
+				pph->m_motion_right == CJoinMotionHint::MotionType::Any);
 	}
 
 	IOstream &
@@ -299,12 +329,42 @@ public:
 	{
 		os << "CJoinMotionHint";
 
+		auto motionToString = [](CJoinMotionHint::MotionType motion) {
+			switch (motion)
+			{
+				case CJoinMotionHint::MotionType::Redistribute:
+				{
+					return "redistribute";
+				}
+				case CJoinMotionHint::MotionType::Broadcast:
+				{
+					return "broadcast";
+				}
+				case CJoinMotionHint::MotionType::Gather:
+				{
+					return "gather";
+				}
+				case CJoinMotionHint::MotionType::Any:
+				{
+					return "any";
+				}
+				case CJoinMotionHint::MotionType::None:
+				{
+					return "none";
+				}
+			}
+			return "unknown";
+		};
+
+		os << "( " << motionToString(m_motion_left) << ", "
+		   << motionToString(m_motion_right) << " )";
+
 		return os;
 	}
 
 private:
-	CWStringConst *m_name_left;
-	CWStringConst *m_name_right;
+	CWStringHashSet *m_leftnames;
+	CWStringHashSet *m_rightnames;
 	MotionType m_motion_left;
 	MotionType m_motion_right;
 };
@@ -324,6 +384,7 @@ class CShapeSpec : public CPropSpec
 private:
 	// memory pool
 	CMemoryPool *m_mp;
+	COperator *m_op{nullptr};
 
 protected:
 	CPlanHintArray *m_pdrgpScanHint;
@@ -337,6 +398,18 @@ public:
 
 	// dtor
 	~CShapeSpec() override;
+
+	void
+	SetOperator(COperator *op)
+	{
+		m_op = op;
+	}
+
+	COperator *
+	GetOperator()
+	{
+		return m_op;
+	}
 
 	// check if shape spec has hints
 	BOOL
@@ -402,7 +475,6 @@ public:
 
 
 };	// class CShapeSpec
-
 }  // namespace gpopt
 
 #endif	// !GPOPT_CShapeSpec_H
