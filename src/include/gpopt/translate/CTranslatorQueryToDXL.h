@@ -126,6 +126,9 @@ private:
 	// list of CTE producers
 	CDXLNodeArray *m_dxl_cte_producers;
 
+	// list of plan hints
+	CDXLNodeArray *m_dxl_plan_hints;
+
 	// CTE producer IDs defined at the current query level
 	UlongBoolHashMap *m_cteid_at_current_query_level_map;
 
@@ -460,10 +463,14 @@ public:
 	// return the list of CTEs
 	CDXLNodeArray *GetCTEs() const;
 
+	// return the list of plan hints
+	CDXLNodeArray *GetPlanHints() const;
+
 	// factory function
 	static CTranslatorQueryToDXL *QueryToDXLInstance(CMemoryPool *mp,
 													 CMDAccessor *md_accessor,
-													 Query *query);
+													 Query *query,
+													 void *plan_hints);
 };
 }  // namespace gpdxl
 #endif	// GPDXL_CTranslatorQueryToDXL_H

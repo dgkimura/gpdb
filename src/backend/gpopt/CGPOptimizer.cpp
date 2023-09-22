@@ -51,6 +51,7 @@ CGPOptimizer::GPOPTOptimizedPlan(
 	SOptContext gpopt_context;
 	PlannedStmt *plStmt = nullptr;
 
+	// TODO: setup gpopt_context.m_plan_hints
 	*had_unexpected_failure = false;
 
 	GPOS_TRY

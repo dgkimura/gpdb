@@ -43,6 +43,8 @@
 /* GPORCA entry point */
 extern PlannedStmt * GPOPTOptimizedPlan(Query *parse, bool *had_unexpected_failure);
 
+plan_hint_hook_type plan_hint_hook = NULL;
+
 static Plan *remove_redundant_results(PlannerInfo *root, Plan *plan);
 static Node *remove_redundant_results_mutator(Node *node, void *);
 static bool can_replace_tlist(Plan *plan);
@@ -151,6 +153,10 @@ optimize_query(Query *parse, int cursorOptions, ParamListInfo boundParams)
 	 * transform it such that the grouped query appears as a subquery
 	 */
 	pqueryCopy = (Query *) transformGroupedWindows((Node *) pqueryCopy, NULL);
+
+	// TODO:XXX: pass parsed hints into GPOPTOptimizedPlan()
+	if (plan_hint_hook != NULL)
+		plan_hint_hook(pqueryCopy);
 
 	/* Ok, invoke ORCA. */
 	result = GPOPTOptimizedPlan(pqueryCopy, &fUnexpectedFailure);

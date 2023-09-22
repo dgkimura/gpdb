@@ -73,6 +73,9 @@ struct SOptContext
 	// query object
 	Query *m_query{nullptr};
 
+	// plan hints
+	void *m_plan_hints{nullptr};
+
 	// plan object serialized to DXL
 	CHAR *m_plan_dxl{nullptr};
 

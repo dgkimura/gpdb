@@ -530,7 +530,7 @@ COptTasks::OptimizeTask(void *ptr)
 
 			CAutoP<CTranslatorQueryToDXL> query_to_dxl_translator;
 			query_to_dxl_translator = CTranslatorQueryToDXL::QueryToDXLInstance(
-				mp, &mda, (Query *) opt_ctxt->m_query);
+				mp, &mda, (Query *) opt_ctxt->m_query, opt_ctxt->m_plan_hints);
 
 			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
 			COptimizerConfig *optimizer_config =
@@ -545,6 +545,8 @@ COptTasks::OptimizeTask(void *ptr)
 				query_to_dxl_translator->GetQueryOutputCols();
 			CDXLNodeArray *cte_dxlnode_array =
 				query_to_dxl_translator->GetCTEs();
+			CDXLNodeArray *plan_hints_dxlnode_array =
+				query_to_dxl_translator->GetPlanHints();
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
 
 			BOOL is_coordinator_only =
@@ -729,6 +731,7 @@ COptTasks::Optimize(Query *query)
 
 	SOptContext gpopt_context;
 	gpopt_context.m_query = query;
+	gpopt_context.m_plan_hints = nullptr;
 	gpopt_context.m_should_serialize_plan_dxl = true;
 	Execute(&OptimizeTask, &gpopt_context);
 

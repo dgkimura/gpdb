@@ -241,10 +241,12 @@ CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 CTranslatorQueryToDXL *
 CTranslatorQueryToDXL::QueryToDXLInstance(CMemoryPool *mp,
 										  CMDAccessor *md_accessor,
-										  Query *query)
+										  Query *query,
+										  void *plan_hints GPOS_UNUSED)
 {
 	CContextQueryToDXL *context = GPOS_NEW(mp) CContextQueryToDXL(mp);
 
+	// TODO:XXX: serialize plan hints
 	return GPOS_NEW(context->m_mp)
 		CTranslatorQueryToDXL(context, md_accessor,
 							  nullptr,	// var_colid_mapping,
@@ -507,6 +509,20 @@ CDXLNodeArray *
 CTranslatorQueryToDXL::GetCTEs() const
 {
 	return m_dxl_cte_producers;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CTranslatorQueryToDXL::GetPlanHints
+//
+//	@doc:
+//		Return the list of plan hints
+//
+//---------------------------------------------------------------------------
+CDXLNodeArray *
+CTranslatorQueryToDXL::GetPlanHints() const
+{
+	return m_dxl_plan_hints;
 }
 
 //---------------------------------------------------------------------------
