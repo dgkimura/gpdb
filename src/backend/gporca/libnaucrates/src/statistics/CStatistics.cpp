@@ -195,6 +195,12 @@ CStatistics::Rows() const
 	return m_rows;
 }
 
+void
+CStatistics::SetRows(CDouble rows)
+{
+	m_rows = rows;
+}
+
 // return the estimated skew of the given column
 CDouble
 CStatistics::GetSkew(ULONG colid) const
