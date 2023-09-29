@@ -16,6 +16,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
 
+#include "naucrates/dxl/hints/CDXLPlanHint.h"
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
 
 namespace gpdxl
@@ -219,13 +220,23 @@ protected:
 	// memory pool
 	CMemoryPool *m_mp;
 
+	// plan hint
+	CDXLPlanHint *m_dxl_plan_hint{nullptr};
+
 public:
 	CDXLOperator(const CDXLOperator &) = delete;
 
 	// ctor/dtor
 	explicit CDXLOperator(CMemoryPool *);
 
+	explicit CDXLOperator(CMemoryPool *, CDXLPlanHint *hint);
+
 	~CDXLOperator() override;
+
+	CDXLPlanHint *GetDXLPlanHint()
+	{
+		return m_dxl_plan_hint;
+	}
 
 	// ident accessors
 	virtual Edxlopid GetDXLOperator() const = 0;

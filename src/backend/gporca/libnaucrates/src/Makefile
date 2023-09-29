@@ -10,7 +10,7 @@ include $(top_builddir)/src/Makefile.global
 
 include $(top_srcdir)/src/backend/gporca/gporca.mk
 
-SUBDIRS     = base md operators parser statistics xml
+SUBDIRS     = base hints md operators parser statistics xml
 OBJS        = CCostModelConfigSerializer.o \
               CDXLUtils.o \
               CIdGenerator.o \

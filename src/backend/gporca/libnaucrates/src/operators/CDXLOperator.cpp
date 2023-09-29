@@ -28,6 +28,11 @@ CDXLOperator::CDXLOperator(CMemoryPool *mp) : m_mp(mp)
 {
 }
 
+CDXLOperator::CDXLOperator(CMemoryPool *mp, CDXLPlanHint *hint)
+	: m_mp(mp), m_dxl_plan_hint(hint)
+{
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CDXLOperator::~CDXLOperator
