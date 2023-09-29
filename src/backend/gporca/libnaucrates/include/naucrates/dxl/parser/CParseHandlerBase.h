@@ -46,6 +46,7 @@ enum EDxlParseHandlerType
 	EdxlphWindowOids,
 	EdxlphTraceFlags,
 	EdxlphPlan,
+	EdxlphPlanHint,
 	EdxlphQuery,
 	EdxlphMetadata,
 	EdxlphMetadataRequest,

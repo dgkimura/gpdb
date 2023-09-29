@@ -66,6 +66,7 @@ CParseHandlerPlanHint::StartElement(const XMLCh *const,	 //element_uri,
 									const XMLCh *const,	 //element_qname,
 									const Attributes &attrs)
 {
+	// TODO:FIXME:KIMURA: CPlanHint
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenHint),
 									  element_local_name))
 	{
@@ -161,7 +162,7 @@ CParseHandlerPlanHint::EndElement(const XMLCh *const,  // element_uri,
 EDxlParseHandlerType
 CParseHandlerPlanHint::GetParseHandlerType() const
 {
-	return EdxlphHint;
+	return EdxlphPlanHint;
 }
 
 //---------------------------------------------------------------------------

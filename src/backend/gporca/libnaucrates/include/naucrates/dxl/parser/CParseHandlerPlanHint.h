@@ -67,6 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// hint configuration
+	// TODO:FIXME:KIMURA: CPlanHint
 	CHint *GetHint() const;
 };
 }  // namespace gpdxl
