@@ -42,6 +42,7 @@ class CMDAccessor;
 class CQueryContext;
 class COptimizerConfig;
 class ICostModel;
+class CPlanHint;
 }  // namespace gpopt
 
 struct PlannedStmt;
@@ -120,7 +121,8 @@ private:
 
 	// create optimizer configuration object
 	static COptimizerConfig *CreateOptimizerConfig(CMemoryPool *mp,
-												   ICostModel *cost_model);
+												   ICostModel *cost_model,
+												   CPlanHint *plan_hints);
 
 	// optimize a query to a physical DXL
 	static void *OptimizeTask(void *ptr);
