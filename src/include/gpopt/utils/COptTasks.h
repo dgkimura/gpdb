@@ -145,6 +145,9 @@ private:
 	// generate an instance of optimizer cost model
 	static ICostModel *GetCostModel(CMemoryPool *mp, ULONG num_segments);
 
+	// create optimizer plan hints
+	static CPlanHint *GetPlanHints(CMemoryPool *mp, Query *query);
+
 	// print warning messages for columns with missing statistics
 	static void PrintMissingStatsWarning(CMemoryPool *mp,
 										 CMDAccessor *md_accessor,

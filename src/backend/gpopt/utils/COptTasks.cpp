@@ -18,6 +18,7 @@
 extern "C" {
 #include "cdb/cdbvars.h"
 #include "optimizer/hints.h"
+#include "optimizer/orca.h"
 #include "utils/fmgroids.h"
 #include "utils/guc.h"
 }
@@ -85,6 +86,8 @@ using namespace gpdbcost;
 
 // default id for the source system
 const CSystemId default_sysid(IMDId::EmdidGeneral, GPOS_WSZ_STR_LENGTH("GPDB"));
+
+plan_hint_hook_type plan_hint_hook = nullptr;
 
 
 //---------------------------------------------------------------------------
@@ -449,6 +452,122 @@ COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 	return cost_model;
 }
 
+
+//---------------------------------------------------------------------------
+//      @function:
+//			COptTasks::GetPlanHints
+//
+//      @doc:
+//			Generate an instance of plan hints by parsing the query tree.
+//
+//---------------------------------------------------------------------------
+CPlanHint *
+COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
+{
+	HintState *hintstate = nullptr;
+	if (plan_hint_hook != nullptr)
+	{
+		hintstate = (HintState *) plan_hint_hook(query);
+	}
+
+	if (nullptr == hintstate)
+	{
+		return nullptr;
+	}
+
+	CPlanHint *plan_hints = GPOS_NEW(mp) CPlanHint(mp);
+
+	for (int ul = 0; ul < hintstate->num_hints[HINT_TYPE_SCAN_METHOD]; ul++)
+	{
+		ScanMethodHint *scan_hint =
+			(ScanMethodHint *) hintstate->scan_hints[ul];
+
+		BOOL is_partitioned =
+			gpdb::IsAliasPartitionedTable(query, scan_hint->relname);
+
+		StringPtrArray *indexnames = GPOS_NEW(mp) StringPtrArray(mp);
+		COperator::EOperatorId op = COperator::EopSentinel;
+		BOOL isnot = false;
+		switch (scan_hint->base.hint_keyword)
+		{
+			case HINT_KEYWORD_SEQSCAN:
+			{
+				op = is_partitioned ? COperator::EopLogicalDynamicGet
+									: COperator::EopLogicalGet;
+				break;
+			}
+			case HINT_KEYWORD_INDEXSCAN:
+			{
+				op = is_partitioned ? COperator::EopLogicalDynamicIndexGet
+									: COperator::EopLogicalIndexGet;
+				break;
+			}
+			case HINT_KEYWORD_INDEXONLYSCAN:
+			{
+				op = is_partitioned ? COperator::EopLogicalDynamicIndexOnlyGet
+									: COperator::EopLogicalIndexOnlyGet;
+				break;
+			}
+			case HINT_KEYWORD_BITMAPSCAN:
+			{
+				op = COperator::EopScalarBitmapIndexProbe;
+				break;
+			}
+			case HINT_KEYWORD_NOSEQSCAN:
+			{
+				op = is_partitioned ? COperator::EopLogicalDynamicGet
+									: COperator::EopLogicalGet;
+				isnot = true;
+				break;
+			}
+			case HINT_KEYWORD_NOINDEXSCAN:
+			{
+				isnot = true;
+				op = is_partitioned ? COperator::EopLogicalDynamicIndexGet
+									: COperator::EopLogicalIndexGet;
+				break;
+			}
+			case HINT_KEYWORD_NOINDEXONLYSCAN:
+			{
+				isnot = true;
+				op = is_partitioned ? COperator::EopLogicalDynamicIndexOnlyGet
+									: COperator::EopLogicalIndexOnlyGet;
+				break;
+			}
+			case HINT_KEYWORD_NOBITMAPSCAN:
+			{
+				isnot = true;
+				op = COperator::EopScalarBitmapIndexProbe;
+				break;
+			}
+			default:
+			{
+				CWStringDynamic *error_message = GPOS_NEW(mp) CWStringDynamic(
+					mp, GPOS_WSZ_LIT("Unsupported plan hint: "));
+				error_message->AppendFormat(GPOS_WSZ_LIT("%d"),
+											scan_hint->base.hint_keyword);
+
+				GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsupportedOp,
+						   error_message->GetBuffer());
+				break;
+			}
+		}
+
+		ListCell *l;
+		foreach (l, scan_hint->indexnames)
+		{
+			char *indexname = (char *) lfirst(l);
+			indexnames->Append(GPOS_NEW(mp) CWStringConst(mp, indexname));
+		}
+
+		plan_hints->AddHint(GPOS_NEW(mp) CScanHint(
+			mp, GPOS_NEW(mp) CWStringConst(mp, scan_hint->relname), indexnames,
+			op, isnot));
+	}
+
+	return plan_hints;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		COptTasks::OptimizeTask
@@ -537,7 +656,7 @@ COptTasks::OptimizeTask(void *ptr)
 				mp, &mda, (Query *) opt_ctxt->m_query);
 
 			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
-			CPlanHint *plan_hints = nullptr;
+			CPlanHint *plan_hints = GetPlanHints(mp, opt_ctxt->m_query);
 			COptimizerConfig *optimizer_config =
 				CreateOptimizerConfig(mp, cost_model, plan_hints);
 			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);

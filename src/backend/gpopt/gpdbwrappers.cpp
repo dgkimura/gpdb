@@ -2743,4 +2743,16 @@ gpdb::TestexprIsHashable(Node *testexpr, List *param_ids)
 	return false;
 }
 
+bool
+gpdb::IsAliasPartitionedTable(Query *query, const char *alias)
+{
+	GP_WRAP_START;
+	{
+		return isAliasPartitionedTable(query, alias);
+	}
+	GP_WRAP_END;
+
+	return true;
+}
+
 // EOF
