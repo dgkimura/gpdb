@@ -3031,10 +3031,11 @@ CXformUtils::PexprBitmapSelectBestIndex(
 		pexprIndexFinal->AddRef();
 		(*ppexprRecheck) = pexprIndexFinal;
 
+		ptabdesc->AddRef();
 		return GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarBitmapIndexProbe(
-				mp, pindexdesc, pmdindex->GetIndexRetItemTypeMdid()),
+				mp, pindexdesc, ptabdesc, pmdindex->GetIndexRetItemTypeMdid()),
 			pexprIndexFinal);
 	}
 
