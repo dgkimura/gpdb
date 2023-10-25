@@ -1,0 +1,23 @@
+Hints Framework
+===============
+
+The hints framework (aka plan hints) allows the user to override the optimizer
+(ORCA) in order to coerce a plan shape by disregarding its estimated cost
+compared to alternative plans.
+
+
+Grammar
+-------
+Language specification and parser leverages pg_hint_plan module.
+
+
+Supported Hints
+---------------
+SeqScan, NoSeqScan, IndexScan, NoIndexScan, IndexOnlyScan, NoIndexOnlyScan,
+BitmapScan, and NoBitmapScan.
+
+
+Unsupported Hints
+-----------------
+TidScan, NoTidScan, NestLoop, NoNestLoop, HashJoin, NoHashJoin, MergeJoin,
+NoMergeJoin, Leading, Rows, Parallel
