@@ -457,6 +457,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	}
 
 	CDistributionSpec *pds;
+	CDistributionSpec *pdsOther;
 
 	if ((CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		 CDistributionSpec::EdtTaintedReplicated == pdsOuter->Edt() ||
@@ -466,11 +467,13 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		// if outer is replicated/universal and inner is not universal
 		// then return inner distribution
 		pds = pdsInner;
+		pdsOther = pdsOuter;
 	}
 	else
 	{
 		// otherwise, return outer distribution
 		pds = pdsOuter;
+		pdsOther = pdsInner;
 	}
 
 	if (CDistributionSpec::EdtHashed == pds->Edt())
@@ -490,12 +493,26 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 				opfamilies->AddRef();
 			}
 			pdrgpexpr->AddRef();
-			CDistributionSpecHashed *result = GPOS_NEW(mp) CDistributionSpecHashed(
-				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
+			CDistributionSpecHashed *result =
+				GPOS_NEW(mp) CDistributionSpecHashed(
+					pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
 
-			if (exprhdl.Pop()->Eopid() == EopPhysicalRightOuterHashJoin)
+			if (CDistributionSpec::EdtHashed == pdsOther->Edt())
 			{
-				result = result->Combine(mp, CDistributionSpecHashed::PdsConvert(pdsInner));
+				CTableDescriptor *tabOuter =
+					exprhdl.DeriveTableDescriptor(0 /*child_index*/);
+				CTableDescriptor *tabInner =
+					exprhdl.DeriveTableDescriptor(1 /*child_index*/);
+				BOOL isselfjoin =
+					(NULL != tabOuter && NULL != tabInner)
+						? tabOuter->MDId()->Equals(tabInner->MDId())
+						: false;
+
+				if (isselfjoin)
+				{
+					result = result->Combine(
+						mp, CDistributionSpecHashed::PdsConvert(pdsOther));
+				}
 			}
 			return result;
 		}

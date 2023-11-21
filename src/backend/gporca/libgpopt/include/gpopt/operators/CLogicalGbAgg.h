@@ -258,6 +258,12 @@ public:
 	static IOstream &OsPrintGbAggType(IOstream &os,
 									  COperator::EGbAggType egbaggtype);
 
+	CTableDescriptor *
+	DeriveTableDescriptor(CMemoryPool *, CExpressionHandle &exprhdl) const
+	{
+		return exprhdl.DeriveTableDescriptor(0);
+	}
+
 private:
 	// private copy ctor
 	CLogicalGbAgg(const CLogicalGbAgg &);
