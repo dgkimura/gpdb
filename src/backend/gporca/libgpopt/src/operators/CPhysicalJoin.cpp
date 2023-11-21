@@ -510,8 +510,10 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 				if (isselfjoin)
 				{
-					result = result->Combine(
+					CDistributionSpecHashed *tmp = result->Combine(
 						mp, CDistributionSpecHashed::PdsConvert(pdsOther));
+					result->Release();
+					result = tmp;
 				}
 			}
 			return result;
