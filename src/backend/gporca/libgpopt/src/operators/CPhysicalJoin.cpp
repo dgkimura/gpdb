@@ -490,8 +490,14 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 				opfamilies->AddRef();
 			}
 			pdrgpexpr->AddRef();
-			return GPOS_NEW(mp) CDistributionSpecHashed(
+			CDistributionSpecHashed *result = GPOS_NEW(mp) CDistributionSpecHashed(
 				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
+
+			if (exprhdl.Pop()->Eopid() == EopPhysicalRightOuterHashJoin)
+			{
+				result = result->Combine(mp, CDistributionSpecHashed::PdsConvert(pdsInner));
+			}
+			return result;
 		}
 	}
 
