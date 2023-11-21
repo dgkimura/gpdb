@@ -418,6 +418,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	}
 
 	CDistributionSpec *pds;
+	CDistributionSpec *pdsOther;
 
 	if ((CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		 CDistributionSpec::EdtTaintedReplicated == pdsOuter->Edt() ||
@@ -427,11 +428,13 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		// if outer is replicated/universal and inner is not universal
 		// then return inner distribution
 		pds = pdsInner;
+		pdsOther = pdsOuter;
 	}
 	else
 	{
 		// otherwise, return outer distribution
 		pds = pdsOuter;
+		pdsOther = pdsInner;
 	}
 
 	if (CDistributionSpec::EdtHashed == pds->Edt())
@@ -451,8 +454,32 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 				opfamilies->AddRef();
 			}
 			pdrgpexpr->AddRef();
-			return GPOS_NEW(mp) CDistributionSpecHashed(
-				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
+			CDistributionSpecHashed *result =
+				GPOS_NEW(mp) CDistributionSpecHashed(
+					pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
+
+			if (CDistributionSpec::EdtHashed == pdsOther->Edt())
+			{
+				CTableDescriptor *tabOuter =
+					exprhdl.DeriveTableDescriptor(0 /*child_index*/);
+				CTableDescriptor *tabInner =
+					exprhdl.DeriveTableDescriptor(1 /*child_index*/);
+				if (nullptr != tabOuter && nullptr != tabInner &&
+					tabOuter->MDId()->Equals(tabInner->MDId()))
+				{
+					// A self-join returns the combined distribution spec of
+					// outer and inner children. This optimization allows the
+					// derived distribution to satisfy requests from additional
+					// self-joins without requiring an enforcer regardless of
+					// child ordering.
+					CDistributionSpecHashed *other =
+						CDistributionSpecHashed::PdsConvert(pdsOther);
+					CDistributionSpecHashed *tmp = other->Combine(mp, result);
+					result->Release();
+					result = tmp;
+				}
+			}
+			return result;
 		}
 	}
 
