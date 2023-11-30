@@ -460,12 +460,29 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 			if (CDistributionSpec::EdtHashed == pdsOther->Edt())
 			{
-				CTableDescriptor *tabOuter =
-					exprhdl.DeriveTableDescriptor(0 /*child_index*/);
-				CTableDescriptor *tabInner =
-					exprhdl.DeriveTableDescriptor(1 /*child_index*/);
-				if (nullptr != tabOuter && nullptr != tabInner &&
-					tabOuter->MDId()->Equals(tabInner->MDId()))
+				auto transform_tabdesc_to_imdid =
+					[](CMemoryPool *mp, CTableDescriptorHashSet *tabdescs) {
+						MdidHashSet *imdids = GPOS_NEW(mp) MdidHashSet(mp);
+						CTableDescriptorHashSetIter hsiter(tabdescs);
+						while (hsiter.Advance())
+						{
+							CTableDescriptor *ptabdesc =
+								const_cast<CTableDescriptor *>(hsiter.Get());
+							if (imdids->Insert(ptabdesc->MDId()))
+							{
+								ptabdesc->MDId()->AddRef();
+							}
+						}
+						return imdids;
+					};
+
+				MdidHashSet *outerImdidSet = transform_tabdesc_to_imdid(
+					mp, exprhdl.DeriveTableDescriptor(0 /*child_index*/));
+				MdidHashSet *innerImdidSet = transform_tabdesc_to_imdid(
+					mp, exprhdl.DeriveTableDescriptor(1 /*child_index*/));
+
+				if (outerImdidSet->Size() == 1 && innerImdidSet->Size() == 1 &&
+					outerImdidSet->First()->Equals(innerImdidSet->First()))
 				{
 					// A self-join returns the combined distribution spec of
 					// outer and inner children. This optimization allows the
@@ -478,6 +495,8 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 					result->Release();
 					result = tmp;
 				}
+				outerImdidSet->Release();
+				innerImdidSet->Release();
 			}
 			return result;
 		}

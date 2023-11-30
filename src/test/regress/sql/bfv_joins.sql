@@ -453,6 +453,19 @@ left outer join (select a1, b1 from o1) t2 on t1.a1 = t2.a1
 left outer join o1 t3 on t2.a1 = t3.a1
 left outer join o1 t4 on t2.a1 = t4.a1;
 
+-- Self join maintains the distribution keys from both children (i.e. the join
+-- result produces a combine hash distribution spec)
+--
+-- Expect no redistribute under the joins
+explain (costs off) select t2.b1 from o1 t3
+right outer join (select a1, b1 from o1) t2 on t2.a1 = t3.a1
+right outer join o1 t4 on t2.a1 = t4.a1
+right outer join (select distinct a1 from o1) t1 on t1.a1 = t2.a1;
+select t2.b1 from o1 t3
+right outer join (select a1, b1 from o1) t2 on t2.a1 = t3.a1
+right outer join o1 t4 on t2.a1 = t4.a1
+right outer join (select distinct a1 from o1) t1 on t1.a1 = t2.a1;
+
 -- Self join, but the projected distribution key value is changed
 --
 -- Expect redistribute under the joins
