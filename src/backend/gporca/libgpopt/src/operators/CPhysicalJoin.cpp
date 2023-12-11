@@ -460,43 +460,30 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 			if (CDistributionSpec::EdtHashed == pdsOther->Edt())
 			{
-				auto transform_tabdesc_to_imdid =
-					[](CMemoryPool *mp, CTableDescriptorHashSet *tabdescs) {
-						MdidHashSet *imdids = GPOS_NEW(mp) MdidHashSet(mp);
-						CTableDescriptorHashSetIter hsiter(tabdescs);
-						while (hsiter.Advance())
-						{
-							CTableDescriptor *ptabdesc =
-								const_cast<CTableDescriptor *>(hsiter.Get());
-							if (imdids->Insert(ptabdesc->MDId()))
-							{
-								ptabdesc->MDId()->AddRef();
-							}
-						}
-						return imdids;
-					};
+				CTableDescriptorHashSet *outertabs =
+					CUtils::RemoveDuplicateMdids(
+						mp, exprhdl.DeriveTableDescriptor(0 /*child_index*/));
+				CTableDescriptorHashSet *innertabs =
+					CUtils::RemoveDuplicateMdids(
+						mp, exprhdl.DeriveTableDescriptor(1 /*child_index*/));
 
-				MdidHashSet *outerImdidSet = transform_tabdesc_to_imdid(
-					mp, exprhdl.DeriveTableDescriptor(0 /*child_index*/));
-				MdidHashSet *innerImdidSet = transform_tabdesc_to_imdid(
-					mp, exprhdl.DeriveTableDescriptor(1 /*child_index*/));
-
-				if (outerImdidSet->Size() == 1 && innerImdidSet->Size() == 1 &&
-					outerImdidSet->First()->Equals(innerImdidSet->First()))
+				// Size() of 1 means that there is 1 unique table on each side
+				// of the join. If they are the same table (i.e. same mdid)
+				// then it is a self-join.
+				if (outertabs->Size() == 1 && innertabs->Size() == 1 &&
+					outertabs->First()->MDId()->Equals(
+						innertabs->First()->MDId()))
 				{
 					// A self-join returns the combined distribution spec of
-					// outer and inner children. This optimization allows the
-					// derived distribution to satisfy requests from additional
-					// self-joins without requiring an enforcer regardless of
-					// child ordering.
+					// outer and inner children.
 					CDistributionSpecHashed *other =
 						CDistributionSpecHashed::PdsConvert(pdsOther);
 					CDistributionSpecHashed *tmp = other->Combine(mp, result);
 					result->Release();
 					result = tmp;
 				}
-				outerImdidSet->Release();
-				innerImdidSet->Release();
+				outertabs->Release();
+				innertabs->Release();
 			}
 			return result;
 		}
