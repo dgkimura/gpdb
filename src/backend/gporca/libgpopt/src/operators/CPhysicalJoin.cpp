@@ -418,7 +418,6 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	}
 
 	CDistributionSpec *pds;
-	CDistributionSpec *pdsOther;
 
 	if ((CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		 CDistributionSpec::EdtTaintedReplicated == pdsOuter->Edt() ||
@@ -428,13 +427,11 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		// if outer is replicated/universal and inner is not universal
 		// then return inner distribution
 		pds = pdsInner;
-		pdsOther = pdsOuter;
 	}
 	else
 	{
 		// otherwise, return outer distribution
 		pds = pdsOuter;
-		pdsOther = pdsInner;
 	}
 
 	if (CDistributionSpec::EdtHashed == pds->Edt())
@@ -454,38 +451,8 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 				opfamilies->AddRef();
 			}
 			pdrgpexpr->AddRef();
-			CDistributionSpecHashed *result =
-				GPOS_NEW(mp) CDistributionSpecHashed(
-					pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
-
-			if (CDistributionSpec::EdtHashed == pdsOther->Edt())
-			{
-				CTableDescriptorHashSet *outertabs =
-					CUtils::RemoveDuplicateMdids(
-						mp, exprhdl.DeriveTableDescriptor(0 /*child_index*/));
-				CTableDescriptorHashSet *innertabs =
-					CUtils::RemoveDuplicateMdids(
-						mp, exprhdl.DeriveTableDescriptor(1 /*child_index*/));
-
-				// Size() of 1 means that there is 1 unique table on each side
-				// of the join. If they are the same table (i.e. same mdid)
-				// then it is a self-join.
-				if (outertabs->Size() == 1 && innertabs->Size() == 1 &&
-					outertabs->First()->MDId()->Equals(
-						innertabs->First()->MDId()))
-				{
-					// A self-join returns the combined distribution spec of
-					// outer and inner children.
-					CDistributionSpecHashed *other =
-						CDistributionSpecHashed::PdsConvert(pdsOther);
-					CDistributionSpecHashed *tmp = other->Combine(mp, result);
-					result->Release();
-					result = tmp;
-				}
-				outertabs->Release();
-				innertabs->Release();
-			}
-			return result;
+			return GPOS_NEW(mp) CDistributionSpecHashed(
+				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
 		}
 	}
 

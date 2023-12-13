@@ -317,6 +317,127 @@ CPhysicalHashJoin::PdsMatch(CMemoryPool *mp, CDistributionSpec *pds,
 
 //---------------------------------------------------------------------------
 //	@function:
+//		CPhysicalInnerHashJoin::PdsDeriveFromHashedChildren
+//
+//	@doc:
+//		Derive hash join distribution from hashed children;
+//		return NULL if derivation failed
+//
+//---------------------------------------------------------------------------
+CDistributionSpec *
+CPhysicalHashJoin::PdsDeriveFromHashedChildren(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsOuter,
+	CDistributionSpec *pdsInner) const
+{
+	GPOS_ASSERT(nullptr != pdsOuter);
+	GPOS_ASSERT(nullptr != pdsInner);
+
+	// LOJ and ROJ can combine distribution specs in this case. But semi-join
+	// and anti-semi-join cannot because the predicate is not matching a single
+	// value.
+	GPOS_ASSERT(EopPhysicalLeftOuterHashJoin == Eopid() ||
+				EopPhysicalRightOuterHashJoin == Eopid());
+
+	CDistributionSpecHashed *pdshashedOuter =
+		CDistributionSpecHashed::PdsConvert(pdsOuter);
+	CDistributionSpecHashed *pdshashedInner =
+		CDistributionSpecHashed::PdsConvert(pdsInner);
+
+	if (pdshashedOuter->IsCoveredBy(PdrgpexprOuterKeys()) &&
+		pdshashedInner->IsCoveredBy(PdrgpexprInnerKeys()))
+	{
+		// if both sides are hashed on subsets of hash join keys, join's output can be
+		// seen as distributed on outer spec or (equivalently) on inner spec,
+		// so create a new spec and mark outer and inner as equivalent
+
+		CDistributionSpecHashed *pdshashedInnerCopy =
+			pdshashedInner->Copy(mp, false);
+		CDistributionSpecHashed *combined_hashed_spec =
+			pdshashedOuter->Combine(mp, pdshashedInnerCopy);
+		pdshashedInnerCopy->Release();
+		return combined_hashed_spec;
+	}
+
+	if (CUtils::FSelfJoinOnDistributionColumns(mp, exprhdl))
+	{
+		CDistributionSpecHashed *pdshashedInnerCopy = pdshashedInner->Copy(mp);
+		CDistributionSpecHashed *combined_hashed_spec =
+			pdshashedOuter->Combine(mp, pdshashedInnerCopy);
+		pdshashedInnerCopy->Release();
+		return combined_hashed_spec;
+	}
+
+	return nullptr;
+}
+
+CDistributionSpec *
+CPhysicalHashJoin::PdsDeriveForOuterJoin(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl) const
+{
+	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+
+	// We must use the non-nullable side for the distribution spec for outer joins.
+	// For right join, the hash side is the non-nullable side, so we swap the inner/outer
+	// distribution specs for the logic below
+	if (exprhdl.Pop()->Eopid() == EopPhysicalRightOuterHashJoin)
+	{
+		pdsOuter = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+		pdsInner = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	}
+
+	if (CDistributionSpec::EdtHashed == pdsOuter->Edt() &&
+		CDistributionSpec::EdtHashed == pdsInner->Edt())
+	{
+		CDistributionSpec *pdsDerived =
+			PdsDeriveFromHashedChildren(mp, exprhdl, pdsOuter, pdsInner);
+		if (nullptr != pdsDerived)
+		{
+			return pdsDerived;
+		}
+	}
+
+	CDistributionSpec *pds;
+	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
+		CDistributionSpec::EdtUniversal == pdsOuter->Edt())
+	{
+		// if outer is replicated/universal, return inner distribution
+		pds = pdsInner;
+	}
+	else
+	{
+		// otherwise, return outer distribution
+		pds = pdsOuter;
+	}
+
+	if (CDistributionSpec::EdtHashed == pds->Edt())
+	{
+		CDistributionSpecHashed *pdsHashed =
+			CDistributionSpecHashed::PdsConvert(pds);
+
+		// Clean up any incomplete distribution specs since they can no longer be completed above
+		// Note that, since this is done at the lowest join, no relevant equivalent specs are lost.
+		if (!pdsHashed->HasCompleteEquivSpec(mp))
+		{
+			CExpressionArray *pdrgpexpr = pdsHashed->Pdrgpexpr();
+			IMdIdArray *opfamilies = pdsHashed->Opfamilies();
+
+			if (nullptr != opfamilies)
+			{
+				opfamilies->AddRef();
+			}
+			pdrgpexpr->AddRef();
+			return GPOS_NEW(mp) CDistributionSpecHashed(
+				pdrgpexpr, pdsHashed->FNullsColocated(), opfamilies);
+		}
+	}
+
+	pds->AddRef();
+	return pds;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
 //		CPhysicalHashJoin::PdshashedMatching
 //
 //	@doc:

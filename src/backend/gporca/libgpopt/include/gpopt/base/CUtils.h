@@ -730,6 +730,13 @@ public:
 	// Check if expression tree has a col being referenced in the CColRefSet passed as input
 	static BOOL FExprHasAnyCrFromCrs(CExpression *pexpr, CColRefSet *pcrs);
 
+	// Check if the two CColRefSets reference the same column names
+	static BOOL FSameNameCrs(CMemoryPool *mp, CColRefSet *left,
+							 CColRefSet *right);
+
+	static BOOL FSelfJoinOnDistributionColumns(CMemoryPool *mp,
+											   CExpressionHandle &exprhdl);
+
 	// If it's a scalar array of all CScalarConst, collapse it into a single
 	// expression but keep the constants in the operator.
 	static CExpression *PexprCollapseConstArray(CMemoryPool *mp,
