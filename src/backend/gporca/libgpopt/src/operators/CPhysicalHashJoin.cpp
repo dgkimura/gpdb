@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CCastUtils.h"
+#include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecNonReplicated.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
@@ -314,6 +315,92 @@ CPhysicalHashJoin::PdsMatch(CMemoryPool *mp, CDistributionSpec *pds,
 	}
 }
 
+static BOOL
+IsEqual(CExpression *left, CExpression *right)
+{
+	if (left->Pop()->Eopid() == COperator::EopScalarIdent &&
+		right->Pop()->Eopid() == COperator::EopScalarIdent)
+	{
+		// skip colid check. just make sure that names are same.
+		if (!CWStringConst::Equals(
+				CScalarIdent::PopConvert(left->Pop())->Pcr()->Name().Pstr(),
+				CScalarIdent::PopConvert(right->Pop())->Pcr()->Name().Pstr()))
+		{
+			return false;
+		}
+		return true;
+	}
+	else if (!left->Pop()->Matches(right->Pop()))
+	{
+		return false;
+	}
+	else
+	{
+		for (ULONG ul = 0; ul < left->Arity(); ul++)
+		{
+			if (!IsEqual((*left)[ul], (*right)[ul]))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		FIdenticalNamesInCrs
+//
+//	@doc:
+//		Check whether the names in the col ref sets match
+//---------------------------------------------------------------------------
+static BOOL
+FIdenticalJoinKeys(const CExpressionArray *outer, const CExpressionArray *inner)
+{
+	GPOS_ASSERT(outer->Size() == inner->Size());
+
+	for (ULONG ul = 0; ul < outer->Size(); ul++)
+	{
+		if (!IsEqual((*outer)[ul], (*inner)[ul]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+BOOL
+CPhysicalHashJoin::FSelfJoinWithMatchingJoinKeys(
+	CMemoryPool *mp, CExpressionHandle &exprhdl) const
+{
+	// There may be duplicate mdids because the hash key is unique on a
+	// combination of mdid and alias. Here we do not care about duplicate
+	// aliases because joining the same table with different alias is still a
+	// self-join.
+	CTableDescriptorHashSet *outertabs = CUtils::RemoveDuplicateMdids(
+		mp, exprhdl.DeriveTableDescriptor(0 /*child_index*/));
+	CTableDescriptorHashSet *innertabs = CUtils::RemoveDuplicateMdids(
+		mp, exprhdl.DeriveTableDescriptor(1 /*child_index*/));
+
+	BOOL result = false;
+
+	// Size() of 1 means that there is 1 unique table on each side
+	// of the join. If they are the same table (i.e. same mdid)
+	// then it is a self-join.
+	if (outertabs->Size() == 1 && innertabs->Size() == 1 &&
+		outertabs->First()->MDId()->Equals(innertabs->First()->MDId()))
+	{
+		if (FIdenticalJoinKeys(PdrgpexprInnerKeys(), PdrgpexprOuterKeys()))
+		{
+			result = true;
+		}
+	}
+	outertabs->Release();
+	innertabs->Release();
+
+	return result;
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -331,12 +418,6 @@ CPhysicalHashJoin::PdsDeriveFromHashedChildren(
 {
 	GPOS_ASSERT(nullptr != pdsOuter);
 	GPOS_ASSERT(nullptr != pdsInner);
-
-	// LOJ and ROJ can combine distribution specs in this case. But semi-join
-	// and anti-semi-join cannot because the predicate is not matching a single
-	// value.
-	GPOS_ASSERT(EopPhysicalLeftOuterHashJoin == Eopid() ||
-				EopPhysicalRightOuterHashJoin == Eopid());
 
 	CDistributionSpecHashed *pdshashedOuter =
 		CDistributionSpecHashed::PdsConvert(pdsOuter);
@@ -358,12 +439,12 @@ CPhysicalHashJoin::PdsDeriveFromHashedChildren(
 		return combined_hashed_spec;
 	}
 
-	if (CUtils::FSelfJoinOnDistributionColumns(mp, exprhdl))
+	if (FSelfJoinWithMatchingJoinKeys(mp, exprhdl))
 	{
-		CDistributionSpecHashed *pdshashedInnerCopy = pdshashedInner->Copy(mp);
+		// A self join on distributed spec columns will preserve the colocated
+		// nulls.
 		CDistributionSpecHashed *combined_hashed_spec =
-			pdshashedOuter->Combine(mp, pdshashedInnerCopy);
-		pdshashedInnerCopy->Release();
+			pdshashedOuter->Combine(mp, pdshashedInner);
 		return combined_hashed_spec;
 	}
 
@@ -374,6 +455,9 @@ CDistributionSpec *
 CPhysicalHashJoin::PdsDeriveForOuterJoin(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl) const
 {
+	GPOS_ASSERT(EopPhysicalLeftOuterHashJoin == Eopid() ||
+				EopPhysicalRightOuterHashJoin == Eopid());
+
 	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
 

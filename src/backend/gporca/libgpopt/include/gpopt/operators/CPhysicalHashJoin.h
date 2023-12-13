@@ -60,6 +60,9 @@ private:
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec *pdsOuter, CDistributionSpec *pdsInner) const;
 
+	BOOL FSelfJoinWithMatchingJoinKeys(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl) const;
+
 
 protected:
 	// compute required hashed distribution from the n-th child
