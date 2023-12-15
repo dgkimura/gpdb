@@ -245,101 +245,106 @@ EXPLAIN (costs off) SELECT t1.a, t2.a, t3.a FROM my_table AS t1 JOIN your_table 
 --
 -- 4. [SCAN] No scan type
 --
--- In order to perform negative test we disable as many of the alternatives as
--- possible. That means many of these tests will fallback. A couple exceptions
--- are when ORCA does not have a GUC to disable an alternative (e.g. dynamic
--- index scan and dynamic bitmap scan).
+-- Note that pg_hint_plan does not support multiple No.*Scan hints, so the
+-- parser will generate warnings indicating conflicting hints.
 --
 --------------------------------------------------------------------
 
-SET optimizer_enable_indexscan=off;
-SET optimizer_enable_indexonlyscan=off;
-SET optimizer_enable_bitmapscan=off;
-SET optimizer_enable_tablescan=off;
-SET optimizer_enable_dynamictablescan=off;
-SET optimizer_enable_dynamicindexonlyscan=off;
-
-RESET optimizer_enable_tablescan;
-RESET optimizer_enable_dynamictablescan;
-
-/*+
-    NoSeqScan(t1)
- */
-EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
-
-/*+
-    NoSeqScan(t2)
- */
-EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
-
-/*+
-    NoSeqScan(t3)
- */
-EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
-
-SET optimizer_enable_tablescan=off;
-SET optimizer_enable_dynamictablescan=off;
-RESET optimizer_enable_indexscan;
-
+--
+-- Make SeqScan is only valid plan
+--
 /*+
     NoIndexScan(t1)
- */
-EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
-
-/*+
-    NoIndexScan(t2)
- */
-EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
-
-/*+
-    NoIndexScan(t3)
- */
-EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
-
-SET optimizer_enable_indexscan=off;
-RESET optimizer_enable_indexonlyscan;
-RESET optimizer_enable_dynamicindexonlyscan;
-
-/*+
     NoIndexOnlyScan(t1)
- */
-EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
-
-/*+
-    NoIndexOnlyScan(t2)
- */
-EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
-
-/*+
-    NoIndexOnlyScan(t3)
- */
-EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
-
-SET optimizer_enable_indexonlyscan=off;
-SET optimizer_enable_dynamicindexonlyscan=off;
-RESET optimizer_enable_bitmapscan;
-
-/*+
     NoBitmapScan(t1)
  */
 EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
 
 /*+
+    NoIndexScan(t2)
+    NoIndexOnlyScan(t2)
     NoBitmapScan(t2)
  */
 EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
 
 /*+
+    NoIndexScan(t3)
+    NoIndexOnlyScan(t3)
     NoBitmapScan(t3)
  */
 EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
 
-RESET optimizer_enable_indexscan;
-RESET optimizer_enable_indexonlyscan;
-RESET optimizer_enable_bitmapscan;
-RESET optimizer_enable_tablescan;
-RESET optimizer_enable_dynamictablescan;
-RESET optimizer_enable_dynamicindexonlyscan;
+--
+-- Make IndexScan is only valid plan
+--
+/*+
+    NoSeqScan(t1)
+    NoIndexOnlyScan(t1)
+    NoBitmapScan(t1)
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+
+/*+
+    NoSeqScan(t2)
+    NoIndexOnlyScan(t2)
+    NoBitmapScan(t2)
+ */
+EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
+
+/*+
+    NoSeqScan(t3)
+    NoIndexOnlyScan(t3)
+    NoBitmapScan(t3)
+ */
+EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
+
+--
+-- Make IndexOnlyScan is only valid plan
+--
+/*+
+    NoSeqScan(t1)
+    NoIndexScan(t1)
+    NoBitmapScan(t1)
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+
+/*+
+    NoSeqScan(t2)
+    NoIndexScan(t2)
+    NoBitmapScan(t2)
+ */
+EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
+
+/*+
+    NoSeqScan(t3)
+    NoIndexScan(t3)
+    NoBitmapScan(t3)
+ */
+EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
+
+--
+-- Make BitmapScan is only valid plan
+--
+/*+
+    NoSeqScan(t1)
+    NoIndexScan(t1)
+    NoIndexOnlyScan(t1)
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+
+/*+
+    NoSeqScan(t2)
+    NoIndexScan(t2)
+    NoIndexOnlyScan(t2)
+ */
+EXPLAIN SELECT t2.a FROM your_table AS t2 WHERE t2.a<42;
+
+/*+
+    NoSeqScan(t3)
+    NoIndexScan(t3)
+    NoIndexOnlyScan(t3)
+ */
+EXPLAIN SELECT t3.a FROM our_table AS t3 WHERE t3.a<42;
 
 --------------------------------------------------------------------
 --
@@ -514,5 +519,28 @@ EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
 
 /*+
     BitmapScanRegexp(t1 '*awesome*')
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+
+
+--------------------------------------------------------------------
+--
+-- 8. Miscellaneous cases
+--
+--------------------------------------------------------------------
+
+-- Missing hint relation name argument
+/*+
+    SeqScan()
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+
+-- Mixing NoIndexScan and SeqScan hints
+/*+
+    SeqScan(t1) NoIndexScan(t1)
+ */
+EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
+/*+
+    NoIndexScan(t1) SeqScan(t1)
  */
 EXPLAIN SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
