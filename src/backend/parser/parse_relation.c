@@ -64,7 +64,6 @@ static void expandTupleDesc(TupleDesc tupdesc, Alias *eref,
 							List **colnames, List **colvars);
 static int	specialAttNum(const char *attname);
 static bool isQueryUsingTempRelation_walker(Node *node, void *context);
-static bool isAliasPartitionedTable_walker(Node *node, void *context);
 
 
 /*
@@ -3782,81 +3781,4 @@ isQueryUsingTempRelation_walker(Node *node, void *context)
 	return expression_tree_walker(node,
 								  isQueryUsingTempRelation_walker,
 								  context);
-}
-
-typedef struct IsAliasPartitionedTableContext
-{
-	const char *alias;
-	bool		is_partitioned;
-	Query	   *query;
-} IsAliasPartitionedTableContext;
-
-/*
- * Check whether an alias is a partitioned table in a query
- */
-bool
-isAliasPartitionedTable(Query *query, const char *alias)
-{
-	IsAliasPartitionedTableContext result = {
-		.alias = alias,
-		.is_partitioned = false,
-		.query = query
-	};
-
-	range_table_walker(query->rtable, isAliasPartitionedTable_walker,
-					   &result, QTW_EXAMINE_RTES_BEFORE);
-	return result.is_partitioned;
-}
-
-static bool
-isAliasPartitionedTable_walker(Node *node, void *context)
-{
-	if (node == NULL)
-	{
-		return false;
-	}
-
-	if (IsA(node, RangeTblEntry))
-	{
-		RangeTblEntry *rte = (RangeTblEntry *) node;
-		IsAliasPartitionedTableContext *_context = (IsAliasPartitionedTableContext *) context;
-
-		if (rte->rtekind == RTE_RELATION)
-		{
-			if (rte->alias != NULL &&
-				pg_strcasecmp(_context->alias, rte->alias->aliasname) == 0)
-			{
-				_context->is_partitioned =
-					rte->relkind == RELKIND_PARTITIONED_TABLE;
-			}
-			else if (rte->eref != NULL &&
-					 pg_strcasecmp(_context->alias, rte->eref->aliasname) == 0)
-			{
-				_context->is_partitioned =
-					rte->relkind == RELKIND_PARTITIONED_TABLE;
-			}
-		}
-		else if (rte->rtekind == RTE_SUBQUERY)
-		{
-			return range_table_walker(
-									  rte->subquery->rtable,
-									  isAliasPartitionedTable_walker, context,
-									  QTW_EXAMINE_RTES_BEFORE);
-		}
-		else if (rte->rtekind == RTE_CTE)
-		{
-			return expression_tree_walker(
-										  (Node *) _context->query->cteList,
-										  isAliasPartitionedTable_walker, context);
-		}
-		return false;
-	}
-	if (IsA(node, Query))
-	{
-		return range_table_walker(((Query *) node)->rtable,
-								  isAliasPartitionedTable_walker,
-								  context, QTW_EXAMINE_RTES_BEFORE);
-	}
-	return expression_tree_walker(
-								  node, isAliasPartitionedTable_walker, context);
 }
