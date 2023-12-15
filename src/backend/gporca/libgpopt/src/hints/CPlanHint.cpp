@@ -22,7 +22,7 @@ FORCE_GENERATE_DBGSTR(CPlanHint);
 //		CPlanHint::CPlanHint
 //---------------------------------------------------------------------------
 CPlanHint::CPlanHint(CMemoryPool *mp)
-	: m_scan_hint(GPOS_NEW(mp) ScanHintList(mp))
+	: m_mp(mp), m_scan_hint(GPOS_NEW(mp) ScanHintList(mp))
 {
 }
 
@@ -37,8 +37,17 @@ CPlanHint::AddHint(CScanHint *hint)
 	m_scan_hint->Append(hint);
 }
 
-IHint *
-CPlanHint::GetHint(const CWStringBase *name)
+CScanHint *
+CPlanHint::GetScanHint(const char *relname)
+{
+	CWStringConst *name = GPOS_NEW(m_mp) CWStringConst(m_mp, relname);
+	CScanHint *hint = GetScanHint(name);
+	GPOS_DELETE(name);
+	return hint;
+}
+
+CScanHint *
+CPlanHint::GetScanHint(const CWStringBase *name)
 {
 	for (ULONG ul = 0; ul < m_scan_hint->Size(); ul++)
 	{

@@ -11,9 +11,90 @@
 
 #include "gpopt/hints/CScanHint.h"
 
+#include "gpopt/exception.h"
+#include "gpopt/hints/CHintUtils.h"
+#include "naucrates/dxl/CDXLUtils.h"
+
 using namespace gpopt;
 
 FORCE_GENERATE_DBGSTR(CScanHint);
+
+
+BOOL
+CScanHint::SatisfiesOperator(COperator *op) const
+{
+	BOOL is_satisfied = true;
+
+	CEHintTypeSetSetIter type_info(*m_types);
+	while (type_info.Advance() && is_satisfied)
+	{
+		switch (type_info.TBit())
+		{
+			case SeqScan:
+			{
+				is_satisfied = op->Eopid() == COperator::EopLogicalDynamicGet ||
+							   op->Eopid() == COperator::EopLogicalGet;
+				break;
+			}
+			case NoSeqScan:
+			{
+				is_satisfied = op->Eopid() != COperator::EopLogicalDynamicGet &&
+							   op->Eopid() != COperator::EopLogicalGet;
+				break;
+			}
+			case IndexScan:
+			{
+				is_satisfied =
+					op->Eopid() == COperator::EopLogicalDynamicIndexGet ||
+					op->Eopid() == COperator::EopLogicalIndexGet;
+				break;
+			}
+			case NoIndexScan:
+			{
+				is_satisfied =
+					op->Eopid() != COperator::EopLogicalDynamicIndexGet &&
+					op->Eopid() != COperator::EopLogicalIndexGet;
+				break;
+			}
+			case IndexOnlyScan:
+			{
+				is_satisfied =
+					op->Eopid() == COperator::EopLogicalDynamicIndexOnlyGet ||
+					op->Eopid() == COperator::EopLogicalIndexOnlyGet;
+				break;
+			}
+			case NoIndexOnlyScan:
+			{
+				is_satisfied =
+					op->Eopid() != COperator::EopLogicalDynamicIndexOnlyGet &&
+					op->Eopid() != COperator::EopLogicalIndexOnlyGet;
+				break;
+			}
+			case BitmapScan:
+			{
+				is_satisfied =
+					op->Eopid() == COperator::EopScalarBitmapIndexProbe;
+				break;
+			}
+			case NoBitmapScan:
+			{
+				is_satisfied =
+					op->Eopid() != COperator::EopScalarBitmapIndexProbe;
+				break;
+			}
+			default:
+			{
+				CWStringDynamic *error_message = GPOS_NEW(m_mp)
+					CWStringDynamic(m_mp, GPOS_WSZ_LIT("Unknown scan type: "));
+				//error_message->AppendFormat(GPOS_WSZ_LIT("%d"), m_hint_keyword);
+
+				GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsupportedOp,
+						   error_message->GetBuffer());
+			}
+		}
+	}
+	return is_satisfied;
+}
 
 IOstream &
 CScanHint::OsPrint(IOstream &os) const
@@ -28,33 +109,8 @@ CScanHint::OsPrint(IOstream &os) const
 	{
 		os << ", " << (*m_indexnames)[ul]->GetBuffer();
 	}
-	if (m_isnot)
-	{
-		os << "|isnot=true";
-	}
 	os << "]";
 	return os;
-}
-
-static CWStringDynamic *
-GetIndexesCommaSeparatedStr(const StringPtrArray *indexes, CMemoryPool *mp)
-{
-	CWStringDynamic *str = GPOS_NEW(mp) CWStringDynamic(mp);
-
-	ULONG num_of_indexes = indexes == nullptr ? 0 : indexes->Size();
-	for (ULONG idx = 0; idx < num_of_indexes; idx++)
-	{
-		const WCHAR *index = ((*indexes)[idx])->GetBuffer();
-		str->AppendWideCharArray(index);
-		if (idx != num_of_indexes - 1)
-		{
-			str->AppendFormat(
-				GPOS_WSZ_LIT("%ls"),
-				CDXLTokens::GetDXLTokenStr(EdxltokenComma)->GetBuffer());
-		}
-	}
-
-	return str;
 }
 
 void
@@ -66,13 +122,15 @@ CScanHint::Serialize(CXMLSerializer *xml_serializer) const
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias),
 								 GetName());
+
+	CWStringDynamic *hints =
+		CDXLUtils::Serialize(m_mp, m_types, CHintUtils::ScanHintEnumToString);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOpName),
-								 GetOperator());
-	xml_serializer->AddAttribute(
-		CDXLTokens::GetDXLTokenStr(EdxltokenScalarBoolNot), GetIsNot());
+								 hints);
+	GPOS_DELETE(hints);
 
 	CWStringDynamic *indexes =
-		GetIndexesCommaSeparatedStr(GetIndexNames(), m_mp);
+		CDXLUtils::SerializeToCommaSeparatedString(m_mp, GetIndexNames());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIndexName),
 								 indexes);
 	GPOS_DELETE(indexes);

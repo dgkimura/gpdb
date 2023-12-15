@@ -29,6 +29,8 @@ namespace gpopt
 class CPlanHint : public CRefCount, public DbgPrintMixin<CPlanHint>
 {
 private:
+	CMemoryPool *m_mp{nullptr};
+
 	ScanHintList *m_scan_hint{nullptr};
 
 public:
@@ -40,7 +42,8 @@ public:
 	void AddHint(CScanHint *hint);
 
 	// Get a scan hint that matches a name (table or alias)
-	IHint *GetHint(const CWStringBase *name);
+	CScanHint *GetScanHint(const char *name);
+	CScanHint *GetScanHint(const CWStringBase *name);
 
 	IOstream &OsPrint(IOstream &os) const;
 

@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPlanHint.h"
 
+#include "gpopt/hints/CHintUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -78,13 +79,15 @@ CParseHandlerPlanHint::StartElement(
 		CWStringBase *alias = CDXLOperatorFactory::ExtractConvertAttrValueToStr(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenAlias,
 			EdxltokenPlanHint);
-		COperator::EOperatorId opid = static_cast<COperator::EOperatorId>(
-			CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-				EdxltokenOpName, EdxltokenPlanHint));
-		BOOL isnot = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-			EdxltokenScalarBoolNot, EdxltokenPlanHint);
+
+		const XMLCh *attr_val_xml_hints = CDXLOperatorFactory::ExtractAttrValue(
+			attrs, EdxltokenOpName, EdxltokenPlanHint);
+		StringPtrArray *hint_names = nullptr;
+		if (nullptr != attr_val_xml_hints)
+		{
+			hint_names = CDXLOperatorFactory::ExtractConvertStrsToArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attr_val_xml_hints);
+		}
 
 		const XMLCh *attr_val_xml = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenIndexName, EdxltokenPlanHint);
@@ -95,8 +98,15 @@ CParseHandlerPlanHint::StartElement(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attr_val_xml);
 		}
 
-		m_hint->AddHint(GPOS_NEW(m_mp)
-							CScanHint(m_mp, alias, index_names, opid, isnot));
+		CScanHint *hint = GPOS_NEW(m_mp) CScanHint(m_mp, alias, index_names);
+		for (ULONG ul = 0; ul < hint_names->Size(); ul++)
+		{
+			hint->AddType(CHintUtils::ScanHintStringToEnum(
+				(*hint_names)[ul]->GetBuffer()));
+		}
+		hint_names->Release();
+
+		m_hint->AddHint(hint);
 	}
 }
 

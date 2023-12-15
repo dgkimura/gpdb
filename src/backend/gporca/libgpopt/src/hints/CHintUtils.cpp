@@ -11,6 +11,8 @@
 
 #include "gpopt/hints/CHintUtils.h"
 
+#include "gpos/common/clibwrapper.h"
+
 using namespace gpopt;
 
 
@@ -30,7 +32,7 @@ GetScanHint(T *pop, CPlanHint *plan_hint)
 
 	const CWStringConst *name = pop->Ptabdesc()->Name().Pstr();
 
-	return static_cast<CScanHint *>(plan_hint->GetHint(name));
+	return plan_hint->GetScanHint(name);
 }
 
 
@@ -47,9 +49,7 @@ CHintUtils::SatisfiesPlanHints(CLogicalGet *pop, CPlanHint *plan_hint)
 	}
 
 	// If opertor matches hint operator _or_ it doesn't match and is a not.
-	return (scan_hint->GetOperator() == pop->Eopid() &&
-			!scan_hint->GetIsNot()) ||
-		   (scan_hint->GetOperator() != pop->Eopid() && scan_hint->GetIsNot());
+	return scan_hint->SatisfiesOperator(pop);
 }
 
 BOOL
@@ -70,16 +70,12 @@ CHintUtils::SatisfiesPlanHints(CLogicalIndexGet *pop, CPlanHint *plan_hint)
 				(*scan_hint->GetIndexNames())[ul]))
 		{
 			// If opertor matches hint operator and index matches hint index.
-			return scan_hint->GetOperator() == pop->Eopid();
+			return scan_hint->SatisfiesOperator(pop);
 		}
 	}
 
-	// If opertor matches hint operator and no index was specified
-	// If opertor doesn't match hint operator and is a not.
-	return (scan_hint->GetOperator() == pop->Eopid() &&
-			scan_hint->GetIndexNames()->Size() == 0 &&
-			!scan_hint->GetIsNot()) ||
-		   (scan_hint->GetOperator() != pop->Eopid() && scan_hint->GetIsNot());
+	return scan_hint->GetIndexNames()->Size() == 0 &&
+		   scan_hint->SatisfiesOperator(pop);
 }
 
 
@@ -95,10 +91,7 @@ CHintUtils::SatisfiesPlanHints(CLogicalDynamicGet *pop, CPlanHint *plan_hint)
 		return true;
 	}
 
-	// If opertor matches hint operator _or_ it doesn't match and is a not.
-	return (scan_hint->GetOperator() == pop->Eopid() &&
-			!scan_hint->GetIsNot()) ||
-		   (scan_hint->GetOperator() != pop->Eopid() && scan_hint->GetIsNot());
+	return scan_hint->SatisfiesOperator(pop);
 }
 
 
@@ -121,16 +114,12 @@ CHintUtils::SatisfiesPlanHints(CLogicalDynamicIndexGet *pop,
 				(*scan_hint->GetIndexNames())[ul]))
 		{
 			// If opertor matches hint operator and index matches hint index.
-			return scan_hint->GetOperator() == pop->Eopid();
+			return scan_hint->SatisfiesOperator(pop);
 		}
 	}
 
-	// If opertor matches hint operator and no index was specified
-	// If opertor doesn't match hint operator and is a not.
-	return (scan_hint->GetOperator() == pop->Eopid() &&
-			scan_hint->GetIndexNames()->Size() == 0 &&
-			!scan_hint->GetIsNot()) ||
-		   (scan_hint->GetOperator() != pop->Eopid() && scan_hint->GetIsNot());
+	return scan_hint->GetIndexNames()->Size() == 0 &&
+		   scan_hint->SatisfiesOperator(pop);
 }
 
 
@@ -153,14 +142,100 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 				(*scan_hint->GetIndexNames())[ul]))
 		{
 			// If opertor matches hint operator and index matches hint index.
-			return scan_hint->GetOperator() == pop->Eopid();
+			return scan_hint->SatisfiesOperator(pop);
 		}
 	}
 
-	// If opertor matches hint operator and no index was specified
-	// If opertor doesn't match hint operator and is a not.
-	return (scan_hint->GetOperator() == pop->Eopid() &&
-			scan_hint->GetIndexNames()->Size() == 0 &&
-			!scan_hint->GetIsNot()) ||
-		   (scan_hint->GetOperator() != pop->Eopid() && scan_hint->GetIsNot());
+	return scan_hint->GetIndexNames()->Size() == 0 &&
+		   scan_hint->SatisfiesOperator(pop);
+}
+
+const WCHAR *
+CHintUtils::ScanHintEnumToString(CScanHint::EType type)
+{
+	switch (type)
+	{
+		case CScanHint::SeqScan:
+		{
+			return GPOS_WSZ_LIT("SeqScan");
+		}
+		case CScanHint::NoSeqScan:
+		{
+			return GPOS_WSZ_LIT("NoSeqScan");
+		}
+		case CScanHint::IndexScan:
+		{
+			return GPOS_WSZ_LIT("IndexScan");
+		}
+		case CScanHint::NoIndexScan:
+		{
+			return GPOS_WSZ_LIT("NoIndexScan");
+		}
+		case CScanHint::IndexOnlyScan:
+		{
+			return GPOS_WSZ_LIT("IndexOnlyScan");
+		}
+		case CScanHint::NoIndexOnlyScan:
+		{
+			return GPOS_WSZ_LIT("NoIndexOnlyScan");
+		}
+		case CScanHint::BitmapScan:
+		{
+			return GPOS_WSZ_LIT("BitmapScan");
+		}
+		case CScanHint::NoBitmapScan:
+		{
+			return GPOS_WSZ_LIT("NoBitmapScan");
+		}
+		default:
+		{
+			return nullptr;
+		}
+	}
+}
+
+CScanHint::EType
+CHintUtils::ScanHintStringToEnum(const WCHAR *type)
+{
+	if (0 ==
+		clib::Wcsncmp(type, GPOS_WSZ_LIT("SeqScan"), gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::SeqScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("NoSeqScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::NoSeqScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("IndexScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::IndexScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("NoIndexScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::NoIndexScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("IndexOnlyScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::IndexOnlyScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("NoIndexOnlyScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::NoIndexOnlyScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("BitmapScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::BitmapScan;
+	}
+	if (0 == clib::Wcsncmp(type, GPOS_WSZ_LIT("NoBitmapScan"),
+						   gpos::clib::Wcslen(type)))
+	{
+		return CScanHint::NoBitmapScan;
+	}
+	return CScanHint::Sentinal;
 }

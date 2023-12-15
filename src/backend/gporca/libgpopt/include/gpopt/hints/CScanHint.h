@@ -13,8 +13,12 @@
 #ifndef GPOS_CScanHint_H
 #define GPOS_CScanHint_H
 
+#include <vector>
+
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/CEnumSet.h"
+#include "gpos/common/CEnumSetIter.h"
 #include "gpos/common/CRefCount.h"
 
 #include "gpopt/hints/IHint.h"
@@ -25,29 +29,45 @@ namespace gpopt
 {
 class CScanHint : public IHint, public DbgPrintMixin<CScanHint>
 {
-private:
+public:
+	enum EType
+	{
+		SeqScan,
+		NoSeqScan,
+		IndexScan,
+		NoIndexScan,
+		IndexOnlyScan,
+		NoIndexOnlyScan,
+		BitmapScan,
+		NoBitmapScan,
+
+		Sentinal
+	};
+
+	using CEHintTypeSet = CEnumSet<CScanHint::EType, CScanHint::Sentinal>;
+	using CEHintTypeSetSetIter =
+		CEnumSetIter<CScanHint::EType, CScanHint::Sentinal>;
+
+protected:
 	CMemoryPool *m_mp;
 
+private:
 	// relation or alias used in the query
 	const CWStringBase *m_name;
 
 	// specfied index names (if any) for index and bitmap scans
 	StringPtrArray *m_indexnames;
 
-	// scan operator to use
-	COperator::EOperatorId m_id;
-
-	// is this a No* hint (e.g. NoSeqScan)?
-	BOOL m_isnot;
+	// all scan hint associated with this relation
+	CEHintTypeSet *m_types;
 
 public:
 	CScanHint(CMemoryPool *mp, const CWStringBase *name,
-			  StringPtrArray *indexnames, COperator::EOperatorId id, BOOL isnot)
+			  StringPtrArray *indexnames)
 		: m_mp(mp),
 		  m_name(name),
 		  m_indexnames(indexnames),
-		  m_id(id),
-		  m_isnot(isnot)
+		  m_types(GPOS_NEW(mp) CEHintTypeSet(mp))
 	{
 	}
 
@@ -55,6 +75,7 @@ public:
 	{
 		GPOS_DELETE(m_name);
 		m_indexnames->Release();
+		m_types->Release();
 	}
 
 	const CWStringBase *
@@ -69,21 +90,17 @@ public:
 		return m_indexnames;
 	}
 
-	COperator::EOperatorId
-	GetOperator() const
+	void
+	AddType(CScanHint::EType type)
 	{
-		return m_id;
+		m_types->ExchangeSet(type);
 	}
 
-	BOOL
-	GetIsNot() const
-	{
-		return m_isnot;
-	}
+	virtual BOOL SatisfiesOperator(COperator *op) const;
 
-	IOstream &OsPrint(IOstream &os) const;
+	virtual IOstream &OsPrint(IOstream &os) const;
 
-	void Serialize(CXMLSerializer *xml_serializer) const;
+	virtual void Serialize(CXMLSerializer *xml_serializer) const;
 };
 
 using ScanHintList = CDynamicPtrArray<CScanHint, CleanupRelease>;

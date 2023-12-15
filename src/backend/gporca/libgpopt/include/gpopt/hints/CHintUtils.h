@@ -40,6 +40,10 @@ public:
 	// Check if CScalarBitmapIndexProbe operator satisfies plan hints
 	static BOOL SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 								   CPlanHint *plan_hint);
+
+	static const WCHAR *ScanHintEnumToString(CScanHint::EType type);
+
+	static CScanHint::EType ScanHintStringToEnum(const WCHAR *type);
 };
 
 }  // namespace gpopt

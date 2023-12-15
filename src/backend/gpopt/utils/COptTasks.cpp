@@ -481,63 +481,53 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 	{
 		ScanMethodHint *scan_hint =
 			(ScanMethodHint *) hintstate->scan_hints[ul];
-
-		BOOL is_partitioned =
-			gpdb::IsAliasPartitionedTable(query, scan_hint->relname);
+		if (nullptr == scan_hint->relname)
+		{
+			continue;
+		}
 
 		StringPtrArray *indexnames = GPOS_NEW(mp) StringPtrArray(mp);
-		COperator::EOperatorId op = COperator::EopSentinel;
-		BOOL isnot = false;
+		CScanHint::EType type = CScanHint::Sentinal;
 		switch (scan_hint->base.hint_keyword)
 		{
 			case HINT_KEYWORD_SEQSCAN:
 			{
-				op = is_partitioned ? COperator::EopLogicalDynamicGet
-									: COperator::EopLogicalGet;
-				break;
-			}
-			case HINT_KEYWORD_INDEXSCAN:
-			{
-				op = is_partitioned ? COperator::EopLogicalDynamicIndexGet
-									: COperator::EopLogicalIndexGet;
-				break;
-			}
-			case HINT_KEYWORD_INDEXONLYSCAN:
-			{
-				op = is_partitioned ? COperator::EopLogicalDynamicIndexOnlyGet
-									: COperator::EopLogicalIndexOnlyGet;
-				break;
-			}
-			case HINT_KEYWORD_BITMAPSCAN:
-			{
-				op = COperator::EopScalarBitmapIndexProbe;
+				type = CScanHint::SeqScan;
 				break;
 			}
 			case HINT_KEYWORD_NOSEQSCAN:
 			{
-				op = is_partitioned ? COperator::EopLogicalDynamicGet
-									: COperator::EopLogicalGet;
-				isnot = true;
+				type = CScanHint::NoSeqScan;
+				break;
+			}
+			case HINT_KEYWORD_INDEXSCAN:
+			{
+				type = CScanHint::IndexScan;
 				break;
 			}
 			case HINT_KEYWORD_NOINDEXSCAN:
 			{
-				isnot = true;
-				op = is_partitioned ? COperator::EopLogicalDynamicIndexGet
-									: COperator::EopLogicalIndexGet;
+				type = CScanHint::NoIndexScan;
+				break;
+			}
+			case HINT_KEYWORD_INDEXONLYSCAN:
+			{
+				type = CScanHint::IndexOnlyScan;
 				break;
 			}
 			case HINT_KEYWORD_NOINDEXONLYSCAN:
 			{
-				isnot = true;
-				op = is_partitioned ? COperator::EopLogicalDynamicIndexOnlyGet
-									: COperator::EopLogicalIndexOnlyGet;
+				type = CScanHint::NoIndexOnlyScan;
+				break;
+			}
+			case HINT_KEYWORD_BITMAPSCAN:
+			{
+				type = CScanHint::BitmapScan;
 				break;
 			}
 			case HINT_KEYWORD_NOBITMAPSCAN:
 			{
-				isnot = true;
-				op = COperator::EopScalarBitmapIndexProbe;
+				type = CScanHint::NoBitmapScan;
 				break;
 			}
 			default:
@@ -560,9 +550,15 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 			indexnames->Append(GPOS_NEW(mp) CWStringConst(mp, indexname));
 		}
 
-		plan_hints->AddHint(GPOS_NEW(mp) CScanHint(
-			mp, GPOS_NEW(mp) CWStringConst(mp, scan_hint->relname), indexnames,
-			op, isnot));
+		CScanHint *hint = plan_hints->GetScanHint(scan_hint->relname);
+		if (nullptr == hint)
+		{
+			hint = GPOS_NEW(mp) CScanHint(
+				mp, GPOS_NEW(mp) CWStringConst(mp, scan_hint->relname),
+				indexnames);
+			plan_hints->AddHint(hint);
+		}
+		hint->AddType(type);
 	}
 
 	return plan_hints;
