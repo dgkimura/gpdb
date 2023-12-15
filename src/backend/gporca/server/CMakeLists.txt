@@ -416,9 +416,9 @@ CoveringIndex-DoesSupport-Gist CoveringIndex-DoesNotSupport-Gin;
 
 CPlanHintsTest:
 Hint-SeqScan-Over-Table Hint-SeqScan-Over-Join
-Hint-IndexScan-Over-Table Hint-IndexScan-Over-Join
-Hint-IndexOnlyScan-Over-Table
-Hint-BitmapScan-Over-Table;
+Hint-IndexScan-Over-Table Hint-IndexScan-Over-Join Hint-NoIndexScan-Over-Table
+Hint-IndexOnlyScan-Over-Table Hint-NoIndexOnlyScan-Over-Table
+Hint-BitmapScan-Over-Table Hint-NoBitmapScan-Over-Table;
 
 CForeignPartTest:
 ForeignPartUniform PartForeignMixed PartForeignDifferentServer PartForeignDifferentExecLocation PartForeignMixedDPE PartForeignMixedSPE PartForeignUniformSPE ForeignScanExecLocAnySimpleScan ForeignScanExecLocAnyJoin ForeignPartOneTimeFilterDPE

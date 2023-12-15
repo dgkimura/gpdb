@@ -17,7 +17,7 @@
       /*+
           IndexOnlyScan(hint_table_1 our_incredible_index)
        */
-       EXPLAIN SELECT * FROM hint_table_1 WHERE a=42;
+       EXPLAIN SELECT a FROM hint_table_1 WHERE a=42;
   ]]>
   </dxl:Comment>
   <dxl:Thread Id="0">
