@@ -4,6 +4,13 @@ CREATE TABLE foo (a int, b numeric(3)[]);
 SELECT b[1] AS typmod_in_array_ref FROM foo;
 -->
 <dxl:DXLMessage xmlns:dxl="http://greenplum.com/dxl/2010/12/">
+  <dxl:Comment type="Setup"><![CDATA[
+      DROP TABLE IF EXISTS foo;
+      CREATE TABLE foo (a int, b numeric(3)[]);
+      EXPLAIN (costs off) SELECT b[1] AS typmod_in_array_ref FROM foo;
+  ]]> </dxl:Comment>
+  <dxl:Comment type="Explain"><![CDATA[
+  ]]></dxl:Comment>
   <dxl:Thread Id="0">
     <dxl:OptimizerConfig>
       <dxl:EnumeratorConfig Id="0" PlanSamples="0" CostThreshold="0"/>
@@ -256,7 +263,7 @@ SELECT b[1] AS typmod_in_array_ref FROM foo;
                 <dxl:Column ColId="5" Attno="-5" ColName="xmax" TypeMdid="0.28.1.0" ColWidth="4"/>
                 <dxl:Column ColId="6" Attno="-6" ColName="cmax" TypeMdid="0.29.1.0" ColWidth="4"/>
                 <dxl:Column ColId="7" Attno="-7" ColName="tableoid" TypeMdid="0.26.1.0" ColWidth="4"/>
-                <dxl:Column ColId="8" Attno="-8" ColName="gp_segment_id" TypeMdid="0.23.1.0" ColWidth="4"/>
+                <dxl:Column ColId="9" Attno="-8" ColName="gp_segment_id" TypeMdid="0.23.1.0" ColWidth="4"/>
               </dxl:Columns>
             </dxl:TableDescriptor>
           </dxl:TableScan>
