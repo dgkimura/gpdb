@@ -17,6 +17,12 @@ import re
 import argparse
 
 dryrun = False
+updateExplainComments = False
+
+try:
+    from gppylib.db import dbconn
+except ImportError as e:
+    sys.exit('ERROR: Cannot import modules.  Please check that you have sourced greenplum_path.sh.  Detail: ' + str(e))
 
 def run_command(command):
     p = subprocess.Popen(command,
@@ -47,6 +53,25 @@ def replacePlanInFile(filename, innerContent):
     with open(filename, "r") as fp:
         filedata = fp.read()
     filedata = re.sub('    <dxl:Plan.*</dxl:Plan>\n',innerContent,filedata,flags=re.DOTALL)
+    with open(filename, 'w') as fp:
+        fp.write(filedata)
+    return
+
+def replaceExplainInFile(filename):
+    with open(filename, "r") as fp:
+        filedata = fp.read()
+    setup = re.search('(?<=Comment type="Setup"><!\[CDATA\[).*?(?<=\]\])', filedata, re.DOTALL).group(0)
+
+    dburl = dbconn.DbURL(port=7000, dbname='test')
+    conn = dbconn.connect(dburl, encoding="UTF8", unsetSearchPath=False)
+    curs = dbconn.query(conn, setup[:-2])
+
+    rows = curs.fetchall()
+
+    with open(filename, "r") as fp:
+        filedata = fp.read()
+    filedata = re.sub('  <dxl:Comment type="Explain">.*</dxl:Comment>',
+                      '  <dxl:Comment type="Explain"><![[CDATA[[\n' + "\n".join(['    ' + r[0] for r in rows]) + '\n    ]]></dxl:Comment>',filedata,flags=re.DOTALL)
     with open(filename, 'w') as fp:
         fp.write(filedata)
     return
@@ -86,6 +111,9 @@ def processLogFile(logFileLines):
             if not dryrun:
                 replacePlanInFile(current_file, actual_plan )
                 print("Changed query plan in %s \n" % (current_file))
+                if updateExplainComments:
+                    replaceExplainInFile(current_file)
+                    print("Changed explain plan in %s \n" % (current_file))
             else:
                 print("Query plan is different in %s \n" % (current_file))
         elif read_plan > 1:
@@ -132,12 +160,15 @@ def main():
                         help='dry run only, do not actually change MDP files')
     parser.add_argument('--logFile',
                         help='Log file created with ctest --output-on-failure command')
+    parser.add_argument("--updateExplainComments", action="store_true", default=False,
+                        help="Update commented explain plans")
 
     args = parser.parse_args()
 
     dryrun = args.dryRun
     inputfile = args.failed_tests_file
     logfile = args.logFile
+    updateExplainComments = args.updateExplainComments
 
     if inputfile is None and logfile is None:
         print("Either a file with failed tests or a log file needs to be specified\n")
