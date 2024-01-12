@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/memory/CAutoMemoryPool.h"
+#include "gpos/string/CWStringConst.h"
 #include "gpos/test/CUnittest.h"
 
 using namespace gpos;
@@ -37,6 +38,8 @@ CDynamicPtrArrayTest::EresUnittest()
 			CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit),
 		GPOS_UNITTEST_FUNC(
 			CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes),
+		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Equals),
+		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Sort),
 	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
@@ -345,6 +348,85 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgpulIndexes->Release();
 	pdrgULONGTarget->Release();
 	pdrgULONGLookup->Release();
+
+	return GPOS_OK;
+}
+
+//---------------------------------------------------------------------------
+//     @function:
+//             CDynamicPtrArrayTest::EresUnittest_Equals
+//
+//     @doc:
+//             Testing whether two arrays are equal
+//
+//---------------------------------------------------------------------------
+GPOS_RESULT
+CDynamicPtrArrayTest::EresUnittest_Equals()
+{
+	CAutoMemoryPool amp;
+	CMemoryPool *mp = amp.Pmp();
+
+	StringPtrArray *myStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+
+	StringPtrArray *yourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+
+	// string array with same elements, in the same order should be equal
+	GPOS_ASSERT(myStringArray->Equals(yourStringArray));
+	GPOS_ASSERT(yourStringArray->Equals(myStringArray));
+
+	// string array with same elements, in the different order should not be equal
+	StringPtrArray *ourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+
+	GPOS_ASSERT(!myStringArray->Equals(ourStringArray));
+	GPOS_ASSERT(!ourStringArray->Equals(myStringArray));
+
+	myStringArray->Release();
+	yourStringArray->Release();
+	ourStringArray->Release();
+
+	return GPOS_OK;
+}
+
+//---------------------------------------------------------------------------
+//     @function:
+//             CDynamicPtrArrayTest::EresUnittest_Sort
+//
+//     @doc:
+//             Testing whether an array can be sorted
+//
+//---------------------------------------------------------------------------
+GPOS_RESULT
+CDynamicPtrArrayTest::EresUnittest_Sort()
+{
+	CAutoMemoryPool amp;
+	CMemoryPool *mp = amp.Pmp();
+
+	StringPtrArray *unsortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
+	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+
+	unsortedStringArray->Sort(CWStringBase::Compare);
+
+	StringPtrArray *sortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
+
+	for (ULONG ul = 0; ul < unsortedStringArray->Size(); ul++)
+	{
+		GPOS_ASSERT(
+			(*unsortedStringArray)[ul]->Equals((*sortedStringArray)[ul]));
+	}
+
+	unsortedStringArray->Release();
+	sortedStringArray->Release();
 
 	return GPOS_OK;
 }
