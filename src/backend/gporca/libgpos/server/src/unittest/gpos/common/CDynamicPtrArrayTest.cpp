@@ -11,9 +11,13 @@
 
 #include "unittest/gpos/common/CDynamicPtrArrayTest.h"
 
+#include <algorithm>
+
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/memory/CAutoMemoryPool.h"
+#include "gpos/memory/vector.h"
+#include "gpos/string/CWStringConst.h"
 #include "gpos/test/CUnittest.h"
 
 using namespace gpos;
@@ -37,6 +41,8 @@ CDynamicPtrArrayTest::EresUnittest()
 			CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit),
 		GPOS_UNITTEST_FUNC(
 			CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes),
+		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Equals),
+		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Sort),
 	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
@@ -345,6 +351,74 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgpulIndexes->Release();
 	pdrgULONGTarget->Release();
 	pdrgULONGLookup->Release();
+
+	return GPOS_OK;
+}
+
+//---------------------------------------------------------------------------
+//     @function:
+//             CDynamicPtrArrayTest::EresUnittest_Equals
+//
+//     @doc:
+//             Testing whether two arrays are equal
+//
+//---------------------------------------------------------------------------
+GPOS_RESULT
+CDynamicPtrArrayTest::EresUnittest_Equals()
+{
+	CAutoMemoryPool amp;
+	CMemoryPool *mp = amp.Pmp();
+
+	gpos::vector<CWStringConst> myStringArray(mp);
+	myStringArray.push_back(CWStringConst(mp, "a_string"));
+	myStringArray.push_back(CWStringConst(mp, "b_string"));
+
+	gpos::vector<CWStringConst> yourStringArray(mp);
+	yourStringArray.push_back(CWStringConst(mp, "a_string"));
+	yourStringArray.push_back(CWStringConst(mp, "b_string"));
+
+	GPOS_ASSERT(myStringArray == yourStringArray);
+	GPOS_ASSERT(yourStringArray == myStringArray);
+
+	gpos::vector<CWStringConst> ourStringArray(mp);
+	ourStringArray.push_back(CWStringConst(mp, "b_string"));
+	ourStringArray.push_back(CWStringConst(mp, "a_string"));
+
+	GPOS_ASSERT(myStringArray != ourStringArray);
+	GPOS_ASSERT(ourStringArray != myStringArray);
+
+	return GPOS_OK;
+}
+
+//---------------------------------------------------------------------------
+//     @function:
+//             CDynamicPtrArrayTest::EresUnittest_Sort
+//
+//     @doc:
+//             Testing whether an array can be sorted
+//
+//---------------------------------------------------------------------------
+GPOS_RESULT
+CDynamicPtrArrayTest::EresUnittest_Sort()
+{
+	CAutoMemoryPool amp;
+	CMemoryPool *mp = amp.Pmp();
+
+	gpos::vector<CWStringConst> myvec(mp);
+	myvec.push_back(CWStringConst(mp, "b_string"));
+	myvec.push_back(CWStringConst(mp, "a_string"));
+	myvec.push_back(CWStringConst(mp, "c_string"));
+
+	std::sort(myvec.begin(), myvec.end(),
+			  [](CWStringConst const &a, CWStringConst const &b) {
+				  return wcscmp(a.GetBuffer(), b.GetBuffer()) == -1;
+			  });
+
+	CWStringConst a_string(mp, "a_string");
+	CWStringConst b_string(mp, "b_string");
+
+	GPOS_ASSERT(myvec[0].Equals(&a_string));
+	GPOS_ASSERT(myvec[1].Equals(&b_string));
 
 	return GPOS_OK;
 }
