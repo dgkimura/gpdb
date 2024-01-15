@@ -2339,7 +2339,7 @@ CPredicateUtils::PexprInverseComparison(CMemoryPool *mp, CExpression *pexprCmp)
 	pmdidInverseOp->AddRef();
 
 	return CUtils::PexprScalarCmp(mp, (*pexprCmp)[0], (*pexprCmp)[1],
-								  *pstrFirst, pmdidInverseOp);
+								  const_cast<CWStringConst*>(pstrFirst), pmdidInverseOp);
 }
 
 // convert predicates of the form (true = (a Cmp b)) into (a Cmp b);

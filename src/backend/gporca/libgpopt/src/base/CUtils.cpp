@@ -197,7 +197,7 @@ CUtils::PexprScalarProjectElement(CMemoryPool *mp, CColRef *colref,
 // generate a comparison expression over two columns
 CExpression *
 CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-					   const CColRef *pcrRight, CWStringConst strOp,
+					   const CColRef *pcrRight, CWStringConst *strOp,
 					   IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != pcrLeft);
@@ -223,7 +223,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 	return GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarCmp(
-			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp.GetBuffer()),
+			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp->GetBuffer()),
 			ParseCmpType(mdid_op)),
 		PexprScalarIdent(mp, pcrLeft), PexprScalarIdent(mp, pcrRight));
 }
@@ -231,7 +231,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 // Generate a comparison expression between a column and an expression
 CExpression *
 CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-					   CExpression *pexprRight, CWStringConst strOp,
+					   CExpression *pexprRight, CWStringConst *strOp,
 					   IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != pcrLeft);
@@ -257,7 +257,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 	return GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarCmp(
-			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp.GetBuffer()),
+			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp->GetBuffer()),
 			ParseCmpType(mdid_op)),
 		PexprScalarIdent(mp, pcrLeft), pexprRight);
 }
@@ -308,7 +308,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 // Generate a comparison expression over an expression and a column
 CExpression *
 CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-					   const CColRef *pcrRight, CWStringConst strOp,
+					   const CColRef *pcrRight, CWStringConst *strOp,
 					   IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
@@ -334,7 +334,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 	return GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarCmp(
-			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp.GetBuffer()),
+			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp->GetBuffer()),
 			cmp_type),
 		pexprLeft, PexprScalarIdent(mp, pcrRight));
 }
@@ -342,7 +342,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 // Generate a comparison expression over two expressions
 CExpression *
 CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-					   CExpression *pexprRight, CWStringConst strOp,
+					   CExpression *pexprRight, CWStringConst *strOp,
 					   IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
@@ -368,7 +368,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 	return GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CScalarCmp(
-			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp.GetBuffer()),
+			mp, mdid_op, GPOS_NEW(mp) CWStringConst(mp, strOp->GetBuffer()),
 			cmp_type),
 		pexprLeft, pexprRight);
 }
@@ -746,7 +746,7 @@ CUtils::PexprScalarArrayCmp(CMemoryPool *mp,
 	{
 		(*pexprScalarChildren)[0]->AddRef();
 		CExpression *scalarCmp = CUtils::PexprScalarCmp(
-			mp, colref, (*pexprScalarChildren)[0], strOp, pmdidCmpOp);
+			mp, colref, (*pexprScalarChildren)[0], &strOp, pmdidCmpOp);
 		pexprScalarChildren->Release();
 		return scalarCmp;
 	}
@@ -1653,7 +1653,7 @@ CUtils::PexprNegate(CMemoryPool *mp, CExpression *pexpr)
 // generate a ScalarOp expression over a column and an expression
 CExpression *
 CUtils::PexprScalarOp(CMemoryPool *mp, const CColRef *pcrLeft,
-					  CExpression *pexprRight, const CWStringConst strOp,
+					  CExpression *pexprRight, const CWStringConst *strOp,
 					  IMDId *mdid_op, IMDId *return_type_mdid)
 {
 	GPOS_ASSERT(nullptr != pcrLeft);
@@ -1663,7 +1663,7 @@ CUtils::PexprScalarOp(CMemoryPool *mp, const CColRef *pcrLeft,
 		mp,
 		GPOS_NEW(mp)
 			CScalarOp(mp, mdid_op, return_type_mdid,
-					  GPOS_NEW(mp) CWStringConst(mp, strOp.GetBuffer())),
+					  GPOS_NEW(mp) CWStringConst(mp, strOp->GetBuffer())),
 		PexprScalarIdent(mp, pcrLeft), pexprRight);
 }
 

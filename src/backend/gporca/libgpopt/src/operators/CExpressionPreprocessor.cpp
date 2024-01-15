@@ -261,7 +261,7 @@ CExpressionPreprocessor::PexprSimplifyQuantifiedSubqueries(CMemoryPool *mp,
 			mdid->AddRef();
 			pexprScalar->AddRef();
 
-			return CUtils::PexprScalarCmp(mp, pexprScalar, pexprSubquery, *str,
+			return CUtils::PexprScalarCmp(mp, pexprScalar, pexprSubquery, const_cast<CWStringConst*>(str),
 										  mdid);
 		}
 	}
@@ -2721,7 +2721,7 @@ CExpressionPreprocessor::ConvertInToSimpleExists(CMemoryPool *mp,
 	mdid->AddRef();
 	pexprLeft->AddRef();
 	CExpression *pexprScalarOp =
-		CUtils::PexprScalarCmp(mp, pexprLeft, pexprRight, *str, mdid);
+		CUtils::PexprScalarCmp(mp, pexprLeft, pexprRight, const_cast<CWStringConst*>(str), mdid);
 
 	pexprSubqOfExists->AddRef();
 	CExpression *pexprScalarSubqExists = GPOS_NEW(mp) CExpression(

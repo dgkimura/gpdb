@@ -11,6 +11,7 @@
 #ifndef GPOS_CWStringConst_H
 #define GPOS_CWStringConst_H
 
+#include <cassert>
 #include "gpos/string/CWStringBase.h"
 
 namespace gpos
@@ -39,8 +40,19 @@ public:
 	CWStringConst(CMemoryPool *mp, const WCHAR *w_str_buffer);
 	CWStringConst(CMemoryPool *mp, const CHAR *str_buffer);
 
+	CWStringConst(const CWStringConst &&a) : CWStringBase(std::move(a)), m_w_str_buffer(a.m_w_str_buffer) {
+		assert(a.m_length == m_length);
+	}
+	CWStringConst& operator=(CWStringConst&& other) {
+		m_w_str_buffer = other.m_w_str_buffer;
+		m_length = other.m_length;
+		m_owns_memory = other.m_owns_memory;
+		other.m_owns_memory = false;
+		return *this;
+	}
+
 	// shallow copy ctor
-	CWStringConst(const CWStringConst &);
+	//CWStringConst(const CWStringConst &);
 
 	//dtor
 	~CWStringConst() override;

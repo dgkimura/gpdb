@@ -289,9 +289,11 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	pexprScIdentEquality->AddRef();
 	pdrgpexprOriginal->Append(pexprScIdentEquality);
 
+	CWStringConst str(GPOS_WSZ_LIT("<"));
+
 	// generate a non-equality predicate between two column reference
 	CExpression *pexprScIdentInequality = CUtils::PexprScalarCmp(
-		mp, pcrLeft, pcrRight, CWStringConst(GPOS_WSZ_LIT("<")),
+		mp, pcrLeft, pcrRight, &str,
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_LT_OP));
 
 	pexprScIdentInequality->AddRef();

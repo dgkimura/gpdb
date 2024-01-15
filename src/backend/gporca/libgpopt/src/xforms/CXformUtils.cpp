@@ -1244,7 +1244,7 @@ CXformUtils::PexprInversePred(CMemoryPool *mp, CExpression *pexprSubquery)
 	pexprScalar->AddRef();
 	pmdidInverseOp->AddRef();
 
-	return CUtils::PexprScalarCmp(mp, pexprScalar, colref, *pstrFirst,
+	return CUtils::PexprScalarCmp(mp, pexprScalar, colref, const_cast<CWStringConst*>(pstrFirst),
 								  pmdidInverseOp);
 }
 

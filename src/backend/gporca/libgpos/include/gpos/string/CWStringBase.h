@@ -11,6 +11,7 @@
 #ifndef GPOS_CWStringBase_H
 #define GPOS_CWStringBase_H
 
+#include <cassert>
 #include "gpos/common/clibwrapper.h"
 #include "gpos/types.h"
 
@@ -61,6 +62,18 @@ public:
 	CWStringBase(ULONG length, BOOL owns_memory)
 		: m_length(length), m_owns_memory(owns_memory)
 	{
+	}
+
+	CWStringBase(const CWStringBase &&a) : m_length(a.m_length), m_owns_memory(a.m_owns_memory) {
+		assert(a.m_length == m_length);
+		CWStringBase &&_a = const_cast<CWStringBase&&>(a);
+		_a.m_owns_memory = false ;
+	}
+	CWStringBase& operator=(CWStringBase&& other) {
+		m_length = other.m_length;
+		m_owns_memory = other.m_owns_memory;
+		other.m_owns_memory = false;
+		return *this;
 	}
 
 	// dtor

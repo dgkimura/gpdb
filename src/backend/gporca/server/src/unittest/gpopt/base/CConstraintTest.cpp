@@ -1113,7 +1113,7 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 	CWStringConst strOpName(mdname.GetMDName()->GetBuffer());
 
 	CExpression *pexpr =
-		CUtils::PexprScalarCmp(mp, colref, pexprConst, strOpName, mdid_op);
+		CUtils::PexprScalarCmp(mp, colref, pexprConst, &strOpName, mdid_op);
 	(void) pexpr->PdpDerive();
 	return pexpr;
 }

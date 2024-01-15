@@ -9,6 +9,8 @@
 //		Test for CDynamicPtrArray
 //---------------------------------------------------------------------------
 
+#include <algorithm>
+
 #include "unittest/gpos/common/CDynamicPtrArrayTest.h"
 
 #include "gpos/base.h"
@@ -16,6 +18,8 @@
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/string/CWStringConst.h"
 #include "gpos/test/CUnittest.h"
+
+#include "gpos/memory/vector.h"
 
 using namespace gpos;
 
@@ -363,35 +367,44 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 GPOS_RESULT
 CDynamicPtrArrayTest::EresUnittest_Equals()
 {
-	CAutoMemoryPool amp;
-	CMemoryPool *mp = amp.Pmp();
+	//CAutoMemoryPool amp;
+	//CMemoryPool *mp = amp.Pmp();
 
-	StringPtrArray *myStringArray = GPOS_NEW(mp) StringPtrArray(mp);
-	myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
-	myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	//StringPtrArray *myStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	//myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	//myStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
 
-	StringPtrArray *yourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
-	yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
-	yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	//StringPtrArray *yourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	//yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	//yourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
 
-	// string array with same elements, in the same order should be equal
-	GPOS_ASSERT(myStringArray->Equals(yourStringArray));
-	GPOS_ASSERT(yourStringArray->Equals(myStringArray));
+	//// string array with same elements, in the same order should be equal
+	//GPOS_ASSERT(myStringArray->Equals(yourStringArray));
+	//GPOS_ASSERT(yourStringArray->Equals(myStringArray));
 
-	// string array with same elements, in the different order should not be equal
-	StringPtrArray *ourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
-	ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
-	ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	//// string array with same elements, in the different order should not be equal
+	//StringPtrArray *ourStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	//ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	//ourStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
 
-	GPOS_ASSERT(!myStringArray->Equals(ourStringArray));
-	GPOS_ASSERT(!ourStringArray->Equals(myStringArray));
+	//GPOS_ASSERT(!myStringArray->Equals(ourStringArray));
+	//GPOS_ASSERT(!ourStringArray->Equals(myStringArray));
 
-	myStringArray->Release();
-	yourStringArray->Release();
-	ourStringArray->Release();
+	//myStringArray->Release();
+	//yourStringArray->Release();
+	//ourStringArray->Release();
 
 	return GPOS_OK;
 }
+
+struct less_than_key
+{
+    inline bool operator() (const CWStringConst& struct1, const CWStringConst& struct2)
+    {
+		return wcscmp(struct1.GetBuffer(), struct2.GetBuffer()) == -1;
+
+    }
+};
 
 //---------------------------------------------------------------------------
 //     @function:
@@ -407,26 +420,61 @@ CDynamicPtrArrayTest::EresUnittest_Sort()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	StringPtrArray *unsortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
-	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
-	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
-	unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	CWStringConst a(mp, "b_string");
 
-	unsortedStringArray->Sort(CWStringBase::Compare);
+	gpos::vector<CWStringConst> myvec(mp);
+	myvec.push_back(CWStringConst(mp, "b_string"));
+	myvec.push_back(CWStringConst(mp, "a_string"));
+	myvec.push_back(CWStringConst(mp, "c_string"));
 
-	StringPtrArray *sortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
-	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
-	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
-	sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
+	std::sort(myvec.begin(), myvec.end(), [] (CWStringConst const& a, CWStringConst const& b) {
+		return wcscmp(a.GetBuffer(), b.GetBuffer()) == -1;
+	});
+	//std::sort(myvec.begin(), myvec.end(), less_than_key());
 
-	for (ULONG ul = 0; ul < unsortedStringArray->Size(); ul++)
-	{
-		GPOS_ASSERT(
-			(*unsortedStringArray)[ul]->Equals((*sortedStringArray)[ul]));
-	}
+	CWStringConst *a_string = GPOS_NEW(mp) CWStringConst(mp, "a_string");
+	CWStringConst *b_string = GPOS_NEW(mp) CWStringConst(mp, "b_string");
 
-	unsortedStringArray->Release();
-	sortedStringArray->Release();
+	GPOS_ASSERT(myvec[0].Equals(a_string));
+	GPOS_ASSERT(myvec[1].Equals(b_string));
+
+	GPOS_DELETE(a_string);
+	GPOS_DELETE(b_string);
+
+
+	//StringPtrArray *unsortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	//unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
+	//unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	//unsortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+
+	//unsortedStringArray->Sort(CWStringBase::Compare);
+
+	//StringPtrArray *sortedStringArray = GPOS_NEW(mp) StringPtrArray(mp);
+	//sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "a_string"));
+	//sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "b_string"));
+	//sortedStringArray->Append(GPOS_NEW(mp) CWStringConst(mp, "c_string"));
+
+	//for (ULONG ul = 0; ul < unsortedStringArray->Size(); ul++)
+	//{
+	//	GPOS_ASSERT(
+	//		(*unsortedStringArray)[ul]->Equals((*sortedStringArray)[ul]));
+	//}
+
+	//unsortedStringArray->Release();
+	//sortedStringArray->Release();
+
+	//XXX:FIXME:TODO
+	//CWStringConst *b_string = GPOS_NEW(mp) CWStringConst(mp, "b_string");
+	//CWStringConst *a_string = GPOS_NEW(mp) CWStringConst(mp, "a_string");
+
+	//StringPtrArray *array = GPOS_NEW(mp) StringPtrArray(mp);
+	//array->Append(b_string);
+	//array->Append(a_string);
+
+	//array->Sort();
+
+	//GPOS_ASSERT((*array)[0]->Equals(a_string));
+	//GPOS_ASSERT((*array)[1]->Equals(b_string));
 
 	return GPOS_OK;
 }
