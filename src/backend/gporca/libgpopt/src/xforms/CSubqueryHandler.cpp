@@ -236,7 +236,7 @@ CSubqueryHandler::PexprSubqueryPred(CExpression *pexprOuter,
 
 	mdid_op->AddRef();
 	CExpression *pexprPredicate =
-		CUtils::PexprScalarCmp(m_mp, pexprNewScalar, colref, *str, mdid_op);
+		CUtils::PexprScalarCmp(m_mp, pexprNewScalar, colref, str, mdid_op);
 
 	return pexprPredicate;
 }

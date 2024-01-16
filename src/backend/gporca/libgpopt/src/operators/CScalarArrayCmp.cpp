@@ -230,7 +230,7 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
 		mdid_op->AddRef();
 
 		CExpression *pexprCmp = CUtils::PexprScalarCmp(
-			mp, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
+			mp, pexprIdent, pexprArrayElem, str_opname, mdid_op);
 		pdrgpexpr->Append(pexprCmp);
 	}
 	GPOS_ASSERT(0 < pdrgpexpr->Size());

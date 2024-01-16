@@ -234,11 +234,11 @@ class GetBuilder
 {
 	CMemoryPool *m_mp;
 	CTableDescriptor *m_ptabdesc;
-	CWStringConst m_strTableName;
+	CWStringConst *m_strTableName;
 	const IMDTypeInt4 *m_pmdtypeint4;
 
 public:
-	GetBuilder(CMemoryPool *mp, CWStringConst strTableName, OID oidTableOid)
+	GetBuilder(CMemoryPool *mp, CWStringConst *strTableName, OID oidTableOid)
 		: m_mp(mp), m_strTableName(strTableName)
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -250,7 +250,7 @@ public:
 		const BOOL convert_hash_to_random = false;
 		const ULONG ulExecuteAsUser = 0;
 		m_ptabdesc = GPOS_NEW(mp) CTableDescriptor(
-			mp, mdid, CName(&strTableName), convert_hash_to_random,
+			mp, mdid, CName(strTableName), convert_hash_to_random,
 			CMDRelationGPDB::EreldistrCoordinatorOnly,
 			CMDRelationGPDB::ErelstorageHeap,
 			IMDRelation::GetCurrentAOVersion(), ulExecuteAsUser,
@@ -271,7 +271,7 @@ public:
 	CExpression *
 	PexprLogicalGet()
 	{
-		return CTestUtils::PexprLogicalGet(m_mp, m_ptabdesc, &m_strTableName);
+		return CTestUtils::PexprLogicalGet(m_mp, m_ptabdesc, m_strTableName);
 	}
 };
 }  // namespace
@@ -291,7 +291,7 @@ CTranslatorDXLToExprTest::PexprGet(CMemoryPool *mp)
 	CWStringConst strTblName(GPOS_WSZ_LIT("r"));
 	const BOOL is_nullable = true;
 
-	GetBuilder gb(mp, strTblName, GPOPT_TEST_REL_OID21);
+	GetBuilder gb(mp, &strTblName, GPOPT_TEST_REL_OID21);
 	gb.AddIntColumn(CWStringConst(GPOS_WSZ_LIT("a")), 1, is_nullable);
 	gb.AddIntColumn(CWStringConst(GPOS_WSZ_LIT("b")), 2, is_nullable);
 
@@ -647,14 +647,16 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithScalarOp()
 
 		ULONG ulVal = 2;
 		CExpression *pexprScConst = CUtils::PexprScalarConstInt4(mp, ulVal);
+		CWStringConst str(GPOS_WSZ_LIT("+"));
 		CExpression *pexprScOp = CUtils::PexprScalarOp(
-			mp, pcrLeft, pexprScConst, CWStringConst(GPOS_WSZ_LIT("+")),
+			mp, pcrLeft, pexprScConst, &str,
 			GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_ADD_OP));
 
 		// create a scalar compare for a > b + 2
 		CColRef *pcrRight = (*colref_array)[0];
+		CWStringConst str2(GPOS_WSZ_LIT(">"));
 		CExpression *pexprScCmp = CUtils::PexprScalarCmp(
-			mp, pcrRight, pexprScOp, CWStringConst(GPOS_WSZ_LIT(">")),
+			mp, pcrRight, pexprScOp, &str2,
 			GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_GT_OP));
 
 		CExpression *pexprExpected =

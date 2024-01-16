@@ -112,22 +112,26 @@ public:
 	// generate a comparison expression for two column references
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 									   const CColRef *pcrRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+									   const CWStringConst *strOp,
+									   IMDId *mdid_op);
 
 	// generate a comparison expression for a column reference and an expression
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 									   CExpression *pexprRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+									   const CWStringConst *strOp,
+									   IMDId *mdid_op);
 
 	// generate a comparison expression for an expression and a column reference
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 									   const CColRef *pcrRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+									   const CWStringConst *strOp,
+									   IMDId *mdid_op);
 
 	// generate a comparison expression for two expressions
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
 									   CExpression *pexprRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+									   const CWStringConst *strOp,
+									   IMDId *mdid_op);
 
 	// generate a comparison expression for two expressions
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
@@ -219,7 +223,8 @@ public:
 
 	// generate a scalar op expression for a column reference and an expression
 	static CExpression *PexprScalarOp(CMemoryPool *mp, const CColRef *pcrLeft,
-									  CExpression *pexpr, CWStringConst strOp,
+									  CExpression *pexpr,
+									  const CWStringConst *strOp,
 									  IMDId *mdid_op,
 									  IMDId *return_type_mdid = nullptr);
 

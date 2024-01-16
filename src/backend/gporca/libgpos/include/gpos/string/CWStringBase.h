@@ -63,6 +63,22 @@ public:
 	{
 	}
 
+	CWStringBase(const CWStringBase &&a)
+		: m_length(a.m_length), m_owns_memory(a.m_owns_memory)
+	{
+		CWStringBase &&_a = const_cast<CWStringBase &&>(a);
+		_a.m_owns_memory = false;
+	}
+
+	CWStringBase &
+	operator=(CWStringBase &&other)
+	{
+		m_length = other.m_length;
+		m_owns_memory = other.m_owns_memory;
+		other.m_owns_memory = false;
+		return *this;
+	}
+
 	// dtor
 	virtual ~CWStringBase() = default;
 

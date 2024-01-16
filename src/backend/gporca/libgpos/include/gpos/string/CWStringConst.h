@@ -39,8 +39,20 @@ public:
 	CWStringConst(CMemoryPool *mp, const WCHAR *w_str_buffer);
 	CWStringConst(CMemoryPool *mp, const CHAR *str_buffer);
 
-	// shallow copy ctor
-	CWStringConst(const CWStringConst &);
+	CWStringConst(const CWStringConst &&a)
+		: CWStringBase(std::move(a)), m_w_str_buffer(a.m_w_str_buffer)
+	{
+	}
+
+	CWStringConst &
+	operator=(CWStringConst &&other)
+	{
+		m_w_str_buffer = other.m_w_str_buffer;
+		m_length = other.m_length;
+		m_owns_memory = other.m_owns_memory;
+		other.m_owns_memory = false;
+		return *this;
+	}
 
 	//dtor
 	~CWStringConst() override;

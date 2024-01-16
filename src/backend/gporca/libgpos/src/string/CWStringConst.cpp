@@ -107,23 +107,6 @@ CWStringConst::CWStringConst(CMemoryPool *mp, const CHAR *str_buffer)
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringConst::CWStringConst
-//
-//	@doc:
-//		Shallow copy constructor.
-//
-//---------------------------------------------------------------------------
-CWStringConst::CWStringConst(const CWStringConst &str)
-	: CWStringBase(str.Length(),
-				   false  // owns_memory
-				   ),
-	  m_w_str_buffer(str.GetBuffer())
-{
-	GPOS_ASSERT(nullptr != m_w_str_buffer);
-	GPOS_ASSERT(IsValid());
-}
-//---------------------------------------------------------------------------
-//	@function:
 //		CWStringConst::~CWStringConst
 //
 //	@doc:
