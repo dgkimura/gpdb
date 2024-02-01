@@ -464,6 +464,29 @@ COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 }
 
 
+CJoinHint::JoinPair *
+GenerateJoinPairs(CMemoryPool *mp, OuterInnerRels *outer_inner)
+{
+	CJoinHint::JoinPair *pair = nullptr;
+
+	if (outer_inner->relation != nullptr)
+	{
+		pair = GPOS_NEW(mp) CJoinHint::JoinPair(
+			GPOS_NEW(mp) CWStringConst(mp, outer_inner->relation));
+	}
+	else
+	{
+		pair = GPOS_NEW(mp) CJoinHint::JoinPair(
+			GenerateJoinPairs(mp, (OuterInnerRels *) lfirst(list_head(
+									  outer_inner->outer_inner_pair))),
+			GenerateJoinPairs(mp, (OuterInnerRels *) lfirst(lnext(list_head(
+									  outer_inner->outer_inner_pair)))));
+	}
+
+	return pair;
+}
+
+
 //---------------------------------------------------------------------------
 //      @function:
 //			COptTasks::GetPlanHints
@@ -597,6 +620,21 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 		plan_hints->AddHint(GPOS_NEW(mp) CRowHint(
 			mp, aliases, CDouble(row_hint->rows),
 			(CRowHint::RowsValueType) row_hint->value_type));
+	}
+
+
+	// Translate RowsHint => CRowHint
+
+	for (int hint_index = 0;
+		 hint_index < hintstate->num_hints[HINT_TYPE_LEADING]; hint_index++)
+	{
+		LeadingHint *leading_hint =
+			(LeadingHint *) hintstate->leading_hint[hint_index];
+
+
+		plan_hints->AddHint(GPOS_NEW(mp) CJoinHint(
+			mp, GenerateJoinPairs(mp, leading_hint->outer_inner)));
+		GPOS_ASSERT(nullptr != leading_hint);
 	}
 
 	return plan_hints;

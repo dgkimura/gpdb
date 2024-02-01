@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/engine/CHint.h"
+#include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
 #include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/CPatternMultiLeaf.h"
@@ -145,7 +146,26 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 			CNormalizer::PexprNormalize(mp, nextJoinOrder);
 
 		nextJoinOrder->Release();
-		pxfres->Add(pexprNormalized);
+
+		CExpressionHandle exprhdl(mp);
+		exprhdl.Attach(pexprNormalized);
+		exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+
+		CPlanHint *planhint =
+			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+		if (nullptr != planhint)
+		{
+			CJoinHint *joinhint =
+				planhint->GetJoinHint(exprhdl.DeriveTableDescriptor());
+			if (nullptr != joinhint)
+			{
+				GPOS_ASSERT(nullptr != joinhint);
+			}
+		}
+		else
+		{
+			pxfres->Add(pexprNormalized);
+		}
 	}
 }
 

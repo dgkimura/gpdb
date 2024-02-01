@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
 
+#include "gpopt/hints/CJoinHint.h"
 #include "gpopt/hints/CRowHint.h"
 #include "gpopt/hints/CScanHint.h"
 #include "gpopt/hints/IHint.h"
@@ -39,6 +40,9 @@ private:
 	// List of all row hints
 	RowHintList *m_row_hints{nullptr};
 
+	// List of all join hints
+	JoinHintList *m_join_hints{nullptr};
+
 public:
 	CPlanHint(CMemoryPool *mp);
 
@@ -50,12 +54,18 @@ public:
 	// Add a row hint
 	void AddHint(CRowHint *hint);
 
+	// Add a jion hint
+	void AddHint(CJoinHint *hint);
+
 	// Get a scan hint that matches a name (table or alias)
 	CScanHint *GetScanHint(const char *name);
 	CScanHint *GetScanHint(const CWStringBase *name);
 
 	// Get a row hint that matches a set of table descriptors
 	CRowHint *GetRowHint(CTableDescriptorHashSet *ptabdescset);
+
+	// Get a join hint that matches a set of table descriptors
+	CJoinHint *GetJoinHint(CTableDescriptorHashSet *ptabdescset);
 
 	IOstream &OsPrint(IOstream &os) const;
 

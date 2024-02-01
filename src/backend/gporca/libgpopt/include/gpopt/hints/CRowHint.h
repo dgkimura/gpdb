@@ -68,7 +68,7 @@ public:
 			 RowsValueType type)
 		: m_mp(mp), m_aliases(aliases), m_rows(rows), m_type(type)
 	{
-		aliases->Sort(CWStringBase::Compare);
+		m_aliases->Sort(CWStringBase::Compare);
 	}
 
 	~CRowHint() override

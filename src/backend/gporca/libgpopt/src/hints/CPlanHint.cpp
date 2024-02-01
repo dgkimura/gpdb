@@ -24,7 +24,8 @@ FORCE_GENERATE_DBGSTR(CPlanHint);
 CPlanHint::CPlanHint(CMemoryPool *mp)
 	: m_mp(mp),
 	  m_scan_hints(GPOS_NEW(mp) ScanHintList(mp)),
-	  m_row_hints(GPOS_NEW(mp) RowHintList(mp))
+	  m_row_hints(GPOS_NEW(mp) RowHintList(mp)),
+	  m_join_hints(GPOS_NEW(mp) JoinHintList(mp))
 {
 }
 
@@ -32,6 +33,7 @@ CPlanHint::~CPlanHint()
 {
 	m_scan_hints->Release();
 	m_row_hints->Release();
+	m_join_hints->Release();
 }
 
 void
@@ -44,6 +46,12 @@ void
 CPlanHint::AddHint(CRowHint *hint)
 {
 	m_row_hints->Append(hint);
+}
+
+void
+CPlanHint::AddHint(CJoinHint *hint)
+{
+	m_join_hints->Append(hint);
 }
 
 
@@ -112,6 +120,48 @@ CPlanHint::GetRowHint(CTableDescriptorHashSet *ptabdescs)
 	return matching_hint;
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CPlanHint::GetJoinHint
+//
+//	@doc:
+//		Given a set of table descriptors, find a matching CRowHint.  A match
+//		means that the table alias names used to describe the CRowHint equals
+//		the set of table alias names provided by the given set of table
+//		descriptors.
+//
+//---------------------------------------------------------------------------
+CJoinHint *
+CPlanHint::GetJoinHint(CTableDescriptorHashSet *ptabdescs)
+{
+	GPOS_ASSERT(ptabdescs->Size() > 0);
+
+	StringPtrArray *aliases = GPOS_NEW(m_mp) StringPtrArray(m_mp);
+	CTableDescriptorHashSetIter hsiter(ptabdescs);
+
+	while (hsiter.Advance())
+	{
+		const CTableDescriptor *ptabdesc = hsiter.Get();
+		aliases->Append(GPOS_NEW(m_mp) CWStringConst(
+			m_mp, ptabdesc->Name().Pstr()->GetBuffer()));
+	}
+	// Row hint aliases are sorted because the hint is order agnostic.
+	aliases->Sort(CWStringBase::Compare);
+
+	CJoinHint *matching_hint = nullptr;
+	for (ULONG ul = 0; ul < m_join_hints->Size(); ul++)
+	{
+		CJoinHint *hint = (*m_join_hints)[ul];
+		if (aliases->Equals(hint->GetAliasNames()))
+		{
+			matching_hint = hint;
+			break;
+		}
+	}
+	aliases->Release();
+	return matching_hint;
+}
+
 IOstream &
 CPlanHint::OsPrint(IOstream &os) const
 {
@@ -133,6 +183,12 @@ CPlanHint::OsPrint(IOstream &os) const
 	{
 		os << "  ";
 		(*m_row_hints)[ul]->OsPrint(os) << "\n";
+	}
+
+	for (ULONG ul = 0; ul < m_join_hints->Size(); ul++)
+	{
+		os << "  ";
+		(*m_join_hints)[ul]->OsPrint(os) << "\n";
 	}
 	os << "]";
 	return os;
