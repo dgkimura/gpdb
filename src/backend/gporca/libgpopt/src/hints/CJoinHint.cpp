@@ -18,12 +18,34 @@
 using namespace gpopt;
 
 FORCE_GENERATE_DBGSTR(CJoinHint);
+FORCE_GENERATE_DBGSTR(CJoinHint::JoinPair);
+
+IOstream &
+CJoinHint::JoinPair::OsPrint(IOstream &os) const
+{
+	if (nullptr != m_name)
+	{
+		os << m_name->GetBuffer();
+	}
+	else
+	{
+		os << "(";
+		m_outer->OsPrint(os);
+		os << " ";
+		m_inner->OsPrint(os);
+		os << ")";
+	}
+	return os;
+}
 
 
 IOstream &
 CJoinHint::OsPrint(IOstream &os) const
 {
 	os << "JoinHint:";
+
+	m_join_pair->OsPrint(os);
+
 	return os;
 }
 

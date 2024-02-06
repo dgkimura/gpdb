@@ -41,6 +41,9 @@ public:
 	static BOOL SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 								   CPlanHint *plan_hint);
 
+	static BOOL SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
+								   CPlanHint *plan_hint);
+
 	static const WCHAR *ScanHintEnumToString(CScanHint::EType type);
 
 	static CScanHint::EType ScanHintStringToEnum(const WCHAR *type);

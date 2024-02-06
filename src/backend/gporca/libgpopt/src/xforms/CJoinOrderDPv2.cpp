@@ -22,6 +22,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/cost/ICostModelParams.h"
 #include "gpopt/exception.h"
+#include "gpopt/hints/CHintUtils.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
 #include "gpopt/operators/CLogicalSelect.h"
@@ -399,6 +400,19 @@ CJoinOrderDPv2::GetJoinExpr(const SGroupAndExpression &left_child_expr,
 		join_expr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			m_mp, left_expr, right_expr, scalar_expr);
 	}
+
+	// TODO:KIMURA does join_expr satisfy hint?
+	//if (!SatisfiesJoinHints(join_expr))
+	//{
+	//	return nullptr;
+	//}
+	if (!CHintUtils::SatisfiesJoinHints(
+			m_mp, join_expr,
+			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint()))
+	{
+		return nullptr;
+	}
+
 
 	return GPOS_NEW(m_mp) SExpressionInfo(m_mp, join_expr, left_child_expr,
 										  right_child_expr, result_properties);

@@ -66,6 +66,7 @@ public:
 
 	// Get a join hint that matches a set of table descriptors
 	CJoinHint *GetJoinHint(CTableDescriptorHashSet *ptabdescset);
+	CJoinHint *GetJoinHint();
 
 	IOstream &OsPrint(IOstream &os) const;
 

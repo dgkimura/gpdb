@@ -162,6 +162,12 @@ CPlanHint::GetJoinHint(CTableDescriptorHashSet *ptabdescs)
 	return matching_hint;
 }
 
+CJoinHint *
+CPlanHint::GetJoinHint()
+{
+	return m_join_hints->Size() == 1 ? (*m_join_hints)[0] : nullptr;
+}
+
 IOstream &
 CPlanHint::OsPrint(IOstream &os) const
 {

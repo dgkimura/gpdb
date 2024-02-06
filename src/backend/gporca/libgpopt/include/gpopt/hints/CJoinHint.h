@@ -25,7 +25,7 @@ namespace gpopt
 class CJoinHint : public IHint, public DbgPrintMixin<CJoinHint>
 {
 public:
-	class JoinPair : public CRefCount
+	class JoinPair : public CRefCount, public DbgPrintMixin<JoinPair>
 	{
 	private:
 		CWStringConst *m_name{nullptr};
@@ -67,6 +67,8 @@ public:
 		{
 			return m_inner;
 		}
+
+		IOstream &OsPrint(IOstream &os) const;
 	};
 
 private:
@@ -109,12 +111,6 @@ public:
 	GetAliasNames() const
 	{
 		return m_aliases;
-	}
-
-	CExpression *
-	CreateJoin(CExpression *pexpr)
-	{
-		GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
 	}
 
 	IOstream &OsPrint(IOstream &os) const;

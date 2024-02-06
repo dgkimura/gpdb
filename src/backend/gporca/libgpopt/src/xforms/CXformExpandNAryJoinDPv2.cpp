@@ -147,25 +147,26 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 
 		nextJoinOrder->Release();
 
-		CExpressionHandle exprhdl(mp);
-		exprhdl.Attach(pexprNormalized);
-		exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+		//CExpressionHandle exprhdl(mp);
+		//exprhdl.Attach(pexprNormalized);
+		//exprhdl.DeriveProps(nullptr /*pdpctxt*/);
 
-		CPlanHint *planhint =
-			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
-		if (nullptr != planhint)
-		{
-			CJoinHint *joinhint =
-				planhint->GetJoinHint(exprhdl.DeriveTableDescriptor());
-			if (nullptr != joinhint)
-			{
-				GPOS_ASSERT(nullptr != joinhint);
-			}
-		}
-		else
-		{
-			pxfres->Add(pexprNormalized);
-		}
+		//CPlanHint *planhint =
+		//	COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+		//if (nullptr != planhint)
+		//{
+		//	CJoinHint *joinhint =
+		//		planhint->GetJoinHint(exprhdl.DeriveTableDescriptor());
+		//	if (nullptr != joinhint)
+		//	{
+		//		GPOS_ASSERT(nullptr != joinhint);
+		//	}
+		//}
+		//else
+		//{
+		//	pxfres->Add(pexprNormalized);
+		//}
+		pxfres->Add(pexprNormalized);
 	}
 }
 

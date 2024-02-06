@@ -13,6 +13,8 @@
 
 #include "gpos/common/clibwrapper.h"
 
+#include "gpopt/operators/CExpressionHandle.h"
+
 using namespace gpopt;
 
 
@@ -148,6 +150,42 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 
 	return scan_hint->GetIndexNames()->Size() == 0 &&
 		   scan_hint->SatisfiesOperator(pop);
+}
+
+BOOL
+CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
+							   CPlanHint *plan_hint)
+{
+	GPOS_ASSERT(nullptr != pexpr);
+	if (plan_hint == nullptr)
+	{
+		// no matched hint, so everything goes...
+		return true;
+	}
+
+	CJoinHint *join_hint = plan_hint->GetJoinHint();
+	if (join_hint == nullptr)
+	{
+		// no matched hint, so everything goes...
+		return true;
+	}
+
+	CExpressionHandle outer_exprhdl(mp);
+	outer_exprhdl.Attach((*pexpr)[0]);
+	outer_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+
+	CTableDescriptorHashSet *outertabs = outer_exprhdl.DeriveTableDescriptor();
+
+	CExpressionHandle inner_exprhdl(mp);
+	inner_exprhdl.Attach((*pexpr)[1]);
+	inner_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+
+	CTableDescriptorHashSet *innertabs = inner_exprhdl.DeriveTableDescriptor();
+
+	GPOS_ASSERT(nullptr != outertabs);
+	GPOS_ASSERT(nullptr != innertabs);
+
+	return true;
 }
 
 const WCHAR *
