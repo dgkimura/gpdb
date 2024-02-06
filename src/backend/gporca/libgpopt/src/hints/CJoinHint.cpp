@@ -34,6 +34,15 @@ CJoinHint::JoinPair::OsPrint(IOstream &os) const
 		os << " ";
 		m_inner->OsPrint(os);
 		os << ")";
+
+		os << "{";
+		CJoinHint::CWStringConstHashSetIter iter(m_aliases);
+		while (iter.Advance())
+		{
+			const CWStringConst *cwstr = iter.Get();
+			os << " " << cwstr->GetBuffer();
+		}
+		os << " }";
 	}
 	return os;
 }

@@ -465,22 +465,36 @@ COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 
 
 CJoinHint::JoinPair *
-GenerateJoinPairs(CMemoryPool *mp, OuterInnerRels *outer_inner)
+GenerateJoinPairs(CMemoryPool *mp, OuterInnerRels *outer_inner,
+				  CJoinHint::CWStringConstHashSet *aliases)
 {
 	CJoinHint::JoinPair *pair = nullptr;
 
 	if (outer_inner->relation != nullptr)
 	{
-		pair = GPOS_NEW(mp) CJoinHint::JoinPair(
-			GPOS_NEW(mp) CWStringConst(mp, outer_inner->relation));
+		GPOS_ASSERT(nullptr != aliases);
+
+		CWStringConst *alias =
+			GPOS_NEW(mp) CWStringConst(mp, outer_inner->relation);
+		aliases->Insert(alias);
+
+		pair = GPOS_NEW(mp) CJoinHint::JoinPair(alias);
 	}
 	else
 	{
+		CJoinHint::CWStringConstHashSet *current_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+
 		pair = GPOS_NEW(mp) CJoinHint::JoinPair(
-			GenerateJoinPairs(mp, (OuterInnerRels *) lfirst(list_head(
-									  outer_inner->outer_inner_pair))),
-			GenerateJoinPairs(mp, (OuterInnerRels *) lfirst(lnext(list_head(
-									  outer_inner->outer_inner_pair)))));
+			GenerateJoinPairs(mp,
+							  (OuterInnerRels *) lfirst(
+								  list_head(outer_inner->outer_inner_pair)),
+							  current_aliases),
+			GenerateJoinPairs(mp,
+							  (OuterInnerRels *) lfirst(lnext(
+								  list_head(outer_inner->outer_inner_pair))),
+							  current_aliases),
+			current_aliases);
 	}
 
 	return pair;
@@ -633,7 +647,7 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 
 
 		plan_hints->AddHint(GPOS_NEW(mp) CJoinHint(
-			mp, GenerateJoinPairs(mp, leading_hint->outer_inner)));
+			mp, GenerateJoinPairs(mp, leading_hint->outer_inner, nullptr)));
 		GPOS_ASSERT(nullptr != leading_hint);
 	}
 

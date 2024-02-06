@@ -25,6 +25,14 @@ namespace gpopt
 class CJoinHint : public IHint, public DbgPrintMixin<CJoinHint>
 {
 public:
+	using CWStringConstHashSet =
+		CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
+				 CleanupDelete<CWStringConst>>;
+
+	using CWStringConstHashSetIter =
+		CHashSetIter<CWStringConst, CWStringConst::HashValue,
+					 CWStringConst::Equals, CleanupDelete<CWStringConst>>;
+
 	class JoinPair : public CRefCount, public DbgPrintMixin<JoinPair>
 	{
 	private:
@@ -33,12 +41,15 @@ public:
 		struct JoinPair *m_outer{nullptr};
 		struct JoinPair *m_inner{nullptr};
 
+		CWStringConstHashSet *m_aliases{nullptr};
+
 	public:
 		JoinPair(CWStringConst *name) : m_name(name)
 		{
 		}
-		JoinPair(struct JoinPair *outer, struct JoinPair *inner)
-			: m_outer(outer), m_inner(inner)
+		JoinPair(struct JoinPair *outer, struct JoinPair *inner,
+				 CWStringConstHashSet *aliases)
+			: m_outer(outer), m_inner(inner), m_aliases(aliases)
 		{
 		}
 

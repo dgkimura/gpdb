@@ -152,6 +152,23 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 		   scan_hint->SatisfiesOperator(pop);
 }
 
+static BOOL
+SatisfiesJoinHintsInternal(CMemoryPool *mp,
+						   const struct CJoinHint::JoinPair *joinpair,
+						   CExpression *left, CExpression *right)
+{
+	CHintUtils::CWStringConstHashSet *outertabs =
+		CHintUtils::GetAliases(mp, left);
+	CHintUtils::CWStringConstHashSet *innertabs =
+		CHintUtils::GetAliases(mp, right);
+
+	GPOS_ASSERT(nullptr != joinpair);
+	GPOS_ASSERT(nullptr != outertabs);
+	GPOS_ASSERT(nullptr != innertabs);
+
+	return true;
+}
+
 BOOL
 CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 							   CPlanHint *plan_hint)
@@ -173,13 +190,7 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 	const struct CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
 	GPOS_ASSERT(nullptr != joinpair);
 
-	CWStringConstHashSet *outertabs = GetAliases(mp, (*pexpr)[0]);
-	CWStringConstHashSet *innertabs = GetAliases(mp, (*pexpr)[1]);
-
-	GPOS_ASSERT(nullptr != outertabs);
-	GPOS_ASSERT(nullptr != innertabs);
-
-	return true;
+	return SatisfiesJoinHintsInternal(mp, joinpair, (*pexpr)[0], (*pexpr)[1]);
 }
 
 
