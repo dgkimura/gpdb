@@ -113,6 +113,12 @@ public:
 		return m_aliases;
 	}
 
+	const struct CJoinHint::JoinPair *
+	GetJoinPair() const
+	{
+		return m_join_pair;
+	}
+
 	IOstream &OsPrint(IOstream &os) const;
 
 	void Serialize(CXMLSerializer *xml_serializer) const;

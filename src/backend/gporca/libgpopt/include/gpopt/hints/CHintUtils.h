@@ -47,6 +47,13 @@ public:
 	static const WCHAR *ScanHintEnumToString(CScanHint::EType type);
 
 	static CScanHint::EType ScanHintStringToEnum(const WCHAR *type);
+
+	using CWStringConstHashSet =
+		CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
+				 CleanupDelete<CWStringConst>>;
+
+	static CWStringConstHashSet *GetAliases(CMemoryPool *mp,
+											CExpression *pexpr);
 };
 
 }  // namespace gpopt

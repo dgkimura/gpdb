@@ -170,22 +170,37 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 		return true;
 	}
 
-	CExpressionHandle outer_exprhdl(mp);
-	outer_exprhdl.Attach((*pexpr)[0]);
-	outer_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+	const struct CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
+	GPOS_ASSERT(nullptr != joinpair);
 
-	CTableDescriptorHashSet *outertabs = outer_exprhdl.DeriveTableDescriptor();
-
-	CExpressionHandle inner_exprhdl(mp);
-	inner_exprhdl.Attach((*pexpr)[1]);
-	inner_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
-
-	CTableDescriptorHashSet *innertabs = inner_exprhdl.DeriveTableDescriptor();
+	CWStringConstHashSet *outertabs = GetAliases(mp, (*pexpr)[0]);
+	CWStringConstHashSet *innertabs = GetAliases(mp, (*pexpr)[1]);
 
 	GPOS_ASSERT(nullptr != outertabs);
 	GPOS_ASSERT(nullptr != innertabs);
 
 	return true;
+}
+
+
+CHintUtils::CWStringConstHashSet *
+CHintUtils::GetAliases(CMemoryPool *mp, CExpression *pexpr)
+{
+	CWStringConstHashSet *aliases = GPOS_NEW(mp) CWStringConstHashSet(mp);
+
+	CExpressionHandle outer_exprhdl(mp);
+	outer_exprhdl.Attach(pexpr);
+	outer_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+
+	CTableDescriptorHashSet *tabset = outer_exprhdl.DeriveTableDescriptor();
+	CTableDescriptorHashSetIter hsiter(tabset);
+	while (hsiter.Advance())
+	{
+		const CTableDescriptor *tabdesc = hsiter.Get();
+		aliases->Insert(const_cast<CWStringConst *>(tabdesc->Name().Pstr()));
+	}
+
+	return aliases;
 }
 
 const WCHAR *
