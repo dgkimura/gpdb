@@ -155,12 +155,20 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 static BOOL
 SatisfiesJoinHintsInternal(CMemoryPool *mp,
 						   const struct CJoinHint::JoinPair *joinpair,
-						   CExpression *left, CExpression *right)
+						   CExpression *pexpr)
 {
+	if (nullptr != joinpair->GetName())
+	{
+		CHintUtils::CWStringConstHashSet *tabs =
+			CHintUtils::GetAliases(mp, pexpr);
+
+		return tabs->Size() == 1 && tabs->First()->Equals(joinpair->GetName());
+	}
+
 	CHintUtils::CWStringConstHashSet *outertabs =
-		CHintUtils::GetAliases(mp, left);
+		CHintUtils::GetAliases(mp, (*pexpr)[0]);
 	CHintUtils::CWStringConstHashSet *innertabs =
-		CHintUtils::GetAliases(mp, right);
+		CHintUtils::GetAliases(mp, (*pexpr)[1]);
 
 	GPOS_ASSERT(nullptr != joinpair);
 	GPOS_ASSERT(nullptr != outertabs);
@@ -190,7 +198,7 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 	const struct CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
 	GPOS_ASSERT(nullptr != joinpair);
 
-	return SatisfiesJoinHintsInternal(mp, joinpair, (*pexpr)[0], (*pexpr)[1]);
+	return SatisfiesJoinHintsInternal(mp, joinpair, pexpr);
 }
 
 

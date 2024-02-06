@@ -26,12 +26,12 @@ class CJoinHint : public IHint, public DbgPrintMixin<CJoinHint>
 {
 public:
 	using CWStringConstHashSet =
-		CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
-				 CleanupDelete<CWStringConst>>;
+		CHashSet<const CWStringConst, CWStringConst::HashValue,
+				 CWStringConst::Equals, CleanupDelete<const CWStringConst>>;
 
 	using CWStringConstHashSetIter =
-		CHashSetIter<CWStringConst, CWStringConst::HashValue,
-					 CWStringConst::Equals, CleanupDelete<CWStringConst>>;
+		CHashSetIter<const CWStringConst, CWStringConst::HashValue,
+					 CWStringConst::Equals, CleanupDelete<const CWStringConst>>;
 
 	class JoinPair : public CRefCount, public DbgPrintMixin<JoinPair>
 	{
@@ -44,8 +44,11 @@ public:
 		CWStringConstHashSet *m_aliases{nullptr};
 
 	public:
-		JoinPair(CWStringConst *name) : m_name(name)
+		JoinPair(CWStringConst *name, CMemoryPool *mp)
+			: m_name(name),
+			  m_aliases(GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp))
 		{
+			m_aliases->Insert(m_name);
 		}
 		JoinPair(struct JoinPair *outer, struct JoinPair *inner,
 				 CWStringConstHashSet *aliases)
@@ -62,19 +65,19 @@ public:
 		}
 
 		CWStringConst *
-		GetName()
+		GetName() const
 		{
 			return m_name;
 		}
 
 		struct JoinPair *
-		GetOuter()
+		GetOuter() const
 		{
 			return m_outer;
 		}
 
 		struct JoinPair *
-		GetInner()
+		GetInner() const
 		{
 			return m_inner;
 		}

@@ -478,23 +478,44 @@ GenerateJoinPairs(CMemoryPool *mp, OuterInnerRels *outer_inner,
 			GPOS_NEW(mp) CWStringConst(mp, outer_inner->relation);
 		aliases->Insert(alias);
 
-		pair = GPOS_NEW(mp) CJoinHint::JoinPair(alias);
+		pair = GPOS_NEW(mp) CJoinHint::JoinPair(alias, mp);
 	}
 	else
 	{
-		CJoinHint::CWStringConstHashSet *current_aliases =
+		CJoinHint::CWStringConstHashSet *left_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+		CJoinHint::JoinPair *left_joinpair = GenerateJoinPairs(
+			mp,
+			(OuterInnerRels *) lfirst(list_head(outer_inner->outer_inner_pair)),
+			left_aliases);
+
+		CJoinHint::CWStringConstHashSet *right_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+		CJoinHint::JoinPair *right_joinpair = GenerateJoinPairs(
+			mp,
+			(OuterInnerRels *) lfirst(
+				lnext(list_head(outer_inner->outer_inner_pair))),
+			right_aliases);
+
+		CJoinHint::CWStringConstHashSet *this_aliases =
 			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
 
-		pair = GPOS_NEW(mp) CJoinHint::JoinPair(
-			GenerateJoinPairs(mp,
-							  (OuterInnerRels *) lfirst(
-								  list_head(outer_inner->outer_inner_pair)),
-							  current_aliases),
-			GenerateJoinPairs(mp,
-							  (OuterInnerRels *) lfirst(lnext(
-								  list_head(outer_inner->outer_inner_pair))),
-							  current_aliases),
-			current_aliases);
+		CJoinHint::CWStringConstHashSetIter leftiter(left_aliases);
+		while (leftiter.Advance())
+		{
+			aliases->Insert(leftiter.Get());
+			this_aliases->Insert(leftiter.Get());
+		}
+
+		CJoinHint::CWStringConstHashSetIter rightiter(right_aliases);
+		while (rightiter.Advance())
+		{
+			aliases->Insert(rightiter.Get());
+			this_aliases->Insert(rightiter.Get());
+		}
+
+		pair = GPOS_NEW(mp)
+			CJoinHint::JoinPair(left_joinpair, right_joinpair, this_aliases);
 	}
 
 	return pair;
@@ -645,9 +666,11 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 		LeadingHint *leading_hint =
 			(LeadingHint *) hintstate->leading_hint[hint_index];
 
+		CJoinHint::CWStringConstHashSet *aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
 
 		plan_hints->AddHint(GPOS_NEW(mp) CJoinHint(
-			mp, GenerateJoinPairs(mp, leading_hint->outer_inner, nullptr)));
+			mp, GenerateJoinPairs(mp, leading_hint->outer_inner, aliases)));
 		GPOS_ASSERT(nullptr != leading_hint);
 	}
 
