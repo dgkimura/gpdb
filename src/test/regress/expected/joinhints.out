@@ -99,3 +99,35 @@ EXPLAIN (costs off) SELECT * FROM t1, t2, (select * from t3 limit 42) as t3;
 --EXPLAIN (costs off) SELECT t1.a, t2.a FROM t1, t2, t3, t4, t5;
 -- TODO: Fix SIGSEGV due to bad syntax (extra set of parens)
 -- Leading((t2 (((t5 t4) (t1 t3)))))
+/*+
+    Leading(((t5 (t4 t3)) (t1 t2)))
+ */
+EXPLAIN (costs off) SELECT t12.a, t3.a FROM (SELECT t1.a FROM t1, t2 LIMIT 42) AS t12, t3, t4, t5;
+                                   QUERY PLAN                                    
+---------------------------------------------------------------------------------
+ Nested Loop
+   Join Filter: true
+   ->  Limit
+         ->  Gather Motion 3:1  (slice4; segments: 3)
+               ->  Nested Loop
+                     Join Filter: true
+                     ->  Seq Scan on t1
+                     ->  Materialize
+                           ->  Broadcast Motion 3:3  (slice5; segments: 3)
+                                 ->  Seq Scan on t2
+   ->  Materialize
+         ->  Gather Motion 3:1  (slice1; segments: 3)
+               ->  Nested Loop
+                     Join Filter: true
+                     ->  Nested Loop
+                           Join Filter: true
+                           ->  Seq Scan on t3
+                           ->  Materialize
+                                 ->  Broadcast Motion 3:3  (slice3; segments: 3)
+                                       ->  Seq Scan on t4
+                     ->  Materialize
+                           ->  Broadcast Motion 3:3  (slice2; segments: 3)
+                                 ->  Seq Scan on t5
+ Optimizer: GPORCA
+(24 rows)
+

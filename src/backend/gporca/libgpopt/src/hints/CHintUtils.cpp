@@ -167,10 +167,19 @@ SatisfiesJoinHintsRecurse(CMemoryPool *mp,
 			   pexpr->DeriveTableDescriptor()->First()->Name().Pstr()->Equals(
 				   joinpair->GetName());
 	}
+
 	if (nullptr != joinpair->GetName())
 	{
 		// The hint specifies specific table, so there should only be one.
 		return pexpr->DeriveTableDescriptor()->Size() == 1;
+	}
+
+	if (pexpr->Arity() <= 1)
+	{
+		// If no children (e.g. limit) then assume order has already been
+		// handled.
+		return CHintUtils::ExpressionContainsHint(mp, joinpair, pexpr) &&
+			   CHintUtils::HintContainsExpression(mp, joinpair, pexpr);
 	}
 
 	// Check whether the hint matches a subtree in pexpr

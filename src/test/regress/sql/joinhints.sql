@@ -38,3 +38,8 @@ EXPLAIN (costs off) SELECT * FROM t1, t2, (select * from t3 limit 42) as t3;
 
 -- TODO: Fix SIGSEGV due to bad syntax (extra set of parens)
 -- Leading((t2 (((t5 t4) (t1 t3)))))
+
+/*+
+    Leading(((t5 (t4 t3)) (t1 t2)))
+ */
+EXPLAIN (costs off) SELECT t12.a, t3.a FROM (SELECT t1.a FROM t1, t2 LIMIT 42) AS t12, t3, t4, t5;
