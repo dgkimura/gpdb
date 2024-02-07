@@ -159,10 +159,18 @@ SatisfiesJoinHintsRecurse(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != joinpair);
 
+	if (pexpr->DeriveTableDescriptor()->Size() == 1)
+	{
+		// If there only one table descriptor then to satisfy there must be one
+		// matching hint alias.
+		return nullptr != joinpair->GetName() &&
+			   pexpr->DeriveTableDescriptor()->First()->Name().Pstr()->Equals(
+				   joinpair->GetName());
+	}
 	if (nullptr != joinpair->GetName())
 	{
-		return pexpr->DeriveTableDescriptor()->First()->Name().Pstr()->Equals(
-			joinpair->GetName());
+		// The hint specifies specific table, so there should only be one.
+		return pexpr->DeriveTableDescriptor()->Size() == 1;
 	}
 
 	// Check whether the hint matches a subtree in pexpr
@@ -279,11 +287,21 @@ CHintUtils::ExpressionContainsHint(CMemoryPool *mp,
 	exprhdl.Attach(pexpr);
 	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
 
+	CWStringConstHashSet *aliases = GPOS_NEW(mp) CWStringConstHashSet(mp);
+
 	CTableDescriptorHashSetIter hsiter(exprhdl.DeriveTableDescriptor());
 	while (hsiter.Advance())
 	{
 		const CTableDescriptor *tabdesc = hsiter.Get();
-		if (!joinpair->GetAliases()->Contains(tabdesc->Name().Pstr()))
+		aliases->Insert(tabdesc->Name().Pstr());
+	}
+
+	// Check that all hint aliases are in the table aliases
+	CJoinHint::CWStringConstHashSetIter aliasiter(joinpair->GetAliases());
+	while (aliasiter.Advance())
+	{
+		const CWStringConst *alias = aliasiter.Get();
+		if (!aliases->Contains(alias))
 		{
 			return false;
 		}
@@ -302,20 +320,12 @@ CHintUtils::HintContainsExpression(CMemoryPool *mp,
 	exprhdl.Attach(pexpr);
 	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
 
-	CWStringConstHashSet *aliases = GPOS_NEW(mp) CWStringConstHashSet(mp);
-
+	// Check that all table aliases are in the hint aliases
 	CTableDescriptorHashSetIter hsiter(exprhdl.DeriveTableDescriptor());
 	while (hsiter.Advance())
 	{
 		const CTableDescriptor *tabdesc = hsiter.Get();
-		aliases->Insert(tabdesc->Name().Pstr());
-	}
-
-	CJoinHint::CWStringConstHashSetIter aliasiter(joinpair->GetAliases());
-	while (aliasiter.Advance())
-	{
-		const CWStringConst *alias = aliasiter.Get();
-		if (!aliases->Contains(alias))
+		if (!joinpair->GetAliases()->Contains(tabdesc->Name().Pstr()))
 		{
 			return false;
 		}
