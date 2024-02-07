@@ -49,11 +49,16 @@ public:
 	static CScanHint::EType ScanHintStringToEnum(const WCHAR *type);
 
 	using CWStringConstHashSet =
-		CHashSet<CWStringConst, CWStringConst::HashValue, CWStringConst::Equals,
-				 CleanupDelete<CWStringConst>>;
+		CHashSet<const CWStringConst, CWStringConst::HashValue,
+				 CWStringConst::Equals, CleanupDelete<const CWStringConst>>;
 
-	static CWStringConstHashSet *GetAliases(CMemoryPool *mp,
-											CExpression *pexpr);
+	static BOOL ExpressionContainsHint(
+		CMemoryPool *mp, const struct CJoinHint::JoinPair *joinpair,
+		CExpression *pexpr);
+
+	static BOOL HintContainsExpression(
+		CMemoryPool *mp, const struct CJoinHint::JoinPair *joinpair,
+		CExpression *pexpr);
 };
 
 }  // namespace gpopt

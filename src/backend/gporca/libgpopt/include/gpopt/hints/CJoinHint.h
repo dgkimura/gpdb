@@ -82,6 +82,12 @@ public:
 			return m_inner;
 		}
 
+		CWStringConstHashSet *
+		GetAliases() const
+		{
+			return m_aliases;
+		}
+
 		IOstream &OsPrint(IOstream &os) const;
 	};
 

@@ -153,27 +153,95 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 }
 
 static BOOL
-SatisfiesJoinHintsInternal(CMemoryPool *mp,
-						   const struct CJoinHint::JoinPair *joinpair,
-						   CExpression *pexpr)
+SatisfiesJoinHintsRecurse(CMemoryPool *mp,
+						  const struct CJoinHint::JoinPair *joinpair,
+						  CExpression *pexpr)
 {
+	GPOS_ASSERT(nullptr != joinpair);
+
 	if (nullptr != joinpair->GetName())
 	{
-		CHintUtils::CWStringConstHashSet *tabs =
-			CHintUtils::GetAliases(mp, pexpr);
-
-		return tabs->Size() == 1 && tabs->First()->Equals(joinpair->GetName());
+		return pexpr->DeriveTableDescriptor()->First()->Name().Pstr()->Equals(
+			joinpair->GetName());
 	}
 
-	CHintUtils::CWStringConstHashSet *outertabs =
-		CHintUtils::GetAliases(mp, (*pexpr)[0]);
-	CHintUtils::CWStringConstHashSet *innertabs =
-		CHintUtils::GetAliases(mp, (*pexpr)[1]);
+	// Check whether the hint matches a subtree in pexpr
+	//
+	// For example:
+	//
+	//   Hint        Pexpr
+	//     x            x                    .
+	//    / \          / \                   .
+	//  t1   t2       t3  x                  .
+	//                   / \                 .
+	//                 t1   t2               .
 
-	GPOS_ASSERT(nullptr != joinpair);
-	GPOS_ASSERT(nullptr != outertabs);
-	GPOS_ASSERT(nullptr != innertabs);
+	// left hint on one side and right hint on other side
+	if (CHintUtils::ExpressionContainsHint(mp, joinpair->GetOuter(),
+										   (*pexpr)[0]) &&
+		CHintUtils::ExpressionContainsHint(mp, joinpair->GetInner(),
+										   (*pexpr)[1]))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair->GetOuter(),
+										 (*pexpr)[0]) &&
+			   SatisfiesJoinHintsRecurse(mp, joinpair->GetInner(), (*pexpr)[1]);
+	}
+	// left hint on one side and right hint on other side (mirrors above case)
+	else if (CHintUtils::ExpressionContainsHint(mp, joinpair->GetOuter(),
+												(*pexpr)[1]) &&
+			 CHintUtils::ExpressionContainsHint(mp, joinpair->GetInner(),
+												(*pexpr)[0]))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair->GetOuter(),
+										 (*pexpr)[1]) &&
+			   SatisfiesJoinHintsRecurse(mp, joinpair->GetInner(), (*pexpr)[0]);
+	}
+	// both hints on left side
+	else if (CHintUtils::ExpressionContainsHint(mp, joinpair, (*pexpr)[0]))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair, (*pexpr)[0]);
+	}
+	// both hints on right side
+	else if (CHintUtils::ExpressionContainsHint(mp, joinpair, (*pexpr)[1]))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair, (*pexpr)[1]);
+	}
 
+	// Check whether pexpr is a subtree in the hint.
+	//
+	// These mirror cases are required because DPV2 join algorithm is executed
+	// bottom up. In this case the join may be an incomplete work in progress.
+	//
+	// For example:
+	//
+	//   Hint       Pexpr
+	//     x           x                    .
+	//    / \         / \                   .
+	//   t3  x       t1  t2                 .
+	//      / \                             .
+	//    t1   t2                           .
+	else if (CHintUtils::HintContainsExpression(mp, joinpair->GetOuter(),
+												pexpr))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair->GetOuter(), pexpr);
+	}
+	else if (CHintUtils::HintContainsExpression(mp, joinpair->GetInner(),
+												pexpr))
+	{
+		return SatisfiesJoinHintsRecurse(mp, joinpair->GetInner(), pexpr);
+	}
+	else if (CHintUtils::HintContainsExpression(mp, joinpair, pexpr))
+	{
+		// If expression is broken along different branches of the hint, then
+		// it is not satisfied.
+		//
+		// Note that the case where the trees are symmetric is handled
+		// previously while checking if hint is a subrree of the expression.
+		return false;
+	}
+
+	// hint is not a subtree of pexpr and pexpr is not a subtree of hint. so
+	// let it go through
 	return true;
 }
 
@@ -198,28 +266,62 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 	const struct CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
 	GPOS_ASSERT(nullptr != joinpair);
 
-	return SatisfiesJoinHintsInternal(mp, joinpair, pexpr);
+	return SatisfiesJoinHintsRecurse(mp, joinpair, pexpr);
 }
 
 
-CHintUtils::CWStringConstHashSet *
-CHintUtils::GetAliases(CMemoryPool *mp, CExpression *pexpr)
+BOOL
+CHintUtils::ExpressionContainsHint(CMemoryPool *mp,
+								   const struct CJoinHint::JoinPair *joinpair,
+								   CExpression *pexpr)
 {
-	CWStringConstHashSet *aliases = GPOS_NEW(mp) CWStringConstHashSet(mp);
+	CExpressionHandle exprhdl(mp);
+	exprhdl.Attach(pexpr);
+	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
 
-	CExpressionHandle outer_exprhdl(mp);
-	outer_exprhdl.Attach(pexpr);
-	outer_exprhdl.DeriveProps(nullptr /*pdpctxt*/);
-
-	CTableDescriptorHashSet *tabset = outer_exprhdl.DeriveTableDescriptor();
-	CTableDescriptorHashSetIter hsiter(tabset);
+	CTableDescriptorHashSetIter hsiter(exprhdl.DeriveTableDescriptor());
 	while (hsiter.Advance())
 	{
 		const CTableDescriptor *tabdesc = hsiter.Get();
-		aliases->Insert(const_cast<CWStringConst *>(tabdesc->Name().Pstr()));
+		if (!joinpair->GetAliases()->Contains(tabdesc->Name().Pstr()))
+		{
+			return false;
+		}
 	}
 
-	return aliases;
+	return true;
+}
+
+
+BOOL
+CHintUtils::HintContainsExpression(CMemoryPool *mp,
+								   const struct CJoinHint::JoinPair *joinpair,
+								   CExpression *pexpr)
+{
+	CExpressionHandle exprhdl(mp);
+	exprhdl.Attach(pexpr);
+	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
+
+	CWStringConstHashSet *aliases = GPOS_NEW(mp) CWStringConstHashSet(mp);
+
+	CTableDescriptorHashSetIter hsiter(exprhdl.DeriveTableDescriptor());
+	while (hsiter.Advance())
+	{
+		const CTableDescriptor *tabdesc = hsiter.Get();
+		aliases->Insert(tabdesc->Name().Pstr());
+	}
+
+	CJoinHint::CWStringConstHashSetIter aliasiter(joinpair->GetAliases());
+	while (aliasiter.Advance())
+	{
+		const CWStringConst *alias = aliasiter.Get();
+		if (!aliases->Contains(alias))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 const WCHAR *
