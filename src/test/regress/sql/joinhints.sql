@@ -26,6 +26,11 @@ EXPLAIN (costs off) SELECT t1.a, t2.a FROM t1, t2, t3, t4, t5;
 EXPLAIN (costs off) SELECT t1.a, t2.a FROM t1, t2, t3, t4, t5;
 
 /*+
+    Leading((t2 (t1 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1, t2, (select * from t3 limit 42) as t3;
+
+/*+
     Leading((t2 ((t5 t4) (t1 t3))))
  */
 EXPLAIN (costs off) SELECT t1.a, t2.a FROM t1, t2, t3, t4, t5;
