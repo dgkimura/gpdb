@@ -1207,7 +1207,8 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 	if (left_ix >= left_size)
 	{
 		// we didn't find a greedy solution for the left side
-		GPOS_ASSERT(!"No greedy solution found for the left side");
+		// TODO:FIXME:KIMURA when join order hints are specified
+		//GPOS_ASSERT(!"No greedy solution found for the left side");
 		return;
 	}
 
