@@ -153,8 +153,7 @@ CHintUtils::SatisfiesPlanHints(CScalarBitmapIndexProbe *pop,
 }
 
 static BOOL
-SatisfiesJoinHintsRecurse(CMemoryPool *mp,
-						  const struct CJoinHint::JoinPair *joinpair,
+SatisfiesJoinHintsRecurse(CMemoryPool *mp, const CJoinHint::JoinPair *joinpair,
 						  CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != joinpair);
@@ -280,7 +279,7 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 		return true;
 	}
 
-	const struct CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
+	const CJoinHint::JoinPair *joinpair = join_hint->GetJoinPair();
 	GPOS_ASSERT(nullptr != joinpair);
 
 	return SatisfiesJoinHintsRecurse(mp, joinpair, pexpr);
@@ -289,7 +288,7 @@ CHintUtils::SatisfiesJoinHints(CMemoryPool *mp, CExpression *pexpr,
 
 BOOL
 CHintUtils::ExpressionContainsHint(CMemoryPool *mp,
-								   const struct CJoinHint::JoinPair *joinpair,
+								   const CJoinHint::JoinPair *joinpair,
 								   CExpression *pexpr)
 {
 	CExpressionHandle exprhdl(mp);
@@ -322,7 +321,7 @@ CHintUtils::ExpressionContainsHint(CMemoryPool *mp,
 
 BOOL
 CHintUtils::HintContainsExpression(CMemoryPool *mp,
-								   const struct CJoinHint::JoinPair *joinpair,
+								   const CJoinHint::JoinPair *joinpair,
 								   CExpression *pexpr)
 {
 	CExpressionHandle exprhdl(mp);

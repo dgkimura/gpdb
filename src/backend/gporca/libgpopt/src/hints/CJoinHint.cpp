@@ -59,7 +59,6 @@ CJoinHint::OsPrint(IOstream &os) const
 }
 
 void
-CJoinHint::Serialize(CXMLSerializer *xml_serializer) const
+CJoinHint::Serialize(CXMLSerializer *xml_serializer GPOS_UNUSED) const
 {
-	GPOS_ASSERT(nullptr != xml_serializer);
 }

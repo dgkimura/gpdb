@@ -38,8 +38,8 @@ public:
 	private:
 		CWStringConst *m_name{nullptr};
 
-		struct JoinPair *m_outer{nullptr};
-		struct JoinPair *m_inner{nullptr};
+		JoinPair *m_outer{nullptr};
+		JoinPair *m_inner{nullptr};
 
 		CWStringConstHashSet *m_aliases{nullptr};
 
@@ -50,13 +50,13 @@ public:
 		{
 			m_aliases->Insert(m_name);
 		}
-		JoinPair(struct JoinPair *outer, struct JoinPair *inner,
+		JoinPair(JoinPair *outer, JoinPair *inner,
 				 CWStringConstHashSet *aliases)
 			: m_outer(outer), m_inner(inner), m_aliases(aliases)
 		{
 		}
 
-		~JoinPair()
+		~JoinPair() override
 		{
 			GPOS_DELETE(m_name);
 
@@ -70,13 +70,13 @@ public:
 			return m_name;
 		}
 
-		struct JoinPair *
+		JoinPair *
 		GetOuter() const
 		{
 			return m_outer;
 		}
 
-		struct JoinPair *
+		JoinPair *
 		GetInner() const
 		{
 			return m_inner;
@@ -92,8 +92,6 @@ public:
 	};
 
 private:
-	CMemoryPool *m_mp;
-
 	JoinPair *m_join_pair;
 
 	// m_aliases contains sorted alias names.
@@ -101,9 +99,7 @@ private:
 
 public:
 	CJoinHint(CMemoryPool *mp, JoinPair *join_pair)
-		: m_mp(mp),
-		  m_join_pair(join_pair),
-		  m_aliases(GPOS_NEW(mp) StringPtrArray(mp))
+		: m_join_pair(join_pair), m_aliases(GPOS_NEW(mp) StringPtrArray(mp))
 	{
 		std::function<void(JoinPair *, StringPtrArray *)> build_aliases =
 			[&build_aliases](JoinPair *pair, StringPtrArray *aliases) {
@@ -133,7 +129,7 @@ public:
 		return m_aliases;
 	}
 
-	const struct CJoinHint::JoinPair *
+	const CJoinHint::JoinPair *
 	GetJoinPair() const
 	{
 		return m_join_pair;

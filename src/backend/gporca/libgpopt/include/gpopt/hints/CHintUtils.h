@@ -52,13 +52,13 @@ public:
 		CHashSet<const CWStringConst, CWStringConst::HashValue,
 				 CWStringConst::Equals, CleanupDelete<const CWStringConst>>;
 
-	static BOOL ExpressionContainsHint(
-		CMemoryPool *mp, const struct CJoinHint::JoinPair *joinpair,
-		CExpression *pexpr);
+	static BOOL ExpressionContainsHint(CMemoryPool *mp,
+									   const CJoinHint::JoinPair *joinpair,
+									   CExpression *pexpr);
 
-	static BOOL HintContainsExpression(
-		CMemoryPool *mp, const struct CJoinHint::JoinPair *joinpair,
-		CExpression *pexpr);
+	static BOOL HintContainsExpression(CMemoryPool *mp,
+									   const CJoinHint::JoinPair *joinpair,
+									   CExpression *pexpr);
 };
 
 }  // namespace gpopt
