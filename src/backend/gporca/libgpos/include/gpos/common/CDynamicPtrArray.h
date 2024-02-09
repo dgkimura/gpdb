@@ -77,6 +77,7 @@ using IntPtrArray = CDynamicPtrArray<INT, CleanupDelete>;
 
 // array of strings
 using StringPtrArray = CDynamicPtrArray<CWStringBase, CleanupDelete>;
+using StringPtrArrays = CDynamicPtrArray<StringPtrArray, CleanupRelease>;
 
 // arrays of chars
 using CharPtrArray = CDynamicPtrArray<CHAR, CleanupDelete>;

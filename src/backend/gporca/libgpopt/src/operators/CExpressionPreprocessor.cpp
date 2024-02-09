@@ -3299,6 +3299,13 @@ RecursivelyApplyJoinOrderHints(CMemoryPool *mp,
 							   const CJoinHint::JoinPair *joinpair,
 							   CExpressionArray *pdrgpexpr)
 {
+	if (pdrgpexpr->Size() <= 2)
+	{
+		// one 1 child relation (2nd is scalar).  Though, it should never be size 1
+		(*pdrgpexpr)[0]->AddRef();
+		return (*pdrgpexpr)[0];
+	}
+
 	if (nullptr != joinpair->GetName())
 	{
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
@@ -3326,49 +3333,163 @@ RecursivelyApplyJoinOrderHints(CMemoryPool *mp,
 }
 
 
+// Finds the lowest common ancestor among all names.
+//
+// Note: Initial non-recursive caller must pass a JoinPair that contains all
+//       names.
+const CJoinHint::JoinPair *
+FindSubHintThatAppliesToExpr(const CJoinHint::JoinPair *joinpair,
+							 StringPtrArray *names)
+{
+	if (nullptr != joinpair->GetName())
+	{
+		for (ULONG ul = 0; ul < names->Size(); ul++)
+		{
+			if ((*names)[ul]->Equals(joinpair->GetName()))
+			{
+				return joinpair;
+			}
+		}
+
+		// didn't contain name in names
+		return nullptr;
+	}
+
+	bool inOuter =
+		FindSubHintThatAppliesToExpr(joinpair->GetOuter(), names) != nullptr;
+	bool inInner =
+		FindSubHintThatAppliesToExpr(joinpair->GetInner(), names) != nullptr;
+
+	if (inOuter && inInner)
+	{
+		return joinpair;
+	}
+	else if (inOuter)
+	{
+		return joinpair->GetOuter();
+	}
+	else if (inInner)
+	{
+		return joinpair->GetInner();
+	}
+
+	return nullptr;
+}
+
+/*
+
+(gdb) pp pexpr
++--CLogicalNAryJoin
+   |--CLogicalLimit <empty> global
+   |  |--CLogicalNAryJoin
+   |  |  |--CLogicalGet "t1" ("t1"), 
+   |  |  |--CLogicalGet "t2" ("t2"), 
+   |  |  +--CScalarConst (1)
+   |  |--CScalarConst (0)
+   |  +--CScalarConst (42)
+   |--CLogicalGet "t3" ("t3"), 
+   |--CLogicalGet "t4" ("t4"), 
+   |--CLogicalGet "t5" ("t5"), 
+   +--CScalarConst (1)
+
+((t5 (t4 t3){ t4 t3 }){ t5 t4 t3 } (t1 t2){ t1 t2 }){ t5 t4 t3 t1 t2 }
+*/
+
 CExpression *
 CExpressionPreprocessor::ApplyJoinOrderHints(
-	CMemoryPool *mp,
-	CExpression *pexpr	// does not take ownership
-)
+	CMemoryPool *mp, CExpression *pexpr, const CJoinHint::JoinPair *joinpair)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
+	// XXX: GPOS_ASSERT(HintCompatibleWithExpr());   // every table of hint is contained in expr
+
 	COperator *pop = pexpr->Pop();
 
-	if (COperator::EopLogicalNAryJoin == pop->Eopid())
+	if (COperator::EopLogicalNAryJoin == pop->Eopid() && nullptr != joinpair)
 	{
-		CPlanHint *planhint =
-			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
-		if (nullptr != planhint)
+		CExpressionArray *pdrgpexprLeaves = GPOS_NEW(mp) CExpressionArray(mp);
+		StringPtrArray *leafnames = GPOS_NEW(mp) StringPtrArray(mp);
+
+		CExpressionArray *pdrgpexprBranches = GPOS_NEW(mp) CExpressionArray(mp);
+		StringPtrArrays *branchnames = GPOS_NEW(mp) StringPtrArrays(mp);
+
+		for (ULONG ul = 0; ul < pexpr->PdrgPexpr()->Size(); ul++)
 		{
-			CJoinHint *joinhint = planhint->GetJoinHint();
-			if (nullptr != joinhint)
+			CExpression *node = (*pexpr->PdrgPexpr())[ul];
+			node->AddRef();
+
+			CTableDescriptorHashSet *ptabs = node->DeriveTableDescriptor();
+
+			if (ptabs->Size() == 1)
 			{
-				//CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-				//pdrgpexpr->Append(RecursivelyApplyJoinOrderHints(
-				//	mp, joinhint->GetJoinPair(), pexpr->PdrgPexpr()));
+				pdrgpexprLeaves->Append(node);
+				leafnames->Append(
+					const_cast<CWStringConst *>(ptabs->First()->Name().Pstr()));
+			}
+			else
+			{
+				StringPtrArray *branchleafnames =
+					GPOS_NEW(mp) StringPtrArray(mp);
 
-				//(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]->AddRef();
-				//pdrgpexpr->Append(
-				//	(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
+				CTableDescriptorHashSet *ptabs = node->DeriveTableDescriptor();
+				CTableDescriptorHashSetIter hsiter(ptabs);
+				while (hsiter.Advance())
+				{
+					const CTableDescriptor *tabdesc = hsiter.Get();
+					branchleafnames->Append(
+						const_cast<CWStringConst *>(tabdesc->Name().Pstr()));
+				}
 
-				//pop->AddRef();
-				//return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
-				return RecursivelyApplyJoinOrderHints(
-					mp, joinhint->GetJoinPair(), pexpr->PdrgPexpr());
+				pdrgpexprBranches->Append(node);
+				branchnames->Append(branchleafnames);
 			}
 		}
+		CExpression *scalar =
+			(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1];
+		scalar->AddRef();
+		pdrgpexprLeaves->Append(scalar);
+
+		const CJoinHint::JoinPair *leaf_joinpair =
+			FindSubHintThatAppliesToExpr(joinpair, leafnames);
+		CExpression *pexprHintAppliedToLeaves =
+			RecursivelyApplyJoinOrderHints(mp, leaf_joinpair, pdrgpexprLeaves);
+
+		// last one is scalar...
+		if (pdrgpexprBranches->Size() == 1)
+		{
+			return pexprHintAppliedToLeaves;
+		}
+
+		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+
+		// XXX:FIXME:TODO: is it guaranteed that NAryJoin has at least 2 leaf nodes?
+		pdrgpexpr->Append(pexprHintAppliedToLeaves);
+
+		for (ULONG ul = 0; ul < pdrgpexprBranches->Size() - 1; ul++)
+		{
+			const CJoinHint::JoinPair *branch_joinpair =
+				FindSubHintThatAppliesToExpr(joinpair, (*branchnames)[ul]);
+			CExpression *child = ApplyJoinOrderHints(
+				mp, (*pdrgpexprBranches)[ul], branch_joinpair);
+			pdrgpexpr->Append(child);
+		}
+
+		scalar->AddRef();
+		pdrgpexpr->Append(scalar);
+
+		pop->AddRef();
+		return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 	}
 
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CExpressionArray *pdrgexprChildren = pexpr->PdrgPexpr();
 	for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
 	{
-		pdrgpexpr->Append(ApplyJoinOrderHints(mp, (*pdrgexprChildren)[ul]));
+		pdrgpexpr->Append(
+			ApplyJoinOrderHints(mp, (*pdrgexprChildren)[ul], joinpair));
 	}
 
 	pop->AddRef();
@@ -3605,13 +3726,23 @@ CExpressionPreprocessor::PexprPreprocess(
 	GPOS_CHECK_ABORT;
 	pexprSplitUpdateToInplace->Release();
 
-	// (31) apply join order hints
-	CExpression *pexprJoinHintsApplied =
-		ApplyJoinOrderHints(mp, pexprNormalized2);
-	GPOS_CHECK_ABORT;
-	pexprNormalized2->Release();
+	CJoinHint *joinhint = nullptr;
+	CPlanHint *planhint =
+		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+	if (nullptr != planhint)
+	{
+		joinhint = planhint->GetJoinHint();
 
-	return pexprJoinHintsApplied;
+		// (31) apply join order hints
+		CExpression *pexprJoinHintsApplied =
+			ApplyJoinOrderHints(mp, pexprNormalized2, joinhint->GetJoinPair());
+		GPOS_CHECK_ABORT;
+		pexprNormalized2->Release();
+
+		return pexprJoinHintsApplied;
+	}
+
+	return pexprNormalized2;
 }
 
 // EOF

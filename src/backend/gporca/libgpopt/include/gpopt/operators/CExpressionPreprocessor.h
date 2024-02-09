@@ -17,6 +17,7 @@
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/hints/CJoinHint.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CScalarBoolOp.h"
@@ -226,7 +227,9 @@ private:
 													   CColRef *pcolref,
 													   CExpression *pprojExpr);
 
-	static CExpression *ApplyJoinOrderHints(CMemoryPool *mp, CExpression *expr);
+	static CExpression *ApplyJoinOrderHints(
+		CMemoryPool *mp, CExpression *expr,
+		const CJoinHint::JoinPair *joinpair);
 
 public:
 	CExpressionPreprocessor() = delete;
