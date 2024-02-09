@@ -3289,6 +3289,92 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(CMemoryPool *mp,
 	return pexpr;
 }
 
+
+// Given an array of child expressions, return all child expressions that apply to hint.
+//
+// Example:
+//   Hint: ((t1 t2) t3)     Expr (t1 t2 t3)     Returns (t1 t2) (t3)
+CExpression *
+RecursivelyApplyJoinOrderHints(CMemoryPool *mp,
+							   const CJoinHint::JoinPair *joinpair,
+							   CExpressionArray *pdrgpexpr)
+{
+	if (nullptr != joinpair->GetName())
+	{
+		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
+		{
+			CTableDescriptorHashSet *ptabs =
+				(*pdrgpexpr)[ul]->DeriveTableDescriptor();
+			if (ptabs->Size() == 1 &&
+				ptabs->First()->Name().Pstr()->Equals(joinpair->GetName()))
+			{
+				(*pdrgpexpr)[ul]->AddRef();
+				return (*pdrgpexpr)[ul];
+			}
+		}
+
+		// Hmmm... shouldn't get here?
+		return nullptr;
+	}
+
+	(*pdrgpexpr)[pdrgpexpr->Size() - 1]->AddRef();
+	return GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
+		RecursivelyApplyJoinOrderHints(mp, joinpair->GetOuter(), pdrgpexpr),
+		RecursivelyApplyJoinOrderHints(mp, joinpair->GetInner(), pdrgpexpr),
+		(*pdrgpexpr)[pdrgpexpr->Size() - 1]);
+}
+
+
+CExpression *
+CExpressionPreprocessor::ApplyJoinOrderHints(
+	CMemoryPool *mp,
+	CExpression *pexpr	// does not take ownership
+)
+{
+	// protect against stack overflow during recursion
+	GPOS_CHECK_STACK_SIZE;
+	GPOS_ASSERT(nullptr != mp);
+	GPOS_ASSERT(nullptr != pexpr);
+
+	COperator *pop = pexpr->Pop();
+
+	if (COperator::EopLogicalNAryJoin == pop->Eopid())
+	{
+		CPlanHint *planhint =
+			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+		if (nullptr != planhint)
+		{
+			CJoinHint *joinhint = planhint->GetJoinHint();
+			if (nullptr != joinhint)
+			{
+				//CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+				//pdrgpexpr->Append(RecursivelyApplyJoinOrderHints(
+				//	mp, joinhint->GetJoinPair(), pexpr->PdrgPexpr()));
+
+				//(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]->AddRef();
+				//pdrgpexpr->Append(
+				//	(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
+
+				//pop->AddRef();
+				//return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
+				return RecursivelyApplyJoinOrderHints(
+					mp, joinhint->GetJoinPair(), pexpr->PdrgPexpr());
+			}
+		}
+	}
+
+	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	CExpressionArray *pdrgexprChildren = pexpr->PdrgPexpr();
+	for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
+	{
+		pdrgpexpr->Append(ApplyJoinOrderHints(mp, (*pdrgexprChildren)[ul]));
+	}
+
+	pop->AddRef();
+	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
+}
+
 // main driver, pre-processing of input logical expression
 CExpression *
 CExpressionPreprocessor::PexprPreprocess(
@@ -3519,7 +3605,13 @@ CExpressionPreprocessor::PexprPreprocess(
 	GPOS_CHECK_ABORT;
 	pexprSplitUpdateToInplace->Release();
 
-	return pexprNormalized2;
+	// (31) apply join order hints
+	CExpression *pexprJoinHintsApplied =
+		ApplyJoinOrderHints(mp, pexprNormalized2);
+	GPOS_CHECK_ABORT;
+	pexprNormalized2->Release();
+
+	return pexprJoinHintsApplied;
 }
 
 // EOF

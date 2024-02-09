@@ -464,6 +464,64 @@ COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 }
 
 
+CJoinHint::JoinPair *
+GenerateJoinPairs(CMemoryPool *mp, OuterInnerRels *outer_inner,
+				  CJoinHint::CWStringConstHashSet *aliases)
+{
+	CJoinHint::JoinPair *pair = nullptr;
+
+	if (outer_inner->relation != nullptr)
+	{
+		GPOS_ASSERT(nullptr != aliases);
+
+		CWStringConst *alias =
+			GPOS_NEW(mp) CWStringConst(mp, outer_inner->relation);
+		aliases->Insert(alias);
+
+		pair = GPOS_NEW(mp) CJoinHint::JoinPair(alias, mp);
+	}
+	else
+	{
+		CJoinHint::CWStringConstHashSet *left_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+		CJoinHint::JoinPair *left_joinpair = GenerateJoinPairs(
+			mp,
+			(OuterInnerRels *) lfirst(list_head(outer_inner->outer_inner_pair)),
+			left_aliases);
+
+		CJoinHint::CWStringConstHashSet *right_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+		CJoinHint::JoinPair *right_joinpair = GenerateJoinPairs(
+			mp,
+			(OuterInnerRels *) lfirst(
+				lnext(list_head(outer_inner->outer_inner_pair))),
+			right_aliases);
+
+		CJoinHint::CWStringConstHashSet *this_aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+
+		CJoinHint::CWStringConstHashSetIter leftiter(left_aliases);
+		while (leftiter.Advance())
+		{
+			aliases->Insert(leftiter.Get());
+			this_aliases->Insert(leftiter.Get());
+		}
+
+		CJoinHint::CWStringConstHashSetIter rightiter(right_aliases);
+		while (rightiter.Advance())
+		{
+			aliases->Insert(rightiter.Get());
+			this_aliases->Insert(rightiter.Get());
+		}
+
+		pair = GPOS_NEW(mp)
+			CJoinHint::JoinPair(left_joinpair, right_joinpair, this_aliases);
+	}
+
+	return pair;
+}
+
+
 //---------------------------------------------------------------------------
 //      @function:
 //			COptTasks::GetPlanHints
@@ -597,6 +655,23 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 		plan_hints->AddHint(GPOS_NEW(mp) CRowHint(
 			mp, aliases, CDouble(row_hint->rows),
 			(CRowHint::RowsValueType) row_hint->value_type));
+	}
+
+
+	// Translate RowsHint => CRowHint
+
+	for (int hint_index = 0;
+		 hint_index < hintstate->num_hints[HINT_TYPE_LEADING]; hint_index++)
+	{
+		LeadingHint *leading_hint =
+			(LeadingHint *) hintstate->leading_hint[hint_index];
+
+		CJoinHint::CWStringConstHashSet *aliases =
+			GPOS_NEW(mp) CJoinHint::CWStringConstHashSet(mp);
+
+		plan_hints->AddHint(GPOS_NEW(mp) CJoinHint(
+			mp, GenerateJoinPairs(mp, leading_hint->outer_inner, aliases)));
+		GPOS_ASSERT(nullptr != leading_hint);
 	}
 
 	return plan_hints;

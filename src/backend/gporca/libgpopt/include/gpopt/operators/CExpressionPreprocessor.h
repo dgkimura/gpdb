@@ -226,6 +226,8 @@ private:
 													   CColRef *pcolref,
 													   CExpression *pprojExpr);
 
+	static CExpression *ApplyJoinOrderHints(CMemoryPool *mp, CExpression *expr);
+
 public:
 	CExpressionPreprocessor() = delete;
 
