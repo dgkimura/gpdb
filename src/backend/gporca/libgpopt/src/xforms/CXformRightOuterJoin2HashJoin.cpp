@@ -13,10 +13,12 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/hints/CPlanHint.h"
 #include "gpopt/operators/CLogicalRightOuterJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/operators/CPhysicalRightOuterHashJoin.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 
@@ -77,6 +79,18 @@ CXformRightOuterJoin2HashJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
+
+	// join order hints may specify that a specific relation be on the inner or
+	// the outer side of the join. if such a hint exists, then skip adding join
+	// commutativity alternatives.
+	CPlanHint *planhint =
+		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+	if (nullptr != planhint && planhint->HasJoinHintWithDirection(pexpr))
+	{
+		CXformUtils::ImplementHashJoin<CPhysicalRightOuterHashJoin>(
+			pxfctxt, pxfres, pexpr);
+		return;
+	}
 
 	const IStatistics *outerStats = (*pexpr)[0]->Pstats();
 	const IStatistics *innerStats = (*pexpr)[1]->Pstats();
