@@ -875,6 +875,70 @@ EXPLAIN (costs off) SELECT * FROM t1, t2, t3;
 (12 rows)
 
 -- Test join order hints on non-inner join queries
+--
+-- Following queries exercise LOJ and ROJ
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a AND t3.a>40;
+                    QUERY PLAN                    
+--------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t2.a)
+         ->  Seq Scan on t1
+         ->  Hash
+               ->  Hash Left Join
+                     Hash Cond: (t2.a = t3.a)
+                     ->  Seq Scan on t2
+                     ->  Hash
+                           ->  Seq Scan on t3
+                                 Filter: (a > 40)
+ Optimizer: GPORCA
+(12 rows)
+
+/*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t1.a=t4.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t2.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t4.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t4
+         ->  Hash
+               ->  Hash Left Join
+                     Hash Cond: (t2.a = t3.a)
+                     ->  Seq Scan on t2
+                     ->  Hash
+                           ->  Seq Scan on t3
+ Optimizer: GPORCA
+(15 rows)
+
+/*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Hash Right Join
+               Hash Cond: (t3.a = t2.a)
+               ->  Seq Scan on t3
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
 /*+
     Leading(((t3 t2) t1))
  */
@@ -882,17 +946,18 @@ EXPLAIN (costs off) SELECT * FROM t1, t2 LEFT JOIN t3 ON t2.a=t3.a;
                           QUERY PLAN                           
 ---------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  Hash Left Join
-         Hash Cond: (t2.a = t3.a)
-         ->  Nested Loop
-               Join Filter: true
+   ->  Nested Loop
+         Join Filter: true
+         ->  Hash Right Join
+               Hash Cond: (t3.a = t2.a)
+               ->  Seq Scan on t3
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Materialize
                ->  Broadcast Motion 3:3  (slice2; segments: 3)
                      ->  Seq Scan on t1
-               ->  Seq Scan on t2
-         ->  Hash
-               ->  Seq Scan on t3
  Optimizer: GPORCA
-(11 rows)
+(12 rows)
 
 /*+
     Leading(((t3 t2) t1))
@@ -901,15 +966,629 @@ EXPLAIN (costs off) SELECT * FROM t1, t2 RIGHT JOIN t3 ON t2.a=t3.a;
                           QUERY PLAN                           
 ---------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  Hash Left Join
-         Hash Cond: (t3.a = t2.a)
-         ->  Nested Loop
-               Join Filter: true
+   ->  Nested Loop
+         Join Filter: true
+         ->  Hash Left Join
+               Hash Cond: (t3.a = t2.a)
+               ->  Seq Scan on t3
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Materialize
                ->  Broadcast Motion 3:3  (slice2; segments: 3)
                      ->  Seq Scan on t1
+ Optimizer: GPORCA
+(12 rows)
+
+/*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(7 rows)
+
+-- Bad hints
+/*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t2.a=t4.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t2.a = t4.a)
+         ->  Hash Left Join
+               Hash Cond: (t2.a = t3.a)
+               ->  Hash Left Join
+                     Hash Cond: (t1.a = t2.a)
+                     ->  Seq Scan on t1
+                     ->  Hash
+                           ->  Seq Scan on t2
+               ->  Hash
+                     ->  Seq Scan on t3
+         ->  Hash
+               ->  Seq Scan on t4
+ Optimizer: GPORCA
+(15 rows)
+
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
                ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+-- Test that only *valid* join order hint shapes are applied for LOJ.
+--
+-- These check that every possible order on 3 relations. There are 12 possible
+-- orders:
+--
+-- T1 T2 T3   =>   (T1 T2) T3,  T1 (T2 T3)
+-- T1 T3 T2   =>   (T1 T3) T2,  T1 (T3 T2)
+-- T2 T1 T3   =>   (T2 T1) T3,  T2 (T1 T3)
+-- T2 T3 T1   =>   (T2 T3) T1,  T2 (T3 T1)
+-- T3 T1 T2   =>   (T3 T1) T2,  T3 (T1 T2)
+-- T3 T2 T1   =>   (T3 T2) T1,  T3 (T2 T1)
+--
+-- Note that not every order is a valid plan! And that regardless of the hint,
+-- the query should produce the same results.
+INSERT INTO t1 VALUES (50, 50), (51, 51), (NULL, NULL);
+INSERT INTO t2 VALUES (50, 50), (52, 52), (NULL, NULL);
+INSERT INTO t3 VALUES (50, 50), (53, 53), (NULL, NULL);
+INSERT INTO t4 VALUES (50, 50), (54, 54), (NULL, NULL);
+INSERT INTO t5 VALUES (50, 50), (55, 55), (NULL, NULL);
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t1 (t2 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t1 (t3 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t1 (t3 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t2 t3) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading(((t2 t3) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading(((t3 t2) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t1 t3) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.a = t2.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t3.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t3
          ->  Hash
                ->  Seq Scan on t2
  Optimizer: GPORCA
 (11 rows)
+
+/*+
+    Leading(((t1 t3) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t3 t1) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.a = t2.a)
+         ->  Hash Right Join
+               Hash Cond: (t3.a = t1.a)
+               ->  Seq Scan on t3
+               ->  Hash
+                     ->  Seq Scan on t1
+         ->  Hash
+               ->  Seq Scan on t2
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading(((t3 t1) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t2 (t1 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Seq Scan on t2
+         ->  Hash
+               ->  Hash Left Join
+                     Hash Cond: (t1.a = t3.a)
+                     ->  Seq Scan on t1
+                     ->  Hash
+                           ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t2 (t1 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t2 (t3 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Seq Scan on t2
+         ->  Hash
+               ->  Hash Right Join
+                     Hash Cond: (t3.a = t1.a)
+                     ->  Seq Scan on t3
+                     ->  Hash
+                           ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t2 (t3 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t1 t2) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading(((t1 t2) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading(((t2 t1) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t2.a = t1.a)
+               ->  Seq Scan on t2
+               ->  Hash
+                     ->  Seq Scan on t1
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading(((t2 t1) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t3 (t1 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t3.a = t1.a)
+         ->  Seq Scan on t3
+         ->  Hash
+               ->  Hash Join
+                     Hash Cond: (t1.a = t2.a)
+                     ->  Seq Scan on t1
+                     ->  Hash
+                           ->  Seq Scan on t2
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t3 (t1 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t3 (t2 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+                  QUERY PLAN                  
+----------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t3.a = t1.a)
+         ->  Seq Scan on t3
+         ->  Hash
+               ->  Hash Join
+                     Hash Cond: (t2.a = t1.a)
+                     ->  Seq Scan on t2
+                     ->  Hash
+                           ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t3 (t2 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+(1 row)
+
+/*+
+    Leading((t1 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t2.a = t3.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t1 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 51 | 51 |    |    |    |   
+    |    |    |    |    |   
+ 50 | 50 | 50 | 50 | 50 | 50
+(3 rows)
+
+/*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t2.a = t3.a)
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: t2.a
+               ->  Hash Right Join
+                     Hash Cond: (t2.a = t1.a)
+                     ->  Seq Scan on t2
+                     ->  Hash
+                           ->  Seq Scan on t1
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(13 rows)
+
+/*+
+    Leading((t2 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+    |    |    |    |    |   
+ 51 | 51 |    |    |    |   
+(3 rows)
+
+/*+
+    Leading((t2 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Hash Left Join
+               Hash Cond: (t2.a = t3.a)
+               ->  Seq Scan on t2
+               ->  Hash
+                     ->  Seq Scan on t3
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t2 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+    |    |    |    |    |   
+ 51 | 51 |    |    |    |   
+ 50 | 50 | 50 | 50 | 50 | 50
+(3 rows)
+
+/*+
+    Leading((t3 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Hash Right Join
+               Hash Cond: (t3.a = t2.a)
+               ->  Seq Scan on t3
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t3 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 50 | 50 | 50 | 50 | 50 | 50
+    |    |    |    |    |   
+ 51 | 51 |    |    |    |   
+(3 rows)
+
+/*+
+    Leading((t1 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t2.a = t3.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t1 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 51 | 51 |    |    |    |   
+    |    |    |    |    |   
+ 50 | 50 | 50 | 50 | 50 | 50
+(3 rows)
+
+/*+
+    Leading((t3 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Left Join
+         Hash Cond: (t2.a = t3.a)
+         ->  Hash Left Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
+ Optimizer: GPORCA
+(11 rows)
+
+/*+
+    Leading((t3 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+ a  | b  | a  | b  | a  | b  
+----+----+----+----+----+----
+ 51 | 51 |    |    |    |   
+    |    |    |    |    |   
+ 50 | 50 | 50 | 50 | 50 | 50
+(3 rows)
 

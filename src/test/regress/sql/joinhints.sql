@@ -235,6 +235,23 @@ EXPLAIN (costs off) SELECT * FROM t1, t2, t3;
 EXPLAIN (costs off) SELECT * FROM t1, t2, t3;
 
 -- Test join order hints on non-inner join queries
+--
+-- Following queries exercise LOJ and ROJ
+
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a AND t3.a>40;
+
+/*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t1.a=t4.a;
+
+/*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
 
 /*+
     Leading(((t3 t2) t1))
@@ -245,3 +262,221 @@ EXPLAIN (costs off) SELECT * FROM t1, t2 LEFT JOIN t3 ON t2.a=t3.a;
     Leading(((t3 t2) t1))
  */
 EXPLAIN (costs off) SELECT * FROM t1, t2 RIGHT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a;
+
+-- Bad hints
+/*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t2.a=t4.a;
+
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+
+-- Test that only *valid* join order hint shapes are applied for LOJ.
+--
+-- These check that every possible order on 3 relations. There are 12 possible
+-- orders:
+--
+-- T1 T2 T3   =>   (T1 T2) T3,  T1 (T2 T3)
+-- T1 T3 T2   =>   (T1 T3) T2,  T1 (T3 T2)
+-- T2 T1 T3   =>   (T2 T1) T3,  T2 (T1 T3)
+-- T2 T3 T1   =>   (T2 T3) T1,  T2 (T3 T1)
+-- T3 T1 T2   =>   (T3 T1) T2,  T3 (T1 T2)
+-- T3 T2 T1   =>   (T3 T2) T1,  T3 (T2 T1)
+--
+-- Note that not every order is a valid plan! And that regardless of the hint,
+-- the query should produce the same results.
+
+INSERT INTO t1 VALUES (50, 50), (51, 51), (NULL, NULL);
+INSERT INTO t2 VALUES (50, 50), (52, 52), (NULL, NULL);
+INSERT INTO t3 VALUES (50, 50), (53, 53), (NULL, NULL);
+INSERT INTO t4 VALUES (50, 50), (54, 54), (NULL, NULL);
+INSERT INTO t5 VALUES (50, 50), (55, 55), (NULL, NULL);
+
+/*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t1 (t2 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t1 (t3 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t1 (t3 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t2 t3) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t2 t3) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t3 t2) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t1 t3) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t1 t3) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t3 t1) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t3 t1) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t2 (t1 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t2 (t1 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t2 (t3 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t2 (t3 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t1 t2) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t1 t2) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading(((t2 t1) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading(((t2 t1) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t3 (t1 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t3 (t1 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t3 (t2 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+/*+
+    Leading((t3 (t2 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+/*+
+    Leading((t1 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t1 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t2 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t2 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t2 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t3 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t3 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t1 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t1 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+/*+
+    Leading((t3 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+/*+
+    Leading((t3 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
