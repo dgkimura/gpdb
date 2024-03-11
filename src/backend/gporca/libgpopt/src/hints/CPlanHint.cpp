@@ -141,36 +141,6 @@ CPlanHint::GetJoinHint(CExpression *pexpr)
 		return nullptr;
 	}
 
-	// Disable join order hints on LEFT/RIGHT JOINS. There's some trickiness to
-	// this because some reorders are not valid. Before enabling, extra checks
-	// need to be added.
-	//
-	// For example:
-	//
-	//    T1 LOJ T2 LOJ T3
-	//
-	// *cannot* reorder to ..
-	//
-	//    T1 LOJ (T2 LOJ T3)
-	//
-	// without risking wrong results. Consider if tables have values:
-	//
-	//    T1 values (42)
-	//    T2 values (43)
-	//    T3 values (42)
-	//
-	// Then (T1 LOJ T2) LOJ T3 produces... (42, NULL, 42)
-	// Whereas T1 LOJ (T2 LOJ T3) produces... (42, NULL, NULL)
-	//
-	// Also, unlike inner joins the join condition of LOJ and ROJ cannot be
-	// split otherwise it can produce wrong results.
-	if (COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid() &&
-		COperator::EopScalarNAryJoinPredList ==
-			(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
-	{
-		return nullptr;
-	}
-
 	CTableDescriptorHashSet *ptabdesc = pexpr->DeriveTableDescriptor();
 	StringPtrArray *pexprAliases =
 		CHintUtils::GetAliasesFromTableDescriptors(m_mp, ptabdesc);
