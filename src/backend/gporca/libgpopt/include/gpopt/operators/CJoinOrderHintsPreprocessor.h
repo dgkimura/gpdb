@@ -12,6 +12,8 @@
 #ifndef GPOPT_CJoinOrderHintsPreprocessor_H
 #define GPOPT_CJoinOrderHintsPreprocessor_H
 
+#include <set>
+
 #include "gpos/base.h"
 
 #include "gpopt/base/CColRefSet.h"
@@ -27,13 +29,17 @@ private:
 	// binaryJoinExpr.
 	static CExpressionArray *GetUnusedChildren(CMemoryPool *mp,
 											   CExpression *naryJoinPexpr,
-											   CExpression *binaryJoinExpr);
+											   CExpression *binaryJoinExpr,
+		std::set<ULONG> &usedChildrenIndexes,
+		std::set<ULONG> &usedPredicateIndexes);
 
 	// Recursively constructs CLogicalInnerJoin expressions using the children
 	// of a CLogicalNAryJoin.
 	static CExpression *RecursiveApplyJoinOrderHintsOnNAryJoin(
 		CMemoryPool *mp, CExpression *pexpr,
-		const CJoinHint::JoinNode *joinnode);
+		const CJoinHint::JoinNode *joinnode,
+		std::set<ULONG> &usedChildrenIndexes,
+		std::set<ULONG> &usedPredicateIndexes, ULONG *index = nullptr);
 
 public:
 	CJoinOrderHintsPreprocessor(const CJoinOrderHintsPreprocessor &) = delete;

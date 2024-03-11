@@ -11,13 +11,20 @@
 //
 #include "gpopt/operators/CJoinOrderHintsPreprocessor.h"
 
+#include <limits>
+
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
+#include "gpopt/operators/CLogicalLeftOuterJoin.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
+#include "gpopt/operators/CLogicalRightOuterJoin.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/operators/CScalarNAryJoinPredList.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
 
 using namespace gpopt;
+
+constexpr ULONG MAX_INDEX = std::numeric_limits<ULONG>::max();
 
 
 //---------------------------------------------------------------------------
@@ -29,7 +36,7 @@ using namespace gpopt;
 //		matching alias. If none exists, return nullptr.
 //---------------------------------------------------------------------------
 static CExpression *
-GetChildWithSingleAlias(CExpression *pexpr, const CWStringConst *alias)
+GetChildWithSingleAlias(CExpression *pexpr, const CWStringConst *alias, ULONG *index)
 {
 	GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
 
@@ -38,6 +45,17 @@ GetChildWithSingleAlias(CExpression *pexpr, const CWStringConst *alias)
 		CTableDescriptorHashSet *ptabs = (*pexpr)[ul]->DeriveTableDescriptor();
 		if (ptabs->Size() == 1 && ptabs->First()->Name().Pstr()->Equals(alias))
 		{
+			if (nullptr != index &&
+				COperator::EopScalarNAryJoinPredList ==
+					(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+			{
+				if (nullptr != (*CLogicalNAryJoin::PopConvert(pexpr->Pop())
+									 ->GetLojChildPredIndexes())[ul])
+				{
+					*index = *(*CLogicalNAryJoin::PopConvert(pexpr->Pop())
+									->GetLojChildPredIndexes())[ul];
+				}
+			}
 			return (*pexpr)[ul];
 		}
 	}
@@ -55,7 +73,8 @@ GetChildWithSingleAlias(CExpression *pexpr, const CWStringConst *alias)
 //		containing the aliases. If none exists, return nullptr.
 //---------------------------------------------------------------------------
 static CExpression *
-GetChild(CMemoryPool *mp, CExpression *pexpr, StringPtrArray *aliases)
+GetChild(CMemoryPool *mp, CExpression *pexpr, StringPtrArray *aliases,
+		 ULONG *index = nullptr)
 {
 	GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
 
@@ -79,6 +98,17 @@ GetChild(CMemoryPool *mp, CExpression *pexpr, StringPtrArray *aliases)
 		pexpr_aliases->Release();
 		if (is_contained)
 		{
+			if (nullptr != index &&
+				COperator::EopScalarNAryJoinPredList ==
+					(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+			{
+				if (nullptr != (*CLogicalNAryJoin::PopConvert(pexpr->Pop())
+									 ->GetLojChildPredIndexes())[ul])
+				{
+					*index = *(*CLogicalNAryJoin::PopConvert(pexpr->Pop())
+									->GetLojChildPredIndexes())[ul];
+				}
+			}
 			return (*pexpr)[ul];
 		}
 	}
@@ -147,9 +177,10 @@ IsAliasSubsetOrDisjoint(CTableDescriptorHashSet *tabdescs,
 //		binaryJoinExpr.
 //---------------------------------------------------------------------------
 CExpressionArray *
-CJoinOrderHintsPreprocessor::GetUnusedChildren(CMemoryPool *mp,
-											   CExpression *naryJoinPexpr,
-											   CExpression *binaryJoinExpr)
+CJoinOrderHintsPreprocessor::GetUnusedChildren(
+	CMemoryPool *mp, CExpression *naryJoinPexpr, CExpression *binaryJoinExpr,
+	std::set<ULONG> &usedChildrenIndexes,
+	GPOS_UNUSED std::set<ULONG> &usedPredicateIndexes)
 {
 	GPOS_ASSERT(COperator::EopLogicalNAryJoin == naryJoinPexpr->Pop()->Eopid());
 
@@ -158,6 +189,11 @@ CJoinOrderHintsPreprocessor::GetUnusedChildren(CMemoryPool *mp,
 		mp, binaryJoinExpr->DeriveTableDescriptor());
 
 	CExpressionArray *unusedChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	if (usedChildrenIndexes.count(0) > 0)
+	{
+		binaryJoinExpr->AddRef();
+		unusedChildren->Append(binaryJoinExpr);
+	}
 
 	// check for hint aliases not used in any child
 	for (ULONG ul = 0; ul < naryJoinPexpr->Arity(); ul++)
@@ -181,9 +217,30 @@ CJoinOrderHintsPreprocessor::GetUnusedChildren(CMemoryPool *mp,
 				mp, (*naryJoinPexpr)[ul]));
 		}
 	}
+	if (usedChildrenIndexes.count(0) == 0)
+	{
+		binaryJoinExpr->AddRef();
+		unusedChildren->Append(binaryJoinExpr);
+	}
 
 	usedNames->Release();
 	return unusedChildren;
+}
+
+
+static bool
+IsValidLOJPred(CMemoryPool *mp, CExpression *outer, CExpression *inner,
+			   CExpression *pred)
+{
+	CColRefSet *innerAndOuter = GPOS_NEW(mp) CColRefSet(mp);
+	innerAndOuter->Include(outer->DeriveOutputColumns());
+	innerAndOuter->Include(inner->DeriveOutputColumns());
+
+	CColRefSet *predCols = pred->DeriveUsedColumns();
+
+	bool result = innerAndOuter->ContainsAll(predCols);
+	innerAndOuter->Release();
+	return result;
 }
 
 
@@ -269,7 +326,9 @@ GetOnPreds(CMemoryPool *mp, CExpression *outer, CExpression *inner,
 //---------------------------------------------------------------------------
 CExpression *
 CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
-	CMemoryPool *mp, CExpression *pexpr, const CJoinHint::JoinNode *joinnode)
+	CMemoryPool *mp, CExpression *pexpr, const CJoinHint::JoinNode *joinnode,
+	std::set<ULONG> &usedChildrenIndexes, std::set<ULONG> &usedPredicateIndexes,
+	ULONG *index)
 {
 	GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
 
@@ -282,12 +341,13 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 		//
 		// hint specifies name, then return the child of CLogicalNAryJoin by
 		// that name.
-		pexprAppliedHints = GetChildWithSingleAlias(pexpr, joinnode->GetName());
+		pexprAppliedHints = GetChildWithSingleAlias(pexpr, joinnode->GetName(), index);
 		if (nullptr != pexprAppliedHints)
 		{
 			pexprAppliedHints->AddRef();
 		}
 		hint_aliases->Release();
+		usedChildrenIndexes.insert(*index);
 		return pexprAppliedHints;
 	}
 
@@ -309,6 +369,9 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 			mp, GetChild(mp, pexpr, hint_aliases), joinnode);
 
 		hint_aliases->Release();
+		pexprAppliedHints = CJoinOrderHintsPreprocessor::PexprPreprocess(
+			mp, GetChild(mp, pexpr, hint_aliases, index), joinnode);
+		usedChildrenIndexes.insert(*index);
 		return pexprAppliedHints;
 	}
 
@@ -322,17 +385,29 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 	//
 	// Then left (T1 T2) and right (T3 T4) hints need to be applied to the
 	// operator, and the result joined.
-	CExpression *outer =
-		RecursiveApplyJoinOrderHintsOnNAryJoin(mp, pexpr, joinnode->GetOuter());
-	CExpression *inner =
-		RecursiveApplyJoinOrderHintsOnNAryJoin(mp, pexpr, joinnode->GetInner());
+	ULONG outer_index = MAX_INDEX;
+	ULONG inner_index = MAX_INDEX;
+	CExpression *outer = RecursiveApplyJoinOrderHintsOnNAryJoin(
+		mp, pexpr, joinnode->GetOuter(), usedChildrenIndexes,
+		usedPredicateIndexes, &outer_index);
+	CExpression *inner = RecursiveApplyJoinOrderHintsOnNAryJoin(
+		mp, pexpr, joinnode->GetInner(), usedChildrenIndexes,
+		usedPredicateIndexes, &inner_index);
+
+	usedChildrenIndexes.insert(outer_index);
+	usedChildrenIndexes.insert(inner_index);
 
 	// Hint not satisfied. This can happen, for example, if joins hint
 	// splits across a GROUP BY, like:
 	//
 	// Leading(T1 T3)
 	// SELECT * FROM (SELECT a FROM T1, T2 LIMIT 42) q, T3;
-	if (outer == nullptr || inner == nullptr)
+	//
+	// It can also happen for invalid hints on LOJ/ROJ queries.
+	if (outer == nullptr || inner == nullptr ||
+		((outer_index == MAX_INDEX || inner_index == MAX_INDEX) &&
+		 COperator::EopScalarNAryJoinPredList ==
+			 (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid()))
 	{
 		hint_aliases->Release();
 		pexpr->AddRef();
@@ -344,9 +419,60 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 
 	CExpressionArray *all_on_preds = CPredicateUtils::PdrgpexprConjuncts(
 		mp, (*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
-	pexprAppliedHints = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), outer, inner,
-					GetOnPreds(mp, outer, inner, all_on_preds));
+
+	if (outer_index != inner_index)
+	{
+		if (nullptr != index)
+		{
+			*index = std::min(outer_index, inner_index);
+		}
+		CExpression *pred =
+			(*(*all_on_preds)[0])[std::max(outer_index, inner_index)];
+		usedPredicateIndexes.insert(std::max(outer_index, inner_index));
+		if (IsValidLOJPred(mp, outer, inner, pred))
+		{
+			pred->AddRef();
+			if (outer_index < inner_index)
+			{
+				pexprAppliedHints = GPOS_NEW(mp)
+					CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
+								outer, inner, pred);
+			}
+			else
+			{
+				pexprAppliedHints = GPOS_NEW(mp)
+					CExpression(mp, GPOS_NEW(mp) CLogicalRightOuterJoin(mp),
+								outer, inner, pred);
+			}
+		}
+		else
+		{
+			CRefCount::SafeRelease(outer);
+			CRefCount::SafeRelease(inner);
+
+			// Hint created an invalid plan - return nullptr
+		}
+	}
+	else if (COperator::EopScalarNAryJoinPredList ==
+			 (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+	{
+		GPOS_ASSERT(outer_index == inner_index);
+		if (nullptr != index)
+		{
+			*index = outer_index;
+		}
+
+		CExpression *pred = (*(*all_on_preds)[0])[0];
+		pred->AddRef();
+		pexprAppliedHints = GPOS_NEW(mp) CExpression(
+			mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), outer, inner, pred);
+	}
+	else
+	{
+		pexprAppliedHints = GPOS_NEW(mp)
+			CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), outer,
+						inner, GetOnPreds(mp, outer, inner, all_on_preds));
+	}
 	all_on_preds->Release();
 
 
@@ -393,19 +519,79 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 	// join.
 	if (COperator::EopLogicalNAryJoin == pop->Eopid() && nullptr != joinnode)
 	{
-		CExpression *pexprAppliedHints =
-			RecursiveApplyJoinOrderHintsOnNAryJoin(mp, pexpr, joinnode);
+		std::set<ULONG> usedPredicateIndexes;
+		std::set<ULONG> usedChildrenIndexes;
+		CExpression *pexprAppliedHints = RecursiveApplyJoinOrderHintsOnNAryJoin(
+			mp, pexpr, joinnode, usedChildrenIndexes, usedPredicateIndexes);
 
-		CExpressionArray *naryChildren =
-			GetUnusedChildren(mp, pexpr, pexprAppliedHints);
-		if (naryChildren->Size() == 0)
+		if (nullptr == pexprAppliedHints)
+		{
+			pexpr->AddRef();
+			return pexpr;
+		}
+
+		CExpressionArray *naryChildren = GetUnusedChildren(
+			mp, pexpr, pexprAppliedHints, usedChildrenIndexes, usedPredicateIndexes);
+		if (naryChildren->Size() <= 1)
 		{
 			naryChildren->Release();
 			return pexprAppliedHints;
 		}
+		else if (COperator::EopScalarNAryJoinPredList ==
+				 (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+		{
+			pexprAppliedHints
+				->Release();  // Hack! <-- added and addref'd in naryChildren
+
+			CExpression *predList = (*pexpr)[pexpr->Arity() - 1];
+			CExpressionArray *naryJoinPredicates =
+				GPOS_NEW(mp) CExpressionArray(mp);
+			ULongPtrArray *lojChildPredIndexes = GPOS_NEW(mp) ULongPtrArray(mp);
+			for (ULONG ul = 0; ul < predList->Arity(); ul++)
+			{
+				if (usedPredicateIndexes.count(ul) == 0)
+				{
+					(*predList)[ul]->AddRef();
+					naryJoinPredicates->Append((*predList)[ul]);
+				}
+			}
+			for (ULONG ul = 0; ul < CLogicalNAryJoin::PopConvert(pexpr->Pop())
+										->GetLojChildPredIndexes()
+										->Size();
+				 ul++)
+			{
+				ULONG predicateIndex =
+					*(*CLogicalNAryJoin::PopConvert(pexpr->Pop())
+						   ->GetLojChildPredIndexes())[ul];
+				if (usedPredicateIndexes.count(predicateIndex) == 0)
+				{
+					// FIXME: this needs to be adjusted if middle index used
+					//        example [0 1 3 2] and 1 is used then [0 2 1]
+					ULONG adjustedPredicateIndex = predicateIndex;
+					for (ULONG ul2 = 0; ul2 < predicateIndex; ul2++)
+					{
+						if (usedPredicateIndexes.count(ul2) != 0)
+						{
+							adjustedPredicateIndex -= 1;
+						}
+					}
+					lojChildPredIndexes->Append(
+						GPOS_NEW(mp) ULONG(adjustedPredicateIndex));
+				}
+			}
+			naryChildren->Append(GPOS_NEW(mp) CExpression(
+				mp, GPOS_NEW(mp) CScalarNAryJoinPredList(mp),
+				naryJoinPredicates));
+
+			return GPOS_NEW(mp) CExpression(
+				mp, GPOS_NEW(mp) CLogicalNAryJoin(mp, lojChildPredIndexes),
+				naryChildren);
+		}
 		else
 		{
-			naryChildren->Append(pexprAppliedHints);
+			pexprAppliedHints
+				->Release();  // Hack! <-- added and addref'd in naryChildren
+
 			(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]->AddRef();
 			naryChildren->Append(
 				(*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
