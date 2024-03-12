@@ -8,7 +8,6 @@
 //	@doc:
 //		Preprocessing routines of join order hints
 //---------------------------------------------------------------------------
-//
 #include "gpopt/operators/CJoinOrderHintsPreprocessor.h"
 
 #include <limits>
@@ -173,8 +172,13 @@ IsAliasSubsetOrDisjoint(CTableDescriptorHashSet *tabdescs,
 //		CJoinOrderHintsPreprocessor::GetUnusedChildren
 //
 //	@doc:
-//		Return list of all the children of naryJoinPexpr that are not referenced in
-//		binaryJoinExpr.
+//		Return list of children for the new NAry join expression.
+//
+//		"naryJoinPexpr" is the original NAry join and "binaryJoinExpr" is the
+//		processed version with hints applied. Some children from the original
+//		NAry join "naryJoinPexpr" may not be included in "binaryJoinExpr"
+//		because they were not used in the hints. Those children need to be
+//		added.
 //---------------------------------------------------------------------------
 CExpressionArray *
 CJoinOrderHintsPreprocessor::GetUnusedChildren(
@@ -213,6 +217,9 @@ CJoinOrderHintsPreprocessor::GetUnusedChildren(
 										 .Pstr();
 		if (nullptr == usedNames->Find(alias))
 		{
+			// If the child expression has an alias that isn't in the
+			// "usedNames" set , then the child expression hasn't been
+			// processed yet. Process it now.
 			unusedChildren->Append(CJoinOrderHintsPreprocessor::PexprPreprocess(
 				mp, (*naryJoinPexpr)[ul]));
 		}
@@ -249,7 +256,7 @@ IsValidLOJPred(CMemoryPool *mp, CExpression *outer, CExpression *inner,
 //		GetOnPreds
 //
 //	@doc:
-//		Builds the predicates to join the inner and outer expressions.
+//		Builds the predicates on inner join expressions.
 //---------------------------------------------------------------------------
 static CExpression *
 GetOnPreds(CMemoryPool *mp, CExpression *outer, CExpression *inner,
@@ -270,6 +277,8 @@ GetOnPreds(CMemoryPool *mp, CExpression *outer, CExpression *inner,
 			predCols->FIntersects(outer->DeriveOutputColumns()) &&
 			predCols->FIntersects(inner->DeriveOutputColumns()))
 		{
+			// if both inner and outer contain cover the predicate columns then
+			// add the predicate.
 			(*allOnPreds)[ul]->AddRef();
 			preds->Append((*allOnPreds)[ul]);
 		}
@@ -278,13 +287,14 @@ GetOnPreds(CMemoryPool *mp, CExpression *outer, CExpression *inner,
 	if (preds->Size() > 0)
 	{
 		innerAndOuter->Release();
+		// create a conjunction of all the found predicates.
 		return CPredicateUtils::PexprConjunction(mp, preds);
 	}
 
 	preds->Release();
 	innerAndOuter->Release();
 
-	// No explicit predicate found, use "ON true".
+	// if no explicit predicate found, use "ON true".
 	return CUtils::PexprScalarConstBool(mp, /*fVal*/ true, /*is_null*/ false);
 }
 
@@ -294,8 +304,8 @@ GetOnPreds(CMemoryPool *mp, CExpression *outer, CExpression *inner,
 //		CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin
 //
 //	@doc:
-//		Recursively constructs CLogicalInnerJoin expressions using the children
-//		of a CLogicalNAryJoin.
+//		Recursively apply a hint on a Nary join expression to bottom-up build
+//		a new expression using Inner and Left/Right Outer join operators.
 //
 //		For example, let's say the expression tree is:
 //
@@ -486,9 +496,16 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 //		CJoinOrderHintsPreprocessor::PexprPreprocess
 //
 //	@doc:
-//		Search for and apply join order hints on an expression. The result of
-//		this converts two or more children of a CLogicalNAryJoin into one or
-//		more CLogicalInnerJoin(s).
+//		Search for and apply join order hints on an expression.
+//
+//		After we have a hint there are 3 stages to apply the hint and construct
+//		a new Nary join expression:
+//
+//		1. Apply the hint to the leaf operators.
+//		2. Apply the hint to the non-leaf operators.
+//		3. Add the unused children.
+//
+//		Steps 1 and 2 are handled in RecursiveApplyJoinOrderHintsOnNAryJoin().
 //---------------------------------------------------------------------------
 CExpression *
 CJoinOrderHintsPreprocessor::PexprPreprocess(

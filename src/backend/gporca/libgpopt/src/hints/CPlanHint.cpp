@@ -127,10 +127,30 @@ CPlanHint::GetRowHint(CTableDescriptorHashSet *ptabdescs)
 //		CPlanHint::GetJoinHint
 //
 //	@doc:
-//		Given a join expression, find a matching CJoinHint. A match means that
-//		every alias in the hint is covered in the expression and at least one
-//		alias is a leaf child of the join.
+//		Given a join expression, find a matching hint. A match means that every
+//		alias in the hint is covered in the expression and at least one alias
+//		is a leaf child of the join. A leaf child means the child has only one
+//		relation.
 //
+//		For example, let's say the expression tree is:
+//
+//		  +--CLogicalNAryJoin
+//		     |--CLogicalGet "t1" ("t1"), Columns: ["a" (0), "b" (1),...
+//		     |--CLogicalLimit <empty> global
+//		     |  |--CLogicalNAryJoin
+//		     |  |  |--CLogicalGet "t2" ("t2"), Columns: ["a" (9), "b" (10),...
+//		     |  |  |--CLogicalGet "t3" ("t3"), Columns: ["a" (18), "b" (19),...
+//		     |  |  ...
+//		     |  ...
+//		     ...
+//
+//		If the hint is Leading((t2 t3)), then the hint does not apply to the
+//		top level Nary join because neither "t2" nor "t3" is a leaf child of
+//		the Nary join. Instead, the hint should be applied to the lower level
+//		Nary join that contains both "t2" and "t3" relations as leaf children.
+//
+//		However, if the hint is Leading((t1 (t2 t3))), then the hint does apply
+//		to the top level Nary join because "t1" is a leaf child.
 //---------------------------------------------------------------------------
 CJoinHint *
 CPlanHint::GetJoinHint(CExpression *pexpr)
