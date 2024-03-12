@@ -27,10 +27,9 @@ class CJoinOrderHintsPreprocessor
 private:
 	// Return list of all the children of naryJoinPexpr that are not referenced in
 	// binaryJoinExpr.
-	static CExpressionArray *GetUnusedChildren(CMemoryPool *mp,
-											   CExpression *naryJoinPexpr,
-											   CExpression *binaryJoinExpr,
-		std::set<ULONG> &usedChildrenIndexes,
+	static CExpressionArray *ConstructNAryJoinChildren(
+		CMemoryPool *mp, CExpression *naryJoinPexpr,
+		CExpression *binaryJoinExpr, std::set<ULONG> &usedChildrenIndexes,
 		std::set<ULONG> &usedPredicateIndexes);
 
 	// Recursively constructs CLogicalInnerJoin expressions using the children
