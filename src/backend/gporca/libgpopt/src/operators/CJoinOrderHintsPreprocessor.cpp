@@ -240,7 +240,7 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 			naryJoinPexpr->DeriveTableDescriptor()->Size() >
 				binaryJoinExpr->DeriveTableDescriptor()->Size())
 		{
-			// if this child index was used to construct "binaryJoinExpr" and
+			// If this child index was used to construct "binaryJoinExpr" and
 			// "binaryJoinExpr" covers a subset of "naryJoinPexpr" children
 			// then use it to construct naryChildren
 			naryChildren->Append(binaryJoinExpr);
@@ -252,7 +252,10 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 		naryJoinPexpr->DeriveTableDescriptor()->Size() >
 			binaryJoinExpr->DeriveTableDescriptor()->Size())
 	{
-		// if inner join and alias hasn't been used then add it.
+		// If "naryJoinPexpr" is an inner join and alias hasn't been used then
+		// add "binaryJoinExpr" to naryChildren. Join requires 2+ relations.
+		// So, if there isn't one already , then there is no point creating
+		// join children.
 		naryChildren->Append(binaryJoinExpr);
 		binaryJoinExprAdded = true;
 	}
@@ -571,7 +574,7 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 		CExpressionArray *naryChildren = ConstructNAryJoinChildren(
 			mp, pexpr, pexprAppliedHints, usedChildrenIndexes,
 			usedPredicateIndexes);
-		if (naryChildren->Size() <= 1)
+		if (naryChildren->Size() == 0)
 		{
 			naryChildren->Release();
 			return pexprAppliedHints;
