@@ -25,6 +25,23 @@ using namespace gpopt;
 
 constexpr ULONG MAX_INDEX = std::numeric_limits<ULONG>::max();
 
+//
+//---------------------------------------------------------------------------
+//	@function:
+//		ContainsLeftOrRightJoin
+//
+//	@doc:
+//		Return whether the logical join expression contains LEFT or RIGHT JOIN.
+//---------------------------------------------------------------------------
+static bool
+ContainsLeftOrRightJoin(CExpression *pexpr)
+{
+	GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
+
+	return COperator::EopScalarNAryJoinPredList ==
+		   (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid();
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -45,9 +62,7 @@ GetChildWithSingleAlias(CExpression *pexpr, const CWStringConst *alias,
 		CTableDescriptorHashSet *ptabs = (*pexpr)[ul]->DeriveTableDescriptor();
 		if (ptabs->Size() == 1 && ptabs->First()->Name().Pstr()->Equals(alias))
 		{
-			if (nullptr != index &&
-				COperator::EopScalarNAryJoinPredList ==
-					(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+			if (nullptr != index && ContainsLeftOrRightJoin(pexpr))
 			{
 				if (nullptr != (*CLogicalNAryJoin::PopConvert(pexpr->Pop())
 									 ->GetLojChildPredIndexes())[ul])
@@ -98,9 +113,7 @@ GetChild(CMemoryPool *mp, CExpression *pexpr, StringPtrArray *aliases,
 		pexpr_aliases->Release();
 		if (is_contained)
 		{
-			if (nullptr != index &&
-				COperator::EopScalarNAryJoinPredList ==
-					(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+			if (nullptr != index && ContainsLeftOrRightJoin(pexpr))
 			{
 				if (nullptr != (*CLogicalNAryJoin::PopConvert(pexpr->Pop())
 									 ->GetLojChildPredIndexes())[ul])
@@ -235,9 +248,7 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 		}
 	}
 
-	if (!binaryJoinExprAdded &&
-		COperator::EopScalarNAryJoinPredList !=
-			(*naryJoinPexpr)[naryJoinPexpr->Arity() - 1]->Pop()->Eopid() &&
+	if (!binaryJoinExprAdded && !ContainsLeftOrRightJoin(naryJoinPexpr) &&
 		naryJoinPexpr->DeriveTableDescriptor()->Size() >
 			binaryJoinExpr->DeriveTableDescriptor()->Size())
 	{
@@ -248,22 +259,6 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 
 	usedNames->Release();
 	return naryChildren;
-}
-
-
-static bool
-IsValidLOJPred(CMemoryPool *mp, CExpression *outer, CExpression *inner,
-			   CExpression *pred)
-{
-	CColRefSet *innerAndOuter = GPOS_NEW(mp) CColRefSet(mp);
-	innerAndOuter->Include(outer->DeriveOutputColumns());
-	innerAndOuter->Include(inner->DeriveOutputColumns());
-
-	CColRefSet *predCols = pred->DeriveUsedColumns();
-
-	bool result = innerAndOuter->ContainsAll(predCols);
-	innerAndOuter->Release();
-	return result;
 }
 
 
@@ -433,8 +428,7 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 	// It can also happen for invalid hints on LOJ/ROJ queries.
 	if (outer == nullptr || inner == nullptr ||
 		((outer_index == MAX_INDEX || inner_index == MAX_INDEX) &&
-		 COperator::EopScalarNAryJoinPredList ==
-			 (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid()))
+		 ContainsLeftOrRightJoin(pexpr)))
 	{
 		hint_aliases->Release();
 		pexpr->AddRef();
@@ -447,8 +441,7 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 	CExpressionArray *all_on_preds = CPredicateUtils::PdrgpexprConjuncts(
 		mp, (*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
 
-	if (COperator::EopScalarNAryJoinPredList ==
-		(*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+	if (ContainsLeftOrRightJoin(pexpr))
 	{
 		if (outer_index != inner_index)
 		{
@@ -456,10 +449,14 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 			{
 				*index = std::min(outer_index, inner_index);
 			}
-			CExpression *pred =
-				(*(*all_on_preds)[0])[std::max(outer_index, inner_index)];
-			usedPredicateIndexes.insert(std::max(outer_index, inner_index));
-			if (IsValidLOJPred(mp, outer, inner, pred))
+			//
+			// LEFT/RIGHT JOIN use rightmost predicate index. Mark used
+			ULONG current_index = std::max(outer_index, inner_index);
+			CExpression *pred = (*(*all_on_preds)[0])[current_index];
+			usedPredicateIndexes.insert(current_index);
+
+			if (CUtils::InnerOrOuterExpressionContainsColumns(
+					outer, inner, pred->DeriveUsedColumns()))
 			{
 				pred->AddRef();
 				if (outer_index < inner_index)
@@ -481,6 +478,10 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 				CRefCount::SafeRelease(inner);
 
 				// Hint created an invalid plan - return nullptr
+				//
+				// This can happen if the hint joined two relations that do
+				// not have a valid join predicate.
+				GPOS_ASSERT(nullptr == pexprAppliedHints);
 			}
 		}
 		else
@@ -575,8 +576,7 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 			naryChildren->Release();
 			return pexprAppliedHints;
 		}
-		else if (COperator::EopScalarNAryJoinPredList ==
-				 (*pexpr)[pexpr->Arity() - 1]->Pop()->Eopid())
+		else if (ContainsLeftOrRightJoin(pexpr))
 		{
 			CExpression *predList = (*pexpr)[pexpr->Arity() - 1];
 			CExpressionArray *naryJoinPredicates =

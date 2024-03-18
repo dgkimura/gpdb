@@ -1024,6 +1024,12 @@ public:
 
 	static CTableDescriptorHashSet *RemoveDuplicateMdids(
 		CMemoryPool *mp, CTableDescriptorHashSet *tabdescs);
+
+	// return true if every column is referenced in either outer or inner
+	// CExpression
+	static BOOL InnerOrOuterExpressionContainsColumns(CExpression *outer,
+													  CExpression *inner,
+													  CColRefSet *columns);
 };	// class CUtils
 
 // hash set from expressions

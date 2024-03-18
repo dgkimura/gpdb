@@ -5063,4 +5063,28 @@ CUtils::RemoveDuplicateMdids(CMemoryPool *mp, CTableDescriptorHashSet *tabdescs)
 	mdids->Release();
 	return result;
 }
+
+
+// return true if every column is referenced in either outer or inner
+// CExpression
+BOOL
+CUtils::InnerOrOuterExpressionContainsColumns(CExpression *outer,
+											  CExpression *inner,
+											  CColRefSet *columns)
+{
+	CColRefSet *outerCols = outer->DeriveOutputColumns();
+	CColRefSet *innerCols = inner->DeriveOutputColumns();
+
+	CColRefSetIter iter(*columns);
+	while (iter.Advance())
+	{
+		CColRef *colref = iter.Pcr();
+		if (!outerCols->FMember(colref) && !innerCols->FMember(colref))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 // EOF
