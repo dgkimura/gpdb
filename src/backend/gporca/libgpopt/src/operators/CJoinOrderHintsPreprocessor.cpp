@@ -178,8 +178,8 @@ IsAliasSubsetOrDisjoint(CTableDescriptorHashSet *tabdescs,
 //		"naryJoinPexpr" is the original NAry join and "binaryJoinExpr" is the
 //		processed version with hints applied. Some children from the original
 //		NAry join "naryJoinPexpr" may not be included in "binaryJoinExpr"
-//		because they were not used in the hints. Those children need to be
-//		added.
+//		because they were not used in the hints. This function adds both used
+//		and unused children in the returned expression array
 //---------------------------------------------------------------------------
 CExpressionArray *
 CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
@@ -196,7 +196,9 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 	CExpressionArray *naryChildren = GPOS_NEW(mp) CExpressionArray(mp);
 	bool binaryJoinExprAdded = false;
 
-	// check for hint aliases not used in any child
+	// for each "naryJoinPexpr" child, check if the child is accounted for in
+	// "binaryJoinExpr" (i.e. contained in usedNames). if it wasn't then
+	// preprocess the child directly and add the result to naryChildren.
 	for (ULONG ul = 0; ul < naryJoinPexpr->Arity(); ul++)
 	{
 		if ((*naryJoinPexpr)[ul]->DeriveTableDescriptor()->Size() == 0)
@@ -221,25 +223,25 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 				mp, (*naryJoinPexpr)[ul]));
 		}
 
-		// if this child index was used to construct "binaryJoinExpr" and "binaryJoinExpr"
-		// covers a subset of "naryJoinPexpr" children then use it to construct
-		// naryChildren
 		if (!binaryJoinExprAdded && usedChildrenIndexes.count(ul) > 0 &&
 			naryJoinPexpr->DeriveTableDescriptor()->Size() >
 				binaryJoinExpr->DeriveTableDescriptor()->Size())
 		{
+			// if this child index was used to construct "binaryJoinExpr" and
+			// "binaryJoinExpr" covers a subset of "naryJoinPexpr" children
+			// then use it to construct naryChildren
 			naryChildren->Append(binaryJoinExpr);
 			binaryJoinExprAdded = true;
 		}
 	}
 
-	// if inner join and alias hasn't been used then add it.
 	if (!binaryJoinExprAdded &&
 		COperator::EopScalarNAryJoinPredList !=
 			(*naryJoinPexpr)[naryJoinPexpr->Arity() - 1]->Pop()->Eopid() &&
 		naryJoinPexpr->DeriveTableDescriptor()->Size() >
 			binaryJoinExpr->DeriveTableDescriptor()->Size())
 	{
+		// if inner join and alias hasn't been used then add it.
 		naryChildren->Append(binaryJoinExpr);
 		binaryJoinExprAdded = true;
 	}
