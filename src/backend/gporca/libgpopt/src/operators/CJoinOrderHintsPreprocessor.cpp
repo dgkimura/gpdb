@@ -578,10 +578,10 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 		}
 		else if (ContainsLeftOrRightJoin(pexpr))
 		{
+			// 1) Re-create list of unused predicates
 			CExpression *predList = (*pexpr)[pexpr->Arity() - 1];
 			CExpressionArray *naryJoinPredicates =
 				GPOS_NEW(mp) CExpressionArray(mp);
-			ULongPtrArray *lojChildPredIndexes = GPOS_NEW(mp) ULongPtrArray(mp);
 			for (ULONG ul = 0; ul < predList->Arity(); ul++)
 			{
 				if (usedPredicateIndexes.count(ul) == 0)
@@ -590,6 +590,9 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 					naryJoinPredicates->Append((*predList)[ul]);
 				}
 			}
+
+			// 2) Re-create list of unused predicate indexes
+			ULongPtrArray *lojChildPredIndexes = GPOS_NEW(mp) ULongPtrArray(mp);
 			for (ULONG ul = 0; ul < CLogicalNAryJoin::PopConvert(pexpr->Pop())
 										->GetLojChildPredIndexes()
 										->Size();
@@ -600,8 +603,16 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 						   ->GetLojChildPredIndexes())[ul];
 				if (usedPredicateIndexes.count(predicateIndex) == 0)
 				{
-					// FIXME: this needs to be adjusted if middle index used
-					//        example [0 1 3 2] and 1 is used then [0 2 1]
+					// Adjust lojChildPredIndexes to fill in holes created by
+					// used predicates. For example:
+					//
+					// Before:
+					//   [0 1 3 2]
+					//      ^
+					// Let hint use index 1
+					//
+					// After:
+					//   [0 2 1]
 					ULONG adjustedPredicateIndex = predicateIndex;
 					for (ULONG ul2 = 0; ul2 < predicateIndex; ul2++)
 					{
