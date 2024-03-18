@@ -194,10 +194,7 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 		mp, binaryJoinExpr->DeriveTableDescriptor());
 
 	CExpressionArray *naryChildren = GPOS_NEW(mp) CExpressionArray(mp);
-	if (usedChildrenIndexes.count(0) > 0)
-	{
-		naryChildren->Append(binaryJoinExpr);
-	}
+	bool binaryJoinExprAdded = false;
 
 	// check for hint aliases not used in any child
 	for (ULONG ul = 0; ul < naryJoinPexpr->Arity(); ul++)
@@ -223,10 +220,28 @@ CJoinOrderHintsPreprocessor::ConstructNAryJoinChildren(
 			naryChildren->Append(CJoinOrderHintsPreprocessor::PexprPreprocess(
 				mp, (*naryJoinPexpr)[ul]));
 		}
+
+		// if this child index was used to construct "binaryJoinExpr" and "binaryJoinExpr"
+		// covers a subset of "naryJoinPexpr" children then use it to construct
+		// naryChildren
+		if (!binaryJoinExprAdded && usedChildrenIndexes.count(ul) > 0 &&
+			naryJoinPexpr->DeriveTableDescriptor()->Size() >
+				binaryJoinExpr->DeriveTableDescriptor()->Size())
+		{
+			naryChildren->Append(binaryJoinExpr);
+			binaryJoinExprAdded = true;
+		}
 	}
-	if (usedChildrenIndexes.count(0) == 0)
+
+	// if inner join and alias hasn't been used then add it.
+	if (!binaryJoinExprAdded &&
+		COperator::EopScalarNAryJoinPredList !=
+			(*naryJoinPexpr)[naryJoinPexpr->Arity() - 1]->Pop()->Eopid() &&
+		naryJoinPexpr->DeriveTableDescriptor()->Size() >
+			binaryJoinExpr->DeriveTableDescriptor()->Size())
 	{
 		naryChildren->Append(binaryJoinExpr);
+		binaryJoinExprAdded = true;
 	}
 
 	usedNames->Release();
@@ -555,7 +570,6 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 			usedPredicateIndexes);
 		if (naryChildren->Size() <= 1)
 		{
-			pexprAppliedHints->AddRef();
 			naryChildren->Release();
 			return pexprAppliedHints;
 		}

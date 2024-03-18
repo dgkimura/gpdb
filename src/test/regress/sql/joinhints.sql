@@ -480,3 +480,41 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t3 t1))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+
+
+-- Test LOJ cases where middle joins are applied first
+--
+-- For example, if query is:
+--
+--    T1 LOJ T2 LOJ T3 LOJ T4 LOJ T5
+--
+-- Then if hint is Leading((T2 T3)), then query should generate correct results.
+/*+
+    Leading((t2 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+/*+
+    Leading((t2 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+
+/*+
+    Leading((t3 t2))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+/*+
+    Leading((t3 t2))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+
+/*+
+    Leading((t4 (t3 t2)))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+/*+
+    Leading((t4 (t3 t2)))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
