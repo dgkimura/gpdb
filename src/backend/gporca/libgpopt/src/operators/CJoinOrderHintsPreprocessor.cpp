@@ -391,12 +391,9 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 		// explicity pass that one along so we don't try to find another
 		// matching hint
 		pexprAppliedHints = CJoinOrderHintsPreprocessor::PexprPreprocess(
-			mp, GetChild(mp, pexpr, hint_aliases), joinnode);
-
-		hint_aliases->Release();
-		pexprAppliedHints = CJoinOrderHintsPreprocessor::PexprPreprocess(
 			mp, GetChild(mp, pexpr, hint_aliases, index), joinnode);
 		usedChildrenIndexes.insert(*index);
+		hint_aliases->Release();
 		return pexprAppliedHints;
 	}
 
