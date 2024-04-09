@@ -54,6 +54,11 @@ using namespace gpos;
 using namespace gpdxl;
 using namespace gpopt;
 
+using StringToStringArrayMap =
+	CHashMap<CWStringBase, StringPtrArray, CWStringBase::HashValue,
+			 CWStringBase::Equals, CleanupDelete<CWStringBase>,
+			 CleanupRelease<StringPtrArray>>;
+
 // context of optimizer input and output objects
 struct SOptContext
 {
@@ -120,9 +125,9 @@ private:
 	static void LogExceptionMessageAndDelete(CHAR *err_buf);
 
 	// create optimizer configuration object
-	static COptimizerConfig *CreateOptimizerConfig(CMemoryPool *mp,
-												   ICostModel *cost_model,
-												   CPlanHint *plan_hints);
+	static COptimizerConfig *CreateOptimizerConfig(
+		CMemoryPool *mp, ICostModel *cost_model, CPlanHint *plan_hints,
+		StringToStringArrayMap *alias_table_names_map);
 
 	// optimize a query to a physical DXL
 	static void *OptimizeTask(void *ptr);

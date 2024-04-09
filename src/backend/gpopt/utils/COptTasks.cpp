@@ -364,7 +364,8 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 //---------------------------------------------------------------------------
 COptimizerConfig *
 COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model,
-								 CPlanHint *plan_hints)
+								 CPlanHint *plan_hints,
+								 StringToStringArrayMap *alias_table_names_map)
 {
 	// get chosen plan number, cost threshold
 	ULLONG plan_id = (ULLONG) optimizer_plan_id;
@@ -402,7 +403,7 @@ COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model,
 								      * enforce them ourselves in the executor */
 				  push_group_by_below_setop_threshold, xform_bind_threshold,
 				  skew_factor),
-		plan_hints,
+		plan_hints, alias_table_names_map,
 		GPOS_NEW(mp) CWindowOids(OID(F_WINDOW_ROW_NUMBER), OID(F_WINDOW_RANK)));
 }
 
@@ -925,14 +926,6 @@ COptTasks::OptimizeTask(void *ptr)
 			query_to_dxl_translator = CTranslatorQueryToDXL::QueryToDXLInstance(
 				mp, &mda, (Query *) opt_ctxt->m_query);
 
-			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
-			CPlanHint *plan_hints = GetPlanHints(mp, opt_ctxt->m_query);
-			COptimizerConfig *optimizer_config =
-				CreateOptimizerConfig(mp, cost_model, plan_hints);
-			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);
-			IConstExprEvaluator *expr_evaluator =
-				GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, &mda, &expr_eval_proxy);
-
 			CDXLNode *query_dxl =
 				query_to_dxl_translator->TranslateQueryToDXL();
 			CDXLNodeArray *query_output_dxlnode_array =
@@ -940,6 +933,16 @@ COptTasks::OptimizeTask(void *ptr)
 			CDXLNodeArray *cte_dxlnode_array =
 				query_to_dxl_translator->GetCTEs();
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
+
+			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
+			CPlanHint *plan_hints = GetPlanHints(mp, opt_ctxt->m_query);
+			query_to_dxl_translator->GetAliasMapping()->AddRef();
+			COptimizerConfig *optimizer_config = CreateOptimizerConfig(
+				mp, cost_model, plan_hints,
+				query_to_dxl_translator->GetAliasMapping());
+			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);
+			IConstExprEvaluator *expr_evaluator =
+				GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, &mda, &expr_eval_proxy);
 
 			BOOL is_coordinator_only =
 				!optimizer_enable_motions ||

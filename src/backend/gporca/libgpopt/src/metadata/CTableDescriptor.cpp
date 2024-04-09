@@ -325,7 +325,7 @@ CTableDescriptor::HashValue(const CTableDescriptor *ptabdesc)
 {
 	ULONG ulHash =
 		gpos::CombineHashes(ptabdesc->MDId()->HashValue(),
-							CWStringConst::HashValue(ptabdesc->Name().Pstr()));
+							CWStringBase::HashValue(ptabdesc->Name().Pstr()));
 
 	return ulHash;
 }

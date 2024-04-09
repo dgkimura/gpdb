@@ -75,6 +75,12 @@ public:
 	// checks whether the string is byte-wise equal to another string
 	virtual BOOL Equals(const CWStringBase *str) const;
 
+	static BOOL
+	Equals(const CWStringBase *first, const CWStringBase *second)
+	{
+		return first->Equals(second);
+	}
+
 	// checks whether the string is equal to a string literal
 	virtual BOOL Equals(const WCHAR *str) const;
 
@@ -98,6 +104,9 @@ public:
 
 	// count how many times the character appears in string
 	ULONG CountOccurrencesOf(const WCHAR wc) const;
+
+	// hash function
+	static ULONG HashValue(const CWStringBase *string);
 
 	static INT
 	Compare(const void *left, const void *right)

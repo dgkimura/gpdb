@@ -164,14 +164,6 @@ CWStringConst::Equals(const CWStringConst *string1,
 							  length);
 }
 
-// hash function
-ULONG
-CWStringConst::HashValue(const CWStringConst *string)
-{
-	return gpos::HashByteArray((BYTE *) string->GetBuffer(),
-							   string->Length() * GPOS_SIZEOF(WCHAR));
-}
-
 // checks whether the string is byte-wise equal to another string
 BOOL
 CWStringConst::Equals(const CWStringBase *str) const

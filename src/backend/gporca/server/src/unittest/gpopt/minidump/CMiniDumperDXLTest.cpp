@@ -127,6 +127,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 			CStatisticsConfig::PstatsconfDefault(mp),
 			CCTEConfig::PcteconfDefault(mp), ICostModel::PcmDefault(mp),
 			CHint::PhintDefault(mp), nullptr /* pplanhint */,
+			nullptr /* alias_table_names_map */,
 			CWindowOids::GetWindowOids(mp));
 
 		// setup opt ctx

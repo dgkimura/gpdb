@@ -52,6 +52,17 @@ using IntUlongHashmapIter =
 	CHashMapIter<INT, ULONG, gpos::HashValue<INT>, gpos::Equals<INT>,
 				 CleanupDelete<INT>, CleanupDelete<ULONG>>;
 
+using StringToStringArrayMap =
+	CHashMap<CWStringBase, StringPtrArray, CWStringBase::HashValue,
+			 CWStringBase::Equals, CleanupDelete<CWStringBase>,
+			 CleanupRelease<StringPtrArray>>;
+
+using StringToStringArrayMapIter =
+	CHashMapIter<CWStringBase, StringPtrArray, CWStringBase::HashValue,
+				 CWStringBase::Equals, CleanupDelete<CWStringBase>,
+				 CleanupRelease<StringPtrArray>>;
+
+
 //---------------------------------------------------------------------------
 //	@class:
 //		CTranslatorQueryToDXL
@@ -128,6 +139,9 @@ private:
 
 	// CTE producer IDs defined at the current query level
 	UlongBoolHashMap *m_cteid_at_current_query_level_map;
+
+	// Alias to table name(s) to be used by hints (e.g. join order or motion)
+	StringToStringArrayMap *m_alias_table_names_map;
 
 	// id of current query (and for nested queries), it's used for correct assigning
 	// of relation links to target relation of DML query
@@ -467,6 +481,14 @@ public:
 	static CTranslatorQueryToDXL *QueryToDXLInstance(CMemoryPool *mp,
 													 CMDAccessor *md_accessor,
 													 Query *query);
+
+	void CombineAliasMapping(StringToStringArrayMap *alias_table_names_map);
+
+	StringToStringArrayMap *
+	GetAliasMapping() const
+	{
+		return m_alias_table_names_map;
+	}
 };
 }  // namespace gpdxl
 #endif	// GPDXL_CTranslatorQueryToDXL_H

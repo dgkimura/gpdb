@@ -28,6 +28,7 @@
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
 #include "naucrates/dxl/parser/CParseHandlerPlanHint.h"
 #include "naucrates/dxl/parser/CParseHandlerStatisticsConfig.h"
+#include "naucrates/dxl/parser/CParseHandlerSubqueryAliasMap.h"
 #include "naucrates/dxl/parser/CParseHandlerTraceFlags.h"
 #include "naucrates/dxl/parser/CParseHandlerWindowOids.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -106,6 +107,21 @@ CParseHandlerOptimizerConfig::StartElement(
 		pphHint->startElement(element_uri, element_local_name, element_qname,
 							  attrs);
 		this->Append(pphHint);
+		return;
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenSubqueryAliasMap),
+					  element_local_name))
+	{
+		// install a parse handler for the subquery alias map
+		CParseHandlerBase *pphSubqueryAliasMap =
+			CParseHandlerFactory::GetParseHandler(
+				m_mp, CDXLTokens::XmlstrToken(EdxltokenSubqueryAliasMap),
+				m_parse_handler_mgr, this);
+		m_parse_handler_mgr->ActivateParseHandler(pphSubqueryAliasMap);
+		pphSubqueryAliasMap->startElement(element_uri, element_local_name,
+										  element_qname, attrs);
+		this->Append(pphSubqueryAliasMap);
 		return;
 	}
 	else if (0 == XMLString::compareString(
@@ -193,7 +209,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 										 const XMLCh *const	 // element_qname
 )
 {
-#define MAX_CONFIG_FIELDS 8
+#define MAX_CONFIG_FIELDS 9
 
 	if (0 != XMLString::compareString(
 				 CDXLTokens::XmlstrToken(EdxltokenOptimizerConfig),
@@ -264,6 +280,16 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	// XXX: Add new fields to COptimizerConfig at (*this)[Length - N].
 
+	CParseHandlerSubqueryAliasMap *pphSubqueryAliasMap =
+		dynamic_cast<CParseHandlerSubqueryAliasMap *>(
+			(*this)[this->Length() - 3]);
+	StringToStringArrayMap *aliasmap =
+		pphSubqueryAliasMap->GetAliasTableNamesMap();
+	if (nullptr != aliasmap)
+	{
+		aliasmap->AddRef();
+	}
+
 	CParseHandlerPlanHint *pphHint =
 		dynamic_cast<CParseHandlerPlanHint *>((*this)[this->Length() - 2]);
 	CPlanHint *pplanhint = pphHint->GetPlanHint();
@@ -272,8 +298,9 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 		pplanhint->AddRef();
 	}
 
-	m_optimizer_config = GPOS_NEW(m_mp) COptimizerConfig(
-		pec, stats_config, pcteconfig, pcm, phint, pplanhint, pwindowoidsGPDB);
+	m_optimizer_config = GPOS_NEW(m_mp)
+		COptimizerConfig(pec, stats_config, pcteconfig, pcm, phint, pplanhint,
+						 aliasmap, pwindowoidsGPDB);
 
 	CParseHandlerTraceFlags *pphTraceFlags =
 		dynamic_cast<CParseHandlerTraceFlags *>((*this)[this->Length() - 1]);

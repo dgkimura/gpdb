@@ -57,6 +57,7 @@ enum Edxltoken
 	EdxltokenCostModelConfig,
 	EdxltokenCostModelType,
 	EdxltokenSegmentsForCosting,
+	EdxltokenSubqueryAliasMap,
 	EdxltokenHint,
 	EdxltokenPlanHint,
 	EdxltokenScanHint,
@@ -770,6 +771,8 @@ enum Edxltoken
 	EdxltokenAdd,
 	EdxltokenSubtract,
 	EdxltokenMultiply,
+
+	EdxltokenItem,
 
 	EdxltokenSentinel
 };
