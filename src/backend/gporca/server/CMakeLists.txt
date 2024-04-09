@@ -422,6 +422,9 @@ Hint-AbsoluteRows-Over-Join Hint-AddRows-Over-Join Hint-SubtractRows-Over-Join H
 Hint-Leading-Multiple Hint-Leading-Directed Hint-Leading-NonDirected
 Hint-FullHashJoin-JoinType Hint-FullMergeJoin-JoinType Hint-IndexHashJoin-JoinType Hint-IndexNestLoop-JoinType;
 
+CParseAndSerializeTest:
+SubqueryAlias;
+
 CForeignPartTest:
 ForeignPartUniform PartForeignMixed PartForeignDifferentServer PartForeignDifferentExecLocation PartForeignMixedDPE PartForeignMixedSPE PartForeignUniformSPE ForeignScanExecLocAnySimpleScan ForeignScanExecLocAnyJoin ForeignPartOneTimeFilterDPE;
 
