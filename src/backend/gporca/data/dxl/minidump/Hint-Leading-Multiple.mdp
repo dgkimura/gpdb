@@ -34,6 +34,7 @@
         </dxl:CostParams>
       </dxl:CostModelConfig>
       <dxl:Hint JoinArityForAssociativityCommutativity="18" ArrayExpansionThreshold="20" JoinOrderDynamicProgThreshold="10" BroadcastThreshold="100000" EnforceConstraintsOnDML="false" PushGroupByBelowSetopThreshold="10" XformBindThreshold="0" SkewFactor="0"/>
+      <dxl:SubqueryAliasMap/>
       <dxl:PlanHint>
         <dxl:JoinHint Leading="(t3 t4)"/>
         <dxl:JoinHint Leading="(t1 (t2 t5))"/>

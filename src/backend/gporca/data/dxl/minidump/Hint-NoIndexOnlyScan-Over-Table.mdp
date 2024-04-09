@@ -31,6 +31,7 @@
         </dxl:CostParams>
       </dxl:CostModelConfig>
       <dxl:Hint JoinArityForAssociativityCommutativity="18" ArrayExpansionThreshold="20" JoinOrderDynamicProgThreshold="10" BroadcastThreshold="100000" EnforceConstraintsOnDML="false" PushGroupByBelowSetopThreshold="10" XformBindThreshold="0" SkewFactor="0"/>
+      <dxl:SubqueryAliasMap/>
       <dxl:PlanHint>
         <dxl:ScanHint Alias="hint_table_1" OperatorName="NoIndexOnlyScan"/>
       </dxl:PlanHint>
