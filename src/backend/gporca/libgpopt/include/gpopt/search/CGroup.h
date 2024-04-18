@@ -17,10 +17,8 @@
 #include "gpos/common/CSyncList.h"
 
 #include "gpopt/base/CCostContext.h"
-#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/COptimizationContext.h"
 #include "gpopt/base/CReqdPropPlan.h"
-#include "gpopt/hints/CPlanHint.h"
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CJobQueue.h"
 #include "gpopt/search/CTreeMap.h"
@@ -241,8 +239,6 @@ private:
 	// implementation job queue
 	CJobQueue m_jqImplementation;
 
-	BOOL m_group_satisfied_hint;
-
 	// cleanup optimization contexts on destruction
 	void CleanupContexts();
 
@@ -370,19 +366,6 @@ public:
 	FScalar() const
 	{
 		return m_fScalar;
-	}
-
-	// does group hold scalar expressions ?
-	BOOL
-	FSatisfyHint() const
-	{
-		return m_group_satisfied_hint;
-	}
-
-	void
-	SetSatisfyHint(BOOL hint_val)
-	{
-		m_group_satisfied_hint = hint_val;
 	}
 
 	// join keys of outer child
@@ -532,16 +515,12 @@ public:
 	void MergeGroup();
 
 	// lookup a given context in contexts hash table
-	COptimizationContext *PocLookup(
-		CMemoryPool *mp, CReqdPropPlan *prpp, ULONG ulSearchStageIndex,
-		CDistributionSpec::EDistributionType hint_distribution =
-			CDistributionSpec::EDistributionType::EdtSentinel);
+	COptimizationContext *PocLookup(CMemoryPool *mp, CReqdPropPlan *prpp,
+									ULONG ulSearchStageIndex);
 
 	// lookup the best context across all stages for the given required properties
-	COptimizationContext *PocLookupBest(
-		CMemoryPool *mp, ULONG ulSearchStages, CReqdPropPlan *prpp,
-		CDistributionSpec::EDistributionType hint_distribution =
-			CDistributionSpec::EDistributionType::EdtSentinel);
+	COptimizationContext *PocLookupBest(CMemoryPool *mp, ULONG ulSearchStages,
+										CReqdPropPlan *prpp);
 
 	// find a context by id
 	COptimizationContext *Ppoc(ULONG id) const;
@@ -623,11 +602,6 @@ public:
 
 	// determine if a pair of groups are duplicates
 	static BOOL FDuplicateGroups(CGroup *pgroupFst, CGroup *pgroupSnd);
-
-	StringPtrArray *GetGroupAliases(StringPtrArray *group_aliases);
-
-	CDistributionSpec::EDistributionType FSatisfiesMotionHint(
-		CPlanHint *plan_hint);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;
