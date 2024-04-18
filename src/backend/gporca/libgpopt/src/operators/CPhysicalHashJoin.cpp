@@ -22,10 +22,13 @@
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/hints/CMotionHint.h"
+#include "gpopt/hints/CPlanHint.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarConst.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 
 using namespace gpopt;
 
@@ -971,6 +974,43 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
 
+	CPlanHint *plan_hint =
+		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+
+	if (plan_hint != nullptr)
+	{
+		CTableDescriptorHashSet *tabs =
+			exprhdl.DeriveTableDescriptor(child_index);
+		CMotionHint *hint = plan_hint->GetMotionHint(tabs);
+
+		if (hint != nullptr)
+		{
+			CMotionHint::MotionType motion_type = hint->GetType();
+			if (motion_type == CMotionHint::Broadcast)
+			{
+				return GPOS_NEW(mp) CEnfdDistribution(
+					GPOS_NEW(mp) CDistributionSpecReplicated(
+						CDistributionSpec::EdtStrictReplicated),
+					dmatch);
+			}
+			else
+			{
+				GPOS_ASSERT(motion_type == CMotionHint::Redistribute);
+
+				// requests 1 .. N are (redistribute, redistribute)
+				CDistributionSpec *pds = PdsRequiredRedistribute(
+					mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
+				if (CDistributionSpec::EdtHashed == pds->Edt())
+				{
+					CDistributionSpecHashed *pdsHashed =
+						CDistributionSpecHashed::PdsConvert(pds);
+					pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
+				}
+				return GPOS_NEW(mp) CEnfdDistribution(pds, dmatch);
+			}
+		}
+	}
+
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
 	{
@@ -1169,9 +1209,10 @@ CPhysicalHashJoin::CreateOptRequests(CMemoryPool *mp)
 	// Req(N + 2) (non-singleton, broadcast)
 	// Req(N + 3) (singleton, singleton)
 
-	ULONG ulDistrReqs =
-		GPOPT_NON_HASH_DIST_REQUESTS + m_pdrgpdsRedistributeRequests->Size();
-	SetDistrRequests(ulDistrReqs);
+	//ULONG ulDistrReqs =
+	//	GPOPT_NON_HASH_DIST_REQUESTS + m_pdrgpdsRedistributeRequests->Size();
+	//SetDistrRequests(ulDistrReqs);
+	SetDistrRequests(1);
 
 	// With DP enabled, there are several (max 10 controlled by macro)
 	// alternatives generated for a join tree and during optimization of those
