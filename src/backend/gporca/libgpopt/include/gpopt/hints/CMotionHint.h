@@ -43,7 +43,7 @@ public:
 		aliases->Sort(CWStringBase::Compare);
 	}
 
-	~CMotionHint()
+	~CMotionHint() override
 	{
 		CRefCount::SafeRelease(m_aliases);
 	}
