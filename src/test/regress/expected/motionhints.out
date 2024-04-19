@@ -1,0 +1,231 @@
+-- Test Optimizer Plan Hints Feature
+--
+-- Purpose: Test that plan hints may be used to coerce the plan shape generated
+-- by the optimizer.
+LOAD 'pg_hint_plan';
+DROP SCHEMA IF EXISTS planhints CASCADE;
+CREATE SCHEMA planhints;
+SET search_path=planhints;
+SET optimizer_trace_fallback=on;
+-- Setup tables
+CREATE TABLE heap_table(a int, b int);
+CREATE TABLE ao_table(a int, b int) WITH (appendonly=true);
+CREATE TABLE pt_table(a int, b int) PARTITION BY RANGE (a) (PARTITION p1 START(0) END(101) EVERY(20));
+CREATE TABLE rep_table(a int, b int) DISTRIBUTED REPLICATED;
+ANALYZE heap_table;
+ANALYZE ao_table;
+ANALYZE pt_table;
+ANALYZE rep_table;
+INSERT INTO heap_table SELECT i, i FROM generate_series(1, 100)i;
+INSERT INTO ao_table SELECT i, i FROM generate_series(1, 100)i;
+INSERT INTO pt_table SELECT i, i FROM generate_series(1, 100)i;
+INSERT INTO rep_table SELECT i, i FROM generate_series(1, 100)i;
+ANALYZE heap_table; ANALYZE ao_table; ANALYZE pt_table; ANALYZE rep_table;
+/*+ Redistribute(t1) Broadcast(t2)*/
+EXPLAIN (costs off)
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.b = t2.a)
+         ->  Seq Scan on heap_table t1
+               Filter: (b = 3)
+         ->  Hash
+               ->  Broadcast Motion 3:3  (slice2; segments: 3)
+                     ->  Seq Scan on heap_table t2
+                           Filter: (a = 3)
+ Optimizer: GPORCA
+(10 rows)
+
+/*+ Redistribute(t1) Broadcast(t2)*/
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Broadcast(t1) Broadcast(t2)*/
+EXPLAIN (costs off)
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Join
+         Hash Cond: (t1.b = t2.a)
+         ->  Broadcast Motion 3:1  (slice2; segments: 3)
+               ->  Seq Scan on heap_table t1
+                     Filter: (b = 3)
+         ->  Hash
+               ->  Broadcast Motion 3:1  (slice3; segments: 3)
+                     ->  Seq Scan on heap_table t2
+                           Filter: (a = 3)
+ Optimizer: GPORCA
+(11 rows)
+
+/*+ Broadcast(t1) Broadcast(t2)*/
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Redistribute(t1) Redistribute(t2)*/
+EXPLAIN (costs off)
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.b = t2.a)
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: t1.b
+               ->  Seq Scan on heap_table t1
+                     Filter: (b = 3)
+         ->  Hash
+               ->  Seq Scan on heap_table t2
+                     Filter: (a = 3)
+ Optimizer: GPORCA
+(11 rows)
+
+/*+ Redistribute(t1) Redistribute(t2)*/
+SELECT * FROM heap_table t1 INNER JOIN heap_table t2 ON t1.b = t2.a WHERE t2.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+-- Testing replicated tables with motion hints
+/*+ Broadcast(rt) Broadcast(ht) */
+EXPLAIN (costs off)
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Join
+         Hash Cond: (rt.b = ht.a)
+         ->  Seq Scan on rep_table rt
+               Filter: (b = 3)
+         ->  Hash
+               ->  Broadcast Motion 3:1  (slice2; segments: 3)
+                     ->  Seq Scan on heap_table ht
+                           Filter: (a = 3)
+ Optimizer: GPORCA
+(10 rows)
+
+/*+ Broadcast(rt) Broadcast(ht) */
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Broadcast(rt) Redistribute(ht) */
+EXPLAIN (costs off)
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (rt.b = ht.a)
+         ->  Seq Scan on rep_table rt
+               Filter: (b = 3)
+         ->  Hash
+               ->  Seq Scan on heap_table ht
+                     Filter: (a = 3)
+ Optimizer: GPORCA
+(9 rows)
+
+/*+ Broadcast(rt) Redistribute(ht) */
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Redistribute(rt) Broadcast(ht) */
+EXPLAIN (costs off)
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Join
+         Hash Cond: (rt.b = ht.a)
+         ->  Seq Scan on rep_table rt
+               Filter: (b = 3)
+         ->  Hash
+               ->  Broadcast Motion 3:1  (slice2; segments: 3)
+                     ->  Seq Scan on heap_table ht
+                           Filter: (a = 3)
+ Optimizer: GPORCA
+(10 rows)
+
+/*+ Redistribute(rt) Broadcast(ht) */
+SELECT * FROM rep_table rt INNER JOIN heap_table ht ON rt.b = ht.a WHERE ht.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Broadcast(rt) Broadcast(rt2)*/
+EXPLAIN (costs off)
+SELECT * FROM rep_table rt INNER JOIN rep_table rt2 ON rt.b = rt2.a WHERE rt2.a=3;
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Join
+         Hash Cond: (rt.b = rt2.a)
+         ->  Seq Scan on rep_table rt
+               Filter: (b = 3)
+         ->  Hash
+               ->  Seq Scan on rep_table rt2
+                     Filter: (a = 3)
+ Optimizer: GPORCA
+(9 rows)
+
+/*+ Broadcast(rt) Broadcast(rt2)*/
+SELECT * FROM rep_table rt INNER JOIN rep_table rt2 ON rt.b = rt2.a WHERE rt2.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+/*+ Redistribute(rt) Redistribute(rt2)*/
+EXPLAIN (costs off)
+SELECT * FROM rep_table rt INNER JOIN rep_table rt2 ON rt.b = rt2.a WHERE rt2.a=3;
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Join
+         Hash Cond: (rt.b = rt2.a)
+         ->  Seq Scan on rep_table rt
+               Filter: (b = 3)
+         ->  Hash
+               ->  Seq Scan on rep_table rt2
+                     Filter: (a = 3)
+ Optimizer: GPORCA
+(9 rows)
+
+/*+ Redistribute(rt) Redistribute(rt2)*/
+SELECT * FROM rep_table rt INNER JOIN rep_table rt2 ON rt.b = rt2.a WHERE rt2.a=3;
+ a | b | a | b 
+---+---+---+---
+ 3 | 3 | 3 | 3
+(1 row)
+
+-- TODO: Look at these later...
+/*+ Broadcast(t2) Redistribute(t1) */
+EXPLAIN (costs off) SELECT * FROM heap_table t2 WHERE t2.b NOT IN (SELECT t1.a FROM heap_table t1);
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)
+   ->  Hash Left Anti Semi (Not-In) Join
+         Hash Cond: (t2.b = t1.a)
+         ->  Broadcast Motion 3:1  (slice2; segments: 3)
+               ->  Seq Scan on heap_table t2
+         ->  Hash
+               ->  Broadcast Motion 3:1  (slice3; segments: 3)
+                     ->  Seq Scan on heap_table t1
+ Optimizer: GPORCA
+(9 rows)
+
