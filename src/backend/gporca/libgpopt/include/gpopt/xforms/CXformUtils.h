@@ -17,6 +17,7 @@
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/hints/CPlanHint.h"
 #include "gpopt/operators/CLogicalDML.h"
 #include "gpopt/operators/CLogicalDynamicIndexGet.h"
 #include "gpopt/operators/CLogicalDynamicIndexOnlyGet.h"
@@ -25,6 +26,7 @@
 #include "gpopt/operators/CLogicalJoin.h"
 #include "gpopt/operators/CPhysicalJoin.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "gpopt/xforms/CXform.h"
 #include "naucrates/md/IMDIndex.h"
 #include "naucrates/md/IMDScalarOp.h"
@@ -632,9 +634,23 @@ CXformUtils::AddHashOrMergeJoinAlternative(
 		(*pexprJoin)[ul]->AddRef();
 	}
 	CLogicalJoin *popLogicalJoin = CLogicalJoin::PopConvert(pexprJoin->Pop());
-	T *op =
-		GPOS_NEW(mp) T(mp, pdrgpexprOuter, pdrgpexprInner, opfamilies,
-					   is_hash_join_null_aware, popLogicalJoin->OriginXform());
+
+	CPlanHint *plan_hint =
+		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
+
+	BOOL has_motion_hint = false;
+	if (plan_hint != nullptr)
+	{
+		CTableDescriptorHashSet *outer =
+			(*pexprJoin)[0]->DeriveTableDescriptor();
+		CTableDescriptorHashSet *inner =
+			(*pexprJoin)[1]->DeriveTableDescriptor();
+		has_motion_hint = nullptr != plan_hint->GetMotionHint(outer) ||
+						  nullptr != plan_hint->GetMotionHint(inner);
+	}
+	T *op = GPOS_NEW(mp) T(mp, pdrgpexprOuter, pdrgpexprInner, opfamilies,
+						   is_hash_join_null_aware,
+						   popLogicalJoin->OriginXform(), has_motion_hint);
 	CExpression *pexprResult = GPOS_NEW(mp)
 		CExpression(mp, op, (*pexprJoin)[0], (*pexprJoin)[1], (*pexprJoin)[2]);
 	pxfres->Add(pexprResult);

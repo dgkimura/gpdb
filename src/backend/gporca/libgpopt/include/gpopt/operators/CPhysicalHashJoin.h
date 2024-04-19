@@ -51,6 +51,8 @@ private:
 	// array redistribute request sent to the first hash join child
 	CDistributionSpecArray *m_pdrgpdsRedistributeRequests;
 
+	BOOL m_has_motion_hint{false};
+
 	// compute a distribution matching the distribution delivered by given child
 	CDistributionSpec *PdsMatch(CMemoryPool *mp, CDistributionSpec *pds,
 								ULONG ulSourceChildIndex) const;
@@ -146,7 +148,8 @@ public:
 	CPhysicalHashJoin(CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
 					  CExpressionArray *pdrgpexprInnerKeys,
 					  IMdIdArray *hash_opfamilies, BOOL is_null_aware = true,
-					  CXform::EXformId origin_xform = CXform::ExfSentinel);
+					  CXform::EXformId origin_xform = CXform::ExfSentinel,
+					  BOOL has_motion_hint = false);
 
 	// dtor
 	~CPhysicalHashJoin() override;

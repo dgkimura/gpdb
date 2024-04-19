@@ -46,18 +46,17 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalHashJoin::CPhysicalHashJoin(CMemoryPool *mp,
-									 CExpressionArray *pdrgpexprOuterKeys,
-									 CExpressionArray *pdrgpexprInnerKeys,
-									 IMdIdArray *hash_opfamilies,
-									 BOOL is_null_aware,
-									 CXform::EXformId origin_xform)
+CPhysicalHashJoin::CPhysicalHashJoin(
+	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
+	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
+	BOOL is_null_aware, CXform::EXformId origin_xform, BOOL has_motion_hint)
 	: CPhysicalJoin(mp, origin_xform),
 	  m_pdrgpexprOuterKeys(pdrgpexprOuterKeys),
 	  m_pdrgpexprInnerKeys(pdrgpexprInnerKeys),
 	  m_hash_opfamilies(nullptr),
 	  m_is_null_aware(is_null_aware),
-	  m_pdrgpdsRedistributeRequests(nullptr)
+	  m_pdrgpdsRedistributeRequests(nullptr),
+	  m_has_motion_hint(has_motion_hint)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pdrgpexprOuterKeys);
@@ -997,6 +996,8 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			{
 				GPOS_ASSERT(motion_type == CMotionHint::Redistribute);
 
+				//CDistributionSpec *pds = PdshashedRequired(mp, child_index, /*ulOptReq*/ 0);
+
 				// requests 1 .. N are (redistribute, redistribute)
 				CDistributionSpec *pds = PdsRequiredRedistribute(
 					mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
@@ -1209,10 +1210,13 @@ CPhysicalHashJoin::CreateOptRequests(CMemoryPool *mp)
 	// Req(N + 2) (non-singleton, broadcast)
 	// Req(N + 3) (singleton, singleton)
 
-	//ULONG ulDistrReqs =
-	//	GPOPT_NON_HASH_DIST_REQUESTS + m_pdrgpdsRedistributeRequests->Size();
-	//SetDistrRequests(ulDistrReqs);
-	SetDistrRequests(1);
+	ULONG ulDistrReqs =
+		GPOPT_NON_HASH_DIST_REQUESTS + m_pdrgpdsRedistributeRequests->Size();
+	if (m_has_motion_hint)
+	{
+		ulDistrReqs = 1;
+	}
+	SetDistrRequests(ulDistrReqs);
 
 	// With DP enabled, there are several (max 10 controlled by macro)
 	// alternatives generated for a join tree and during optimization of those

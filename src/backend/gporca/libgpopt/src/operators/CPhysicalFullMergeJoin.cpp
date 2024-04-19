@@ -29,7 +29,7 @@ using namespace gpopt;
 CPhysicalFullMergeJoin::CPhysicalFullMergeJoin(
 	CMemoryPool *mp, CExpressionArray *outer_merge_clauses,
 	CExpressionArray *inner_merge_clauses, IMdIdArray *, BOOL,
-	CXform::EXformId origin_xform)
+	CXform::EXformId origin_xform, BOOL has_motion_hint GPOS_UNUSED)  //FIXME
 	: CPhysicalJoin(mp, origin_xform),
 	  m_outer_merge_clauses(outer_merge_clauses),
 	  m_inner_merge_clauses(inner_merge_clauses)

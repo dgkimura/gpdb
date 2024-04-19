@@ -32,9 +32,10 @@ using namespace gpopt;
 CPhysicalRightOuterHashJoin::CPhysicalRightOuterHashJoin(
 	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
 	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-	BOOL is_null_aware, CXform::EXformId origin_xform)
+	BOOL is_null_aware, CXform::EXformId origin_xform, BOOL has_motion_hint)
 	: CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
-						hash_opfamilies, is_null_aware, origin_xform)
+						hash_opfamilies, is_null_aware, origin_xform,
+						has_motion_hint)
 {
 	ULONG ulDistrReqs = 1 + NumDistrReq();
 	SetDistrRequests(ulDistrReqs);
