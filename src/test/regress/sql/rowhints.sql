@@ -175,13 +175,16 @@ SELECT enable_xform('CXformLeftSemiJoin2InnerJoin');
 
 CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
 CREATE TABLE bar(a int, b int) DISTRIBUTED BY (a);
+CREATE TABLE meh(a int, b int) DISTRIBUTED BY (a);
 
 INSERT INTO bar SELECT i, i+3 FROM generate_series(1,5) i;
 -- Insert single row
 INSERT INTO foo values (-2, 34);
+INSERT INTO meh values (-2, 34);
 
 ANALYZE foo;
 ANALYZE bar;
+ANALYZE meh;
 
 -- Nested Loop Left Join operator estimates 41 rows(per segment for 3 segment cluster)
 -- honoring the specified RowHint. However, Gather Motion estimates total number of
@@ -211,6 +214,65 @@ Rows(q b #123)
 EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+-- Test Rowhints with Subquery aliases
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq) AS q, meh b;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q r #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) r;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q qq m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq, meh m;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(r m #123)
+Rows(qq q #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq) r, meh m;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
+
+-- Add dummy alias in the hint to check if hint is ignored
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q qq dummy_alias #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
 
 RESET client_min_messages;
 RESET pg_hint_plan.debug_print;
