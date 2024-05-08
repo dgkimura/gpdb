@@ -151,7 +151,8 @@ private:
 	static ICostModel *GetCostModel(CMemoryPool *mp, ULONG num_segments);
 
 	// create optimizer plan hints
-	static CPlanHint *GetPlanHints(CMemoryPool *mp, Query *query);
+	static CPlanHint *GetPlanHints(CMemoryPool *mp, Query *query,
+								   StringToStringArrayMap *alias_map);
 
 	// print warning messages for columns with missing statistics
 	static void PrintMissingStatsWarning(CMemoryPool *mp,

@@ -29,6 +29,7 @@ extern "C" {
 #include "gpos/error/CException.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CAutoMemoryPool.h"
+#include "gpos/memory/queue.h"
 #include "gpos/memory/set.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -612,7 +613,8 @@ GenerateJoinNodes(CMemoryPool *mp, List *relations)
 //
 //---------------------------------------------------------------------------
 CPlanHint *
-COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
+COptTasks::GetPlanHints(CMemoryPool *mp, Query *query,
+						StringToStringArrayMap *alias_map)
 {
 	HintState *hintstate = nullptr;
 	if (plan_hint_hook != nullptr)
@@ -733,8 +735,29 @@ COptTasks::GetPlanHints(CMemoryPool *mp, Query *query)
 
 		for (int rel_index = 0; rel_index < row_hint->nrels; rel_index++)
 		{
-			aliases->Append(
-				GPOS_NEW(mp) CWStringConst(mp, row_hint->relnames[rel_index]));
+			CWStringConst *relname =
+				GPOS_NEW(mp) CWStringConst(mp, row_hint->relnames[rel_index]);
+			gpos::queue<CWStringBase *> q(mp);
+			q.push(relname);
+			while (!q.empty())
+			{
+				CWStringBase *rel_in_queue = q.front();
+				q.pop();
+				StringPtrArray *aliases_list = alias_map->Find(rel_in_queue);
+				if (aliases_list == nullptr)
+				{
+					aliases->Append(GPOS_NEW(mp) CWStringConst(
+						mp, rel_in_queue->GetBuffer()));
+				}
+				else
+				{
+					for (int i = 0; i < aliases_list->Size(); i++)
+					{
+						q.push((*aliases_list)[i]);
+					}
+				}
+			}
+			GPOS_DELETE(relname);
 		}
 
 		plan_hints->AddHint(GPOS_NEW(mp) CRowHint(
@@ -935,7 +958,9 @@ COptTasks::OptimizeTask(void *ptr)
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
 
 			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
-			CPlanHint *plan_hints = GetPlanHints(mp, opt_ctxt->m_query);
+			CPlanHint *plan_hints =
+				GetPlanHints(mp, opt_ctxt->m_query,
+							 query_to_dxl_translator->GetAliasMapping());
 			query_to_dxl_translator->GetAliasMapping()->AddRef();
 			COptimizerConfig *optimizer_config = CreateOptimizerConfig(
 				mp, cost_model, plan_hints,
