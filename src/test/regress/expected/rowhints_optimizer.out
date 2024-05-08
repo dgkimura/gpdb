@@ -470,6 +470,7 @@ not used hint:
                                        ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
  Optimizer: GPORCA
 
+<<<<<<< HEAD
 -- Missing alias in query to test Un-used Hint logging
 \o results/pg_hint_plan.tmpout
 /*+
@@ -485,10 +486,18 @@ used hint:
 not used hint:
 RowHint: y,z #123.000000
 ]",
+=======
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+>>>>>>> 0eec454f413... Add failing test
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
 ----------------
+<<<<<<< HEAD
  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=1000000 width=xxx)
    ->  Nested Loop  (cost=xxx..xxx rows=333334 width=xxx)
          Join Filter: true
@@ -506,6 +515,16 @@ RowHint: y,z #123.000000
 RESET client_min_messages;
 LOG:  statement: RESET client_min_messages;
 RESET pg_hint_plan.debug_print;
+=======
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=123 width=xxx)
+   ->  Nested Loop  (cost=xxx..xxx rows=2 width=xxx)
+         Join Filter: true
+         ->  Broadcast Motion 3:3  (slice2; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Seq Scan on foo  (cost=xxx..xxx rows=1 width=xxx)
+         ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
+ Optimizer: GPORCA
+
+>>>>>>> 0eec454f413... Add failing test
 -- Clean Up
 DROP TABLE foo;
 DROP TABLE bar;

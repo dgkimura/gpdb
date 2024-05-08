@@ -204,6 +204,14 @@ EXPLAIN SELECT t1.a, t2.a FROM my_table AS t1, your_table AS t2, our_table AS t3
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
 
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+
 RESET client_min_messages;
 RESET pg_hint_plan.debug_print;
 -- Clean Up
