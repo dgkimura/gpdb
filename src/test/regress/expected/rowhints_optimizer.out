@@ -425,28 +425,22 @@ LOG:  statement: SELECT enable_xform('CXformLeftSemiJoin2InnerJoin');
 CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
 LOG:  statement: CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
 CREATE TABLE bar(a int, b int) DISTRIBUTED BY (a);
-<<<<<<< HEAD
 LOG:  statement: CREATE TABLE bar(a int, b int) DISTRIBUTED BY (a);
-=======
 CREATE TABLE meh(a int, b int) DISTRIBUTED BY (a);
->>>>>>> 2c50562c9cc... Add Subquery alias tests for rowhints
+LOG:  statement: CREATE TABLE meh(a int, b int) DISTRIBUTED BY (a);
 INSERT INTO bar SELECT i, i+3 FROM generate_series(1,5) i;
 LOG:  statement: INSERT INTO bar SELECT i, i+3 FROM generate_series(1,5) i;
 -- Insert single row
 INSERT INTO foo values (-2, 34);
-<<<<<<< HEAD
 LOG:  statement: INSERT INTO foo values (-2, 34);
-=======
 INSERT INTO meh values (-2, 34);
->>>>>>> 2c50562c9cc... Add Subquery alias tests for rowhints
+LOG:  statement: INSERT INTO meh values (-2, 34);
 ANALYZE foo;
 LOG:  statement: ANALYZE foo;
 ANALYZE bar;
-<<<<<<< HEAD
 LOG:  statement: ANALYZE bar;
-=======
 ANALYZE meh;
->>>>>>> 2c50562c9cc... Add Subquery alias tests for rowhints
+LOG:  statement: ANALYZE meh;
 -- Nested Loop Left Join operator estimates 41 rows(per segment for 3 segment cluster)
 -- honoring the specified RowHint. However, Gather Motion estimates total number of
 -- rows as 5 because the outer table bar only has 5 rows and ComputeScalar is being smart
@@ -482,7 +476,6 @@ not used hint:
                                        ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
  Optimizer: GPORCA
 
-<<<<<<< HEAD
 -- Missing alias in query to test Un-used Hint logging
 \o results/pg_hint_plan.tmpout
 /*+
@@ -498,18 +491,10 @@ used hint:
 not used hint:
 RowHint: y,z #123.000000
 ]",
-=======
-\o results/pg_hint_plan.tmpout
-/*+
-Rows(q b #123)
-*/
-EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
->>>>>>> 0eec454f413... Add failing test
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
 ----------------
-<<<<<<< HEAD
  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=1000000 width=xxx)
    ->  Nested Loop  (cost=xxx..xxx rows=333334 width=xxx)
          Join Filter: true
@@ -524,10 +509,24 @@ EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
                            Number of partitions to scan: 6 (out of 6)
  Optimizer: GPORCA
 
-RESET client_min_messages;
-LOG:  statement: RESET client_min_messages;
-RESET pg_hint_plan.debug_print;
-=======
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+LOG:  statement: /*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+LOG:  2024-05-16 23:31:21:804083 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: b,foo #123.000000
+not used hint:
+]",
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=123 width=xxx)
    ->  Nested Loop  (cost=xxx..xxx rows=41 width=xxx)
          Join Filter: true
@@ -536,15 +535,21 @@ RESET pg_hint_plan.debug_print;
          ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
  Optimizer: GPORCA
 
-<<<<<<< HEAD
->>>>>>> 0eec454f413... Add failing test
-=======
 -- Test Rowhints with Subquery aliases
 \o results/pg_hint_plan.tmpout
 /*+
 Rows(q b #123)
 */
 EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq) AS q, meh b;
+LOG:  statement: /*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq) AS q, meh b;
+LOG:  2024-05-16 23:31:21:819815 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: b,t1,t2 #123.000000
+not used hint:
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -567,6 +572,15 @@ EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq)
 Rows(q r #123)
 */
 EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) r;
+LOG:  statement: /*+
+Rows(q r #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) r;
+LOG:  2024-05-16 23:31:21:837167 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: b,f #123.000000
+not used hint:
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -590,6 +604,15 @@ EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limi
 Rows(q m #123)
 */
 EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
+LOG:  statement: /*+
+Rows(q m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
+LOG:  2024-05-16 23:31:21:850766 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: m #123.000000
+not used hint:
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -606,6 +629,15 @@ EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
 Rows(q qq m #123)
 */
 EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq, meh m;
+LOG:  statement: /*+
+Rows(q qq m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq, meh m;
+LOG:  2024-05-16 23:31:21:869698 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: b,f,m #123.000000
+not used hint:
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -632,6 +664,17 @@ Rows(r m #123)
 Rows(qq q #123)
 */
 EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq) r, meh m;
+LOG:  statement: /*+
+Rows(r m #123)
+Rows(qq q #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq) r, meh m;
+LOG:  2024-05-16 23:31:21:889475 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+RowHint: b,f,m #123.000000
+RowHint: b,f #123.000000
+not used hint:
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -661,6 +704,15 @@ EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * 
 Rows(q qq dummy_alias #123)
 */
 EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq;
+LOG:  statement: /*+
+Rows(q qq dummy_alias #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq;
+LOG:  2024-05-16 23:31:21:906682 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+not used hint:
+RowHint: b,dummy_alias,f #123.000000
+]",
 \o
 \! sql/maskout.sh results/pg_hint_plan.tmpout
   QUERY PLAN
@@ -676,7 +728,9 @@ EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limi
                      ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
  Optimizer: GPORCA
 
->>>>>>> 2c50562c9cc... Add Subquery alias tests for rowhints
+RESET client_min_messages;
+LOG:  statement: RESET client_min_messages;
+RESET pg_hint_plan.debug_print;
 -- Clean Up
 DROP TABLE foo;
 DROP TABLE bar;

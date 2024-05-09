@@ -58,6 +58,9 @@ public:
 	static StringPtrArray *GetAliasesFromTableDescriptors(
 		CMemoryPool *mp, CTableDescriptorHashSet *ptabs);
 
+	static StringPtrArray *ConvertSubqueryAliasesToTableNames(
+		CMemoryPool *mp, StringPtrArray *input);
+
 	// Get set of aliases from join pair
 	static StringPtrArray *GetAliasesFromHint(
 		CMemoryPool *mp, const CJoinHint::JoinNode *joinnode);

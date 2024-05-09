@@ -12,8 +12,10 @@
 #include "gpopt/hints/CPlanHint.h"
 
 #include "gpos/base.h"
+#include "gpos/memory/queue.h"
 
 #include "gpopt/hints/CHintUtils.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 
 using namespace gpopt;
 
@@ -133,6 +135,39 @@ CPlanHint::GetRowHint(CTableDescriptorHashSet *ptabdescs)
 	return matching_hint;
 }
 
+static StringPtrArray *
+ConvertSubqueryToAliases(CMemoryPool *mp, CWStringBase *subquery)
+{
+	StringPtrArray *result = GPOS_NEW(mp) StringPtrArray(mp);
+
+	StringToStringArrayMap *alias_map = COptCtxt::PoctxtFromTLS()
+											->GetOptimizerConfig()
+											->GetAliasToTableNamesMap();
+
+	gpos::queue<CWStringBase *> q(mp);
+	q.push(subquery);
+	while (!q.empty())
+	{
+		CWStringBase *rel_in_queue = q.front();
+		q.pop();
+		StringPtrArray *aliases_list = alias_map->Find(rel_in_queue);
+		if (aliases_list == nullptr)
+		{
+			result->Append(GPOS_NEW(mp)
+							   CWStringConst(mp, rel_in_queue->GetBuffer()));
+		}
+		else
+		{
+			for (ULONG j = 0; j < aliases_list->Size(); j++)
+			{
+				q.push((*aliases_list)[j]);
+			}
+		}
+	}
+
+	return result;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		GetHintSubtrees
@@ -154,8 +189,13 @@ GetHintSubtrees(CMemoryPool *mp, const CJoinHint::JoinNode *node,
 	if (node->GetName())
 	{
 		StringPtrArray *subtree = GPOS_NEW(mp) StringPtrArray(mp);
-		subtree->Append(GPOS_NEW(mp)
-							CWStringConst(mp, node->GetName()->GetBuffer()));
+		StringPtrArray *aliases = ConvertSubqueryToAliases(mp, node->GetName());
+		for (ULONG i = 0; i < aliases->Size(); i++)
+		{
+			subtree->Append(GPOS_NEW(mp)
+								CWStringConst(mp, (*aliases)[i]->GetBuffer()));
+		}
+		aliases->Release();
 		subtrees->Append(subtree);
 		return subtree;
 	}

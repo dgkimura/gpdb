@@ -906,5 +906,78 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
 
+
+-- Test that join order hints can specify subquery aliases
+--
+--
+
+/*+
+    Leading((q t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1, (SELECT * FROM t2 LIMIT 1) AS q;
+
+/*+
+    Leading((q t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (SELECT * FROM t2 LIMIT 1) AS q ON t1.a=q.a;
+
+/*+
+    Leading((q t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1, (SELECT t2.a, t3.a FROM t2, t3 GROUP BY t2.a, t3.a) AS q;
+
+/*+
+    Leading((q t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (SELECT t2.a FROM t2, t3 GROUP BY t2.a, t3.a) AS q ON t1.a=q.a;
+
+/*+
+    Leading((q t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (SELECT t2.a FROM t2 LEFT JOIN t3 ON t2.a=t3.a GROUP BY t2.a, t3.a) AS q ON t1.a=q.a;
+
+/*+
+    Leading((q2 q1))
+ */
+EXPLAIN (costs off) SELECT * FROM (SELECT t2.a FROM t2 LEFT JOIN t3 ON t2.a=t3.a GROUP BY t2.a, t3.a) AS q2 LEFT JOIN (SELECT t1.a FROM t1 LIMIT 42) AS q1 ON q1.a=q2.a;
+
+-- FIXME: Hint *should be* applied but isn't when the hint references a
+-- subquery where with tables that are direct children of the nary join. There
+-- are two possible ways to solve this:
+--
+--  1) Add logic into join order hints preprocessor to split the nary join
+--     based on subquery alias. This may be tricky and messy.
+--  2) Disable the preprocessor step PexprCollapseJoins() to prevent collapsing
+--     the subquery in the first place. This should be pretty clean and
+--     shouldn't require much change (if any) to the join order hint
+--     preprocessor.
+--
+-- Workaround for this issue is to add a LIMIT inside the subquery to prevent
+-- it from collapsing the nary join of the subquery.
+/*+
+    Leading((t3 q))
+*/
+EXPLAIN (costs off) SELECT * FROM (SELECT * FROM t1, t2) AS q, t3;
+
+/*+
+    Leading((t3 q))
+*/
+EXPLAIN (costs off) SELECT * FROM (SELECT * FROM t1, t2 LIMIT 10000) AS q, t3;
+
+/*+
+    Leading((qq t1))
+*/
+EXPLAIN (costs off) SELECT * FROM (SELECT * FROM t1, (SELECT * FROM t2 LIMIT 42) AS qq LIMIT 42) AS q, t3;
+
+/*+
+    Leading((t3 q))
+*/
+EXPLAIN (costs off) SELECT * FROM (SELECT * FROM t1, (SELECT * FROM t2 LIMIT 42) AS qq LIMIT 42) AS q, t3;
+
+/*+
+    Leading((q2 q1))
+*/
+EXPLAIN (costs off) SELECT * FROM (SELECT * FROM t1 LIMIT 42) AS q1, (SELECT * FROM t2 LIMIT 42) AS q2;
+
 RESET client_min_messages;
 RESET pg_hint_plan.debug_print;

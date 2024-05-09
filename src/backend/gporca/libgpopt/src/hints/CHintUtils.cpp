@@ -14,6 +14,8 @@
 #include "gpos/common/clibwrapper.h"
 #include "gpos/memory/queue.h"
 
+#include "gpopt/optimizer/COptimizerConfig.h"
+
 using namespace gpopt;
 
 
@@ -372,6 +374,43 @@ CHintUtils::GetAliasesFromTableDescriptors(CMemoryPool *mp,
 	return pexpr_aliases;
 }
 
+StringPtrArray *
+CHintUtils::ConvertSubqueryAliasesToTableNames(CMemoryPool *mp,
+											   StringPtrArray *input)
+{
+	StringPtrArray *output = GPOS_NEW(mp) StringPtrArray(mp);
+
+	StringToStringArrayMap *alias_map = COptCtxt::PoctxtFromTLS()
+											->GetOptimizerConfig()
+											->GetAliasToTableNamesMap();
+
+	for (ULONG i = 0; i < input->Size(); i++)
+	{
+		gpos::queue<CWStringBase *> q(mp);
+		q.push((*input)[i]);
+		while (!q.empty())
+		{
+			CWStringBase *rel_in_queue = q.front();
+			q.pop();
+			StringPtrArray *aliases_list = alias_map->Find(rel_in_queue);
+			if (aliases_list == nullptr)
+			{
+				output->Append(
+					GPOS_NEW(mp) CWStringConst(mp, rel_in_queue->GetBuffer()));
+			}
+			else
+			{
+				for (ULONG j = 0; j < aliases_list->Size(); j++)
+				{
+					q.push((*aliases_list)[j]);
+				}
+			}
+		}
+	}
+
+	return output;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CHintUtils::GetAliasesFromHint
@@ -405,5 +444,8 @@ CHintUtils::GetAliasesFromHint(CMemoryPool *mp,
 		}
 	}
 
-	return aliases;
+	StringPtrArray *converted_aliases =
+		CHintUtils::ConvertSubqueryAliasesToTableNames(mp, aliases);
+	aliases->Release();
+	return converted_aliases;
 }

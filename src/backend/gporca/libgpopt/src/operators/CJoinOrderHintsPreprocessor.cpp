@@ -346,10 +346,19 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 {
 	GPOS_ASSERT(COperator::EopLogicalNAryJoin == pexpr->Pop()->Eopid());
 
+	if (nullptr == joinnode)
+	{
+		return nullptr;
+	}
+
 	CExpression *pexprAppliedHints = nullptr;
 
+	StringToStringArrayMap *alias_map = COptCtxt::PoctxtFromTLS()
+											->GetOptimizerConfig()
+											->GetAliasToTableNamesMap();
+
 	StringPtrArray *hint_aliases = CHintUtils::GetAliasesFromHint(mp, joinnode);
-	if (joinnode->GetName())
+	if (joinnode->GetName() && nullptr == alias_map->Find(joinnode->GetName()))
 	{
 		// Base case 1:
 		//
@@ -374,21 +383,34 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 	{
 		// Base case 2:
 		//
-		// If a child covers the aliases in the jointree, then recursively
-		// apply the hint to that child. For example, if child is a GROUP BY or
-		// LIMIT expression, like:
+		// If a child covers the aliases in the jointree
+		// For example, if child is a GROUP BY or LIMIT expression, like:
 		//
 		// Leading(T1 T2)
 		// SELECT * FROM (SELECT a FROM T1, T2 LIMIT 42) q, T3;
-		//
-		// Note: We already have a joinnode hint we are trying to satisfy. So,
-		// explicity pass that one along so we don't try to find another
-		// matching hint
-		pexprAppliedHints = CJoinOrderHintsPreprocessor::PexprPreprocess(
-			mp,
-			GetChildMatchingAlias(mp, pexpr, hint_aliases, joinChildPredIndex,
-								  usedChildrenIndexes),
-			joinnode);
+		CExpression *child_expr = GetChildMatchingAlias(
+			mp, pexpr, hint_aliases, joinChildPredIndex, usedChildrenIndexes);
+		if (joinnode->GetOuter() && joinnode->GetInner())
+		{
+			// Recursively apply the hint to that child.
+			//
+			// Note: We already have a joinnode hint we are trying to satisfy.
+			// So, explicity pass that one along so we don't try to find
+			// another matching hint
+			pexprAppliedHints = CJoinOrderHintsPreprocessor::PexprPreprocess(
+				mp, child_expr, joinnode);
+		}
+		else
+		{
+			// Hint is subquery and matches child_expr, so return the child
+			// as-is.
+			child_expr->AddRef();
+			pexprAppliedHints = child_expr;
+		}
+		if (nullptr != joinChildPredIndex)
+		{
+			usedChildrenIndexes.insert(*joinChildPredIndex);
+		}
 		hint_aliases->Release();
 		return pexprAppliedHints;
 	}
@@ -411,6 +433,17 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 	CExpression *inner = RecursiveApplyJoinOrderHintsOnNAryJoin(
 		mp, pexpr, joinnode->GetInner(), usedChildrenIndexes,
 		usedPredicateIndexes, &inner_join_child_pred_index);
+
+	// Hint not satisfied. This can happen, for example, if joins hint uses a
+	// subquery alias which is a subset of the dreict children of the nary
+	// join.
+	//
+	// Leading(q T3)
+	// SELECT * FROM (SELECT a FROM T1, T2) q, T3;
+	if (outer == nullptr && inner == nullptr)
+	{
+		return nullptr;
+	}
 
 	// Hint not satisfied. This can happen, for example, if joins hint
 	// splits across a GROUP BY, like:
