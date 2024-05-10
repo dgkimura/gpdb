@@ -4144,8 +4144,11 @@ CTranslatorQueryToDXL::TranslateDerivedTablesToDXL(const RangeTblEntry *rte,
 		ForEach(lc, query_derived_tbl->rtable)
 		{
 			RangeTblEntry *derived_rte = (RangeTblEntry *) lfirst(lc);
-			names->Append(GPOS_NEW(m_mp) CWStringConst(
-				m_mp, derived_rte->eref->aliasname));
+			if (0 != strcmp("unnamed_join", derived_rte->eref->aliasname))
+			{
+				names->Append(GPOS_NEW(m_mp) CWStringConst(
+					m_mp, derived_rte->eref->aliasname));
+			}
 		}
 		m_alias_table_names_map->Insert(
 			GPOS_NEW(m_mp) CWStringConst(m_mp, rte->alias->aliasname), names);
