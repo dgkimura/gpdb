@@ -439,6 +439,12 @@ CPlanHint::WasCreatedViaDirectedHint(CExpression *pexpr)
 			continue;
 		}
 
+		// skip hints not used
+		if (IHint::HINT_STATE_USED != hint->GetHintStatus())
+		{
+			continue;
+		}
+
 		StringPtrArray *hintAliases =
 			CHintUtils::GetAliasesFromHint(m_mp, hint->GetJoinNode());
 

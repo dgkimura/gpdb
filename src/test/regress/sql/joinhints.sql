@@ -452,9 +452,6 @@ EXPLAIN (COSTS off) SELECT * FROM t1 WHERE t1.a NOT IN (SELECT t2.a FROM t2);
 */
 EXPLAIN (COSTS off) SELECT * FROM t1 WHERE t1.a IN (SELECT t2.a FROM t2);
 
-RESET client_min_messages;
-RESET pg_hint_plan.debug_print;
-
 
 -- Test join order hints on non-inner join queries
 --
@@ -506,6 +503,16 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
     Leading((t1 (t2 t3)))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+
+-- Again, the join condition does not allow the following hint to be applied.
+-- Here t3 join condition requires t1, it is illegal to join t2 and t3 first.
+/*+
+    Leading((t1 (t2 t3)))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
+
+-- Make sure we generate the same plan when hints are not used.
+EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
 
 
 -- Test that only *valid* join order hint shapes are applied for LOJ.
@@ -890,3 +897,6 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
+
+RESET client_min_messages;
+RESET pg_hint_plan.debug_print;

@@ -614,6 +614,7 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 	GPOS_ASSERT(nullptr != pexpr);
 
 	COperator *pop = pexpr->Pop();
+	CJoinHint *joinhint = nullptr;
 
 	// Search for a join order hint for this expression.
 	if (nullptr == joinnode)
@@ -621,7 +622,7 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 		CPlanHint *planhint =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig()->GetPlanHint();
 
-		CJoinHint *joinhint = planhint->GetJoinHint(pexpr);
+		joinhint = planhint->GetJoinHint(pexpr);
 		if (joinhint)
 		{
 			joinnode = joinhint->GetJoinNode();
@@ -642,6 +643,11 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 
 		if (nullptr == pexprAppliedHints)
 		{
+			if (joinhint)
+			{
+				joinhint->SetHintStatus(IHint::HINT_STATE_NOTUSED);
+			}
+
 			pexpr->AddRef();
 			return pexpr;
 		}

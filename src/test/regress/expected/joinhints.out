@@ -2078,9 +2078,6 @@ DETAIL:  Unrecognized hint keyword "InvalidJoinTypeHint".
  Optimizer: Postgres-based planner
 (9 rows)
 
-RESET client_min_messages;
-LOG:  statement: RESET client_min_messages;
-RESET pg_hint_plan.debug_print;
 -- Test join order hints on non-inner join queries
 --
 -- Following queries exercise LOJ and ROJ
@@ -2088,6 +2085,16 @@ RESET pg_hint_plan.debug_print;
     Leading((t1 (t2 t3)))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a AND t3.a>40;
+LOG:  statement: /*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a AND t3.a>40;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
                     QUERY PLAN                    
 --------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2108,6 +2115,16 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
     Leading(((t1 t4) (t2 t3)))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t1.a=t4.a;
+LOG:  statement: /*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t1.a=t4.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t4) (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
                   QUERY PLAN                  
 ----------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2131,6 +2148,16 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
     Leading(((t3 t2) t1))
  */
 EXPLAIN (costs off) SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t2) t1))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2150,6 +2177,16 @@ EXPLAIN (costs off) SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t
     Leading(((t3 t2) t1))
  */
 EXPLAIN (costs off) SELECT * FROM t1, t2 LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1, t2 LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t2) t1))
+not used hint:
+duplication hint:
+error hint:
                        QUERY PLAN                        
 ---------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2169,6 +2206,16 @@ EXPLAIN (costs off) SELECT * FROM t1, t2 LEFT JOIN t3 ON t2.a=t3.a;
     Leading(((t3 t2) t1))
  */
 EXPLAIN (costs off) SELECT * FROM t1, t2 RIGHT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1, t2 RIGHT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t2) t1))
+not used hint:
+duplication hint:
+error hint:
                        QUERY PLAN                        
 ---------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2188,6 +2235,16 @@ EXPLAIN (costs off) SELECT * FROM t1, t2 RIGHT JOIN t3 ON t2.a=t3.a;
     Leading((t2 t1))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a;
+LOG:  statement: /*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t1))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2208,6 +2265,16 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a;
     Leading(((t1 t4) (t2 t3)))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t2.a=t4.a;
+LOG:  statement: /*+
+    Leading(((t1 t4) (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 on t2.a=t4.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t4) (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
                         QUERY PLAN                        
 ----------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2236,6 +2303,16 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
     Leading((t1 (t2 t3)))
  */
 EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
                        QUERY PLAN                        
 ---------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2248,6 +2325,55 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
                      ->  Index Scan using i1 on t1
                      ->  Materialize
                            ->  Index Scan using i2 on t2
+ Optimizer: Postgres-based planner
+(11 rows)
+
+-- Again, the join condition does not allow the following hint to be applied.
+-- Here t3 join condition requires t1, it is illegal to join t2 and t3 first.
+/*+
+    Leading((t1 (t2 t3)))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t2 t3)))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Merge Left Join
+         Merge Cond: (t3.a = t1.a)
+         ->  Index Scan using i3 on t3
+         ->  Materialize
+               ->  Merge Join
+                     Merge Cond: (t1.a = t2.a)
+                     ->  Index Scan using i1 on t1
+                     ->  Materialize
+                           ->  Index Scan using i2 on t2
+ Optimizer: Postgres-based planner
+(11 rows)
+
+-- Make sure we generate the same plan when hints are not used.
+EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t1.a = t3.a)
+         ->  Hash Join
+               Hash Cond: (t1.a = t2.a)
+               ->  Seq Scan on t1
+               ->  Hash
+                     ->  Seq Scan on t2
+         ->  Hash
+               ->  Seq Scan on t3
  Optimizer: Postgres-based planner
 (11 rows)
 
@@ -2266,20 +2392,41 @@ EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t
 -- Note that not every order is a valid plan! And that regardless of the hint,
 -- the query should produce the same results.
 INSERT INTO t1 VALUES (50, 50), (51, 51), (NULL, NULL);
+LOG:  statement: INSERT INTO t1 VALUES (50, 50), (51, 51), (NULL, NULL);
 INSERT INTO t2 VALUES (50, 50), (52, 52), (NULL, NULL);
+LOG:  statement: INSERT INTO t2 VALUES (50, 50), (52, 52), (NULL, NULL);
 INSERT INTO t3 VALUES (50, 50), (53, 53), (NULL, NULL);
+LOG:  statement: INSERT INTO t3 VALUES (50, 50), (53, 53), (NULL, NULL);
 INSERT INTO t4 VALUES (50, 50), (54, 54), (NULL, NULL);
+LOG:  statement: INSERT INTO t4 VALUES (50, 50), (54, 54), (NULL, NULL);
 INSERT INTO t5 VALUES (50, 50), (55, 55), (NULL, NULL);
+LOG:  statement: INSERT INTO t5 VALUES (50, 50), (55, 55), (NULL, NULL);
 VACUUM ANALYZE t1;
+LOG:  statement: VACUUM ANALYZE t1;
 VACUUM ANALYZE t2;
+LOG:  statement: VACUUM ANALYZE t2;
 VACUUM ANALYZE t3;
+LOG:  statement: VACUUM ANALYZE t3;
 VACUUM ANALYZE t4;
+LOG:  statement: VACUUM ANALYZE t4;
 VACUUM ANALYZE t5;
+LOG:  statement: VACUUM ANALYZE t5;
 /*+
     Leading((t1 (t2 t3)))
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t2 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2303,6 +2450,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t1 (t2 t3)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t2 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t2 t3)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2313,6 +2470,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t3 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t3 t2)))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2336,6 +2504,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t1 (t3 t2)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 (t3 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 (t3 t2)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2346,6 +2524,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t2 t3) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t2 t3) t1))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2369,6 +2558,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t2 t3) t1))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t2 t3) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t2 t3) t1))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2379,6 +2578,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t2) t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t2) t1))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2402,6 +2612,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t3 t2) t1))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t2) t1))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t2) t1))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2412,6 +2632,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t1 t3) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t3) t2))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2431,6 +2662,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t1 t3) t2))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t1 t3) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t3) t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2441,6 +2682,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t1) t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t1) t2))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2460,6 +2712,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t3 t1) t2))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t3 t1) t2))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t3 t1) t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2470,6 +2732,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 (t1 t3)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 (t1 t3)))
+not used hint:
+duplication hint:
+error hint:
                   QUERY PLAN                  
 ----------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2489,6 +2762,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t2 (t1 t3)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 (t1 t3)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 (t1 t3)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2499,6 +2782,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 (t3 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 (t3 t1)))
+not used hint:
+duplication hint:
+error hint:
                   QUERY PLAN                  
 ----------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2518,6 +2812,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t2 (t3 t1)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 (t3 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 (t3 t1)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2528,6 +2832,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t1 t2) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t2) t3))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2547,6 +2862,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t1 t2) t3))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t1 t2) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t1 t2) t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2557,6 +2882,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t2 t1) t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t2 t1) t3))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2576,6 +2912,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading(((t2 t1) t3))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading(((t2 t1) t3))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading(((t2 t1) t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2586,6 +2932,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 (t1 t2)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 (t1 t2)))
+not used hint:
+duplication hint:
+error hint:
                   QUERY PLAN                  
 ----------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2605,6 +2962,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t3 (t1 t2)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 (t1 t2)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 (t1 t2)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2615,6 +2982,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 (t2 t1)))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 (t2 t1)))
+not used hint:
+duplication hint:
+error hint:
                   QUERY PLAN                  
 ----------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2634,6 +3012,16 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
     Leading((t3 (t2 t1)))
  */
 SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 (t2 t1)))
+ */
+SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 (t2 t1)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2644,6 +3032,17 @@ SELECT * FROM t1 JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t1.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
                          QUERY PLAN                         
 ------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2664,6 +3063,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t1 t2))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  51 | 51 |    |    |    |   
@@ -2676,6 +3085,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t1))
+not used hint:
+duplication hint:
+error hint:
                          QUERY PLAN                         
 ------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2696,6 +3116,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t2 t1))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t1))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
     |    |    |    |    |   
@@ -2708,6 +3138,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2726,6 +3167,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t2 t3))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t2 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2738,6 +3189,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 t2))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t2))
+not used hint:
+duplication hint:
+error hint:
                 QUERY PLAN                
 ------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2756,6 +3218,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t3 t2))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 t2))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  50 | 50 | 50 | 50 | 50 | 50
@@ -2768,6 +3240,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 t3))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
                          QUERY PLAN                         
 ------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2787,6 +3270,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t1 t3))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t1 t3))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  51 | 51 |    |    |    |   
@@ -2799,6 +3292,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
  */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 t1))
+ */
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t1))
+not used hint:
+duplication hint:
+error hint:
                          QUERY PLAN                         
 ------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2818,6 +3322,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
     Leading((t3 t1))
  */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  statement: /*+
+    Leading((t3 t1))
+ */
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t1))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----
  51 | 51 |    |    |    |   
@@ -2837,6 +3351,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2869,6 +3394,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
     Leading((t2 t3))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----+----+----+----+----
  51 | 51 |    |    |    |    |    |    |    |   
@@ -2881,6 +3416,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t3 t2))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t2))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2913,6 +3459,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
     Leading((t3 t2))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t3 t2))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t3 t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----+----+----+----+----
  51 | 51 |    |    |    |    |    |    |    |   
@@ -2925,6 +3481,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t4 (t3 t2)))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t4 (t3 t2)))
+not used hint:
+duplication hint:
+error hint:
                                         QUERY PLAN                                        
 ------------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -2960,6 +3527,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
     Leading((t4 (t3 t2)))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  statement: /*+
+    Leading((t4 (t3 t2)))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t4 ON t3.a=t4.a LEFT JOIN t5 ON t1.a=t5.a;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t4 (t3 t2)))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a  | b  | a  | b  | a  | b  | a  | b  
 ----+----+----+----+----+----+----+----+----+----
  51 | 51 |    |    |    |    |    |    |    |   
@@ -2996,6 +3573,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a LEFT JOIN t
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3017,6 +3605,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
     Leading((t2 t3))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  50 | 50 |   |   | 53 | 53
@@ -3035,6 +3633,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t1 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3056,6 +3665,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
     Leading((t1 t3))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t1 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  51 | 51 |   |   | 50 | 50
@@ -3074,6 +3693,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3095,6 +3725,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
     Leading((t1 t2))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  51 | 51 |   |   | 50 | 50
@@ -3113,6 +3753,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON t2.a IS NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3134,6 +3785,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
     Leading((t2 t3))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t2 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t2 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  51 | 51 |   |   | 53 | 53
@@ -3152,6 +3813,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t1 t3))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3173,6 +3845,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
     Leading((t1 t3))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t1 t3))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t3))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  50 | 50 |   |   | 53 | 53
@@ -3191,6 +3873,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off)
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
                              QUERY PLAN                              
 ---------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3212,6 +3905,16 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
     Leading((t1 t2))
 */
 SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
+LOG:  pg_hint_plan:
+used hint:
+Leading((t1 t2))
+not used hint:
+duplication hint:
+error hint:
  a  | b  | a | b | a  | b  
 ----+----+---+---+----+----
  50 | 50 |   |   | 53 | 53
@@ -3236,6 +3939,17 @@ SELECT * FROM t1 LEFT JOIN t2 ON t2.a>53 LEFT JOIN t3 ON NOT t2.a IS NOT NULL;
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON t3.a=q.a, t4, t5;
+LOG:  statement: /*+
+    Leading(((t5 t4) (t3 (t1 t2))))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON t3.a=q.a, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading(((t5 t4) (t3 (t1 t2))))
+duplication hint:
+error hint:
                                                      QUERY PLAN                                                      
 ---------------------------------------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3270,6 +3984,17 @@ SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON t3.a=q.a, t4, t5;
+LOG:  statement: /*+
+    Leading((((t1 t2) t3) (t4 t5)))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON t3.a=q.a, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading((((t1 t2) t3) (t4 t5)))
+duplication hint:
+error hint:
                                                      QUERY PLAN                                                      
 ---------------------------------------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3307,6 +4032,17 @@ SELECT * FROM (SELECT t1.a FROM t1, t2 ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q, t3, t4, t5;
+LOG:  statement: /*+
+    Leading(((t5 t4) (t3 (t1 t2))))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q, t3, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading(((t5 t4) (t3 (t1 t2))))
+duplication hint:
+error hint:
                                       QUERY PLAN                                       
 ---------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3341,6 +4077,17 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q, t3, t4, t5;
+LOG:  statement: /*+
+    Leading((((t2 t1) t3) (t4 t5)))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q, t3, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading((((t2 t1) t3) (t4 t5)))
+duplication hint:
+error hint:
                                       QUERY PLAN                                       
 ---------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3378,6 +4125,17 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
+LOG:  statement: /*+
+    Leading(((t5 t4) (t3 (t1 t2))))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading(((t5 t4) (t3 (t1 t2))))
+duplication hint:
+error hint:
                                           QUERY PLAN                                          
 ----------------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3414,6 +4172,17 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
 */
 EXPLAIN (costs off)
 SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
+LOG:  statement: /*+
+    Leading((((t2 t1) t3) (t4 t5)))
+*/
+EXPLAIN (costs off)
+SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42) AS q LEFT JOIN t3 ON q.a=t3.a, t4, t5;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Leading((((t2 t1) t3) (t4 t5)))
+duplication hint:
+error hint:
                                           QUERY PLAN                                          
 ----------------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
@@ -3445,3 +4214,6 @@ SELECT * FROM (SELECT t1.a FROM t1 LEFT JOIN t2 ON t1.a=t2.a ORDER BY 1 LIMIT 42
  Optimizer: Postgres-based planner
 (27 rows)
 
+RESET client_min_messages;
+LOG:  statement: RESET client_min_messages;
+RESET pg_hint_plan.debug_print;
