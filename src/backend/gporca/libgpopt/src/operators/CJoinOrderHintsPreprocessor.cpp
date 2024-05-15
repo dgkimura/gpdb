@@ -432,6 +432,8 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 		return pexpr;
 	}
 
+	// If Nary join contains outer join, "all_on_preds" array will only have
+	// one element - a scalar list
 	CExpressionArray *all_on_preds = CPredicateUtils::PdrgpexprConjuncts(
 		mp, (*pexpr->PdrgPexpr())[pexpr->PdrgPexpr()->Size() - 1]);
 
@@ -460,6 +462,12 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 		// decide whether the hint produces a left or right join.
 		if (outer_join_child_pred_index != inner_join_child_pred_index)
 		{
+			GPOS_ASSERT(outer_join_child_pred_index != MAX_INDEX);
+			GPOS_ASSERT(inner_join_child_pred_index != MAX_INDEX);
+
+			// Send leftmost (i.e. min) predicate index to caller so that
+			// parent node can use the predicate in a join further up the
+			// expression tree.
 			*joinChildPredIndex = std::min(outer_join_child_pred_index,
 										   inner_join_child_pred_index);
 
@@ -469,6 +477,38 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 			CExpression *pred = (*(*all_on_preds)[0])[current_index];
 			usedPredicateIndexes.insert(current_index);
 
+			// Example illustratating "joinChildPredIndex" and "current_index":
+			//
+			// /*+
+			//     Leading((t2 t3))
+			//  */
+			// SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.a LEFT JOIN t3 ON t2.a=t3.a;
+			//
+			// +--CLogicalNAryJoin [0, 1, 2]
+			//    |--CLogicalGet "t1" ("t1"), Columns: ["a" (0), "b" (1), ...
+			//    |--CLogicalGet "t2" ("t2"), Columns: ["a" (9), "b" (10), ...
+			//    |--CLogicalGet "t3" ("t3"), Columns: ["a" (18), "b" (19), ...
+			//    +--CScalarNAryJoinPredList
+			//       |--CScalarConst (1)
+			//       |--CScalarCmp (=)
+			//       |  |--CScalarIdent "a" (0)
+			//       |  +--CScalarIdent "a" (9)
+			//       +--CScalarCmp (=)
+			//          |--CScalarIdent "a" (9)
+			//          +--CScalarIdent "a" (18)
+			//
+			// 1st GetChildMatchingAlias() returns t2 and joinChildPredIndex=1
+			// 2nd GetChildMatchingAlias() returns t3 and joinChildPredIndex=2
+			//
+			// t2 LEFT JOIN t3 predicate "current_index" (i.e. 2== max(1, 2))
+			// corresponds to predicate "a"(9)="a"(18) and is used as the
+			// scalar child of the new join.
+			//
+			// "joinChildPredIndex" (i.e. 1==min(1, 2)), corresponds to
+			// predicate "a"(0)="a"(9) and is *not* used directly. Instead,
+			// that index is passed up the stack so that it can be used a
+			// predicate in a parent join.
+
 			CColRefSet *innerAndOuterCols = GPOS_NEW(mp) CColRefSet(mp);
 			innerAndOuterCols->Include(outer->DeriveOutputColumns());
 			innerAndOuterCols->Include(inner->DeriveOutputColumns());
@@ -476,6 +516,10 @@ CJoinOrderHintsPreprocessor::RecursiveApplyJoinOrderHintsOnNAryJoin(
 			if (innerAndOuterCols->ContainsAll(pred->DeriveUsedColumns()))
 			{
 				// if every used column exists in either outer or inner
+				//
+				// In the case of outer join, join order hints determine the
+				// placement of relation as an "absolute" left or right child,
+				// and the join operator adapts accordingly.
 				pred->AddRef();
 				if (outer_join_child_pred_index < inner_join_child_pred_index)
 				{
@@ -608,9 +652,10 @@ CJoinOrderHintsPreprocessor::PexprPreprocess(
 		{
 			// 0) Hint used all nary children making the nary operator
 			//    irrelevant.
+			CExpression *pexprResult = (*naryChildren)[0];
 			(*naryChildren)[0]->AddRef();
 			naryChildren->Release();
-			return pexprAppliedHints;
+			return pexprResult;
 		}
 		else if (CLogicalNAryJoin::PopConvert(pexpr->Pop())
 					 ->HasOuterJoinChildren())
