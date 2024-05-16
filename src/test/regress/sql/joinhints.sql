@@ -514,6 +514,20 @@ EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON
 -- Make sure we generate the same plan when hints are not used.
 EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a RIGHT JOIN t3 ON t1.a=t3.a;
 
+-- Tables (t2 and t3) of INNER JOIN on the inner side of a LEFT JOIN cannot be
+-- reordered with the tables (t1) on the outer side.
+/*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (t2 INNER JOIN t3 ON t2.a = t3.a) ON t1.a = t2.a;
+
+-- Tables (t2 and t3) of INNER JOIN on the outer side of a RIGHT JOIN cannot be
+-- reordered with the tables (t1) on the inner side.
+/*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t2 INNER JOIN t3 ON t2.a = t3.a RIGHT JOIN t1 ON t1.a=t2.a;
+
 
 -- Test that only *valid* join order hint shapes are applied for LOJ.
 --

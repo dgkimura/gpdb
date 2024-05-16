@@ -2359,6 +2359,66 @@ LOG:  statement: EXPLAIN (costs off) SELECT * FROM t1 RIGHT JOIN t2 ON t1.a=t2.a
  Optimizer: GPORCA
 (12 rows)
 
+-- Tables (t2 and t3) of INNER JOIN on the inner side of a LEFT JOIN cannot be
+-- reordered with the tables (t1) on the outer side.
+/*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (t2 INNER JOIN t3 ON t2.a = t3.a) ON t1.a = t2.a;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t1 LEFT JOIN (t2 INNER JOIN t3 ON t2.a = t3.a) ON t1.a = t2.a;
+LOG:  2024-05-16 03:21:39:252321 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+not used hint:
+JoinHint:(t1 t2)
+]",
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Nested Loop
+               Join Filter: true
+               ->  Seq Scan on t2
+               ->  Index Scan using i3 on t3
+                     Index Cond: (a = t2.a)
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
+-- Tables (t2 and t3) of INNER JOIN on the outer side of a RIGHT JOIN cannot be
+-- reordered with the tables (t1) on the inner side.
+/*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t2 INNER JOIN t3 ON t2.a = t3.a RIGHT JOIN t1 ON t1.a=t2.a;
+LOG:  statement: /*+
+    Leading((t1 t2))
+*/
+EXPLAIN (costs off) SELECT * FROM t2 INNER JOIN t3 ON t2.a = t3.a RIGHT JOIN t1 ON t1.a=t2.a;
+LOG:  2024-05-16 03:21:39:289029 UTC,THD000,TRACE,"PlanHint: [
+used hint:
+not used hint:
+JoinHint:(t1 t2)
+]",
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Right Join
+         Hash Cond: (t2.a = t1.a)
+         ->  Nested Loop
+               Join Filter: true
+               ->  Seq Scan on t2
+               ->  Index Scan using i3 on t3
+                     Index Cond: (a = t2.a)
+         ->  Hash
+               ->  Seq Scan on t1
+ Optimizer: GPORCA
+(11 rows)
+
 -- Test that only *valid* join order hint shapes are applied for LOJ.
 --
 -- These check that every possible order on 3 relations. There are 12 possible
