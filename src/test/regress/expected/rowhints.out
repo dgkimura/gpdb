@@ -480,15 +480,21 @@ CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
 LOG:  statement: CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
 CREATE TABLE bar(a int, b int) DISTRIBUTED BY (a);
 LOG:  statement: CREATE TABLE bar(a int, b int) DISTRIBUTED BY (a);
+CREATE TABLE meh(a int, b int) DISTRIBUTED BY (a);
+LOG:  statement: CREATE TABLE meh(a int, b int) DISTRIBUTED BY (a);
 INSERT INTO bar SELECT i, i+3 FROM generate_series(1,5) i;
 LOG:  statement: INSERT INTO bar SELECT i, i+3 FROM generate_series(1,5) i;
 -- Insert single row
 INSERT INTO foo values (-2, 34);
 LOG:  statement: INSERT INTO foo values (-2, 34);
+INSERT INTO meh values (-2, 34);
+LOG:  statement: INSERT INTO meh values (-2, 34);
 ANALYZE foo;
 LOG:  statement: ANALYZE foo;
 ANALYZE bar;
 LOG:  statement: ANALYZE bar;
+ANALYZE meh;
+LOG:  statement: ANALYZE meh;
 -- Nested Loop Left Join operator estimates 41 rows(per segment for 3 segment cluster)
 -- honoring the specified RowHint. However, Gather Motion estimates total number of
 -- rows as 5 because the outer table bar only has 5 rows and ComputeScalar is being smart
@@ -555,6 +561,222 @@ error hint:
                                  ->  Seq Scan on our_table_1_prt_p1_6 t3_5  (cost=xxx..xxx rows=1 width=xxx)
                      ->  Materialize  (cost=xxx..xxx rows=33 width=xxx)
                            ->  Seq Scan on my_table t1  (cost=xxx..xxx rows=33 width=xxx)
+ Optimizer: Postgres-based planner
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+LOG:  statement: /*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT a FROM foo) AS q, bar AS b;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Rows(b q #123)
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost={inf}..{inf} rows=5 width=xxx)
+   ->  Nested Loop  (cost={inf}..{inf} rows=2 width=xxx)
+         ->  Broadcast Motion 3:3  (slice2; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Seq Scan on foo  (cost=xxx..xxx rows=1 width=xxx)
+         ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
+ Optimizer: Postgres-based planner
+
+-- Test Rowhints with Subquery aliases
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq) AS q, meh b;
+LOG:  statement: /*+
+Rows(q b #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo AS t1, (SELECT * FROM bar AS t2) AS qq) AS q, meh b;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Rows(b q #123)
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=5 width=xxx)
+   ->  Nested Loop  (cost=xxx..xxx rows=2 width=xxx)
+         ->  Nested Loop  (cost={inf}..{inf} rows=2 width=xxx)
+               ->  Broadcast Motion 3:3  (slice2; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+                     ->  Seq Scan on foo t1  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Seq Scan on bar t2  (cost=xxx..xxx rows=2 width=xxx)
+         ->  Materialize  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Broadcast Motion 3:3  (slice3; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+                     ->  Seq Scan on meh b  (cost=xxx..xxx rows=1 width=xxx)
+ Optimizer: Postgres-based planner
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q r #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) r;
+LOG:  statement: /*+
+Rows(q r #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) r;
+LOG:  pg_hint_plan:
+used hint:
+Rows(q r #123)
+not used hint:
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Nested Loop  (cost={inf}..{inf} rows=123 width=xxx)
+   ->  Limit  (cost=xxx..xxx rows=3 width=xxx)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=3 width=xxx)
+               ->  Limit  (cost=xxx..xxx rows=1 width=xxx)
+                     ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
+   ->  Materialize  (cost=xxx..xxx rows=5 width=xxx)
+         ->  Limit  (cost=xxx..xxx rows=5 width=xxx)
+               ->  Gather Motion 3:1  (slice2; segments: 3)  (cost=xxx..xxx rows=5 width=xxx)
+                     ->  Limit  (cost=xxx..xxx rows=2 width=xxx)
+                           ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
+ Optimizer: Postgres-based planner
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
+LOG:  statement: /*+
+Rows(q m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT 1) q, meh m;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Rows(m q #123)
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+   ->  Seq Scan on meh m  (cost=xxx..xxx rows=1 width=xxx)
+ Optimizer: Postgres-based planner
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q qq m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq, meh m;
+LOG:  statement: /*+
+Rows(q qq m #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq, meh m;
+LOG:  pg_hint_plan:
+used hint:
+Rows(m q qq #123)
+not used hint:
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Nested Loop  (cost=xxx..xxx rows=123 width=xxx)
+   ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+         ->  Seq Scan on meh m  (cost=xxx..xxx rows=1 width=xxx)
+   ->  Materialize  (cost={inf}..{inf} rows=15 width=xxx)
+         ->  Nested Loop  (cost={inf}..{inf} rows=15 width=xxx)
+               ->  Limit  (cost=xxx..xxx rows=3 width=xxx)
+                     ->  Gather Motion 3:1  (slice2; segments: 3)  (cost=xxx..xxx rows=3 width=xxx)
+                           ->  Limit  (cost=xxx..xxx rows=1 width=xxx)
+                                 ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Materialize  (cost=xxx..xxx rows=5 width=xxx)
+                     ->  Limit  (cost=xxx..xxx rows=5 width=xxx)
+                           ->  Gather Motion 3:1  (slice3; segments: 3)  (cost=xxx..xxx rows=5 width=xxx)
+                                 ->  Limit  (cost=xxx..xxx rows=2 width=xxx)
+                                       ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
+ Optimizer: Postgres-based planner
+
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(r m #123)
+Rows(qq q #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq) r, meh m;
+LOG:  statement: /*+
+Rows(r m #123)
+Rows(qq q #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq) r, meh m;
+LOG:  pg_hint_plan:
+used hint:
+Rows(q qq #123)
+not used hint:
+Rows(m r #123)
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Nested Loop  (cost=xxx..xxx rows=123 width=xxx)
+   ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=1 width=xxx)
+         ->  Seq Scan on meh m  (cost=xxx..xxx rows=1 width=xxx)
+   ->  Materialize  (cost={inf}..{inf} rows=123 width=xxx)
+         ->  Nested Loop  (cost={inf}..{inf} rows=123 width=xxx)
+               ->  Limit  (cost=xxx..xxx rows=3 width=xxx)
+                     ->  Gather Motion 3:1  (slice2; segments: 3)  (cost=xxx..xxx rows=3 width=xxx)
+                           ->  Limit  (cost=xxx..xxx rows=1 width=xxx)
+                                 ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
+               ->  Materialize  (cost=xxx..xxx rows=5 width=xxx)
+                     ->  Limit  (cost=xxx..xxx rows=5 width=xxx)
+                           ->  Gather Motion 3:1  (slice3; segments: 3)  (cost=xxx..xxx rows=5 width=xxx)
+                                 ->  Limit  (cost=xxx..xxx rows=2 width=xxx)
+                                       ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
+ Optimizer: Postgres-based planner
+
+-- Add dummy alias in the hint to check if hint is ignored
+\o results/pg_hint_plan.tmpout
+/*+
+Rows(q qq dummy_alias #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq;
+LOG:  statement: /*+
+Rows(q qq dummy_alias #123)
+*/
+EXPLAIN SELECT * FROM (SELECT * FROM foo f limit 5) q, (SELECT * FROM bar b limit 5) qq;
+LOG:  pg_hint_plan:
+used hint:
+not used hint:
+Rows(dummy_alias q qq #123)
+duplication hint:
+error hint:
+\o
+\! sql/maskout.sh results/pg_hint_plan.tmpout
+  QUERY PLAN
+----------------
+ Nested Loop  (cost={inf}..{inf} rows=15 width=xxx)
+   ->  Limit  (cost=xxx..xxx rows=3 width=xxx)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=xxx..xxx rows=3 width=xxx)
+               ->  Limit  (cost=xxx..xxx rows=1 width=xxx)
+                     ->  Seq Scan on foo f  (cost=xxx..xxx rows=1 width=xxx)
+   ->  Materialize  (cost=xxx..xxx rows=5 width=xxx)
+         ->  Limit  (cost=xxx..xxx rows=5 width=xxx)
+               ->  Gather Motion 3:1  (slice2; segments: 3)  (cost=xxx..xxx rows=5 width=xxx)
+                     ->  Limit  (cost=xxx..xxx rows=2 width=xxx)
+                           ->  Seq Scan on bar b  (cost=xxx..xxx rows=2 width=xxx)
  Optimizer: Postgres-based planner
 
 RESET client_min_messages;

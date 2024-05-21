@@ -14,6 +14,8 @@
 #include "gpos/common/clibwrapper.h"
 #include "gpos/memory/queue.h"
 
+#include "gpopt/optimizer/COptimizerConfig.h"
+
 using namespace gpopt;
 
 
@@ -370,6 +372,52 @@ CHintUtils::GetAliasesFromTableDescriptors(CMemoryPool *mp,
 	}
 
 	return pexpr_aliases;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CHintUtils::ConvertSubqueryAliasesToTableNames
+//
+//	@doc:
+//		Returns a sorted array of table names from converting the hint alias
+//		names in the "input" array.
+//---------------------------------------------------------------------------
+StringPtrArray *
+CHintUtils::ConvertSubqueryAliasesToTableNames(CMemoryPool *mp,
+											   StringPtrArray *input)
+{
+	StringPtrArray *output = GPOS_NEW(mp) StringPtrArray(mp);
+
+	StringToStringArrayMap *alias_map = COptCtxt::PoctxtFromTLS()
+											->GetOptimizerConfig()
+											->GetAliasToTableNamesMap();
+
+	for (ULONG i = 0; i < input->Size(); i++)
+	{
+		gpos::queue<CWStringBase *> q(mp);
+		q.push((*input)[i]);
+		while (!q.empty())
+		{
+			CWStringBase *rel_in_queue = q.front();
+			q.pop();
+			StringPtrArray *aliases_list = alias_map->Find(rel_in_queue);
+			if (aliases_list == nullptr)
+			{
+				output->Append(
+					GPOS_NEW(mp) CWStringConst(mp, rel_in_queue->GetBuffer()));
+			}
+			else
+			{
+				for (ULONG j = 0; j < aliases_list->Size(); j++)
+				{
+					q.push((*aliases_list)[j]);
+				}
+			}
+		}
+	}
+	output->Sort(CWStringBase::Compare);
+
+	return output;
 }
 
 //---------------------------------------------------------------------------

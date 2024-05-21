@@ -59,6 +59,10 @@ private:
 	//     Rows(b a #42)
 	StringPtrArray *m_aliases{nullptr};
 
+	// sorted list of alias names (subquery aliases are converted to table
+	// names).
+	StringPtrArray *m_aliases_converted{nullptr};
+
 	CDouble m_rows;
 
 	RowsValueType m_type;
@@ -68,19 +72,15 @@ public:
 			 RowsValueType type)
 		: m_mp(mp), m_aliases(aliases), m_rows(rows), m_type(type)
 	{
-		aliases->Sort(CWStringBase::Compare);
 	}
 
 	~CRowHint() override
 	{
 		CRefCount::SafeRelease(m_aliases);
+		CRefCount::SafeRelease(m_aliases_converted);
 	}
 
-	const StringPtrArray *
-	GetAliasNames() const
-	{
-		return m_aliases;
-	}
+	const StringPtrArray *GetAliasNames();
 
 	RowsValueType
 	GetType() const

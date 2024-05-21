@@ -11,6 +11,9 @@
 
 #include "gpopt/hints/CRowHint.h"
 
+#include "gpopt/base/COptCtxt.h"
+#include "gpopt/hints/CHintUtils.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/dxl/CDXLUtils.h"
 
 using namespace gpopt;
@@ -21,7 +24,7 @@ IOstream &
 CRowHint::OsPrint(IOstream &os) const
 {
 	CWStringDynamic *aliases =
-		CDXLUtils::SerializeToCommaSeparatedString(m_mp, GetAliasNames());
+		CDXLUtils::SerializeToCommaSeparatedString(m_mp, m_aliases);
 
 	os << "RowHint: " << aliases->GetBuffer();
 
@@ -59,6 +62,17 @@ CRowHint::OsPrint(IOstream &os) const
 	return os;
 }
 
+const StringPtrArray *
+CRowHint::GetAliasNames()
+{
+	if (nullptr == m_aliases_converted)
+	{
+		m_aliases_converted =
+			CHintUtils::ConvertSubqueryAliasesToTableNames(m_mp, m_aliases);
+	}
+	return m_aliases_converted;
+}
+
 void
 CRowHint::Serialize(CXMLSerializer *xml_serializer) const
 {
@@ -67,7 +81,7 @@ CRowHint::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenRowHint));
 
 	CWStringDynamic *aliases =
-		CDXLUtils::SerializeToCommaSeparatedString(m_mp, GetAliasNames());
+		CDXLUtils::SerializeToCommaSeparatedString(m_mp, m_aliases);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias),
 								 aliases);
 	GPOS_DELETE(aliases);

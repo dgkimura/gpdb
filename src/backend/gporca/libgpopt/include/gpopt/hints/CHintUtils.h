@@ -54,9 +54,13 @@ public:
 
 	static CJoinTypeHint::JoinType JoinTypeHintStringToEnum(const WCHAR *type);
 
-	// Get set of aliases from table descriptor set
+	// Get set of table names from table descriptor set
 	static StringPtrArray *GetAliasesFromTableDescriptors(
 		CMemoryPool *mp, CTableDescriptorHashSet *ptabs);
+
+	// Get list of table names referred in a subquery
+	static StringPtrArray *ConvertSubqueryAliasesToTableNames(
+		CMemoryPool *mp, StringPtrArray *input);
 
 	// Get set of aliases from join pair
 	static StringPtrArray *GetAliasesFromHint(
