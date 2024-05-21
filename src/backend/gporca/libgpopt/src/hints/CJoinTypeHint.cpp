@@ -11,9 +11,11 @@
 
 #include "gpopt/hints/CJoinTypeHint.h"
 
+#include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
 #include "gpopt/hints/CHintUtils.h"
 #include "gpopt/operators/CPhysicalNLJoin.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/dxl/CDXLUtils.h"
 
 using namespace gpopt;
@@ -80,9 +82,14 @@ CJoinTypeHint::SatisfiesOperator(COperator *op)
 //		the hint.
 //---------------------------------------------------------------------------
 const StringPtrArray *
-CJoinTypeHint::GetAliasNames() const
+CJoinTypeHint::GetAliasNames()
 {
-	return m_aliases;
+	if (nullptr == m_aliases_converted)
+	{
+		m_aliases_converted =
+			CHintUtils::ConvertSubqueryAliasesToTableNames(m_mp, m_aliases);
+	}
+	return m_aliases_converted;
 }
 
 
@@ -93,7 +100,7 @@ CJoinTypeHint::OsPrint(IOstream &os) const
 
 	os << " aliases:";
 	CWStringDynamic *aliases =
-		CDXLUtils::SerializeToCommaSeparatedString(m_mp, GetAliasNames());
+		CDXLUtils::SerializeToCommaSeparatedString(m_mp, m_aliases);
 	os << aliases->GetBuffer();
 	GPOS_DELETE(aliases);
 
@@ -118,7 +125,7 @@ CJoinTypeHint::Serialize(CXMLSerializer *xml_serializer)
 		CDXLTokens::GetDXLTokenStr(EdxltokenJoinTypeHint));
 
 	CWStringDynamic *aliases =
-		CDXLUtils::SerializeToCommaSeparatedString(m_mp, GetAliasNames());
+		CDXLUtils::SerializeToCommaSeparatedString(m_mp, m_aliases);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias),
 								 aliases);
 	GPOS_DELETE(aliases);

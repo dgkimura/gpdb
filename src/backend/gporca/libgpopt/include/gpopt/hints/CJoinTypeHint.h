@@ -50,22 +50,26 @@ private:
 
 	JoinType m_type{SENTINEL};
 
-	// sorted list of alias names.
+	// sorted list of alias names (may contained subquery aliases).
 	StringPtrArray *m_aliases{nullptr};
+
+	// sorted list of alias names (subquery aliases are converted to table
+	// names).
+	StringPtrArray *m_aliases_converted{nullptr};
 
 public:
 	CJoinTypeHint(CMemoryPool *mp, enum JoinType type, StringPtrArray *aliases)
 		: m_mp(mp), m_type(type), m_aliases(aliases)
 	{
-		m_aliases->Sort(CWStringBase::Compare);
 	}
 
 	~CJoinTypeHint() override
 	{
 		CRefCount::SafeRelease(m_aliases);
+		CRefCount::SafeRelease(m_aliases_converted);
 	}
 
-	const StringPtrArray *GetAliasNames() const;
+	const StringPtrArray *GetAliasNames();
 
 	BOOL SatisfiesOperator(COperator *op);
 
