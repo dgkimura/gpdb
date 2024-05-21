@@ -71,8 +71,8 @@ protected:
 		CMemoryPool *mp, CColRefArray *root_cols, IMdIdArray *partition_mdids);
 
 	using ColNameToIndexMap =
-		CHashMap<const CWStringConst, ULONG, CWStringConst::HashValue,
-				 CWStringConst::Equals, CleanupNULL<const CWStringConst>,
+		CHashMap<const CWStringBase, ULONG, CWStringBase::HashValue,
+				 CWStringBase::Equals, CleanupNULL<const CWStringBase>,
 				 CleanupDelete<ULONG>>;
 
 public:

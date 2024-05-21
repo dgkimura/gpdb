@@ -137,7 +137,8 @@ CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 	  m_query_level_to_cte_map(nullptr),
 	  m_dxl_query_output_cols(nullptr),
 	  m_dxl_cte_producers(nullptr),
-	  m_cteid_at_current_query_level_map(nullptr)
+	  m_cteid_at_current_query_level_map(nullptr),
+	  m_alias_table_names_map(nullptr)
 {
 	GPOS_ASSERT(nullptr != query);
 	CheckSupportedCmdType(query);
@@ -170,6 +171,7 @@ CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 	m_query_level_to_cte_map = GPOS_NEW(m_mp) HMUlCTEListEntry(m_mp);
 	m_dxl_cte_producers = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 	m_cteid_at_current_query_level_map = GPOS_NEW(m_mp) UlongBoolHashMap(m_mp);
+	m_alias_table_names_map = GPOS_NEW(m_mp) StringToStringArrayMap(m_mp);
 
 	if (nullptr != query_level_to_cte_map)
 	{
@@ -271,6 +273,7 @@ CTranslatorQueryToDXL::~CTranslatorQueryToDXL()
 	m_query_level_to_cte_map->Release();
 	m_dxl_cte_producers->Release();
 	m_cteid_at_current_query_level_map->Release();
+	m_alias_table_names_map->Release();
 	CRefCount::SafeRelease(m_dxl_query_output_cols);
 
 	if (m_query_level == 0)
@@ -4079,6 +4082,38 @@ CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 
 //---------------------------------------------------------------------------
 //	@function:
+//		CTranslatorQueryToDXL::CombineAliasMapping
+//
+//	@doc:
+//		Merge a given alias map into m_alias_table_names_map.
+//
+//---------------------------------------------------------------------------
+void
+CTranslatorQueryToDXL::CombineAliasMapping(
+	StringToStringArrayMap *alias_table_names_map)
+{
+	StringToStringArrayMapIter hmiter(alias_table_names_map);
+	while (hmiter.Advance())
+	{
+		const CWStringBase *alias = hmiter.Key();
+
+		CWStringConst *name =
+			GPOS_NEW(m_mp) CWStringConst(m_mp, alias->GetBuffer());
+		StringPtrArray *table_names =
+			const_cast<StringPtrArray *>(hmiter.Value());
+		if (m_alias_table_names_map->Insert(name, table_names))
+		{
+			table_names->AddRef();
+		}
+		else
+		{
+			GPOS_DELETE(name);
+		}
+	}
+}
+
+//---------------------------------------------------------------------------
+//	@function:
 //		CTranslatorQueryToDXL::TranslateDerivedTablesToDXL
 //
 //	@doc:
@@ -4114,6 +4149,31 @@ CTranslatorQueryToDXL::TranslateDerivedTablesToDXL(const RangeTblEntry *rte,
 	m_var_to_colid_map->LoadDerivedTblColumns(
 		current_query_level, rt_index, query_output_cols_dxlnode_array,
 		query_to_dxl_translator.Pquery()->targetList);
+
+	// get the underlying table names of the derived table
+	if (nullptr != rte->alias)
+	{
+		StringPtrArray *names = GPOS_NEW(m_mp) StringPtrArray(m_mp);
+
+		ListCell *lc = nullptr;
+		ForEach(lc, query_derived_tbl->rtable)
+		{
+			// Considering only RTE from a relation or subquery since only
+			// aliases from those types are currently supported by plan hints.
+			RangeTblEntry *derived_rte = (RangeTblEntry *) lfirst(lc);
+			if (derived_rte->rtekind == RTE_RELATION ||
+				derived_rte->rtekind == RTE_SUBQUERY)
+			{
+				names->Append(GPOS_NEW(m_mp) CWStringConst(
+					m_mp, derived_rte->eref->aliasname));
+			}
+		}
+		m_alias_table_names_map->Insert(
+			GPOS_NEW(m_mp) CWStringConst(m_mp, rte->alias->aliasname), names);
+	}
+
+	// Add map of previous query level into map of current query level
+	CombineAliasMapping(query_to_dxl_translator.m_alias_table_names_map);
 
 	return derived_tbl_dxlnode;
 }

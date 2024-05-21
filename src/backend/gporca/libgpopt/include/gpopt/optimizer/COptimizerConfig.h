@@ -66,14 +66,21 @@ private:
 	// optimizer plan hints
 	CPlanHint *m_plan_hint{nullptr};
 
+	StringToStringArrayMap *m_alias_table_names_map;
+
 	// default window oids
 	CWindowOids *m_window_oids;
+
+	void SerializeAliasTablesMap(CMemoryPool *mp,
+								 CXMLSerializer *xml_serializer) const;
 
 public:
 	// ctor
 	COptimizerConfig(CEnumeratorConfig *pec, CStatisticsConfig *stats_config,
 					 CCTEConfig *pcteconf, ICostModel *pcm, CHint *phint,
-					 CPlanHint *pplanhint, CWindowOids *pdefoidsGPDB);
+					 CPlanHint *pplanhint,
+					 StringToStringArrayMap *alias_table_names_map,
+					 CWindowOids *pdefoidsGPDB);
 
 	// dtor
 	~COptimizerConfig() override;
@@ -125,6 +132,13 @@ public:
 	GetPlanHint() const
 	{
 		return m_plan_hint;
+	}
+
+	// subquery alias to table name(s) map
+	StringToStringArrayMap *
+	GetAliasToTableNamesMap() const
+	{
+		return m_alias_table_names_map;
 	}
 
 	// generate default optimizer configurations

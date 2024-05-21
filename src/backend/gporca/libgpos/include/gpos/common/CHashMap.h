@@ -303,6 +303,17 @@ public:
 using UlongToUlongMap =
 	CHashMap<ULONG, ULONG, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
 			 CleanupDelete<ULONG>, CleanupDelete<ULONG>>;
+
+using StringToStringArrayMap =
+	CHashMap<CWStringBase, StringPtrArray, CWStringBase::HashValue,
+			 CWStringBase::Equals, CleanupDelete<CWStringBase>,
+			 CleanupRelease<StringPtrArray>>;
+
+using StringToStringArrayMapIter =
+	CHashMapIter<CWStringBase, StringPtrArray, CWStringBase::HashValue,
+				 CWStringBase::Equals, CleanupDelete<CWStringBase>,
+				 CleanupRelease<StringPtrArray>>;
+
 }  // namespace gpos
 
 #endif	// !GPOS_CHashMap_H

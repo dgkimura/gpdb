@@ -73,6 +73,7 @@ CDXLTokens::Init(CMemoryPool *mp)
 		{EdxltokenCostModelConfig, GPOS_WSZ_LIT("CostModelConfig")},
 		{EdxltokenCostModelType, GPOS_WSZ_LIT("CostModelType")},
 		{EdxltokenSegmentsForCosting, GPOS_WSZ_LIT("SegmentsForCosting")},
+		{EdxltokenSubqueryAliasMap, GPOS_WSZ_LIT("SubqueryAliasMap")},
 		{EdxltokenHint, GPOS_WSZ_LIT("Hint")},
 		{EdxltokenPlanHint, GPOS_WSZ_LIT("PlanHint")},
 		{EdxltokenScanHint, GPOS_WSZ_LIT("ScanHint")},
@@ -800,6 +801,8 @@ CDXLTokens::Init(CMemoryPool *mp)
 		{EdxltokenAdd, GPOS_WSZ_LIT("Add")},
 		{EdxltokenSubtract, GPOS_WSZ_LIT("Sub")},
 		{EdxltokenMultiply, GPOS_WSZ_LIT("Multi")},
+
+		{EdxltokenItem, GPOS_WSZ_LIT("Item")},
 	};
 
 	m_pstrmap = GPOS_NEW_ARRAY(m_mp, SStrMapElem, EdxltokenSentinel);

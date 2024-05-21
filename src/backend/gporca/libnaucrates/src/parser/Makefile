@@ -183,6 +183,7 @@ OBJS        = CParseHandlerAgg.o \
               CParseHandlerStatsBound.o \
               CParseHandlerStatsDerivedColumn.o \
               CParseHandlerStatsDerivedRelation.o \
+              CParseHandlerSubqueryAliasMap.o \
               CParseHandlerTableDescr.o \
               CParseHandlerTableScan.o \
               CParseHandlerTraceFlags.o \

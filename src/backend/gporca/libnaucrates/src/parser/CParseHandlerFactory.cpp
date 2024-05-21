@@ -285,7 +285,8 @@ CParseHandlerFactory::Init(CMemoryPool *mp)
 		{EdxltokenScalarSortGroupClause, &CreateScSortGroupClauseParseHandler},
 		{EdxltokenPhysicalValuesScan, &CreateValuesScanParseHandler},
 		{EdxltokenNLJIndexParamList, &CreateNLJIndexParamListParseHandler},
-		{EdxltokenNLJIndexParam, &CreateNLJIndexParamParseHandler}
+		{EdxltokenNLJIndexParam, &CreateNLJIndexParamParseHandler},
+		{EdxltokenSubqueryAliasMap, &CreateSubqueryAliasMapParseHandler}
 
 	};
 
@@ -2102,5 +2103,14 @@ CParseHandlerFactory::CreateNLJIndexParamParseHandler(
 {
 	return GPOS_NEW(mp) CParseHandlerNLJIndexParam(mp, parse_handler_manager,
 												   parse_handler_root);
+}
+
+CParseHandlerBase *
+CParseHandlerFactory::CreateSubqueryAliasMapParseHandler(
+	CMemoryPool *mp, CParseHandlerManager *parse_handler_manager,
+	CParseHandlerBase *parse_handler_root)
+{
+	return GPOS_NEW(mp) CParseHandlerSubqueryAliasMap(mp, parse_handler_manager,
+													  parse_handler_root);
 }
 // EOF

@@ -17,6 +17,7 @@
 
 #include "gpopt/cost/ICostModel.h"
 #include "naucrates/dxl/CCostModelConfigSerializer.h"
+#include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpopt;
@@ -29,17 +30,18 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-COptimizerConfig::COptimizerConfig(CEnumeratorConfig *pec,
-								   CStatisticsConfig *stats_config,
-								   CCTEConfig *pcteconf, ICostModel *cost_model,
-								   CHint *phint, CPlanHint *pplanhint,
-								   CWindowOids *pwindowoids)
+COptimizerConfig::COptimizerConfig(
+	CEnumeratorConfig *pec, CStatisticsConfig *stats_config,
+	CCTEConfig *pcteconf, ICostModel *cost_model, CHint *phint,
+	CPlanHint *pplanhint, StringToStringArrayMap *alias_table_names_map,
+	CWindowOids *pwindowoids)
 	: m_enumerator_cfg(pec),
 	  m_stats_conf(stats_config),
 	  m_cte_conf(pcteconf),
 	  m_cost_model(cost_model),
 	  m_hint(phint),
 	  m_plan_hint(pplanhint),
+	  m_alias_table_names_map(alias_table_names_map),
 	  m_window_oids(pwindowoids)
 {
 	GPOS_ASSERT(nullptr != pec);
@@ -65,6 +67,7 @@ COptimizerConfig::~COptimizerConfig()
 	m_cte_conf->Release();
 	m_cost_model->Release();
 	CRefCount::SafeRelease(m_plan_hint);
+	CRefCount::SafeRelease(m_alias_table_names_map);
 	m_hint->Release();
 	m_window_oids->Release();
 }
@@ -85,7 +88,7 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 		CStatisticsConfig::PstatsconfDefault(mp),
 		CCTEConfig::PcteconfDefault(mp), ICostModel::PcmDefault(mp),
 		CHint::PhintDefault(mp), nullptr /* pplanhint */,
-		CWindowOids::GetWindowOids(mp));
+		nullptr /* alias_table_names_map */, CWindowOids::GetWindowOids(mp));
 }
 
 //---------------------------------------------------------------------------
@@ -105,7 +108,68 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp, ICostModel *pcm)
 		GPOS_NEW(mp) CEnumeratorConfig(mp, 0 /*plan_id*/, 0 /*ullSamples*/),
 		CStatisticsConfig::PstatsconfDefault(mp),
 		CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
-		nullptr /* pplanhint */, CWindowOids::GetWindowOids(mp));
+		nullptr /* pplanhint */, nullptr /* alias_table_names_map */,
+		CWindowOids::GetWindowOids(mp));
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		COptimizerConfig::SerializeAliasTablesMap
+//
+//	@doc:
+//		Serialize the alias tables map. Example format:
+//
+//		<dxl:OptimizerConfig>
+//		  ...
+//		  <dxl:SubqueryAliasMap>
+//		    <dxl:Item Name="q" Value="t1,t2"/>
+//		    <dxl:Item Name="qq" Value="t3"/>
+//		  </dxl:SubqueryAliasMap>
+//		  ...
+//		</dxl:OptimizerConfig>
+//
+//---------------------------------------------------------------------------
+void
+COptimizerConfig::SerializeAliasTablesMap(CMemoryPool *mp,
+										  CXMLSerializer *xml_serializer) const
+{
+	xml_serializer->OpenElement(
+		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+		CDXLTokens::GetDXLTokenStr(EdxltokenSubqueryAliasMap));
+
+	if (nullptr != m_alias_table_names_map)
+	{
+		StringToStringArrayMapIter hmiter(m_alias_table_names_map);
+		while (hmiter.Advance())
+		{
+			xml_serializer->OpenElement(
+				CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+				CDXLTokens::GetDXLTokenStr(EdxltokenItem));
+
+			const CWStringBase *alias = hmiter.Key();
+
+			xml_serializer->AddAttribute(
+				CDXLTokens::GetDXLTokenStr(EdxltokenName), alias);
+
+			StringPtrArray *table_names =
+				const_cast<StringPtrArray *>(hmiter.Value());
+			CWStringDynamic *names =
+				CDXLUtils::SerializeToCommaSeparatedString(mp, table_names);
+
+			xml_serializer->AddAttribute(
+				CDXLTokens::GetDXLTokenStr(EdxltokenValue), names);
+
+			GPOS_DELETE(names);
+
+			xml_serializer->CloseElement(
+				CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+				CDXLTokens::GetDXLTokenStr(EdxltokenItem));
+		}
+	}
+
+	xml_serializer->CloseElement(
+		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+		CDXLTokens::GetDXLTokenStr(EdxltokenSubqueryAliasMap));
 }
 
 //---------------------------------------------------------------------------
@@ -217,6 +281,8 @@ COptimizerConfig::Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 		CDXLTokens::GetDXLTokenStr(EdxltokenHint));
+
+	SerializeAliasTablesMap(mp, xml_serializer);
 
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

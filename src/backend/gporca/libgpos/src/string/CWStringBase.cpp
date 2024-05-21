@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/clibwrapper.h"
 #include "gpos/string/CWStringConst.h"
+#include "gpos/utils.h"
 
 using namespace gpos;
 
@@ -215,5 +216,12 @@ CWStringBase::CountOccurrencesOf(const WCHAR wc) const
 		}
 	}
 	return occurrences;
+}
+
+ULONG
+CWStringBase::HashValue(const CWStringBase *string)
+{
+	return gpos::HashByteArray((BYTE *) string->GetBuffer(),
+							   string->Length() * GPOS_SIZEOF(WCHAR));
 }
 // EOF

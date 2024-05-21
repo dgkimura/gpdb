@@ -179,6 +179,7 @@
 #include "naucrates/dxl/parser/CParseHandlerStatsBound.h"
 #include "naucrates/dxl/parser/CParseHandlerStatsDerivedColumn.h"
 #include "naucrates/dxl/parser/CParseHandlerStatsDerivedRelation.h"
+#include "naucrates/dxl/parser/CParseHandlerSubqueryAliasMap.h"
 #include "naucrates/dxl/parser/CParseHandlerTableDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerTableScan.h"
 #include "naucrates/dxl/parser/CParseHandlerTraceFlags.h"
