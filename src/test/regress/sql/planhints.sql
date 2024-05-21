@@ -576,5 +576,20 @@ EXPLAIN (costs off) SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
 */
 EXPLAIN (costs off) SELECT t1.a FROM my_table AS t1 WHERE t1.a<42;
 
+
+-- Hints with prepare statements
+CREATE TABLE t1 (c1 int, c2 text, PRIMARY KEY (c1));
+
+/*+BitmapScan(t1)*/
+PREPARE p1 AS SELECT * FROM t1 WHERE t1.c1 < $1;
+EXPLAIN (COSTS false) EXECUTE p1 (1000);
+DEALLOCATE p1;
+
+PREPARE p1 AS SELECT * FROM t1 WHERE t1.c1 = 1;
+/*+BitmapScan(t1)*/
+EXPLAIN (COSTS false) EXECUTE p1;
+DEALLOCATE p1;
+
+
 RESET client_min_messages;
 RESET pg_hint_plan.debug_print;
