@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/hints/CHintUtils.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 
 using namespace gpopt;
 
@@ -133,6 +134,7 @@ CPlanHint::GetRowHint(CTableDescriptorHashSet *ptabdescs)
 	return matching_hint;
 }
 
+
 //---------------------------------------------------------------------------
 //	@function:
 //		GetHintSubtrees
@@ -153,10 +155,15 @@ GetHintSubtrees(CMemoryPool *mp, const CJoinHint::JoinNode *node,
 {
 	if (node->GetName())
 	{
-		StringPtrArray *subtree = GPOS_NEW(mp) StringPtrArray(mp);
-		subtree->Append(GPOS_NEW(mp)
+		StringPtrArray *aliases = GPOS_NEW(mp) StringPtrArray(mp);
+		aliases->Append(GPOS_NEW(mp)
 							CWStringConst(mp, node->GetName()->GetBuffer()));
+
+		StringPtrArray *subtree =
+			CHintUtils::ConvertSubqueryAliasesToTableNames(mp, aliases);
 		subtrees->Append(subtree);
+
+		aliases->Release();
 		return subtree;
 	}
 

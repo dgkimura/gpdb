@@ -453,5 +453,8 @@ CHintUtils::GetAliasesFromHint(CMemoryPool *mp,
 		}
 	}
 
-	return aliases;
+	StringPtrArray *converted_aliases =
+		CHintUtils::ConvertSubqueryAliasesToTableNames(mp, aliases);
+	aliases->Release();
+	return converted_aliases;
 }
