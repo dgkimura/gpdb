@@ -8,6 +8,14 @@ EXPLAIN (COSTS false) SELECT * FROM t1, t2 WHERE t1.val = t2.val;
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.debug_print TO on;
 
+-- Replace timestamp while logging with static string
+-- start_matchsubs
+-- m/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{6} [A-Z]{3}/
+-- s/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{6} [A-Z]{3}/YYYY-MM-DD HH:MM:SS:MSMSMS TMZ/
+-- m/\s+\(entry db(.*)+\spid=\d+\)/ 
+-- s/\s+\(entry db(.*)+\spid=\d+\)//
+-- end_matchsubs
+
 EXPLAIN (COSTS false) SELECT * FROM t1, t2 WHERE t1.id = t2.id;
 EXPLAIN (COSTS false) SELECT * FROM t1, t2 WHERE t1.val = t2.val;
 
@@ -859,7 +867,7 @@ CREATE FUNCTION testfunc() RETURNS RECORD AS $$
 DECLARE
   ret record;
 BEGIN
-  SELECT /*+ SeqScan(t1) */ * INTO ret FROM t1 LIMIT 1;
+  SELECT /*+ SeqScan(t1) */ * INTO ret FROM t1 ORDER BY 1, 2 LIMIT 1;
   RETURN ret;
 END;
 $$ LANGUAGE plpgsql;
@@ -875,7 +883,7 @@ $$ LANGUAGE plpgsql;
 SELECT testfunc();
 
 -- This should not use SeqScan(t1)
-/*+ IndexScan(t1) */ SELECT * from t1 LIMIT 1;
+/*+ IndexScan(t1) */ SELECT * from t1 ORDER BY 1, 2 LIMIT 1;
 
 -- Perform
 DROP FUNCTION testfunc();
@@ -954,7 +962,7 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM testfunc() LIMIT 1;
 
 -- this should not use SeqScan(t1) hint.
-/*+ IndexScan(t1) */ SELECT * from t1 LIMIT 1;
+/*+ IndexScan(t1) */ SELECT * from t1 ORDER BY 1, 2 LIMIT 1;
 
 DROP FUNCTION testfunc();
 DROP EXTENSION pg_hint_plan;
