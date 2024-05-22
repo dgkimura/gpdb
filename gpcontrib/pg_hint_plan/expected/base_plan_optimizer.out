@@ -1,0 +1,91 @@
+SET search_path TO public;
+-- query type 1
+EXPLAIN (COSTS false) SELECT * FROM t1, t2 WHERE t1.id = t2.id;
+                QUERY PLAN                
+------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.id = t2.id)
+         ->  Seq Scan on t1
+         ->  Hash
+               ->  Seq Scan on t2
+ Optimizer: GPORCA
+(7 rows)
+
+-- query type 2
+EXPLAIN (COSTS false) SELECT * FROM t1, t4 WHERE t1.val < 10;
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Nested Loop
+         Join Filter: true
+         ->  Broadcast Motion 3:3  (slice2; segments: 3)
+               ->  Seq Scan on t4
+         ->  Index Scan using t1_val on t1
+               Index Cond: (val < 10)
+ Optimizer: GPORCA
+(8 rows)
+
+-- query type 3
+EXPLAIN (COSTS false) SELECT * FROM t3, t4 WHERE t3.id = t4.id AND t4.ctid = '(1,1)';
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Nested Loop
+         Join Filter: true
+         ->  Seq Scan on t4
+               Filter: (ctid = '(1,1)'::tid)
+         ->  Index Scan using t3_pkey on t3
+               Index Cond: (id = t4.id)
+ Optimizer: GPORCA
+(8 rows)
+
+-- query type 4
+EXPLAIN (COSTS false) SELECT * FROM t1, t2 WHERE t1.id = t2.id AND t1.ctid = '(1,1)';
+                 QUERY PLAN                  
+---------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.id = t2.id)
+         ->  Seq Scan on t1
+               Filter: (ctid = '(1,1)'::tid)
+         ->  Hash
+               ->  Seq Scan on t2
+ Optimizer: GPORCA
+(8 rows)
+
+-- query type 5
+EXPLAIN (COSTS false) SELECT * FROM t1, t3 WHERE t1.val = t3.val;
+                          QUERY PLAN                           
+---------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t1.val = t3.val)
+         ->  Seq Scan on t1
+         ->  Hash
+               ->  Broadcast Motion 3:3  (slice2; segments: 3)
+                     ->  Seq Scan on t3
+ Optimizer: GPORCA
+(8 rows)
+
+-- query type 6
+EXPLAIN (COSTS false) SELECT * FROM t1, t2, t3, t4 WHERE t1.id = t2.id AND t1.id = t3.id AND t1.id = t4.id;
+                          QUERY PLAN                          
+--------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (t3.id = t1.id)
+         ->  Seq Scan on t3
+         ->  Hash
+               ->  Nested Loop
+                     Join Filter: true
+                     ->  Nested Loop
+                           Join Filter: true
+                           ->  Seq Scan on t4
+                           ->  Index Scan using t1_pkey on t1
+                                 Index Cond: (id = t4.id)
+                     ->  Index Scan using t2_pkey on t2
+                           Index Cond: (id = t1.id)
+ Optimizer: GPORCA
+(15 rows)
+
