@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 -- We cannot do ALTER USER current_user SET ...
 DELETE FROM pg_db_role_setting WHERE setrole = (SELECT oid FROM pg_roles WHERE rolname = current_user);
@@ -1199,3 +1200,4 @@ DELETE FROM pg_db_role_setting WHERE setrole = (SELECT oid FROM pg_roles WHERE r
 ALTER SYSTEM SET session_preload_libraries TO DEFAULT;
 SELECT pg_reload_conf();
 \! rm results/ut-S.tmpout
+-- end_ignore

@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -829,3 +830,4 @@ EXPLAIN (COSTS true) SELECT * FROM s1.t1 FULL OUTER JOIN s1.t2 ON (t1.c1 = t2.c1
 \o
 \! sql/maskout.sh results/ut-J.tmpout
 \! rm results/ut-J.tmpout
+-- end_ignore

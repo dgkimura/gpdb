@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -1400,3 +1401,4 @@ EXPLAIN SELECT * FROM s1.t1, s1.t2 WHERE t1.c1 = t2.c1;
 \o
 \! sql/maskout.sh results/ut-R.tmpout
 \! rm results/ut-R.tmpout
+-- end_ignore

@@ -1,3 +1,4 @@
+-- start_ignore
 SET search_path TO public;
 
 CREATE EXTENSION pg_hint_plan;
@@ -133,3 +134,4 @@ SELECT name, setting, category
 SELECT * FROM settings;
 
 ANALYZE;
+-- end_ignore

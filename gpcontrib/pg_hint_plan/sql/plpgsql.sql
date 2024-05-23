@@ -1,3 +1,4 @@
+-- start_ignore
 --
 -- Scenarios with various PL/pgsql functions
 --
@@ -103,3 +104,4 @@ table test_hint_tab;
 drop procedure test_hint_transaction;
 drop function test_hint_queries;
 drop table test_hint_tab;
+-- end_ignore

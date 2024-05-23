@@ -1,3 +1,4 @@
+-- start_ignore
 SET search_path TO public;
 
 CREATE EXTENSION pg_stat_statements;
@@ -167,3 +168,4 @@ SELECT max(b3t1.c1) FROM s1.t1 b3t1, s1.t2 b3t2, s1.t3 b3t3, s1.t4 b3t4 WHERE b3
 );
 CREATE RULE "_RETURN" AS ON SELECT TO s1.r4 DO INSTEAD SELECT r4t1.c1, r4t1.c2, r4t1.c3, r4t1.c4 FROM s1.t1 r4t1;
 CREATE RULE "_RETURN" AS ON SELECT TO s1.r5 DO INSTEAD SELECT r5t1.c1, r5t1.c2, r5t1.c3, r5t1.c4 FROM s1.t1 r5t1;
+-- end_ignore

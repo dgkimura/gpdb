@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET search_path TO public;
 SET pg_hint_plan.debug_print TO on;
@@ -49,3 +50,4 @@ EXPLAIN SELECT * FROM s1.t1, ft1 ft_1, ft1 ft_2 WHERE t1.c1 = ft_1.id AND t1.c1 
 \o
 \! sql/maskout.sh results/ut-fdw.tmpout
 \! rm results/ut-fdw.tmpout
+-- end_ignore

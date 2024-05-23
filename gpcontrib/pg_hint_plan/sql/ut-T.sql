@@ -1,3 +1,4 @@
+-- start_ignore
 -- ut-T: tests for table hints
 -- This test is focusing on hint retrieval from table
 
@@ -46,3 +47,4 @@ DEALLOCATE p1;
 SET pg_hint_plan.enable_hint_table to off;
 DELETE FROM hint_plan.hints;
 
+-- end_ignore

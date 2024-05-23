@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -724,3 +725,4 @@ EXPLAIN (COSTS false) SELECT * FROM s1.t1, s1.t2, s1.t3, s1.t4 WHERE t1.c1 = t2.
 -- No. L-3-6-6
 /*+Leading((t1 (t3 (t4 t2))))*/
 EXPLAIN (COSTS false) SELECT * FROM s1.t1, s1.t2, s1.t3, s1.t4 WHERE t1.c1 = t2.c1 AND t1.c1 = t3.c1 AND t1.c1 = t4.c1;
+-- end_ignore

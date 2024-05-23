@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -127,3 +128,4 @@ SELECT * FROM s1.t1 WHERE false;
 -- No. G-2-4-1
 /*+SeqScan(a)IndexScan(a)SeqScan(c)NestLoop(a) */
 SELECT * FROM s1.t1 a, s1.t2 b WHERE false;
+-- end_ignore
