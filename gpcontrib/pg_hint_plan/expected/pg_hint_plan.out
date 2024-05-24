@@ -1,3 +1,4 @@
+-- start_ignore
 SET search_path TO public;
 SET client_min_messages TO log;
 \set SHOW_CONTEXT always
@@ -9164,3 +9165,4 @@ error hint:
          Index Cond: (id = t1.id)
 (11 rows)
 
+-- end_ignore

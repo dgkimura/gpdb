@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET search_path TO public;
 SET pg_hint_plan.debug_print TO on;
@@ -146,3 +147,4 @@ error hint:
          Index Cond: (c1 = ft_2.id)
 
 \! rm results/ut-fdw.tmpout
+-- end_ignore

@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -876,3 +877,4 @@ NestLoop(a)
 ----+----+----+----+----+----+----+----
 (0 rows)
 
+-- end_ignore

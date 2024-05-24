@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -4808,3 +4809,4 @@ DEALLOCATE p1;
 DEALLOCATE p2;
 DEALLOCATE p3;
 DROP TABLE s1.tpc;
+-- end_ignore

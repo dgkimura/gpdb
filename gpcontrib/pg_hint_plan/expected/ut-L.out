@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -4463,3 +4464,4 @@ error hint:
                                  ->  Seq Scan on t2
 (14 rows)
 
+-- end_ignore

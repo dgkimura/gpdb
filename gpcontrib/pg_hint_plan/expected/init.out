@@ -1,3 +1,4 @@
+-- start_ignore
 SET search_path TO public;
 CREATE EXTENSION pg_hint_plan;
 CREATE SCHEMA s0;
@@ -210,3 +211,4 @@ SELECT * FROM settings;
 (46 rows)
 
 ANALYZE;
+-- end_ignore

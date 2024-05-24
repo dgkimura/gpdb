@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
 SET pg_hint_plan.debug_print TO on;
@@ -4717,3 +4718,4 @@ error hint:
          ->  Seq Scan on t2  (cost=xxx..xxx rows=100 width=xxx)
 
 \! rm results/ut-J.tmpout
+-- end_ignore

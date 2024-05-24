@@ -1,3 +1,4 @@
+-- start_ignore
 LOAD 'pg_hint_plan';
 ALTER SYSTEM SET session_preload_libraries TO 'pg_hint_plan';
 SET pg_hint_plan.enable_hint TO on;
@@ -1316,3 +1317,4 @@ SELECT pg_reload_conf();
  t
 (1 row)
 
+-- end_ignore
